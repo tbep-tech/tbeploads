@@ -1,0 +1,13 @@
+Permit Number	Facility Name	Outfall ID	Year	Month	Average Daily Flow (ADF) (mgd) (Total)	Average Daily Flow (ADF) (mgd) (to Surface Water)	CBOD 	CBOD  Unit	QCBOD	TSS	TSS Unit	QTSS	Total N	Total N Unit	Q Total N	NO2+NO3	NO2+NO3 Unit	Q NO2+NO3	NH4	NH4 Unit	Q NH4	TKN	TKN Unit	Q TKN	Organic N	Organic N Unit	Q Organic N	Total P	Total P Unit	Q Total P	PO4	PO4 Unit	Q PO4	NH3	NH3 Unit	Q NH3	Other P (species)	Other P Unit	Q Other P
+FL0026603	City of Largo		2020	1	12.46	7.4	1.15	mg/L		0.73	mg/L		2.62	mg/L		1.48	mg/L			mg/L		1.42	mg/L			mg/L		0.12	mg/L					0.112	mg/L				
+FL0026603	City of Largo		2020	2	11.73	6.57	1.04	mg/L		0.78	mg/L		2.61	mg/L		1.34	mg/L			mg/L		1.26	mg/L			mg/L		0.08	mg/L					0.098	mg/L				
+FL0026603	City of Largo		2020	3	10.67	4.31	1.39	mg/L		0.76	mg/L		2.42	mg/L		1.15	mg/L			mg/L		1.27	mg/L			mg/L		0.1	mg/L					0.098	mg/L				
+FL0026603	City of Largo		2020	4	10.34	3.9	1.28	mg/L		0.77	mg/L		2.86	mg/L		1.65	mg/L			mg/L		1.21	mg/L			mg/L		0.14	mg/L					0.007	mg/L				
+FL0026603	City of Largo		2020	5	10.91	4.31	1.24	mg/L		0.77	mg/L		2.6	mg/L		1.45	mg/L			mg/L		1.15	mg/L			mg/L		0.48	mg/L					0.089	mg/L				
+FL0026603	City of Largo		2020	6	12.77	6.75	1.26	mg/L		0.71	mg/L		2.64	mg/L		1.41	mg/L			mg/L		1.23	mg/L			mg/L		0.72	mg/L					0.09	mg/L				
+FL0026603	City of Largo		2020	7	11.15	4.16	1.54	mg/L		0.78	mg/L		2.38	mg/L		1.17	mg/L			mg/L		1.21	mg/L			mg/L		1.36	mg/L					0.111	mg/L				
+FL0026603	City of Largo		2020	8	11.78	4.7	1.34	mg/L		0.69	mg/L		2.46	mg/L		1.26	mg/L			mg/L		1.94	mg/L			mg/L		1.15	mg/L					0.098	mg/L				
+FL0026603	City of Largo		2020	9	14.03	7.83	1.16	mg/L		0.56	mg/L		2.35	mg/L		1.19	mg/L			mg/L		1.17	mg/L			mg/L		1.03	mg/L					0.09	mg/L				
+FL0026603	City of Largo		2020	10	11.14	5.67	1.32	mg/L		0.58	mg/L		2.28	mg/L		1.05	mg/L			mg/L		1.23	mg/L			mg/L		1.13	mg/L					0.091	mg/L				
+FL0026603	City of Largo		2020	11	13.52	7.61	2.07	mg/L		1.11	mg/L		3.34	mg/L		1.01	mg/L			mg/L		2.33	mg/L			mg/L		1.07	mg/L					1.52	mg/L				
+FL0026603	City of Largo		2020	12	13.15	7.56	1.42	mg/L		0.86	mg/L		2.02	mg/L		0.87	mg/L			mg/L		1.55	mg/L			mg/L		0.18	mg/L					0.078	mg/L				

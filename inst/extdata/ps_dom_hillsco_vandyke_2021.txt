@@ -1,0 +1,13 @@
+Permit Number	Facility Name	Outfall ID	Year	Month	Average Daily Flow (ADF) (mgd)	BOD 	BOD  Unit	QBOD	TSS	TSS Unit	QTSS	Total N	Total N Unit	Q Total N	NO2+NO3	NO2+NO3 Unit	Q NO2+NO3	NH4	NH4 Unit	Q NH4	TKN	TKN Unit	Q TKN	Organic N	Organic N Unit	Q Organic N	Total P	Total P Unit	Q Total P	PO4	PO4 Unit	Q PO4	Other N (species)	Other N Unit	Q Other N	Other P (species)	Other P Unit	Q Other P
+FLA012234	Van Dyke WWTF	R-001	2021	1	1.21	2.18	mg/l		0.61	mg/l		6.39	mg/l		5.31	mg/l		0.03	mg/l	<	1.08	mg/l		1.05	mg/l		1.70	mg/l		1.84	mg/l							
+FLA012234	Van Dyke WWTF	R-001	2021	2	1.32	1.05	mg/l		0.59	mg/l		7.42	mg/l		2.67	mg/l		4.07	mg/l		4.75	mg/l		0.68	mg/l		1.25	mg/l		1.63	mg/l							
+FLA012234	Van Dyke WWTF	R-001	2021	3	1.23	1.30	mg/l		0.52	mg/l		5.88	mg/l		4.86	mg/l		0.03	mg/l		1.02	mg/l		0.99	mg/l		1.70	mg/l		2.11	mg/l							
+FLA012234	Van Dyke WWTF	R-001	2021	4	1.29	0.93	mg/l		0.39	mg/l		7.19	mg/l		5.97	mg/l		0.13	mg/l		1.23	mg/l		1.10	mg/l		1.41	mg/l		1.45	mg/l							
+FLA012234	Van Dyke WWTF	R-001	2021	5	1.22	1.38	mg/l		0.32	mg/l		4.83	mg/l		2.09	mg/l		1.02	mg/l		2.34	mg/l		1.32	mg/l		2.45	mg/l		2.71	mg/l							
+FLA012234	Van Dyke WWTF	R-001	2021	6	1.30	1.22	mg/l		0.27	mg/l		4.59	mg/l		3.65	mg/l		0.04	mg/l		0.94	mg/l		0.91	mg/l		1.88	mg/l		1.96	mg/l							
+FLA012234	Van Dyke WWTF	R-001	2021	7	1.35	1.45	mg/l		0.33	mg/l		5.05	mg/l		2.99	mg/l		0.93	mg/l		2.06	mg/l		1.13	mg/l		1.66	mg/l		1.70	mg/l							
+FLA012234	Van Dyke WWTF	R-001	2021	8	1.37	0.30	mg/l		0.39	mg/l		4.93	mg/l		1.60	mg/l		1.58	mg/l		3.32	mg/l		1.74	mg/l		1.57	mg/l		1.59	mg/l							
+FLA012234	Van Dyke WWTF	R-001	2021	9	1.36	1.18	mg/l		0.35	mg/l		4.95	mg/l		0.43	mg/l		2.60	mg/l		4.52	mg/l		1.92	mg/l		1.88	mg/l		1.92	mg/l							
+FLA012234	Van Dyke WWTF	R-001	2021	10	1.45	1.00	mg/l		0.52	mg/l		3.57	mg/l		0.66	mg/l		1.41	mg/l		2.91	mg/l		1.50	mg/l		1.43	mg/l		1.46	mg/l							
+FLA012234	Van Dyke WWTF	R-001	2021	11	1.23	1.08	mg/l		0.64	mg/l		5.33	mg/l		0.58	mg/l		3.07	mg/l		4.75	mg/l		1.68	mg/l		1.65	mg/l		1.67	mg/l							
+FLA012234	Van Dyke WWTF	R-001	2021	12	1.31	1.64	mg/l		0.39	mg/l		2.73	mg/l		1.64	mg/l		0.04	mg/l		1.09	mg/l		1.05	mg/l		1.65	mg/l		1.70	mg/l							

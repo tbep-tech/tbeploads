@@ -1,0 +1,49 @@
+Permit Number	Facility Name	Outfall ID	Year	Month	Average Daily Flow (ADF) (mgd)	BOD 	BOD  Unit	QBOD	TSS	TSS Unit	QTSS	Total N	Total N Unit	Q Total N	NO2+NO3	NO2+NO3 Unit	Q NO2+NO3	NH4	NH4 Unit	Q NH4	TKN	TKN Unit	Q TKN	Organic N	Organic N Unit	Q Organic N	Total P	Total P Unit	Q Total P	PO4	PO4 Unit	Q PO4	Other N (species)	Other N Unit	Q Other N	Other P (species)	Other P Unit	Q Other P
+FL0028061	South County Regional AWWTF	D-001	2017	1	0.575	1.05	mg/l		0.50	mg/l	<	1.89	mg/l		1.25	mg/l		0.06	mg/l		0.83	mg/l		0.77	mg/l		0.27	mg/l		0.26	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2017	2	0.302	1.84	mg/l		0.56	mg/l		3.03	mg/l		1.49	mg/l		0.57	mg/l		1.54	mg/l		0.97	mg/l		1.33	mg/l		1.31	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2017	3	0.480	1.62	mg/l		0.63	mg/l		2.39	mg/l		1.18	mg/l		0.25	mg/l		1.21	mg/l		0.95	mg/l		0.84	mg/l		0.77	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2017	4	0.041	0.50	mg/l		0.55	mg/l		3.32	mg/l		1.43	mg/l		2.44	mg/l		1.89	mg/l		-0.55	mg/l		0.75	mg/l		1.08	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2017	5	0.001	0.40	mg/l		0.50	mg/l		0.97	mg/l		0.33	mg/l		0.06	mg/l	<	0.66	mg/l		0.61	mg/l		1.40	mg/l		1.46	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2017	6	2.046	2.35	mg/l		0.75	mg/l		2.79	mg/l		1.96	mg/l		0.05	mg/l	<	0.88	mg/l		0.83	mg/l		1.00	mg/l		0.95	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2017	7	2.143	2.17	mg/l		1.01	mg/l		1.59	mg/l		0.82	mg/l		0.05	mg/l	<	0.80	mg/l		0.75	mg/l		0.45	mg/l		0.45	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2017	8	3.382	3.07	mg/l		1.00	mg/l		1.89	mg/l		1.02	mg/l		0.07	mg/l		0.89	mg/l		0.82	mg/l		0.44	mg/l		0.40	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2017	9	3.971	2.65	mg/l		0.70	mg/l		2.62	mg/l		2.00	mg/l		0.06	mg/l		0.89	mg/l		0.83	mg/l		0.19	mg/l		0.16	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2017	10	0.730	1.34	mg/l		0.52	mg/l	<	3.09	mg/l		2.17	mg/l		0.08	mg/l		0.97	mg/l		0.89	mg/l		0.15	mg/l		0.15	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2017	11	0.544	1.28	mg/l		0.54	mg/l		2.04	mg/l		1.64	mg/l		0.06	mg/l		0.90	mg/l		0.84	mg/l		0.16	mg/l		0.12	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2017	12	0.050	1.49	mg/l	<	0.51	mg/l	<	2.41	mg/l		0.65	mg/l		0.12	mg/l		1.39	mg/l		1.27	mg/l		2.39	mg/l		2.62	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2018	1	1.162	1.51	mg/l		0.55	mg/l		2.41	mg/l		1.23	mg/l		0.20	mg/l		1.07	mg/l		0.87	mg/l		0.45	mg/l		0.44	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2018	2	1.752	0.56	mg/l		0.51	mg/l		3.45	mg/l		2.34	mg/l		0.41	mg/l		1.29	mg/l		0.88	mg/l		0.53	mg/l		0.56	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2018	3	0.635	0.65	mg/l		0.54	mg/l		4.18	mg/l		3.22	mg/l		0.06	mg/l		0.89	mg/l		0.83	mg/l		0.41	mg/l		0.36	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2018	4	1.013	0.43	mg/l		0.50	mg/l		1.83	mg/l		0.97	mg/l		0.15	mg/l		0.88	mg/l		0.73	mg/l		0.53	mg/l		0.59	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2018	5	0.872	0.90	mg/l		0.80	mg/l		1.93	mg/l		1.12	mg/l		0.08	mg/l		0.85	mg/l		0.76	mg/l		0.21	mg/l		0.23	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2018	6	0.307	1.64	mg/l		0.57	mg/l		3.30	mg/l		2.44	mg/l		0.06	mg/l		0.86	mg/l		0.80	mg/l		0.43	mg/l		0.46	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2018	7	1.801	0.22	mg/l		0.50	mg/l		2.69	mg/l		1.68	mg/l		0.08	mg/l	<	1.04	mg/l		0.95	mg/l		1.58	mg/l		1.67	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2018	8	2.064	1.01	mg/l		0.53	mg/l		3.86	mg/l		2.86	mg/l		0.10	mg/l		1.04	mg/l		0.94	mg/l		0.66	mg/l		0.68	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2018	9	2.798	0.80	mg/l		0.50	mg/l		3.02	mg/l		2.06	mg/l		0.09	mg/l	<	0.83	mg/l		0.75	mg/l		0.22	mg/l		0.21	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2018	10	1.104	1.01	mg/l		0.50	mg/l		3.61	mg/l		2.90	mg/l		0.09	mg/l		0.89	mg/l		0.80	mg/l		0.25	mg/l		0.28	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2018	11	0.424	0.66	mg/l		0.50	mg/l	<	1.66	mg/l		0.91	mg/l		0.05	mg/l		0.72	mg/l		0.66	mg/l		0.30	mg/l		0.31	mg/l							
+FL0028061	South County Regional AWWTF	D-001	2018	12	1.383	0.59	mg/l		0.66	mg/l		1.57	mg/l		0.74	mg/l		0.15	mg/l		0.81	mg/l		0.66	mg/l		0.95	mg/l		1.10	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2017	1	0.674	1.05	mg/l		0.51	mg/l	<	2.50	mg/l		1.13	mg/l		0.69	mg/l		1.43	mg/l		0.75	mg/l		0.39	mg/l		0.50	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2017	2	0.758	1.79	mg/l		0.55	mg/l		3.23	mg/l		1.94	mg/l		0.37	mg/l		1.30	mg/l		0.93	mg/l		1.25	mg/l		1.27	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2017	3	0.928	1.42	mg/l		0.65	mg/l		2.56	mg/l		1.26	mg/l		0.38	mg/l		1.30	mg/l		0.92	mg/l		0.74	mg/l		0.88	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2017	4	0.973	0.27	mg/l		0.54	mg/l		2.33	mg/l		1.30	mg/l		0.24	mg/l		1.04	mg/l		0.80	mg/l		0.79	mg/l		1.12	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2017	5	0.870	0.82	mg/l		0.56	mg/l		2.27	mg/l		1.52	mg/l		0.06	mg/l	<	0.77	mg/l		0.71	mg/l		1.40	mg/l		1.66	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2017	6	0.000																																	
+FL0028061	South County Regional AWWTF	R-001	2017	7	0.264	1.46	mg/l		1.18	mg/l		1.50	mg/l		0.73	mg/l		0.05	mg/l	<	0.78	mg/l		0.73	mg/l		0.48	mg/l		0.49	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2017	8	0.135	3.60	mg/l		1.06	mg/l		2.25	mg/l		1.34	mg/l		0.08	mg/l		0.91	mg/l		0.83	mg/l		0.51	mg/l		0.51	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2017	9	0.000																																	
+FL0028061	South County Regional AWWTF	R-001	2017	10	1.020	1.05	mg/l		0.53	mg/l		3.10	mg/l		2.06	mg/l		0.21	mg/l		1.06	mg/l		0.85	mg/l		0.15	mg/l		0.15	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2017	11	0.953	0.79	mg/l		0.50	mg/l	<	2.19	mg/l		1.36	mg/l		0.06	mg/l		0.85	mg/l		0.79	mg/l		0.15	mg/l		0.11	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2017	12	1.498	0.89	mg/l		0.53	mg/l		2.27	mg/l		1.22	mg/l		0.12	mg/l		1.06	mg/l		0.94	mg/l		2.39	mg/l		1.68	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2018	1	0.676	1.69	mg/l		0.61	mg/l		3.90	mg/l		2.10	mg/l		0.81	mg/l		1.81	mg/l		1.00	mg/l		0.52	mg/l		0.86	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2018	2	0.442	0.59	mg/l		0.51	mg/l		3.38	mg/l		2.16	mg/l		0.46	mg/l		1.30	mg/l		0.83	mg/l		0.71	mg/l		0.66	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2018	3	1.390	0.55	mg/l		0.51	mg/l		4.08	mg/l		3.07	mg/l		0.19	mg/l		1.02	mg/l		0.83	mg/l		0.43	mg/l		0.58	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2018	4	0.985	0.44	mg/l		0.50	mg/l		1.84	mg/l		0.97	mg/l		0.15	mg/l		0.88	mg/l		0.73	mg/l		0.53	mg/l		0.59	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2018	5	0.638	0.99	mg/l		0.71	mg/l		1.76	mg/l		0.96	mg/l		0.12	mg/l	<	0.81	mg/l		0.69	mg/l		0.22	mg/l		0.44	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2018	6	0.612	0.74	mg/l		0.50	mg/l		2.85	mg/l		2.03	mg/l		0.07	mg/l		0.84	mg/l		0.76	mg/l		0.58	mg/l		0.90	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2018	7	0.000																																	
+FL0028061	South County Regional AWWTF	R-001	2018	8	0.651	1.07	mg/l		0.54	mg/l		3.89	mg/l		2.85	mg/l		0.09	mg/l		1.04	mg/l		0.95	mg/l		0.62	mg/l		0.60	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2018	9	0.000																																	
+FL0028061	South County Regional AWWTF	R-001	2018	10	0.962	0.95	mg/l		0.50	mg/l		3.26	mg/l		2.46	mg/l		0.08	mg/l		0.82	mg/l		0.75	mg/l		0.26	mg/l		0.49	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2018	11	2.345	0.85	mg/l		0.50	mg/l		2.07	mg/l		1.15	mg/l		0.15	mg/l		0.93	mg/l		0.78	mg/l		0.30	mg/l		0.55	mg/l							
+FL0028061	South County Regional AWWTF	R-001	2018	12	2.404	0.53	mg/l		0.59	mg/l		1.53	mg/l		0.75	mg/l		0.14	mg/l		0.80	mg/l		0.66	mg/l		0.95	mg/l		1.23	mg/l							

@@ -1,0 +1,13 @@
+Permit Number	Facility Name	Outfall ID	Year	Month	Average Daily Flow (ADF) (mgd) - Influent	Effluent Flow (ADF) (MGD) D-001	Reuse Flow (ADF) (MGD) R-001	Reuse Flow to Pinellas (ADF) (MGD) R-002	BOD 	BOD  Unit	QBOD	TSS	TSS Unit	QTSS	Total N	Total N Unit	Q Total N	NO2+NO3	NO2+NO3 Unit	Q NO2+NO3	NH4	NH4 Unit	Q NH4	TKN	TKN Unit	Q TKN	Organic N	Organic N Unit	Q Organic N	Total P	Total P Unit	Q Total P	PO4	PO4 Unit	Q PO4	Other N (species)	Other N Unit	Q Other N	Other P (species)	Other P Unit	Q Other P
+FL0128937	Northeast Water Reclamation Facility	D-001	2021	1	4.72	3.88	1.68	0.16	3.28			0.50			1.23			0.44			0.01			0.82						0.06											
+FL0128937	Northeast Water Reclamation Facility	D-001	2021	2	5.34	4.69	0.98	0.11	4.08			0.51			1.44			0.31			0.01			0.70						0.68											
+FL0128937	Northeast Water Reclamation Facility	D-001	2021	3	4.85	2.08	2.97	0.17	3.13			0.50			1.46			0.66			0.01			0.80						1.28											
+FL0128937	Northeast Water Reclamation Facility	D-001	2021	4	4.82	2.25	2.77	0.16	2.70			0.50			1.06			0.50			0.01			0.55						0.83											
+FL0128937	Northeast Water Reclamation Facility	D-001	2021	5	4.61	0.12	4.64	0.19	2.88			0.50			0.79			0.31			0.01			0.44						1.10											
+FL0128937	Northeast Water Reclamation Facility	D-001	2021	6	4.94	1.80	3.23	0.15	2.34			0.50			0.86			0.39			0.01			0.53						1.42											
+FL0128937	Northeast Water Reclamation Facility	D-001	2021	7	6.13	4.67	1.86	0.01	1.00			0.50			1.01			0.47			0.07			0.68						1.13											
+FL0128937	Northeast Water Reclamation Facility	D-001	2021	8	6.27	4.59	2.00	0.00	1.00			0.53			0.90			0.52			0.01			0.42						0.82											
+FL0128937	Northeast Water Reclamation Facility	D-001	2021	9	6.53	6.09	0.87	0.00	1.00			0.70			1.32			0.73			0.01			0.64						1.41											
+FL0128937	Northeast Water Reclamation Facility	D-001	2021	10	5.06	1.83	3.93	0.17	1.00			0.57			1.31			0.72			0.01			0.64						1.37											
+FL0128937	Northeast Water Reclamation Facility	D-001	2021	11	4.83	3.48	1.60	0.01	1.00			0.66			1.35			0.76			0.01			0.61						0.33											
+FL0128937	Northeast Water Reclamation Facility	D-001	2021	12	4.42	2.85	2.05	0.07	1.00			0.58			0.83			0.31			0.01			0.52						0.13											

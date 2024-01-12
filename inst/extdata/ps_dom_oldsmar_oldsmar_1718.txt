@@ -1,0 +1,49 @@
+Permit Number	Facility Name	Outfall ID	Year	Month	Average Daily Flow (ADF) (mgd)	BOD 	BOD  Unit	QBOD	TSS	TSS Unit	QTSS	Total N	Total N Unit	Q Total N	NO2+NO3	NO2+NO3 Unit	Q NO2+NO3	NH4	NH4 Unit	Q NH4	TKN	TKN Unit	Q TKN	Organic N	Organic N Unit	Q Organic N	Total P	Total P Unit	Q Total P	PO4	PO4 Unit	Q PO4	Other N (species)	Other N Unit	Q Other N	Other P (species)	Other P Unit	Q Other P
+FL0027651	City of Oldsmar AWWTF	D-002	2017	1	0		MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2017	2	0		MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2017	3	0		MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2017	4	0		MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2017	5	0		MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2017	6	0.441	1.0	MG/L		1.1	MG/L		1.7	MG/L					0.03	MG/L		0.76	MG/L					0.6	MG/L		0.60	MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2017	7	1.142	1.0	MG/L		0.5	MG/L		1.7	MG/L					0.03	MG/L		0.76	MG/L					1.9	MG/L		1.94	MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2017	8	0.858	1.0	MG/L		0.5	MG/L		1.5	MG/L					0.05	MG/L		0.73	MG/L					0.7	MG/L		0.74	MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2017	9	0.323	1.0	MG/L		0.5	MG/L		2.0	MG/L					0.05	MG/L		0.77	MG/L					0.8	MG/L		1.07	MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2017	10	0.159	2.1	MG/L		0.5	MG/L		1.7	MG/L					0.05	MG/L		0.73	MG/L					0.4	MG/L		0.62	MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2017	11	0		MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2017	12	0		MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2017	1	0.765	2.6	MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2017	2	0.935	1.5	MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2017	3	0.846	1.9	MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2017	4	1.160	2.2	MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2017	5	1.173	3.3	MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2017	6	0.761	1.0	MG/L		1.1	MG/L		1.7	MG/L					0.03	MG/L		0.76	MG/L					0.6	MG/L		0.60	MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2017	7	0.611	1.0	MG/L		0.5	MG/L		1.7	MG/L					0.03	MG/L		0.76	MG/L					1.9	MG/L		1.94	MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2017	8	0.648	1.0	MG/L		0.5	MG/L		1.5	MG/L					0.05	MG/L		0.73	MG/L					0.7	MG/L		0.74	MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2017	9	0.464	1.0	MG/L		0.5	MG/L		2.0	MG/L					0.05	MG/L		0.77	MG/L					0.8	MG/L		1.07	MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2017	10	0.627	2.1	MG/L		0.5	MG/L		1.7	MG/L					0.05	MG/L		0.73	MG/L					0.4	MG/L		0.62	MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2017	11	0.783	2.2	MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2017	12	0.699	1.7	MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2018	1	0.055	2.4	MG/L		0.7	MG/L		1.6	MG/L					0.01	MG/L		1.11	MG/L					0.5	MG/L		0.14	MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2018	2	0.187	1.0	MG/L		0.6	MG/L		1.5	MG/L					0.14	MG/L		0.85	MG/L					0.4	MG/L		0.29	MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2018	3	0		MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2018	4	0		MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2018	5	0.097	1.0	MG/L		0.5	MG/L		1.6	MG/L					0.01	MG/L		0.75	MG/L					0.2	MG/L		0.11	MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2018	6	0.138	2.0	MG/L		0.5	MG/L		1.3	MG/L					0.51	MG/L		0.41	MG/L					0.1	MG/L		0.15	MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2018	7	0		MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2018	8	0.429	1.0	MG/L		2.5	MG/L		1.7	MG/L					0.04	MG/L		0.77	MG/L					1.1	MG/L		1.17	MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2018	9	0.792	1.0	MG/L		1.0	MG/L		1.6	MG/L					0.04	MG/L		0.72	MG/L					0.5	MG/L		0.53	MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2018	10	0.350	1.0	MG/L		0.5	MG/L		1.4	MG/L					0.04	MG/L		0.65	MG/L					0.7	MG/L		0.75	MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2018	11	0.187	1.0	MG/L		0.5	MG/L		1.1	MG/L					0.04	MG/L		0.58	MG/L					0.4	MG/L		0.47	MG/L							
+FL0027651	City of Oldsmar AWWTF	D-002	2018	12	0.598	1.0	MG/L		0.5	MG/L		1.2	MG/L					0.04	MG/L		0.62	MG/L					0.3	MG/L		0.22	MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2018	1	0.663	1.4	MG/L		0.7	MG/L		1.6	MG/L					0.01	MG/L		1.11	MG/L					0.5	MG/L		0.14	MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2018	2	0.738	1.0	MG/L		0.6	MG/L		1.5	MG/L					0.14	MG/L		0.85	MG/L					0.4	MG/L		0.29	MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2018	3	0.905	1.7	MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2018	4	0.954	6.9	MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2018	5	0.879	1.7	MG/L		0.5	MG/L		1.6	MG/L					0.01	MG/L		0.75	MG/L					0.2	MG/L		0.11	MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2018	6	0.792	1.5	MG/L		0.5	MG/L		1.3	MG/L					0.51	MG/L		0.41	MG/L					0.1	MG/L		0.15	MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2018	7	0.745	1.0	MG/L			MG/L			MG/L						MG/L			MG/L						MG/L			MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2018	8	0.549	1.0	MG/L		2.5	MG/L		1.7	MG/L					0.04	MG/L		0.77	MG/L					1.1	MG/L		1.17	MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2018	9	0.435	1.0	MG/L		1.0	MG/L		1.6	MG/L					0.04	MG/L		0.72	MG/L					0.5	MG/L		0.53	MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2018	10	0.646	1.0	MG/L		0.5	MG/L		1.4	MG/L					0.04	MG/L		0.65	MG/L					0.7	MG/L		0.75	MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2018	11	0.725	1.0	MG/L		0.5	MG/L		1.1	MG/L					0.04	MG/L		0.58	MG/L					0.4	MG/L		0.47	MG/L							
+FL0027651	City of Oldsmar AWWTF	R-001	2018	12	0.530	1.0	MG/L		0.5	MG/L		1.2	MG/L					0.04	MG/L		0.62	MG/L					0.3	MG/L		0.22	MG/L							

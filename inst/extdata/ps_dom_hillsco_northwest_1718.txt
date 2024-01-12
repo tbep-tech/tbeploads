@@ -1,0 +1,73 @@
+Permit Number	Facility Name	Outfall ID	Year	Month	Average Daily Flow (ADF) (mgd)	BOD 	BOD  Unit	QBOD	TSS	TSS Unit	QTSS	Total N	Total N Unit	Q Total N	NO2+NO3	NO2+NO3 Unit	Q NO2+NO3	NH4	NH4 Unit	Q NH4	TKN	TKN Unit	Q TKN	Organic N	Organic N Unit	Q Organic N	Total P	Total P Unit	Q Total P	PO4	PO4 Unit	Q PO4	Other N (species)	Other N Unit	Q Other N	Other P (species)	Other P Unit	Q Other P
+FL0041670	Northwest Regional WRF	D-001	2017	1	0.225	0.40	mg/l		0.50	mg/l	<	1.78	mg/l		1.14	mg/l		0.06	mg/l	<	0.65	mg/l		0.60	mg/l		0.20	mg/l		0.31	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2017	2	0.000																																	
+FL0041670	Northwest Regional WRF	D-001	2017	3	0.000																																	
+FL0041670	Northwest Regional WRF	D-001	2017	4	0.000																																	
+FL0041670	Northwest Regional WRF	D-001	2017	5	0.014	0.30	mg/l		0.50	mg/l	<	1.24	mg/l		0.54	mg/l		0.06	mg/l	<	0.71	mg/l		0.66	mg/l		0.34	mg/l										
+FL0041670	Northwest Regional WRF	D-001	2017	6	0.868	0.80	mg/l		0.50	mg/l	<	2.66	mg/l		1.83	mg/l		0.04	mg/l	<	0.84	mg/l		0.80	mg/l		0.92	mg/l		0.62	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2017	7	2.103	0.16	mg/l		0.50	mg/l		1.33	mg/l		0.62	mg/l		0.06	mg/l	<	0.73	mg/l		0.67	mg/l		0.23	mg/l		0.41	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2017	8	2.046	0.40	mg/l		0.50	mg/l	<	1.32	mg/l		0.60	mg/l		0.06	mg/l	<	0.73	mg/l		0.67	mg/l		0.21	mg/l		0.22	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2017	9	3.533	1.30	mg/l		0.50	mg/l	<	2.46	mg/l		1.85	mg/l		0.05	mg/l		0.62	mg/l		0.57	mg/l		0.42	mg/l		0.40	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2017	10	0.363	0.95	mg/l		0.50	mg/l	<	1.96	mg/l		1.22	mg/l		0.06	mg/l	<	0.75	mg/l		0.70	mg/l		1.07	mg/l		0.47	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2017	11	1.041	0.50	mg/l		0.50	mg/l	<	2.57	mg/l		1.66	mg/l		0.03	mg/l		0.93	mg/l		0.90	mg/l		0.38	mg/l										
+FL0041670	Northwest Regional WRF	D-001	2017	12	0.337	0.30	mg/l		0.50	mg/l	<	2.59	mg/l		1.61	mg/l		0.06	mg/l	<	0.99	mg/l		0.94	mg/l		0.14	mg/l		0.40	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2018	1	3.639	0.70	mg/l		0.53	mg/l		2.14	mg/l		1.34	mg/l		0.05	mg/l	<	0.82	mg/l		0.77	mg/l		0.20	mg/l		0.31	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2018	2	2.902	0.93	mg/l		0.50	mg/l	<	2.35	mg/l		1.51	mg/l		0.06	mg/l	<	0.86	mg/l		0.80	mg/l		0.33	mg/l		0.45	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2018	3	0.116	1.10	mg/l		0.60	mg/l		1.15	mg/l		0.41	mg/l		0.06	mg/l	<	0.76	mg/l		0.71	mg/l		0.15	mg/l		0.57	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2018	4	0.455	0.60	mg/l		0.50	mg/l	<	1.90	mg/l		1.09	mg/l		0.06	mg/l	<	0.83	mg/l		0.77	mg/l		0.35	mg/l		0.59	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2018	5	3.837	0.90	mg/l		0.50	mg/l	<	1.27	mg/l		0.60	mg/l		0.07	mg/l	<	0.70	mg/l		0.62	mg/l		0.23	mg/l		0.38	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2018	6	2.807	0.84	mg/l		0.50	mg/l	<	1.20	mg/l		0.46	mg/l		0.07	mg/l	<	0.76	mg/l		0.69	mg/l		0.10	mg/l		0.62	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2018	7	3.497	0.51	mg/l		0.50	mg/l	<	1.57	mg/l		0.83	mg/l		0.08	mg/l	<	0.76	mg/l		0.67	mg/l		0.10	mg/l		0.41	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2018	8	3.408	0.78	mg/l		0.50	mg/l	<	1.22	mg/l		0.54	mg/l		0.09	mg/l	<	0.69	mg/l		0.61	mg/l		0.14	mg/l		0.22	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2018	9	5.181	1.32	mg/l		0.50	mg/l	<	1.92	mg/l		1.18	mg/l		0.09	mg/l	<	0.75	mg/l		0.67	mg/l		0.12	mg/l		0.40	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2018	10	1.471	1.56	mg/l		0.50	mg/l		1.69	mg/l		0.96	mg/l		0.08	mg/l		0.75	mg/l		0.67	mg/l		0.36	mg/l		0.47	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2018	11	0.004	1.70	mg/l		0.50	mg/l	<	1.67	mg/l		1.06	mg/l		-0.06	mg/l		0.63	mg/l		0.69	mg/l		0.12	mg/l		0.44	mg/l							
+FL0041670	Northwest Regional WRF	D-001	2018	12	4.049	1.27	mg/l		0.51	mg/l	<	2.54	mg/l		1.95	mg/l		0.07	mg/l		0.80	mg/l		0.73	mg/l		0.13	mg/l		0.40	mg/l							
+FL0041670	Northwest Regional WRF	D-005	2017	1	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2017	2	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2017	3	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2017	4	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2017	5	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2017	6	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2017	7	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2017	8	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2017	9	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2017	10	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2017	11	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2017	12	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2018	1	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2018	2	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2018	3	0.002	0.60	mg/l		0.50	mg/l	<	1.51	mg/l		0.76	mg/l		0.06	mg/l	<	0.76	mg/l		0.71	mg/l		0.16	mg/l		0.17	mg/l							
+FL0041670	Northwest Regional WRF	D-005	2018	4	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2018	5	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2018	6	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2018	7	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2018	8	0.180	1.15	mg/l		0.50	mg/l	<	1.14	mg/l		0.48	mg/l		0.09	mg/l	<	0.68	mg/l		0.60	mg/l		0.12	mg/l		0.12	mg/l							
+FL0041670	Northwest Regional WRF	D-005	2018	9	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2018	10	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2018	11	0.000																																	
+FL0041670	Northwest Regional WRF	D-005	2018	12	0.000																																	
+FL0041670	Northwest Regional WRF	R-001	2017	1	6.424	0.51	mg/l		0.52	mg/l		2.99	mg/l		1.97	mg/l		0.08	mg/l		1.02	mg/l		0.94	mg/l		0.49	mg/l		0.46	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2017	2	6.604	0.49	mg/l		0.54	mg/l		3.67	mg/l		2.77	mg/l		0.03	mg/l		0.92	mg/l		0.88	mg/l		1.21	mg/l		1.25	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2017	3	6.705	0.28	mg/l		0.52	mg/l		2.33	mg/l		1.47	mg/l		0.06	mg/l		0.87	mg/l		0.81	mg/l		0.55	mg/l		0.53	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2017	4	6.187	0.11	mg/l		0.50	mg/l	<	1.64	mg/l		0.83	mg/l		0.06	mg/l	<	0.82	mg/l		0.77	mg/l		0.45	mg/l		0.44	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2017	5	6.148	0.29	mg/l		0.50	mg/l	<	2.73	mg/l		1.93	mg/l		0.06	mg/l	<	0.82	mg/l		0.76	mg/l		1.39	mg/l		1.35	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2017	6	5.345	0.27	mg/l		0.52	mg/l		2.79	mg/l		1.98	mg/l		0.05	mg/l	<	0.83	mg/l		0.78	mg/l		1.49	mg/l		1.35	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2017	7	4.952	0.21	mg/l		0.50	mg/l	<	1.44	mg/l		0.65	mg/l		0.07	mg/l	<	0.80	mg/l		0.73	mg/l		0.27	mg/l		0.26	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2017	8	4.770	0.53	mg/l		0.51	mg/l		1.37	mg/l		0.61	mg/l		0.06	mg/l		0.77	mg/l		0.71	mg/l		0.27	mg/l		0.23	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2017	9	4.162	1.10	mg/l		0.50	mg/l		1.99	mg/l		1.22	mg/l		0.04	mg/l		0.78	mg/l		0.74	mg/l		1.10	mg/l		0.88	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2017	10	5.764	1.06	mg/l		0.50	mg/l	<	2.58	mg/l		1.89	mg/l		0.06	mg/l	<	0.70	mg/l		0.65	mg/l		0.83	mg/l		0.75	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2017	11	6.137	0.72	mg/l		0.50	mg/l		2.10	mg/l		1.24	mg/l		0.17	mg/l		0.88	mg/l		0.70	mg/l		0.47	mg/l		0.46	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2017	12	6.786	0.79	mg/l		0.50	mg/l	<	2.04	mg/l		1.22	mg/l		0.05	mg/l		0.84	mg/l		0.79	mg/l		0.73	mg/l		0.74	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2018	1	5.147	0.89	mg/l		0.52	mg/l		2.11	mg/l		1.29	mg/l		0.05	mg/l	<	0.84	mg/l		0.79	mg/l		0.24	mg/l		0.23	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2018	2	7.604	0.85	mg/l		0.56	mg/l		2.14	mg/l		1.27	mg/l		0.06	mg/l	<	0.88	mg/l		0.83	mg/l		0.33	mg/l		0.34	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2018	3	9.341	0.79	mg/l		0.50	mg/l		2.50	mg/l		1.64	mg/l		0.06	mg/l		0.87	mg/l		0.82	mg/l		0.16	mg/l		0.16	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2018	4	9.118	0.52	mg/l		0.49	mg/l		1.44	mg/l		0.67	mg/l		0.06	mg/l	<	0.78	mg/l		0.73	mg/l		0.42	mg/l		0.45	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2018	5	6.328	0.92	mg/l		0.50	mg/l	<	1.20	mg/l		0.49	mg/l		0.10	mg/l	<	0.73	mg/l		0.63	mg/l		0.57	mg/l		0.64	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2018	6	6.711	0.87	mg/l		0.50	mg/l	<	1.15	mg/l		0.47	mg/l		0.06	mg/l		0.70	mg/l		0.65	mg/l		0.11	mg/l		0.10	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2018	7	6.549	0.48	mg/l		0.50	mg/l	<	1.48	mg/l		0.75	mg/l		0.08	mg/l	<	0.75	mg/l		0.67	mg/l		0.10	mg/l		0.10	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2018	8	6.616	0.81	mg/l		0.50	mg/l	<	1.29	mg/l		0.61	mg/l		0.09	mg/l	<	0.70	mg/l		0.62	mg/l		0.13	mg/l		0.13	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2018	9	5.418	1.40	mg/l		0.50	mg/l		1.89	mg/l		1.17	mg/l		0.09	mg/l	<	0.74	mg/l		0.65	mg/l		0.13	mg/l		0.12	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2018	10	8.067	1.40	mg/l		0.50	mg/l	<	1.91	mg/l		1.19	mg/l		0.08	mg/l		0.74	mg/l		0.65	mg/l		0.10	mg/l		0.18	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2018	11	9.300	1.18	mg/l		0.50	mg/l		1.81	mg/l		1.13	mg/l		0.10	mg/l		0.69	mg/l		0.59	mg/l		0.11	mg/l		0.11	mg/l							
+FL0041670	Northwest Regional WRF	R-001	2018	12	6.170	1.08	mg/l		0.51	mg/l		2.42	mg/l		1.77	mg/l		0.08	mg/l		0.75	mg/l		0.68	mg/l		0.21	mg/l		0.13	mg/l							

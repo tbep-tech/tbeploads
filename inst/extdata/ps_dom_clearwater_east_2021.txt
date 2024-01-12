@@ -1,0 +1,13 @@
+Permit Number	Facility Name	Outfall ID	Year	Month	Average Daily Flow (ADF) (mgd) - Influent	Effluent Flow (ADF) (MGD) D-001	Reuse Flow (ADF) (MGD) R-001	BOD 	BOD  Unit	QBOD	TSS	TSS Unit	QTSS	Total N	Total N Unit	Q Total N	NO2+NO3	NO2+NO3 Unit	Q NO2+NO3	NH4	NH4 Unit	Q NH4	TKN	TKN Unit	Q TKN	Organic N	Organic N Unit	Q Organic N	Total P	Total P Unit	Q Total P	PO4	PO4 Unit	Q PO4	Other N (species)	Other N Unit	Q Other N	Other P (species)	Other P Unit	Q Other P
+FL0021865	East Water Reclamation Facility	D-001	2021	1	1.62	2.52	0	1.78			0.50			1.23			0.44			0.01			0.79						0.60											
+FL0021865	East Water Reclamation Facility	D-001	2021	2	1.96	2.93	0	2.71			0.50			1.84			1.00			0.01			0.84						0.11											
+FL0021865	East Water Reclamation Facility	D-001	2021	3	1.67	2.57	0	3.19			0.50			1.64			0.82			0.01			0.82						0.15											
+FL0021865	East Water Reclamation Facility	D-001	2021	4	1.72	2.60	0	3.21			0.50			1.64			0.82			0.01			0.82						0.15											
+FL0021865	East Water Reclamation Facility	D-001	2021	5	1.50	2.30	0.04	3.00			0.50			1.20			0.66			0.01			0.54						0.81											
+FL0021865	East Water Reclamation Facility	D-001	2021	6	1.60	2.30	0.33	2.03			0.55			1.28			0.68			0.01			0.60						0.31											
+FL0021865	East Water Reclamation Facility	D-001	2021	7	2.34	3.55	0.33	1.00			0.56			1.44			0.77			0.01			0.69						0.37											
+FL0021865	East Water Reclamation Facility	D-001	2021	8	2.73	3.59	0.15	1.00			0.50			1.43			0.95			0.02			0.50						0.32											
+FL0021865	East Water Reclamation Facility	D-001	2021	9	2.96	3.39	0	1.00			0.60			2.34			1.72			0.01			0.63						0.53											
+FL0021865	East Water Reclamation Facility	D-001	2021	10	1.76	1.98	0.01	1.00			0.67			1.37			0.80			0.01			0.57						0.21											
+FL0021865	East Water Reclamation Facility	D-001	2021	11	1.76	1.91	0.03	1.00			0.69			1.36			0.65			0.01			0.72						0.11											
+FL0021865	East Water Reclamation Facility	D-001	2021	12	1.61	1.73	0	1.00			0.66			1.10			0.34			0.01			0.76						0.06											

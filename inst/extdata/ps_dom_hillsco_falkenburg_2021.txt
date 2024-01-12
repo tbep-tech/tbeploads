@@ -1,0 +1,37 @@
+Permit Number	Facility Name	Outfall ID	Year	Month	Average Daily Flow (ADF) (mgd)	BOD 	BOD  Unit	QBOD	TSS	TSS Unit	QTSS	Total N	Total N Unit	Q Total N	NO2+NO3	NO2+NO3 Unit	Q NO2+NO3	NH4	NH4 Unit	Q NH4	TKN	TKN Unit	Q TKN	Organic N	Organic N Unit	Q Organic N	Total P	Total P Unit	Q Total P	PO4	PO4 Unit	Q PO4	Other N (species)	Other N Unit	Q Other N	Other P (species)	Other P Unit	Q Other P
+FL00407	Falkenburg Road AWWTF	D-001	2021	1	4.579	1.01	mg/l		0.25	mg/l	<	1.75	mg/l		1.00	mg/l		0.12	mg/l		0.81	mg/l		0.68	mg/l		0.17	mg/l		0.20	mg/l							
+FL00407	Falkenburg Road AWWTF	D-001	2021	2	4.308	0.91	mg/l		0.29	mg/l		2.06	mg/l		1.19	mg/l		0.11	mg/l		0.88	mg/l		0.76	mg/l		0.15	mg/l		0.19	mg/l							
+FL00407	Falkenburg Road AWWTF	D-001	2021	3	3.219	1.13	mg/l		0.29	mg/l		1.72	mg/l		0.85	mg/l		0.11	mg/l		0.88	mg/l		0.77	mg/l		0.19	mg/l		0.21	mg/l							
+FL00407	Falkenburg Road AWWTF	D-001	2021	4	2.541	1.28	mg/l		0.29	mg/l		1.77	mg/l		0.87	mg/l		0.05	mg/l		0.91	mg/l		0.86	mg/l		0.27	mg/l		0.24	mg/l							
+FL00407	Falkenburg Road AWWTF	D-001	2021	5	2.010	1.57	mg/l		0.31	mg/l		2.24	mg/l		1.21	mg/l		0.13	mg/l		1.07	mg/l		0.94	mg/l		0.26	mg/l		0.24	mg/l							
+FL00407	Falkenburg Road AWWTF	D-001	2021	6	4.084	1.31	mg/l		0.25	mg/l		2.34	mg/l		1.11	mg/l		0.23	mg/l		1.18	mg/l		0.94	mg/l		0.49	mg/l		0.44	mg/l							
+FL00407	Falkenburg Road AWWTF	D-001	2021	7	5.163	1.20	mg/l		0.29	mg/l		1.66	mg/l		0.82	mg/l		0.05	mg/l		0.87	mg/l		0.81	mg/l		0.28	mg/l		0.25	mg/l							
+FL00407	Falkenburg Road AWWTF	D-001	2021	8	5.144	0.49	mg/l		0.25	mg/l		1.96	mg/l		0.91	mg/l		0.14	mg/l		1.02	mg/l		0.88	mg/l		0.32	mg/l		0.30	mg/l							
+FL00407	Falkenburg Road AWWTF	D-001	2021	9	4.746	1.35	mg/l		0.38	mg/l		1.75	mg/l		0.86	mg/l		0.07	mg/l		0.87	mg/l		0.80	mg/l		0.27	mg/l		0.25	mg/l							
+FL00407	Falkenburg Road AWWTF	D-001	2021	10	4.299	0.48	mg/l		0.29	mg/l		1.87	mg/l		0.93	mg/l		0.07	mg/l		0.92	mg/l		0.85	mg/l		0.34	mg/l		0.34	mg/l							
+FL00407	Falkenburg Road AWWTF	D-001	2021	11	4.258	1.58	mg/l		0.36	mg/l		2.15	mg/l		1.24	mg/l		0.14	mg/l		0.89	mg/l		0.75	mg/l		0.37	mg/l		0.39	mg/l							
+FL00407	Falkenburg Road AWWTF	D-001	2021	12	4.303	2.05	mg/l		0.32	mg/l		1.90	mg/l		1.03	mg/l		0.07	mg/l		0.89	mg/l		0.82	mg/l		0.35	mg/l		0.38	mg/l							
+FL00407	Falkenburg Road AWWTF	D-003	2021	1	2.042	1.01	mg/l		0.25	mg/l	<	1.75	mg/l		1.00	mg/l		0.12	mg/l		0.81	mg/l		0.68	mg/l		0.17	mg/l		0.20	mg/l							
+FL00407	Falkenburg Road AWWTF	D-003	2021	2	2.152	0.91	mg/l		0.29	mg/l		2.06	mg/l		1.19	mg/l		0.11	mg/l		0.88	mg/l		0.76	mg/l		0.15	mg/l		0.19	mg/l							
+FL00407	Falkenburg Road AWWTF	D-003	2021	3	1.271	1.13	mg/l		0.29	mg/l		1.72	mg/l		0.85	mg/l		0.11	mg/l		0.88	mg/l		0.77	mg/l		0.19	mg/l		0.21	mg/l							
+FL00407	Falkenburg Road AWWTF	D-003	2021	4	0.892	1.28	mg/l		0.29	mg/l		1.77	mg/l		0.87	mg/l		0.05	mg/l		0.91	mg/l		0.86	mg/l		0.27	mg/l		0.24	mg/l							
+FL00407	Falkenburg Road AWWTF	D-003	2021	5	0.002	1.57	mg/l		0.31	mg/l		2.24	mg/l		1.21	mg/l		0.13	mg/l		1.07	mg/l		0.94	mg/l		0.26	mg/l		0.24	mg/l							
+FL00407	Falkenburg Road AWWTF	D-003	2021	6	0.243	1.31	mg/l		0.25	mg/l		2.34	mg/l		1.11	mg/l		0.23	mg/l		1.18	mg/l		0.94	mg/l		0.49	mg/l		0.44	mg/l							
+FL00407	Falkenburg Road AWWTF	D-003	2021	7	0.936	1.20	mg/l		0.29	mg/l		1.66	mg/l		0.82	mg/l		0.05	mg/l		0.87	mg/l		0.81	mg/l		0.28	mg/l		0.25	mg/l							
+FL00407	Falkenburg Road AWWTF	D-003	2021	8	0.372	0.49	mg/l		0.25	mg/l		1.96	mg/l		0.91	mg/l		0.14	mg/l		1.02	mg/l		0.88	mg/l		0.32	mg/l		0.30	mg/l							
+FL00407	Falkenburg Road AWWTF	D-003	2021	9	0.423	1.35	mg/l		0.38	mg/l		1.75	mg/l		0.86	mg/l		0.07	mg/l		0.87	mg/l		0.80	mg/l		0.27	mg/l		0.25	mg/l							
+FL00407	Falkenburg Road AWWTF	D-003	2021	10	0.180	0.48	mg/l		0.29	mg/l		1.87	mg/l		0.93	mg/l		0.07	mg/l		0.92	mg/l		0.85	mg/l		0.34	mg/l		0.34	mg/l							
+FL00407	Falkenburg Road AWWTF	D-003	2021	11	0.354	1.58	mg/l		0.36	mg/l		2.15	mg/l		1.24	mg/l		0.14	mg/l		0.89	mg/l		0.75	mg/l		0.37	mg/l		0.39	mg/l							
+FL00407	Falkenburg Road AWWTF	D-003	2021	12	0.149	2.05	mg/l		0.32	mg/l		1.90	mg/l		1.03	mg/l		0.07	mg/l		0.89	mg/l		0.82	mg/l		0.35	mg/l		0.38	mg/l							
+FL00407	Falkenburg Road AWWTF	R-001	2021	1	2.003	1.01	mg/l		0.25	mg/l	<	1.81	mg/l		1.00	mg/l		0.12	mg/l		0.81	mg/l		0.68	mg/l		0.18	mg/l		0.20	mg/l							
+FL00407	Falkenburg Road AWWTF	R-001	2021	2	1.851	0.91	mg/l		0.29	mg/l		2.07	mg/l		1.19	mg/l		0.11	mg/l		0.88	mg/l		0.76	mg/l		0.14	mg/l		0.19	mg/l							
+FL00407	Falkenburg Road AWWTF	R-001	2021	3	2.456	1.14	mg/l		0.28	mg/l		1.73	mg/l		0.85	mg/l		0.11	mg/l		0.88	mg/l		0.77	mg/l		0.19	mg/l		0.21	mg/l							
+FL00407	Falkenburg Road AWWTF	R-001	2021	4	3.249	1.34	mg/l		0.29	mg/l		1.78	mg/l		0.87	mg/l		0.05	mg/l		0.91	mg/l		0.86	mg/l		0.26	mg/l		0.24	mg/l							
+FL00407	Falkenburg Road AWWTF	R-001	2021	5	4.643	1.55	mg/l		0.32	mg/l		2.29	mg/l		1.21	mg/l		0.13	mg/l		1.07	mg/l		0.94	mg/l		0.26	mg/l		0.24	mg/l							
+FL00407	Falkenburg Road AWWTF	R-001	2021	6	3.160	1.27	mg/l		0.25	mg/l		2.28	mg/l		1.11	mg/l		0.23	mg/l		1.18	mg/l		0.94	mg/l		0.46	mg/l		0.44	mg/l							
+FL00407	Falkenburg Road AWWTF	R-001	2021	7	2.085	1.23	mg/l		0.29	mg/l		1.68	mg/l		0.82	mg/l		0.05	mg/l		0.87	mg/l		0.81	mg/l		0.27	mg/l		0.25	mg/l							
+FL00407	Falkenburg Road AWWTF	R-001	2021	8	2.408	0.49	mg/l		0.25	mg/l		1.93	mg/l		0.91	mg/l		0.14	mg/l		1.02	mg/l		0.88	mg/l		0.32	mg/l		0.30	mg/l							
+FL00407	Falkenburg Road AWWTF	R-001	2021	9	2.659	1.34	mg/l		0.38	mg/l		1.73	mg/l		0.86	mg/l		0.07	mg/l		0.87	mg/l		0.80	mg/l		0.28	mg/l		0.25	mg/l							
+FL00407	Falkenburg Road AWWTF	R-001	2021	10	3.119	0.48	mg/l		0.29	mg/l		1.85	mg/l		0.93	mg/l		0.07	mg/l		0.92	mg/l		0.85	mg/l		0.34	mg/l		0.34	mg/l							
+FL00407	Falkenburg Road AWWTF	R-001	2021	11	1.981	1.62	mg/l		0.36	mg/l		2.13	mg/l		1.24	mg/l		0.14	mg/l		0.89	mg/l		0.75	mg/l		0.38	mg/l		0.39	mg/l							
+FL00407	Falkenburg Road AWWTF	R-001	2021	12	2.545	2.05	mg/l		0.32	mg/l		1.92	mg/l		1.03	mg/l		0.07	mg/l		0.89	mg/l		0.82	mg/l		0.35	mg/l		0.38	mg/l							
