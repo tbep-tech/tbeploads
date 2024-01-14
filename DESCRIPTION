@@ -1,15 +1,37 @@
 Package: tbeploads
-Title: What the Package Does (One Line, Title Case)
+Title: Calculate Loading Data to Tampa Bay
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person(given = "Marcus",
+      family = "Beck",
+      role = c("aut", "cre"),
+      email = "mbeck@tbep.org",
+      comment = c(ORCID = "0000-0002-4996-0059")
+    ),
+    person(given = "Ed",
+      family = "Sherwood",
+      role = c("aut"),
+      email = "esherwood@tbep.org",
+      comment = c(ORCID = "0000-0001-5330-302X")
+    ),
+    person(given = "Ray", 
+      family = "Pribble", 
+      role = c("aut"), 
+      email = "rpribble@esassoc.com" 
+      )
+Description: Loading data from major sources to Tampa Bay are calculated on a monthly or annual
+  basis.  Major sources indlucde domestic point source (reuse, end of pipe), industrial point
+  source, material losses, non-point sources (MS4), atmospheric deposition, and groundwater.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Depends: 
-    R (>= 2.10)
+  R (>= 3.6)
+Imports:
+  dplyr,
+  lubridate,
+  tidyr
 LazyData: true
+URL: https://github.com/tbep-tech/tbeploads
+BugReports: https://github.com/tbep-tech/tbeploads/issues
