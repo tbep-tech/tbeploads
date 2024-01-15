@@ -4,10 +4,14 @@
 \alias{anlz_dps_entity}
 \title{Calculate DPS reuse and end of pipe from raw entity data}
 \usage{
-anlz_dps_entity(path, skip = 0)
+anlz_dps_entity(path, skip = 0, sep = "\\t")
 }
 \arguments{
 \item{path}{path to raw entity data}
+
+\item{skip}{number of lines to skip in raw entity data}
+
+\item{sep}{separator for raw entity data}
 }
 \value{
 data frame with loading data for TP, TN, TSS, and BOD as tons per month and hydro load as million cubic meters per month
@@ -28,6 +32,6 @@ Indput data should include flow as million gallons per day, and conc as mg/L.  S
 }
 }
 \examples{
-pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt')
+pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
 anlz_dps_entity(pth)
 }

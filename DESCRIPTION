@@ -35,3 +35,6 @@ Imports:
 LazyData: true
 URL: https://github.com/tbep-tech/tbeploads
 BugReports: https://github.com/tbep-tech/tbeploads/issues
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
