@@ -1,7 +1,7 @@
 Package: tbeploads
 Title: Calculate Loading Data to Tampa Bay
 Version: 0.0.0.9000
-Authors@R: 
+Authors@R: c(
     person(given = "Marcus",
       family = "Beck",
       role = c("aut", "cre"),
@@ -18,7 +18,8 @@ Authors@R:
       family = "Pribble", 
       role = c("aut"), 
       email = "rpribble@esassoc.com" 
-      )
+    )
+  )
 Description: Loading data from major sources to Tampa Bay are calculated on a monthly or annual
   basis.  Major sources indlucde domestic point source (reuse, end of pipe), industrial point
   source, material losses, non-point sources (MS4), atmospheric deposition, and groundwater.

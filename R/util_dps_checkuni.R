@@ -2,15 +2,15 @@
 #'
 #' Check units DPS reuse and end of pipe from raw entity data
 #'
-#' @param path path to raw entity data
+#' @param dat data frame from raw entity data as \code{data.frame}
 #'
 #' @details
-#' Indput data should include flow as million gallons per day, and conc as mg/L.
+#' Input data should include flow as million gallons per day, and concentration as mg/L.
 #'
 #' @return Input data frame from \code{pth} with relevant data, otherwise an error is returned if units are not correct.
 #' @export
 #'
-#' @importFrom dplyr matches rename select vars %>%
+#' @importFrom dplyr matches rename_at select vars %>%
 #'
 #' @examples
 #' pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')

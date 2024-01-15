@@ -2,7 +2,7 @@
 #'
 #' Calculate DPS reuse and end of pipe from raw entity data
 #'
-#' @param path path to raw entity data
+#' @param pth path to raw entity data
 #' @param skip number of lines to skip in raw entity data
 #' @param sep separator for raw entity data
 #'
@@ -28,7 +28,7 @@
 #' @examples
 #' pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
 #' anlz_dps_entity(pth)
-anlz_dps_entity <- function(path, skip = 0, sep = '\t'){
+anlz_dps_entity <- function(pth, skip = 0, sep = '\t'){
 
   # format input for load calc
   dat <- read.table(pth, skip = skip, sep = sep, header = TRUE) %>%

@@ -7,7 +7,7 @@
 util_dps_checkuni(dat)
 }
 \arguments{
-\item{path}{path to raw entity data}
+\item{dat}{data frame from raw entity data as \code{data.frame}}
 }
 \value{
 Input data frame from \code{pth} with relevant data, otherwise an error is returned if units are not correct.
@@ -16,7 +16,7 @@ Input data frame from \code{pth} with relevant data, otherwise an error is retur
 Check units DPS reuse and end of pipe from raw entity data
 }
 \details{
-Indput data should include flow as million gallons per day, and conc as mg/L.
+Input data should include flow as million gallons per day, and concentration as mg/L.
 }
 \examples{
 pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')

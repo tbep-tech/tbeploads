@@ -4,10 +4,10 @@
 \alias{anlz_dps_entity}
 \title{Calculate DPS reuse and end of pipe from raw entity data}
 \usage{
-anlz_dps_entity(path, skip = 0, sep = "\\t")
+anlz_dps_entity(pth, skip = 0, sep = "\\t")
 }
 \arguments{
-\item{path}{path to raw entity data}
+\item{pth}{path to raw entity data}
 
 \item{skip}{number of lines to skip in raw entity data}
 
