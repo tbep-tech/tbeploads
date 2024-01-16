@@ -21,7 +21,7 @@ Authors@R: c(
     )
   )
 Description: Loading data from major sources to Tampa Bay are calculated on a monthly or annual
-  basis.  Major sources indlucde domestic point source (reuse, end of pipe), industrial point
+  basis.  Major sources include domestic point source (reuse, end of pipe), industrial point
   source, material losses, non-point sources (MS4), atmospheric deposition, and groundwater.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -37,5 +37,8 @@ LazyData: true
 URL: https://github.com/tbep-tech/tbeploads, https://tbep-tech.github.io/tbeploads/
 BugReports: https://github.com/tbep-tech/tbeploads/issues
 Suggests: 
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+VignetteBuilder: knitr
