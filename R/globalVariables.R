@@ -5,3 +5,6 @@ globalVariables(c(".", "Facility.Name", "Month", "Outfall.ID", "Permit.Number", 
 
 #' @importFrom utils read.table
 NULL
+
+#' @importFrom stats na.omit
+NULL

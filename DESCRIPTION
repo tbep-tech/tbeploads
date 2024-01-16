@@ -35,7 +35,10 @@ Imports:
   tibble,
   tidyr
 LazyData: true
-URL: https://github.com/tbep-tech/tbeploads, https://tbep-tech.github.io/tbeploads/
+LazyDataCompression: xz
+VignetteBuilder: knitr
+URL: <https://github.com/tbep-tech/tbeploads>, 
+  <https://tbep-tech.github.io/tbeploads/>
 BugReports: https://github.com/tbep-tech/tbeploads/issues
 Suggests: 
     knitr,
