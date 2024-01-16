@@ -34,7 +34,7 @@ Imports:
   lubridate,
   tidyr
 LazyData: true
-URL: https://github.com/tbep-tech/tbeploads
+URL: https://github.com/tbep-tech/tbeploads, https://tbep-tech.github.io/tbeploads/
 BugReports: https://github.com/tbep-tech/tbeploads/issues
 Suggests: 
     testthat (>= 3.0.0)

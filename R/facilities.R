@@ -2,6 +2,6 @@
 #'
 #' @format A \code{data.frame}
 #'
-#' #examples
+#' @examples
 #' facilities
 "facilities"

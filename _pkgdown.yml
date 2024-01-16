@@ -1,0 +1,21 @@
+url: https://tbep-tech.github.io/tbeploads/
+template:
+  bootstrap: 5
+
+reference:
+- title: Analyze data
+  desc: |
+    Functions for analyzing data.
+  contents: starts_with('anlz')
+- title: Internal datasets
+  desc: |
+    Supporting datasets used by the other functions.
+  contents:
+  - -starts_with('read')
+  - -starts_with('anlz')
+  - -starts_with('show')
+  - -starts_with('util')
+- title: Utility functions
+  desc: |
+    Utility functions used by other functions.
+  contents: starts_with('util')

@@ -6,14 +6,14 @@
 \title{Domestic and industrial point source facilities}
 \format{
 A \code{data.frame}
-
-#examples
-facilities
 }
 \usage{
 facilities
 }
 \description{
 Domestic and industrial point source facilities
+}
+\examples{
+facilities
 }
 \keyword{datasets}

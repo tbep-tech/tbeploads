@@ -5,4 +5,4 @@
 [![Codecov test coverage](https://codecov.io/gh/tbep-tech/tbeploads/branch/master/graph/badge.svg)](https://codecov.io/gh/tbep-tech/tbeploads?branch=master)
 <!-- badges: end -->
   
-R Package for estimating nutrient loading to Tampa Bay
+R Package for estimating nutrient loading to Tampa Bay.
