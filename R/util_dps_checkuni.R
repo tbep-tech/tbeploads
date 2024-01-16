@@ -41,9 +41,11 @@ util_dps_checkuni <- function(dat){
   chk_mgl <- dat %>%
     select(matches('2$')) %>%
     unlist() %>%
-    unique()
+    unique() %>%
+    na.omit() %>%
+    tolower()
 
-  if(any(chk_mgl != 'mg/l')){
+  if(any(!chk_mgl %in% c('', 'mg/l'))){
     stop('Concentration not as mg/l')
   }
 

@@ -32,6 +32,7 @@ Depends:
 Imports:
   dplyr,
   lubridate,
+  tibble,
   tidyr
 LazyData: true
 URL: https://github.com/tbep-tech/tbeploads, https://tbep-tech.github.io/tbeploads/
@@ -41,4 +42,3 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-VignetteBuilder: knitr
