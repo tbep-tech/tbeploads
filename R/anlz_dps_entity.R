@@ -30,9 +30,17 @@
 #' anlz_dps_entity(pth)
 anlz_dps_entity <- function(pth, skip = 0, sep = '\t'){
 
-  # format input for load calc
-  dat <- read.table(pth, skip = skip, sep = sep, header = TRUE) %>%
-    util_dps_checkuni() %>%
+  # read file
+  dat <- read.table(pth, skip = skip, sep = sep, header = TRUE)
+
+  # add wq columns
+  dat <- util_dps_addcol(dat)
+
+  # check units
+  dat <- util_dps_checkuni(dat)
+
+  # format columns
+  dat <- dat %>%
     mutate(
       outfallno = as.numeric(gsub('^.*\\-', '', outfall)),
       source = case_when(
