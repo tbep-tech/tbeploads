@@ -21,7 +21,7 @@
 #' @export
 #'
 #' @importFrom dplyr case_when mutate_at mutate case_when select filter rename %>%
-#' @importFrom dplyr matches vars
+#' @importFrom dplyr contains matches vars
 #' @importFrom tidyr pivot_longer pivot_wider
 #' @importFrom lubridate ymd days_in_month
 #'
@@ -41,14 +41,9 @@ anlz_dps_entity <- function(pth, skip = 0, sep = '\t'){
 
   # format columns
   dat <- dat %>%
-    mutate(
-      outfallno = as.numeric(gsub('^.*\\-', '', outfall)),
-      source = case_when(
-        grepl('^D\\-', outfall) ~ paste0('DPS - end of pipe', outfallno),
-        grepl('^R\\-', outfall) ~ paste0('DPS - reuse', outfallno)
-      )
-    ) %>%
-    select(-outfallno, -outfall) %>%
+    rename(source = outfall) %>%
+    mutate_at(vars(contains('mgl')), as.numeric) %>%
+    # select(-outfallno, -outfall) %>%
     pivot_longer(names_to = 'var', values_to = 'conc_mgl', matches('tn_mgl|tp_mgl|tss_mgl|bod_mgl'))
 
   # get entity, facility, and bay segment
@@ -63,12 +58,13 @@ anlz_dps_entity <- function(pth, skip = 0, sep = '\t'){
       load_kg = conc_mgl * flow_m3m / 1000, # kg var per month,
       load_tons = load_kg / 907.1847, # kg to tons,
       load_tons = case_when(
-        grepl('reuse', source) & var == 'Total N' ~ load_tons * 0.3,
-        grepl('reuse', source) & var %in% c('Total P', 'TSS', 'BOD') ~ load_tons * 0.05,
+        grepl('^R\\-', source) & var == 'Total N' ~ load_tons * 0.3,
+        grepl('^R\\-', source) & var %in% c('Total P', 'TSS', 'BOD') ~ load_tons * 0.05,
+        flow_m3m <= 0 ~ 0, # no flow, no load
         T ~ load_tons
       ),
       flow_m3m = case_when(
-        grepl('reuse', source) ~ flow_m3m * 0.6,
+        grepl('^R\\-', source) ~ flow_m3m * 0.6,
         T ~ flow_m3m
       ),
       entity = entfac[[1]],
