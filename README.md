@@ -10,7 +10,7 @@ R Package for estimating nutrient loading to Tampa Bay.
 
 ## Installation
 
-Install the package from [r-universe](http://tbep-tech.r-universe.dev/ui/#builds) as follows. The source code is available on [GitHub](https://github.com/tbep-tech/tbeploads).
+Install the package from [r-universe](https://tbep-tech.r-universe.dev/tbeploads) as follows. The source code is available on [GitHub](https://github.com/tbep-tech/tbeploads).
 
 ```r
 # Install tbeploads in R:
