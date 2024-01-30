@@ -54,13 +54,17 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_dps_entfacseg</span><span class="op">(</span><span class="va">pth</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_dps_entfacseg</span><span class="op">(</span><span class="va">pth</span>, asdf <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>pth</dt>
 <dd><p>path to raw entity data</p></dd>
+
+
+<dt>asdf</dt>
+<dd><p>logical, if <code>TRUE</code> return as <code>data.frame</code></p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -78,13 +82,13 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">pth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/ps_dom_hillsco_falkenburg_2019.txt'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">util_dps_entfacseg</span><span class="op">(</span><span class="va">pth</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ent</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $entity</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Hillsborough Co."</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $fac</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $facname</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Falkenburg AWTP"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $seg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $bayseg</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
