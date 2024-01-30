@@ -10,10 +10,10 @@ util_dps_checkuni(dat)
 \item{dat}{data frame from raw entity data as \code{data.frame}}
 }
 \value{
-Input data frame from \code{pth} with relevant data, otherwise an error is returned if units are not correct.
+Input data frame from \code{pth} with relevant data and columns renamed, otherwise an error is returned if units are not correct.  Only year, month, outfall, flow, TN, TP, TSS, and BOD are returned.
 }
 \description{
-Check units DPS reuse and end of pipe from raw entity data
+Check units for DPS reuse and end of pipe from raw entity data
 }
 \details{
 Input data should include flow as million gallons per day, and concentration as mg/L.

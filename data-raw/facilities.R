@@ -11,7 +11,11 @@ ipsfac <- read_sas(paste0(pth, '2017-2021IPSMonthlyEntityBasin/ips1721monthentba
 dpsfac <- read_sas(paste0(pth, '2017-2021DPSMonthlyEntityBasin/dps1721monthentbas.sas7bdat')) %>%
   select(bayseg, basin, entity, facname, source = source2) %>%
   distinct() %>%
-  mutate(
+  mutate( # make ototw its own entity
+    entity = case_when(
+      entity == 'St Pete Facilities' & facname == 'On Top Of The World WWTP' ~ 'On Top Of The World',
+      T ~ entity
+    ),
     entityshr = case_when(
       entity == 'Bradenton' ~ 'bradenton',
       entity == 'Clearwater' ~ 'clearwater',
@@ -22,6 +26,7 @@ dpsfac <- read_sas(paste0(pth, '2017-2021DPSMonthlyEntityBasin/dps1721monthentba
       entity == 'Manatee Co.' ~ 'manatee',
       entity == 'Mulberry' ~ 'mulberry',
       entity == 'Oldsmar' ~ 'oldsmar',
+      entity == 'On Top Of The World' ~ 'ototw',
       entity == 'Palmetto' ~ 'palmetto',
       entity == 'Pasco Co.' ~ 'pasco',
       entity == 'Pinellas Co.' ~ 'pinco',
@@ -49,8 +54,8 @@ dpsfac <- read_sas(paste0(pth, '2017-2021DPSMonthlyEntityBasin/dps1721monthentba
       facname == 'Manatee County North WRF' ~ 'north',
       facname == 'Manatee County Southeast WRF' ~ 'se',
       facname == 'Northwest Regional WRF' ~ 'northwest',
-      facname == 'NW Regional WWTP' ~ 'nw',
       facname == 'On Top Of The World WWTP' ~ 'ototw',
+      facname == 'NW Regional WWTP' ~ 'nw',
       facname == 'Pasco Reuse' ~ 'pasco',
       facname == 'Pebble Creek AWTP' ~ 'pebblecrk',
       facname == 'Plant City WRF' ~ 'plantcity',
@@ -93,7 +98,7 @@ dpsfac <- read_sas(paste0(pth, '2017-2021DPSMonthlyEntityBasin/dps1721monthentba
       facname == 'St Pete Facilities' ~ 'STPETE', # not sure how this relates to ne, nw, sw files
       facname == 'Valrico AWTP' ~ 'FL0040983',
       facname == 'Van Dyke WWTP' ~ 'FLA012234',
-      facname == 'William E. Dunn WRF (Pinellas NW)' ~ 'FLA012877'
+      facname == 'William E. Dunn WRF (Pinellas NW)' ~ 'FL0128775'
     ),
     facid = case_when(
       facname == 'Bridgeway Acres' ~ 'FL0168505',
@@ -137,9 +142,11 @@ stpete <- tribble(
   55,  '207-5',  'St. Petersburg',  'City of St. Petersburg Southwest WRF',  'PS - Domestic - REUSE',  'stpete',  'sw',  'FLA128848',  'PC158'
 )
 
+# combine dps
 dpsfac <- dpsfac %>%
   bind_rows(stpete)
 
+# combine ips dps
 facilities <- bind_rows(ipsfac, dpsfac) %>%
   arrange(entity, facname)
 

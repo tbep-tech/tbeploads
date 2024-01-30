@@ -1,13 +1,14 @@
 #' Check units for DPS reuse and end of pipe from raw entity data
 #'
-#' Check units DPS reuse and end of pipe from raw entity data
+#' Check units for DPS reuse and end of pipe from raw entity data
 #'
 #' @param dat data frame from raw entity data as \code{data.frame}
 #'
 #' @details
 #' Input data should include flow as million gallons per day, and concentration as mg/L.
 #'
-#' @return Input data frame from \code{pth} with relevant data, otherwise an error is returned if units are not correct.
+#' @return Input data frame from \code{pth} with relevant data and columns renamed, otherwise an error is returned if units are not correct.  Only year, month, outfall, flow, TN, TP, TSS, and BOD are returned.
+#'
 #' @export
 #'
 #' @importFrom dplyr matches rename_at select vars %>%
@@ -25,8 +26,6 @@ util_dps_checkuni <- function(dat){
 
   dat <- dat %>%
     select(
-      permit = Permit.Number,
-      facility = Facility.Name,
       Year,
       Month,
       outfall = Outfall.ID,
