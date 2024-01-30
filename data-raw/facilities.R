@@ -1,5 +1,6 @@
 library(haven)
 library(dplyr)
+library(tibble)
 
 pth <- 'T:/03_BOARDS_COMMITTEES/05_TBNMC/2022_RA_Update/01_FUNDING_OUT/DELIVERABLES/TO-9/datastick_deliverables/2017-2021LUEntityLoads/'
 
@@ -127,6 +128,17 @@ dpsfac <- read_sas(paste0(pth, '2017-2021DPSMonthlyEntityBasin/dps1721monthentba
       facname == 'William E. Dunn WRF (Pinellas NW)' ~ 'PCNW'
     )
   )
+
+# add dps st pete facilities
+stpete <- tribble(
+  ~bayseg, ~basin, ~entity, ~facname, ~source, ~entityshr, ~facnameshr, ~permit, ~facid,
+  1,   '206-1',  'St. Petersburg',  'City of St. Petersburg Northeast WRF',  'PS - Domestic - REUSE',  'stpete',  'ne',  'FLA128856',  'PC159',
+  5,   '207-5',  'St. Petersburg',  'City of St. Petersburg Northwest WRF',  'PS - Domestic - REUSE',  'stpete',  'nw',  'FLA128821',  'PC156',
+  55,  '207-5',  'St. Petersburg',  'City of St. Petersburg Southwest WRF',  'PS - Domestic - REUSE',  'stpete',  'sw',  'FLA128848',  'PC158'
+)
+
+dpsfac <- dpsfac %>%
+  bind_rows(stpete)
 
 facilities <- bind_rows(ipsfac, dpsfac) %>%
   arrange(entity, facname)

@@ -4,10 +4,12 @@
 \alias{util_dps_entfacseg}
 \title{Get DPS entity, facility, and bay segment from file name}
 \usage{
-util_dps_entfacseg(pth)
+util_dps_entfacseg(pth, asdf = FALSE)
 }
 \arguments{
 \item{pth}{path to raw entity data}
+
+\item{asdf}{logical, if \code{TRUE} return as \code{data.frame}}
 }
 \value{
 A list with entity, facility, and bay segment

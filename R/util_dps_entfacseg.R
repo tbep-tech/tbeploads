@@ -3,44 +3,47 @@
 #' Get DPS entity, facility, and bay segment from file name
 #'
 #' @param pth path to raw entity data
+#' @param asdf logical, if \code{TRUE} return as \code{data.frame}
 #'
 #' @export
 #'
 #' @details Bay segment is an integer with values of 1, 2, 3, 4, 5, 6, 7, and 55 for Old Tampa Bay, Hillsborough Bay, Middle Tampa Bay, Lower Tampa Bay, Boca Ciega Bay, Terra Ceia Bay, Manatee River, and Boca Ciega Bay South, respectively.
 #'
 #'
-#' @importFrom dplyr filter pull
+#' @importFrom dplyr filter pull select
 #'
 #' @return A list with entity, facility, and bay segment
 #'
 #' @examples
 #' pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
 #' util_dps_entfacseg(pth)
-util_dps_entfacseg <- function(pth){
+util_dps_entfacseg <- function(pth, asdf = FALSE){
 
   # get entity and facility from path
-  entfac <- basename(pth) %>%
+  flentfac <- basename(pth) %>%
     gsub('\\.txt$', '', .) %>%
     strsplit('_') %>%
     .[[1]] %>%
     .[c(3, 4)]
 
-  ent <- facilities %>%
-    filter(entityshr == entfac[1]) %>%
-    pull(entity) %>%
+  entfac <- facilities %>%
+    filter(entityshr == flentfac[1] & facnameshr == flentfac[2]) %>%
+    select(-source) %>%
     unique()
 
-  fac <- facilities %>%
-    filter(facnameshr == entfac[2]) %>%
-    pull(facname) %>%
-    unique()
+  ent <- entfac %>%
+    pull(entity)
 
-  seg <- facilities %>%
-    filter(entity == ent & facname == fac) %>%
-    pull(bayseg) %>%
-    unique()
+  fac <- entfac %>%
+    pull(facname)
 
-  out <- list(ent = ent, fac = fac, seg = seg)
+  seg <- entfac %>%
+    pull(bayseg)
+
+  out <- list(entity = ent, facname = fac, bayseg = seg)
+
+  if(asdf)
+    out <- as.data.frame(out)
 
   return(out)
 
