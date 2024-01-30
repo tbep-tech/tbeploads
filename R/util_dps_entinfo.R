@@ -1,6 +1,6 @@
-#' Get DPS entity, facility, and bay segment from file name
+#' Get DPS entity information from file name
 #'
-#' Get DPS entity, facility, and bay segment from file name
+#' Get DPS entity information from file name
 #'
 #' @param pth path to raw entity data
 #' @param asdf logical, if \code{TRUE} return as \code{data.frame}
@@ -12,12 +12,12 @@
 #'
 #' @importFrom dplyr filter pull select
 #'
-#' @return A list with entity, facility, and bay segment
+#' @return A list or \code{data.frame} (if \code{asdf = TRUE}) with entity, facility, permit, and facility id
 #'
 #' @examples
 #' pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
-#' util_dps_entfacseg(pth)
-util_dps_entfacseg <- function(pth, asdf = FALSE){
+#' util_dps_entinfo(pth)
+util_dps_entinfo <- function(pth, asdf = FALSE){
 
   # get entity and facility from path
   flentfac <- basename(pth) %>%
@@ -26,24 +26,16 @@ util_dps_entfacseg <- function(pth, asdf = FALSE){
     .[[1]] %>%
     .[c(3, 4)]
 
-  entfac <- facilities %>%
+  facinfo <- facilities %>%
     filter(entityshr == flentfac[1] & facnameshr == flentfac[2]) %>%
-    select(-source) %>%
+    select(-bayseg, -source, -basin) %>%
     unique()
 
-  ent <- entfac %>%
-    pull(entity)
+  out <- facinfo %>%
+    select(entity, facname, permit, facid)
 
-  fac <- entfac %>%
-    pull(facname)
-
-  seg <- entfac %>%
-    pull(bayseg)
-
-  out <- list(entity = ent, facname = fac, bayseg = seg)
-
-  if(asdf)
-    out <- as.data.frame(out)
+  if(!asdf)
+    out <- as.list(out)
 
   return(out)
 

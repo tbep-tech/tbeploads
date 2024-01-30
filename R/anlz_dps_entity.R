@@ -47,7 +47,7 @@ anlz_dps_entity <- function(pth, skip = 0, sep = '\t'){
     pivot_longer(names_to = 'var', values_to = 'conc_mgl', matches('tn_mgl|tp_mgl|tss_mgl|bod_mgl'))
 
   # get entity, facility, and bay segment
-  entfac <- util_dps_entfacseg(pth)
+  entfac <- util_dps_entinfo(pth)
 
   # get loads
   out <- dat %>%
@@ -67,8 +67,8 @@ anlz_dps_entity <- function(pth, skip = 0, sep = '\t'){
         grepl('^R\\-', source) ~ flow_m3m * 0.6,
         T ~ flow_m3m
       ),
-      entity = entfac[[1]],
-      facility = entfac[[2]],
+      entity = entfac$entity,
+      facility = entfac$facname,
       var = factor(var, levels = c('tn_mgl', 'tp_mgl', 'tss_mgl', 'bod_mgl'),
                    labels = c('tn_load', 'tp_load', 'tss_load', 'bod_load')
       ),
