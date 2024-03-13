@@ -20,18 +20,16 @@
 util_dps_entinfo <- function(pth, asdf = FALSE){
 
   # get entity and facility from path
-  flentfac <- basename(pth) %>%
-    gsub('\\.txt$', '', .) %>%
-    strsplit('_') %>%
-    .[[1]] %>%
-    .[c(3, 4)]
+  flentfac <- gsub('\\.txt$', '', basename(pth)) |>
+    strsplit('_')
+  flentfac <- flentfac[[1]][c(3, 4)]
 
-  facinfo <- facilities %>%
-    filter(entityshr == flentfac[1] & facnameshr == flentfac[2]) %>%
-    select(-bayseg, -source, -basin) %>%
+  facinfo <- facilities |>
+    filter(entityshr == flentfac[1] & facnameshr == flentfac[2]) |>
+    select(-bayseg, -source, -basin) |>
     unique()
 
-  out <- facinfo %>%
+  out <- facinfo |>
     select(entity, facname, permit, facid)
 
   if(!asdf)

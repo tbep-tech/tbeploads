@@ -20,7 +20,7 @@
 #' @return data frame with loading data for TP, TN, TSS, and BOD as tons per month and hydro load as million cubic meters per month
 #' @export
 #'
-#' @importFrom dplyr case_when mutate_at mutate case_when select filter rename %>%
+#' @importFrom dplyr case_when mutate_at mutate case_when select filter rename
 #' @importFrom dplyr contains matches vars
 #' @importFrom tidyr pivot_longer pivot_wider
 #' @importFrom lubridate ymd days_in_month
@@ -40,17 +40,17 @@ anlz_dps_entity <- function(pth, skip = 0, sep = '\t'){
   dat <- util_dps_checkuni(dat)
 
   # format columns
-  dat <- dat %>%
-    rename(source = outfall) %>%
-    mutate_at(vars(contains('mgl')), as.numeric) %>%
-    # select(-outfallno, -outfall) %>%
+  dat <- dat |>
+    rename(source = outfall) |>
+    mutate_at(vars(contains('mgl')), as.numeric) |>
+    # select(-outfallno, -outfall) |>
     pivot_longer(names_to = 'var', values_to = 'conc_mgl', matches('tn_mgl|tp_mgl|tss_mgl|bod_mgl'))
 
   # get entity, facility, and bay segment
   entfac <- util_dps_entinfo(pth)
 
   # get loads
-  out <- dat %>%
+  out <- dat |>
     mutate(
       dys = days_in_month(ymd(paste(Year, Month, '01', sep = '-'))),
       flow_mgm = flow_mgd * dys, # million gallons per month
@@ -73,9 +73,9 @@ anlz_dps_entity <- function(pth, skip = 0, sep = '\t'){
                    labels = c('tn_load', 'tp_load', 'tss_load', 'bod_load')
       ),
       hy_load = flow_m3m / 1e6 # flow as mill m3 /month
-    ) %>%
-    select(-flow_mgm, -flow_mgd, -conc_mgl, -dys, -load_kg, -flow_m3m) %>%
-    pivot_wider(names_from = 'var', values_from = 'load_tons') %>%
+    ) |>
+    select(-flow_mgm, -flow_mgd, -conc_mgl, -dys, -load_kg, -flow_m3m) |>
+    pivot_wider(names_from = 'var', values_from = 'load_tons') |>
     select(Year, Month, entity, facility, source, tn_load, tp_load, tss_load, bod_load, hy_load)
 
   return(out)

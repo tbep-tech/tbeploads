@@ -11,7 +11,7 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr matches rename_at select vars %>%
+#' @importFrom dplyr matches rename_at select vars |>
 #'
 #' @examples
 #' pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
@@ -24,7 +24,7 @@ util_dps_checkuni <- function(dat){
     stop('Flow not as mgd')
   }
 
-  dat <- dat %>%
+  dat <- dat |>
     select(
       Year,
       Month,
@@ -37,19 +37,19 @@ util_dps_checkuni <- function(dat){
     )
 
   # check mgl
-  chk_mgl <- dat %>%
-    select(matches('2$')) %>%
-    unlist() %>%
-    unique() %>%
-    na.omit() %>%
+  chk_mgl <- dat |>
+    select(matches('2$')) |>
+    unlist() |>
+    unique() |>
+    na.omit() |>
     tolower()
 
   if(any(!chk_mgl %in% c('', 'mg/l'))){
     stop('Concentration not as mg/l')
   }
 
-  out <- dat %>%
-    select(-matches('2$')) %>%
+  out <- dat |>
+    select(-matches('2$')) |>
     rename_at(vars(matches('1$')), ~ gsub('1$', '', .x))
 
   return(out)

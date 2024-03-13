@@ -52,7 +52,7 @@ util_dps_checkfls <- function(pth){
 
   }
 
-  out <- enframe(out) %>%
+  out <- enframe(out) |>
     unnest('value')
 
   return(out)

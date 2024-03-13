@@ -1,7 +1,7 @@
 
 test_that("Check load calculations", {
 
-  result <- anlz_dps_entity(pth) %>%
+  result <- anlz_dps_entity(pth) |>
     mutate_if(is.numeric, round, 3)
 
   expect_equal(result$tn_load[[1]], 1.13)
