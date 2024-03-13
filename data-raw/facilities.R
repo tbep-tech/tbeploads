@@ -92,7 +92,8 @@ dpsfac <- read_sas(paste0(pth, '2017-2021DPSMonthlyEntityBasin/dps1721monthentba
       facname == 'Pebble Creek AWTP' ~ 'FL0039896',
       facname == 'Plant City WRF' ~ 'FL0026557',
       facname == 'River Oaks AWWTP' ~ 'FL0027821',
-      facname == 'South County Regional WWTP' ~ 'FL0028061',
+      facname == 'South County Regional WWTP' & grepl('REUSE', source) ~ 'FL0028061LA', # assign separate permit id for reuse
+      facname == 'South County Regional WWTP' & grepl('SW', source) ~ 'FL0028061SW', # assign separate permit id for SW
       facname == 'South Cross Bayou WRF' ~ 'FL0040436',
       facname == 'Southwest Regional WWTF' ~ 'FLA012954',
       facname == 'St Pete Facilities' ~ 'STPETE', # not sure how this relates to ne, nw, sw files
@@ -124,7 +125,8 @@ dpsfac <- read_sas(paste0(pth, '2017-2021DPSMonthlyEntityBasin/dps1721monthentba
       facname == 'Pebble Creek AWTP' ~ '118',
       facname == 'Plant City WRF' ~ '121',
       facname == 'River Oaks AWWTP' ~ '129',
-      facname == 'South County Regional WWTP' ~ '149ab',
+      facname == 'South County Regional WWTP' & grepl('REUSE', source) ~ '149b', # assign separate facid for reuse
+      facname == 'South County Regional WWTP' & grepl('SW', source) ~ '149a', # assign separate facid for sw
       facname == 'South Cross Bayou WRF' ~ 'PC001',
       facname == 'Southwest Regional WWTF' ~ 'PK001',
       facname == 'St Pete Facilities' ~ 'STPET', # not sure how this relates to ne, nw, sw files
@@ -145,6 +147,88 @@ stpete <- tribble(
 # combine dps
 dpsfac <- dpsfac |>
   bind_rows(stpete)
+
+# add coast id to dps
+dpsfac <- dpsfac |>
+  mutate(
+    coast_id = case_when(
+      permit == "FL0036820"   ~  "D_HC_14",
+      permit == "FL0039896"   ~  "D_HC_15",
+      permit == "FL0027821"   ~  "D_HC_2",
+      permit == "FL0020338"   ~ "D_PK_3",
+      permit == "FL0020401"   ~ "D_MC_2",
+      permit == "FL0020940"   ~ "D_HC_5D",
+      permit == "FL0021369"   ~ "D_MC_3",
+      permit == "FL0021865"   ~ "D_PC_8",
+      permit == "FL0026557"   ~ "D_HC_17",
+      permit == "FL0026603"   ~ "D_PC_9",
+      permit == "FL0027651"   ~ "D_PC_5",
+      permit == "FL0028061SW" ~ "D_HC18D1",
+      permit == "FL0028061LA" ~ "D_HC18D2",
+      permit == "FL0039772"   ~ "D_PK_2",
+      permit == "FL0040614"   ~ "D_HC_3P",
+      permit == "FL0040983"   ~ "D_HC_16",
+      permit == "FL0041670"   ~ "D_HC_1P",
+      permit == "FL0128775"   ~ "PINNW",
+      permit == "FL0128937"   ~ "D_PC_6",
+      permit == "FLA012124"   ~ "D_HC_12",
+      permit == "FLA012234"   ~ "D_HC_002",
+      permit == "FLA012617"   ~ "D_MC_1",
+      permit == "FLA012618"   ~ "D_MC_4",
+      permit == "FLA012744"   ~ "D_PA_001",
+      permit == "FLA012905"   ~ "D_PC_7",
+      permit == "FLA012954"   ~ "D_PK_001",
+      permit == "FLA128821"   ~ "D_PC_11",
+      permit == "FLA128848"   ~ "D_PC_13",
+      permit == "FLA128856"   ~ "D_PC_10",
+      permit == "FLA178667"   ~ "D_PK_002",
+      permit == "FL0168505"   ~ "BridgeAc",
+      permit == "FL0040436"   ~ "SCROSSB",
+      permit == "FLA128830"   ~ "D_PC_12",
+      T ~ NA_character_ # only pasco reuse and st pete facilities have no coast id, which is fine
+    )
+  )
+
+# add coast co to dps
+dpsfac <- dpsfac |>
+  mutate(
+    coast_co = case_when(
+      coast_id == "D_HC_14"  ~ "461",
+      coast_id == "D_HC_15"  ~ "204",
+      coast_id == "D_HC_2"   ~ "421",
+      coast_id == "D_PK_3"   ~ "515b",
+      coast_id == "D_MC_2"   ~ "687",
+      coast_id == "D_HC_5D"  ~ "411b",
+      coast_id == "D_MC_3"   ~ "736",
+      coast_id == "D_PC_8"   ~ "480",
+      coast_id == "D_HC_17"  ~ "403",
+      coast_id == "D_PC_9"   ~ "509",
+      coast_id == "D_PC_5"   ~ "392",
+      coast_id == "D_HC18D1" ~ "583",
+      coast_id == "D_HC18D2" ~ "625a",
+      coast_id == "D_PK_2"   ~ "502",
+      coast_id == "D_HC_3P"  ~ "381",
+      coast_id == "D_HC_16"  ~ "463",
+      coast_id == "D_HC_1P"  ~ "319", # if D-005 is outfall id, then coast_co changed to 292, done in functions
+      coast_id == "PINNW"    ~ "257",
+      coast_id == "D_PC_6"   ~ "387",
+      coast_id == "D_HC_12"  ~ "497",
+      coast_id == "D_HC_002" ~ "245",
+      coast_id == "D_MC_1"   ~ "711",
+      coast_id == "D_MC_4"   ~ "767",
+      coast_id == "D_PA_001" ~ "197",
+      coast_id == "D_PC_7"   ~ "451",
+      coast_id == "D_PK_001" ~ "502",
+      coast_id == "D_PC_11"  ~ "501",
+      coast_id == "D_PC_13"  ~ "594a",
+      coast_id == "D_PC_10"  ~ "566",
+      coast_id == "D_PK_002" ~ "244",
+      coast_id == "D_PC_12"  ~ "594",
+      coast_id == "SCROSSB"  ~ "556",
+      coast_id == "BridgeAc" ~ "508",
+      T ~ NA_character_ # only pasco reuse and st pete facilities have no coast id, which is fine
+    )
+  )
 
 # combine ips dps
 facilities <- bind_rows(ipsfac, dpsfac) |>
