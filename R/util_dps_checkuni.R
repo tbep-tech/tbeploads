@@ -11,7 +11,7 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr matches rename_at select vars |>
+#' @importFrom dplyr matches rename_at select vars
 #'
 #' @examples
 #' pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
