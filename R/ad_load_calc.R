@@ -180,7 +180,8 @@ load <- left_join(rain, verna, by = c("yr", "mo")) %>%
 annual_load <- load %>%
                group_by(segment, yr) %>%
                summarise(tntot = sum(tntot, na.rm = T),
-                         tptot = sum(tptot, na.rm = T)) %>%
+                         tptot = sum(tptot, na.rm = T),
+                         sum_h2oload = sum(h2oload)) %>%
                mutate(tntons = tntot*0.0011023113,
                       tptons = tptot*0.0011023113,
                       source = "Atmospheric Deposition")
