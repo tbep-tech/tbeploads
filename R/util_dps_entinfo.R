@@ -12,7 +12,7 @@
 #'
 #' @importFrom dplyr filter pull select
 #'
-#' @return A list or \code{data.frame} (if \code{asdf = TRUE}) with entity, facility, permit, facility id, coastal id, and coastal co
+#' @return A list or \code{data.frame} (if \code{asdf = TRUE}) with entity, facility, permit, facility id, coastal id, and coastal subbasin code
 #'
 #' @examples
 #' pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
