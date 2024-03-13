@@ -5,12 +5,18 @@ library(tbeptools)
 
 noaa_key <- Sys.getenv('NOAA_KEY')
 
-flrain <- read_sas("./data-raw/fl_rain_por_220223v93.sas7bdat")
-
-cenflrainid <- ncdc_stations(extent=c(27.2,-83,28.7,-81.5), datasetid='GHCND', startdate = "2022-01-01", enddate = "2023-12-31", limit = 1000)
-tbrainid <- cenflrainid$data %>%
-              mutate(stationid = unique(id)) %>%
-              select(stationid, name)
+# Placeholder section to improve future AD calculations by utilizing any active
+# rainfall stations within TB region over the time period of interest, you would then:
+# 1) pass these stations to the NCDC function to get daily data (to sum to monthly totals)
+# 2) still need to identify and assign UTM coordinates to these "new" stations
+# 3) find the invdist2 value to each segment grid point in the targetxy dataframe using the loop starting on line 98
+#
+# flrain <- read_sas("./data-raw/fl_rain_por_220223v93.sas7bdat")
+#
+# cenflrainid <- ncdc_stations(extent=c(27.2,-83,28.7,-81.5), datasetid='GHCND', startdate = "2022-01-01", enddate = "2023-12-31", limit = 1000)
+# tbrainid <- cenflrainid$data %>%
+#               mutate(stationid = unique(id)) %>%
+#               select(stationid, name)
 
 stationid <- c("GHCND:USC00080228", "GHCND:USC00080478", "GHCND:USC00080520", "GHCND:USC00080940", "GHCND:USC00080945",
                "GHCND:USC00081046", "GHCND:USC00081163", "GHCND:USC00081632", "GHCND:USC00081641", "GHCND:USW00092806",
