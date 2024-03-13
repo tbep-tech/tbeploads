@@ -12,7 +12,7 @@ util_dps_entinfo(pth, asdf = FALSE)
 \item{asdf}{logical, if \code{TRUE} return as \code{data.frame}}
 }
 \value{
-A list or \code{data.frame} (if \code{asdf = TRUE}) with entity, facility, permit, and facility id
+A list or \code{data.frame} (if \code{asdf = TRUE}) with entity, facility, permit, facility id, coastal id, and coastal co
 }
 \description{
 Get DPS entity information from file name

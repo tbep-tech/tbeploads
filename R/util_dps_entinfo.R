@@ -12,7 +12,7 @@
 #'
 #' @importFrom dplyr filter pull select
 #'
-#' @return A list or \code{data.frame} (if \code{asdf = TRUE}) with entity, facility, permit, and facility id
+#' @return A list or \code{data.frame} (if \code{asdf = TRUE}) with entity, facility, permit, facility id, coastal id, and coastal co
 #'
 #' @examples
 #' pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
@@ -30,7 +30,7 @@ util_dps_entinfo <- function(pth, asdf = FALSE){
     unique()
 
   out <- facinfo |>
-    select(entity, facname, permit, facid)
+    select(entity, facname, permit, facid, coastco, coastid)
 
   if(!asdf)
     out <- as.list(out)

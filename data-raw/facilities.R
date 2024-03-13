@@ -151,7 +151,7 @@ dpsfac <- dpsfac |>
 # add coast id to dps
 dpsfac <- dpsfac |>
   mutate(
-    coast_id = case_when(
+    coastid = case_when(
       permit == "FL0036820"   ~  "D_HC_14",
       permit == "FL0039896"   ~  "D_HC_15",
       permit == "FL0027821"   ~  "D_HC_2",
@@ -192,40 +192,40 @@ dpsfac <- dpsfac |>
 # add coast co to dps
 dpsfac <- dpsfac |>
   mutate(
-    coast_co = case_when(
-      coast_id == "D_HC_14"  ~ "461",
-      coast_id == "D_HC_15"  ~ "204",
-      coast_id == "D_HC_2"   ~ "421",
-      coast_id == "D_PK_3"   ~ "515b",
-      coast_id == "D_MC_2"   ~ "687",
-      coast_id == "D_HC_5D"  ~ "411b",
-      coast_id == "D_MC_3"   ~ "736",
-      coast_id == "D_PC_8"   ~ "480",
-      coast_id == "D_HC_17"  ~ "403",
-      coast_id == "D_PC_9"   ~ "509",
-      coast_id == "D_PC_5"   ~ "392",
-      coast_id == "D_HC18D1" ~ "583",
-      coast_id == "D_HC18D2" ~ "625a",
-      coast_id == "D_PK_2"   ~ "502",
-      coast_id == "D_HC_3P"  ~ "381",
-      coast_id == "D_HC_16"  ~ "463",
-      coast_id == "D_HC_1P"  ~ "319", # if D-005 is outfall id, then coast_co changed to 292, done in functions
-      coast_id == "PINNW"    ~ "257",
-      coast_id == "D_PC_6"   ~ "387",
-      coast_id == "D_HC_12"  ~ "497",
-      coast_id == "D_HC_002" ~ "245",
-      coast_id == "D_MC_1"   ~ "711",
-      coast_id == "D_MC_4"   ~ "767",
-      coast_id == "D_PA_001" ~ "197",
-      coast_id == "D_PC_7"   ~ "451",
-      coast_id == "D_PK_001" ~ "502",
-      coast_id == "D_PC_11"  ~ "501",
-      coast_id == "D_PC_13"  ~ "594a",
-      coast_id == "D_PC_10"  ~ "566",
-      coast_id == "D_PK_002" ~ "244",
-      coast_id == "D_PC_12"  ~ "594",
-      coast_id == "SCROSSB"  ~ "556",
-      coast_id == "BridgeAc" ~ "508",
+    coastco = case_when(
+      coastid == "D_HC_14"  ~ "461",
+      coastid == "D_HC_15"  ~ "204",
+      coastid == "D_HC_2"   ~ "421",
+      coastid == "D_PK_3"   ~ "515b",
+      coastid == "D_MC_2"   ~ "687",
+      coastid == "D_HC_5D"  ~ "411b",
+      coastid == "D_MC_3"   ~ "736",
+      coastid == "D_PC_8"   ~ "480",
+      coastid == "D_HC_17"  ~ "403",
+      coastid == "D_PC_9"   ~ "509",
+      coastid == "D_PC_5"   ~ "392",
+      coastid == "D_HC18D1" ~ "583",
+      coastid == "D_HC18D2" ~ "625a",
+      coastid == "D_PK_2"   ~ "502",
+      coastid == "D_HC_3P"  ~ "381",
+      coastid == "D_HC_16"  ~ "463",
+      coastid == "D_HC_1P"  ~ "319", # if D-005 is outfall id, then coast_co changed to 292, done in functions
+      coastid == "PINNW"    ~ "257",
+      coastid == "D_PC_6"   ~ "387",
+      coastid == "D_HC_12"  ~ "497",
+      coastid == "D_HC_002" ~ "245",
+      coastid == "D_MC_1"   ~ "711",
+      coastid == "D_MC_4"   ~ "767",
+      coastid == "D_PA_001" ~ "197",
+      coastid == "D_PC_7"   ~ "451",
+      coastid == "D_PK_001" ~ "502",
+      coastid == "D_PC_11"  ~ "501",
+      coastid == "D_PC_13"  ~ "594a",
+      coastid == "D_PC_10"  ~ "566",
+      coastid == "D_PK_002" ~ "244",
+      coastid == "D_PC_12"  ~ "594",
+      coastid == "SCROSSB"  ~ "556",
+      coastid == "BridgeAc" ~ "508",
       T ~ NA_character_ # only pasco reuse and st pete facilities have no coast id, which is fine
     )
   )
