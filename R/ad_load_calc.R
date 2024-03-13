@@ -119,7 +119,7 @@ all <- all_data[order(all_data$target, all_data$targ_x, all_data$targ_y, all_dat
 # Calculate weighted mean of 'tpcp_in' using 'invdist2' as weight
 db <- all %>%
   group_by(target, targ_x, targ_y, yr, mo) %>%
-  summarise(tpcp = weighted.mean(tpcp_in, w = invdist2), .groups = "drop")
+  summarise(tpcp = weighted.mean(tpcp_in, w = invdist2, na.rm = T), .groups = "drop")
 
 # Compute average rainfall at all grid points
 db2 <- db %>%
