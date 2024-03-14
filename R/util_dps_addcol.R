@@ -19,7 +19,7 @@ util_dps_addcol <- function(dat){
   chktn <- grepl('^Total.N', names(dat))
   if(!any(chktn))
     dat <- dat |>
-      mutate(
+      dplyr::mutate(
         Total.N = NA_real_,
         Total.N.Unit = 'mg/l'
         )
@@ -28,7 +28,7 @@ util_dps_addcol <- function(dat){
   chktp <- grepl('^Total.P', names(dat))
   if(!any(chktp))
     dat <- dat |>
-      mutate(
+      dplyr::mutate(
         Total.P = NA_real_,
         Total.P.Unit = 'mg/l'
         )
@@ -37,7 +37,7 @@ util_dps_addcol <- function(dat){
   chktss <- grepl('^TSS', names(dat))
   if(!any(chktss))
     dat <- dat |>
-      mutate(
+      dplyr::mutate(
         TSS = NA_real_,
         TSS.Unit = 'mg/l'
         )
@@ -48,13 +48,13 @@ util_dps_addcol <- function(dat){
     chkbod <- grepl('^CBOD$', names(dat))
     if(any(chkbod)){
       dat <- dat |>
-        rename(
-          BOD = matches('^CBOD$'),
-          BOD.Unit = matches('^CBOD.*Unit')
+        dplyr::rename(
+          BOD = dplyr::matches('^CBOD$'),
+          BOD.Unit = dplyr::matches('^CBOD.*Unit')
           )
     } else {
       dat <- dat |>
-        mutate(
+        dplyr::mutate(
           BOD = NA_real_,
           BOD.Unit = 'mg/l'
           )

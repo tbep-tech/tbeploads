@@ -4,14 +4,10 @@
 \alias{anlz_dps_entity}
 \title{Calculate DPS reuse and end of pipe from raw entity data}
 \usage{
-anlz_dps_entity(pth, skip = 0, sep = "\\t")
+anlz_dps_entity(fls)
 }
 \arguments{
-\item{pth}{path to raw entity data}
-
-\item{skip}{number of lines to skip in raw entity data}
-
-\item{sep}{separator for raw entity data}
+\item{fls}{vector of file paths to raw entity data, one to many}
 }
 \value{
 data frame with loading data for TP, TN, TSS, and BOD as tons per month and hydro load as million cubic meters per month
@@ -20,18 +16,19 @@ data frame with loading data for TP, TN, TSS, and BOD as tons per month and hydr
 Calculate DPS reuse and end of pipe from raw entity data
 }
 \details{
-Indput data should include flow as million gallons per day, and conc as mg/L.  Steps include:
+Input data should include flow as million gallons per day, and conc as mg/L.  Steps include:
 \enumerate{
 \item Multiply flow by day in month to get million gallons per month
 \item Multiply flow by 3785.412 to get cubic meters per month
 \item Multiply N by flow and divide by 1000 to get kg N per month
 \item Multiply m3 by 1000 to get L, then divide by 1e6 to convert mg to kg, same as dividing by 1000
-\item TN DPS reuse is multiplied by 0.3 for land application attenuation factor (70\%)
-\item TP, TSS, BOD  dps reuse is multiplied by 0.05 for land application attenuation factor (95\%)
-\item Hydro load (m3 / mo) is also attenuated for the reuse, multiplied by 0.6 (40\% attenutation)
+\item TN, TP, TSS, BOD dps reuse is multiplied by attenuation factor for land application (varies by location)
+\item Hydro load (m3 / mo) is also attenuated for the reuse, multiplied by 0.6 (40\% attenuation)
 }
 }
 \examples{
-pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
-anlz_dps_entity(pth)
+fls <- list.files(system.file('extdata/', package = 'tbeploads'),
+  pattern = '\\\\.txt$', full.names = TRUE)
+dpsload <- anlz_dps_entity(fls)
+head(dpsload)
 }

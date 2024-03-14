@@ -32,6 +32,7 @@ Depends:
 Imports:
   dplyr,
   lubridate,
+  purrr,
   tibble,
   tidyr
 LazyData: true

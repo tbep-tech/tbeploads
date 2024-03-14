@@ -9,9 +9,6 @@
 #'
 #' @details Bay segment is an integer with values of 1, 2, 3, 4, 5, 6, 7, and 55 for Old Tampa Bay, Hillsborough Bay, Middle Tampa Bay, Lower Tampa Bay, Boca Ciega Bay, Terra Ceia Bay, Manatee River, and Boca Ciega Bay South, respectively.
 #'
-#'
-#' @importFrom dplyr filter pull select
-#'
 #' @return A list or \code{data.frame} (if \code{asdf = TRUE}) with entity, facility, permit, facility id, coastal id, and coastal subbasin code
 #'
 #' @examples
@@ -25,12 +22,12 @@ util_dps_entinfo <- function(pth, asdf = FALSE){
   flentfac <- flentfac[[1]][c(3, 4)]
 
   facinfo <- facilities |>
-    filter(entityshr == flentfac[1] & facnameshr == flentfac[2]) |>
-    select(-bayseg, -source, -basin) |>
+    dplyr::filter(entityshr == flentfac[1] & facnameshr == flentfac[2]) |>
+    dplyr::select(-bayseg, -source, -basin) |>
     unique()
 
   out <- facinfo |>
-    select(entity, facname, permit, facid, coastco, coastid)
+    dplyr::select(entity, facname, permit, facid, coastco, coastid)
 
   if(!asdf)
     out <- as.list(out)

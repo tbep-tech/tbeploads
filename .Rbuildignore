@@ -6,3 +6,5 @@
 ^docs$
 ^pkgdown$
 ^CODE_OF_CONDUCT\.md$
+^codecov\.yml$
+^data-raw/facilities\.R$
