@@ -160,8 +160,8 @@ anlz_dps_entity <- function(fls){
       load_kg = dplyr::case_when(
         coastid %in% spcoastid & var == 'tn_mgl'~ load_kg * 0.05, # 95% reduction for all
         coastid %in% thcoastid & var == 'tn_mgl' ~ load_kg * 0.1, # 90% reduction
-        coastid %in% c(spcoastid, thcoastid) & var == 'tn_mgl' ~ load_kg * 0.3, # 70% reduction
-        T ~ load_kg * 0.3 # 70% reduction
+        (!coastid %in% c(spcoastid, thcoastid)) & var == 'tn_mgl' ~ load_kg * 0.3, # 70% reduction
+        T ~ load_kg
       )
     )
 

@@ -1,7 +1,8 @@
 
-test_that("Check load calculations", {
+test_that("Check end of pipe load calculations", {
 
-  result <- anlz_dps_entity(fls) |>
+  result <- dps |>
+    filter(Year == 2021 & Month == 1 & facility == 'City of Clearwater Northeast AWWTF' & source == 'D-001') |>
     mutate_if(is.numeric, round, 3)
 
   expect_equal(result$tn_load[[1]], 0.617)
