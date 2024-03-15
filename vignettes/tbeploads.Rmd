@@ -45,6 +45,6 @@ For convenience, three example files are included with the package.  These files
 ```{r}
 fls <- list.files(system.file('extdata/', package = 'tbeploads'),
   pattern = '\\.txt$', full.names = TRUE)
-anlz-dps_entity(fls)
+anlz_dps_entity(fls)
 ```
 
