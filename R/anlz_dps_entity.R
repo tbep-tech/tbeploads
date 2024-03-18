@@ -20,8 +20,7 @@
 #' @examples
 #' fls <- list.files(system.file('extdata/', package = 'tbeploads'),
 #'   pattern = '\\.txt$', full.names = TRUE)
-#' dpsload <- anlz_dps_entity(fls)
-#' head(dpsload)
+#' anlz_dps_entity(fls)
 anlz_dps_entity <- function(fls){
 
   ##
@@ -31,11 +30,12 @@ anlz_dps_entity <- function(fls){
       fls = fls
     ) |>
     dplyr::group_by(fls) |>
-    tidyr::nest() |>
+    tidyr::nest(.key = 'dat') |>
     dplyr::mutate(
       dat = purrr::map(fls, read.table, skip = 0, sep = '\t', header = T),
       dat = purrr::map(dat, util_dps_addcol),
       dat = purrr::map(dat, util_dps_checkuni),
+      dat = purrr::map(dat, util_dps_fillmis),
       entinfo = purrr::map(fls, util_dps_entinfo, asdf = T)
     ) |>
     dplyr::ungroup() |>
@@ -50,12 +50,11 @@ anlz_dps_entity <- function(fls){
     dplyr::rename(flow_mgm = flow_mgd) |>
     dplyr::mutate(
       dys = lubridate::days_in_month(lubridate::ymd(paste(Year, Month, '01', sep = '-'))),
-      flow_mgm = flow_mgm * dys,
-      flow_mgm = pmax(0, flow_mgm) # neg values as zero
+      flow_mgm = flow_mgm * dys
     ) |>
     dplyr::select(-dys)
 
-  # change coastco for Dale Mabry D-005 (outfallid not in facilities)
+  # change coastco for Hillsborough co Northwest Regional WRF (old Dale Mabry) D-005 (outfallid not in facilities)
   dps <- dps |>
     dplyr::mutate(coastco = dplyr::case_when(
       outfall == "D-005" & coastid == 'D_HC_1P' ~ "292",
@@ -83,11 +82,6 @@ anlz_dps_entity <- function(fls){
 
   # remove fls
   dps <- dplyr::select(dps, -fls)
-
-  # Replace missing values with 0
-  dps <- dps |>
-    dplyr::mutate_at(dplyr::vars(dplyr::ends_with("mgl")), ~tidyr::replace_na(., 0)) |>
-    dplyr::mutate_at(dplyr::vars(dplyr::ends_with("mgm")), ~tidyr::replace_na(., 0))
 
   # calculate loads for end of pipe and reuse, same calc for both but reuse attenuated below
   dps <- dps |>
@@ -118,8 +112,8 @@ anlz_dps_entity <- function(fls){
   ##
   # apply attenuation factors to reuse depending on location
 
-  # st pete coastal id
-  # loads are assigned propotionally to each coastal subbasin code for the selected coast ids
+  # st pete facilities coastal id
+  # loads are assigned proportionally to each coastal subbasin code for the selected coast ids
   # then additonal attenuation factor applied
   spcoastid <- c("D_PC_10", "D_PC_11", "D_PC_12", "D_PC_13")
 
@@ -150,7 +144,7 @@ anlz_dps_entity <- function(fls){
 
   # TN attenuation varies
   # 95% for st pete coastsid
-  # 90% for those in thcoastid
+  # 90% for those in thcoastid (Van Dyke, Polk SW, Polk NW, Zephyrhills, Pinellas WEDunn, SouthCross (outside of RA), MacDill, Manatee North Reg, Manatee SE Reg, Largo, HillsCoSouthCo_SW, HillsCoSouthCo_LA)
   # 70% all others
   thcoastid <- c("D_HC_002", "D_PK_001", "D_PK_002", "D_PA_001", "PINNW", "SCROSSB", "D_HC_12",
                  "D_MC_1", "D_MC_4", "D_PC_9", "D_HC18D1", "D_HC18D2")

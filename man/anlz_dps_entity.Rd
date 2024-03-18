@@ -29,6 +29,5 @@ Input data should include flow as million gallons per day, and conc as mg/L.  St
 \examples{
 fls <- list.files(system.file('extdata/', package = 'tbeploads'),
   pattern = '\\\\.txt$', full.names = TRUE)
-dpsload <- anlz_dps_entity(fls)
-head(dpsload)
+anlz_dps_entity(fls)
 }
