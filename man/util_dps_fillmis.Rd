@@ -16,7 +16,7 @@ Input data frame as is if no missing values, otherwise missing data filled as de
 Fill missing DPS data with annual average
 }
 \details{
-Missing concentration data are replaced with the average for the outfall in a given year. All flow data are also floored at zero.  Rows with missing flow data are assigned 0 for all data.
+Missing concentration data are replaced with the average for the outfall in a given year. All flow data are also floored at zero.  Rows with missing flow data are assigned 0 for all data.  Rows with zero flow are assiged conentration of zero.
 }
 \examples{
 pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')

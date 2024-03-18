@@ -5,7 +5,7 @@
 #' @param dat data frame from raw entity data as \code{data.frame}
 #'
 #' @details
-#' Missing concentration data are replaced with the average for the outfall in a given year. All flow data are also floored at zero.  Rows with missing flow data are assigned 0 for all data.
+#' Missing concentration data are replaced with the average for the outfall in a given year. All flow data are also floored at zero.  Rows with missing flow data are assigned 0 for all data.  Rows with zero flow are assiged conentration of zero.
 #'
 #' @return Input data frame as is if no missing values, otherwise missing data filled as described above.
 #'
@@ -23,7 +23,8 @@ util_dps_fillmis <- function(dat){
                   .by = c('Year', 'outfall')) |>
     dplyr::mutate(flow_mgd = pmax(0, flow_mgd)) |>
     dplyr::mutate(dplyr::across(dplyr::matches('tn|tp|tss|bod|load'), ~ ifelse(is.na(flow_mgd), 0, .x))) |>
-    dplyr::mutate(flow_mgd = ifelse(is.na(flow_mgd), 0, flow_mgd))
+    dplyr::mutate(flow_mgd = ifelse(is.na(flow_mgd), 0, flow_mgd)) |>
+    dplyr::mutate(dplyr::across(dplyr::matches('tn|tp|tss|bod|load'), ~ ifelse(flow_mgd == 0, 0, .x)))
 
   return(out)
 

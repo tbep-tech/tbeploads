@@ -14,7 +14,10 @@
 #' 1. TN, TP, TSS, BOD dps reuse is multiplied by attenuation factor for land application (varies by location)
 #' 1. Hydro load (m3 / mo) is also attenuated for the reuse, multiplied by 0.6 (40% attenuation)
 #'
-#' @return data frame with loading data for TP, TN, TSS, and BOD as tons per month and hydro load as million cubic meters per month
+#' @return data frame with loading data for TP, TN, TSS, and BOD as tons per month and hydro load as million cubic meters per month.  Information for each entity, facility, and outfall is retained.
+#'
+#' @seealso \code{\link{anlz_dps}}
+#'
 #' @export
 #'
 #' @examples

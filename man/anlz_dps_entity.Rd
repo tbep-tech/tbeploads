@@ -10,7 +10,7 @@ anlz_dps_entity(fls)
 \item{fls}{vector of file paths to raw entity data, one to many}
 }
 \value{
-data frame with loading data for TP, TN, TSS, and BOD as tons per month and hydro load as million cubic meters per month
+data frame with loading data for TP, TN, TSS, and BOD as tons per month and hydro load as million cubic meters per month.  Information for each entity, facility, and outfall is retained.
 }
 \description{
 Calculate DPS reuse and end of pipe from raw entity data
@@ -30,4 +30,7 @@ Input data should include flow as million gallons per day, and conc as mg/L.  St
 fls <- list.files(system.file('extdata/', package = 'tbeploads'),
   pattern = '\\\\.txt$', full.names = TRUE)
 anlz_dps_entity(fls)
+}
+\seealso{
+\code{\link{anlz_dps}}
 }
