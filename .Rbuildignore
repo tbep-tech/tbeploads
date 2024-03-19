@@ -9,3 +9,4 @@
 ^codecov\.yml$
 ^data-raw/facilities\.R$
 ^data-raw/dbasing_0407\.sas7bdat$
+^data-raw/*$

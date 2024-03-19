@@ -18,7 +18,7 @@
 #' fls <- list.files(system.file('extdata/', package = 'tbeploads'),
 #'   pattern = '\\.txt$', full.names = TRUE)
 #' anlz_dps(fls)
-anlz_dps <- function(dpsent, summ = c('entity', 'facility', 'segment', 'all'), summtime = c('month', 'year')){
+anlz_dps <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summtime = c('month', 'year')){
 
   summ <- match.arg(summ)
   summtime <- match.arg(summtime)
@@ -28,29 +28,29 @@ anlz_dps <- function(dpsent, summ = c('entity', 'facility', 'segment', 'all'), s
 
   # remove bcb, bcbs from dpsbyfac
   dpsld <- dpsbyfac  |>
-    filter(coastco != "580") |>
-    arrange(coastco) |>
-    inner_join(dbasing, by = "coastco")
+    dplyr::filter(coastco != "580") |>
+    dplyr::arrange(coastco) |>
+    dplyr::inner_join(dbasing, by = "coastco")
 
   # create bcb north and south load subsets
   bcbnorth <- dpsbyfac |>
-    filter(coastco == "580") |>
-    mutate(across(contains("load"), ~ .x * 0.589),
+    dplyr::filter(coastco == "580") |>
+    dplyr::mutate(dplyr::across(dplyr::contains("load"), ~ .x * 0.589),
            bayseg = 5)
 
   bcbsouth <- dpsbyfac |>
-    filter(coastco == "580") |>
-    mutate(across(contains("load"), ~ .x * 0.411),
+    dplyr::filter(coastco == "580") |>
+    dplyr::mutate(dplyr::across(dplyr::contains("load"), ~ .x * 0.411),
            bayseg = 55)
 
-  bcb <- bind_rows(bcbnorth, bcbsouth) |>
-    inner_join(dbasing, by = c("coastco", "bayseg"))
+  bcb <- dplyr::bind_rows(bcbnorth, bcbsouth) |>
+    dplyr::inner_join(dbasing, by = c("coastco", "bayseg"))
 
   # combine orig with refactored bcb data, redo segment
-  dpsld <- bind_rows(dpsld, bcb) |>
-    arrange(coastco) |>
+  dpsld <- dplyr::bind_rows(dpsld, bcb) |>
+    dplyr::arrange(coastco) |>
     dplyr::mutate(
-      segment = case_when(
+      segment = dplyr::case_when(
         basin == "LTARPON"  ~ 1,
         basin == "02306647" ~ 1,
         basin == "02307000" ~ 1,
@@ -86,7 +86,7 @@ anlz_dps <- function(dpsent, summ = c('entity', 'facility', 'segment', 'all'), s
         basin == "02299950" ~ 7
       ),
       bayseg = segment,
-      segment = case_when(
+      segment = dplyr::case_when(
         bayseg == 1 ~ "Hillsborough Bay",
         bayseg == 2 ~ "Old Tampa Bay",
         bayseg == 3 ~ "Middle Tampa Bay",
@@ -97,12 +97,12 @@ anlz_dps <- function(dpsent, summ = c('entity', 'facility', 'segment', 'all'), s
         bayseg == 55 ~ "Boca Ciega Bay South",
         TRUE ~ NA_character_
       ),
-      source = case_when(
+      source = dplyr::case_when(
         grepl('^D', source) ~ "end of pipe",
         grepl('^R', source) ~ "reuse"
       )
     ) |>
-    select(-basin, -hectare, -coastco, -name, -bayseg)
+    dplyr::select(-basin, -hectare, -coastco, -name, -bayseg)
 
   ##
   # summarize by selection
@@ -113,29 +113,29 @@ anlz_dps <- function(dpsent, summ = c('entity', 'facility', 'segment', 'all'), s
     if(summ == 'facility')
 
       out <- out |>
-        summarise(across(contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
                   .by = c(Year, Month, source, entity, facility, segment))
 
     if(summ == 'entity')
 
       out <- out |>
-        summarise(across(contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
                   .by = c(Year, Month, source, entity, segment))
 
     if(summ == 'segment')
 
       out <- out |>
-        summarise(across(contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
                   .by = c(Year, Month, source, segment))
 
     if(summ == 'all')
 
       out <- out |>
-        summarise(across(contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
                   .by = c(Year, Month, source))
 
     out <- out |>
-      arrange(Year, Month, source)
+      dplyr::arrange(source, Year, Month)
 
   }
 
@@ -144,29 +144,29 @@ anlz_dps <- function(dpsent, summ = c('entity', 'facility', 'segment', 'all'), s
     if(summ == 'facility')
 
       out <- out |>
-        summarise(across(contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
                   .by = c(Year, source, entity, facility, segment))
 
     if(summ == 'entity')
 
       out <- out |>
-        summarise(across(contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
                   .by = c(Year, source, entity, segment))
 
     if(summ == 'segment')
 
       out <- out |>
-        summarise(across(contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
                   .by = c(Year, source, segment))
 
     if(summ == 'all')
 
       out <- out |>
-        summarise(across(contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
                   .by = c(Year, source))
 
     out <- out |>
-      arrange(Year, source)
+      dplyr::arrange(source, Year)
 
   }
 

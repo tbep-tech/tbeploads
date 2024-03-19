@@ -5,17 +5,17 @@
 \title{Calculate DPS reuse and end of pipe and summarize}
 \usage{
 anlz_dps(
-  dpsent,
+  fls,
   summ = c("entity", "facility", "segment", "all"),
   summtime = c("month", "year")
 )
 }
 \arguments{
+\item{fls}{vector of file paths to raw entity data, one to many}
+
 \item{summ}{chr string indicating how the returned data are summarized, see details}
 
 \item{summtime}{chr string indicating how the returned data are summarized temporally (month or year), see details}
-
-\item{fls}{vector of file paths to raw entity data, one to many}
 }
 \value{
 data frame with loading data for TP, TN, TSS, and BOD as tons per month/year and hydro load as million cubic meters per month/year
