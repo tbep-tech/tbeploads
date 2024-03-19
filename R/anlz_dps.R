@@ -98,8 +98,8 @@ anlz_dps <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summ
         TRUE ~ NA_character_
       ),
       source = dplyr::case_when(
-        grepl('^D', source) ~ "end of pipe",
-        grepl('^R', source) ~ "reuse"
+        grepl('^D', source) ~ "DPS - end of pipe",
+        grepl('^R', source) ~ "DPS - reuse"
       )
     ) |>
     dplyr::select(-basin, -hectare, -coastco, -name, -bayseg)
