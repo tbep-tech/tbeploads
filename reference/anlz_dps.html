@@ -55,7 +55,7 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">anlz_dps</span><span class="op">(</span></span>
-<span>  <span class="va">dpsent</span>,</span>
+<span>  <span class="va">fls</span>,</span>
 <span>  summ <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"entity"</span>, <span class="st">"facility"</span>, <span class="st">"segment"</span>, <span class="st">"all"</span><span class="op">)</span>,</span>
 <span>  summtime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"month"</span>, <span class="st">"year"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -63,16 +63,16 @@
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>summ</dt>
+    <dl><dt>fls</dt>
+<dd><p>vector of file paths to raw entity data, one to many</p></dd>
+
+
+<dt>summ</dt>
 <dd><p>chr string indicating how the returned data are summarized, see details</p></dd>
 
 
 <dt>summtime</dt>
 <dd><p>chr string indicating how the returned data are summarized temporally (month or year), see details</p></dd>
-
-
-<dt>fls</dt>
-<dd><p>vector of file paths to raw entity data, one to many</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -95,7 +95,20 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  pattern <span class="op">=</span> <span class="st">'\\.txt$'</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">anlz_dps</span><span class="op">(</span><span class="va">fls</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in anlz_dps(fls):</span> object 'fls' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 96 × 10</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Year Month source   entity segment tn_load tp_load tss_load bod_load hy_load</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">2</span>017     1 end of … Hills… Old Ta… 0.092<span style="text-decoration: underline;">4</span>  1.32<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span> 0.038<span style="text-decoration: underline;">8</span>    0.095<span style="text-decoration: underline;">5</span>  0.070<span style="text-decoration: underline;">4</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">2</span>017     2 end of … Hills… Old Ta… 0.105   1.79<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span> 0.049<span style="text-decoration: underline;">7</span>    0.182   0.090<span style="text-decoration: underline;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">2</span>017     3 end of … Hills… Old Ta… 0.016<span style="text-decoration: underline;">7</span>  2.46<span style="color: #949494;">e</span><span style="color: #BB0000;">-3</span> 0.006<span style="text-decoration: underline;">47</span>   0.012<span style="text-decoration: underline;">7</span>  0.011<span style="text-decoration: underline;">7</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  <span style="text-decoration: underline;">2</span>017     4 end of … Hills… Old Ta… 0.002<span style="text-decoration: underline;">49</span> 2.88<span style="color: #949494;">e</span><span style="color: #BB0000;">-4</span> 0.000<span style="text-decoration: underline;">626</span>  0.001<span style="text-decoration: underline;">75</span> 0.001<span style="text-decoration: underline;">14</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>  <span style="text-decoration: underline;">2</span>017     5 end of … Hills… Old Ta… 0.021<span style="text-decoration: underline;">9</span>  1.05<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span> 0.011<span style="text-decoration: underline;">6</span>    0.039<span style="text-decoration: underline;">6</span>  0.021<span style="text-decoration: underline;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>  <span style="text-decoration: underline;">2</span>017     6 end of … Hills… Old Ta… 0.329   8.41<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span> 0.134     0.281   0.238  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>  <span style="text-decoration: underline;">2</span>017     7 end of … Hills… Old Ta… 0.215   5.95<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span> 0.114     0.293   0.208  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>  <span style="text-decoration: underline;">2</span>017     8 end of … Hills… Old Ta… 0.369   1.05<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span> 0.188     0.493   0.341  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">2</span>017     9 end of … Hills… Old Ta… 0.603   1.51<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span> 0.202     0.548   0.360  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>017    10 end of … Hills… Old Ta… 0.286   6.08<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span> 0.113     0.371   0.204  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 86 more rows</span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
