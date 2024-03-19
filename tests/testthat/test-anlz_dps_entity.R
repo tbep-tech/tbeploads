@@ -22,6 +22,8 @@ test_that("Check outfall not found", {
 
   expect_error(anlz_dps_entity(tmpfl), "outfall id not in data: ps_dom_hillsco_falkenburg_2019.txt, R-007")
 
+  file.remove(tmpfl)
+
 })
 
 test_that("Verify output class", {
