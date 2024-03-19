@@ -113,25 +113,25 @@ anlz_dps <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summ
     if(summ == 'facility')
 
       out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
                   .by = c(Year, Month, source, entity, facility, segment))
 
     if(summ == 'entity')
 
       out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
                   .by = c(Year, Month, source, entity, segment))
 
     if(summ == 'segment')
 
       out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
                   .by = c(Year, Month, source, segment))
 
     if(summ == 'all')
 
       out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
                   .by = c(Year, Month, source))
 
     out <- out |>
@@ -144,25 +144,25 @@ anlz_dps <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summ
     if(summ == 'facility')
 
       out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
                   .by = c(Year, source, entity, facility, segment))
 
     if(summ == 'entity')
 
       out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
                   .by = c(Year, source, entity, segment))
 
     if(summ == 'segment')
 
       out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
                   .by = c(Year, source, segment))
 
     if(summ == 'all')
 
       out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), sum),
+        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
                   .by = c(Year, source))
 
     out <- out |>

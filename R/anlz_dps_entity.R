@@ -120,21 +120,21 @@ anlz_dps_entity <- function(fls){
   # then additonal attenuation factor applied
   spcoastid <- c("D_PC_10", "D_PC_11", "D_PC_12", "D_PC_13")
 
-  dpsreuse <- dpsreuse |>
-    dplyr::mutate(
-      load_kg = dplyr::case_when(
-        coastid %in% spcoastid & coastco == '508' ~ load_kg * 0.16,
-        coastid %in% spcoastid & coastco == '544' ~ load_kg * 0.233,
-        coastid %in% spcoastid & coastco == '566' ~ load_kg * 0.161,
-        coastid %in% spcoastid & coastco == '573' ~ load_kg * 0.06,
-        coastid %in% spcoastid & coastco == '586' ~ load_kg * 0.07,
-        coastid %in% spcoastid & coastco == '588' ~ load_kg * 0.04,
-        coastid %in% spcoastid & coastco == '594' ~ load_kg * 0.085,
-        coastid %in% spcoastid & coastco == '594a' ~ load_kg * 0.06,
-        coastid %in% spcoastid & coastco == '580' ~ load_kg * 0.131,
-        T ~ load_kg
-      )
-    )
+  # dpsreuse <- dpsreuse |>
+  #   dplyr::mutate(
+  #     load_kg = dplyr::case_when(
+  #       coastid %in% spcoastid & coastco == '508' ~ load_kg * 0.16,
+  #       coastid %in% spcoastid & coastco == '544' ~ load_kg * 0.233,
+  #       coastid %in% spcoastid & coastco == '566' ~ load_kg * 0.161,
+  #       coastid %in% spcoastid & coastco == '573' ~ load_kg * 0.06,
+  #       coastid %in% spcoastid & coastco == '586' ~ load_kg * 0.07,
+  #       coastid %in% spcoastid & coastco == '588' ~ load_kg * 0.04,
+  #       coastid %in% spcoastid & coastco == '594' ~ load_kg * 0.085,
+  #       coastid %in% spcoastid & coastco == '594a' ~ load_kg * 0.06,
+  #       coastid %in% spcoastid & coastco == '580' ~ load_kg * 0.131,
+  #       T ~ load_kg
+  #     )
+  #   )
 
   # for all, 95% reduction in TP, TSS, BOD
   dpsreuse <- dpsreuse |>
