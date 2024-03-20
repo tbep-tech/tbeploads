@@ -113,13 +113,12 @@ a file with monthly parameter concentration (mg/L) and flow data
 (million gallons per day). The data also describe whether the
 observations are end of pipe (direct inflow to the bay) or reuse
 (applied to the land), with each defined by outfall Ids typically noted
-as D-001, D-002, etc. and R-001, R-002, etc, respectively. Different
-calculations are used to determine the load for each. Both are estimated
-as concentration times flow, whereas reuse includes an attenuation
-factor for land application depending on location. The file names must
-follow a specific convention, where metadata for each entity is found in
-the <code><a href="../reference/facilities.html">facilities()</a></code> file included with the package using
-information in the file name.</p>
+as D-001, D-002, etc. and R-001, R-002, etc, respectively. Both are
+estimated as concentration times flow, whereas reuse includes an
+attenuation factor for land application depending on location. The file
+names must follow a specific convention, where metadata for each entity
+is found in the <code><a href="../reference/facilities.html">facilities()</a></code> file included with the package
+using information in the file name.</p>
 <p>For convenience, three example files are included with the package.
 The paths to these files are used as input to the function. Non-trivial
 data preprocessing is needed for each file and those included in the
