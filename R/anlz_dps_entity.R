@@ -46,10 +46,17 @@ anlz_dps_entity <- function(fls){
     tidyr::unnest('dat')
 
   ##
+  # remove south county regional wwtp la and sw duplicate permits
+
+  dps <- dpsprep |>
+    dplyr::filter(!(grepl('^D', outfall) & permit == 'FL0028061LA')) |>
+    dplyr::filter(!(grepl('^R', outfall) & permit == 'FL0028061SW'))
+
+  ##
   # calc loads
 
   # convert flow as mgd to mgm
-  dps <- dpsprep |>
+  dps <- dps |>
     dplyr::rename(flow_mgm = flow_mgd) |>
     dplyr::mutate(
       dys = lubridate::days_in_month(lubridate::ymd(paste(Year, Month, '01', sep = '-'))),
@@ -120,21 +127,36 @@ anlz_dps_entity <- function(fls){
   # then additonal attenuation factor applied
   spcoastid <- c("D_PC_10", "D_PC_11", "D_PC_12", "D_PC_13")
 
-  # dpsreuse <- dpsreuse |>
-  #   dplyr::mutate(
-  #     load_kg = dplyr::case_when(
-  #       coastid %in% spcoastid & coastco == '508' ~ load_kg * 0.16,
-  #       coastid %in% spcoastid & coastco == '544' ~ load_kg * 0.233,
-  #       coastid %in% spcoastid & coastco == '566' ~ load_kg * 0.161,
-  #       coastid %in% spcoastid & coastco == '573' ~ load_kg * 0.06,
-  #       coastid %in% spcoastid & coastco == '586' ~ load_kg * 0.07,
-  #       coastid %in% spcoastid & coastco == '588' ~ load_kg * 0.04,
-  #       coastid %in% spcoastid & coastco == '594' ~ load_kg * 0.085,
-  #       coastid %in% spcoastid & coastco == '594a' ~ load_kg * 0.06,
-  #       coastid %in% spcoastid & coastco == '580' ~ load_kg * 0.131,
-  #       T ~ load_kg
-  #     )
-  #   )
+  dpsreusesp <- dpsreuse |>
+    dplyr::filter(coastid %in% spcoastid) |>
+    dplyr::select(-coastco) |>
+    list() |>
+    tibble::tibble(
+      coastco = c('508', '544', '566', '573', '580', '586', '588', '594'), #, '594a'),
+      spccpro = c(0.16, 0.233, 0.161, 0.06, 0.131, 0.07, 0.04, 0.145), #0.085, 0.06),
+      data = _
+    ) |>
+    unnest(data) |>
+    dplyr::mutate(
+      flow_m3m = flow_m3m * spccpro,
+      load_kg = load_kg * spccpro,
+      permit = 'STPETE',
+      facid = 'STPET',
+      facname = 'St Pete Facilities',
+      coastid = NA_character_
+    ) |>
+    dplyr::select(-spccpro) |>
+    dplyr::summarise(
+      conc_mgl  = mean(conc_mgl, na.rm = T),
+      flow_m3m = sum(flow_m3m, na.rm = T),
+      load_kg = sum(load_kg),
+      .by = c(Year, Month, outfall, entity, facname, permit, facid, coastco, coastid, var)
+    )
+
+  # add dpsresusesp back to dpsreuse and remove original st pete data
+  dpsreuse <- dpsreuse |>
+    dplyr::filter(!coastid %in% spcoastid) |>
+    dplyr::bind_rows(dpsreusesp)
 
   # for all, 95% reduction in TP, TSS, BOD
   dpsreuse <- dpsreuse |>
@@ -155,9 +177,9 @@ anlz_dps_entity <- function(fls){
   dpsreuse <- dpsreuse |>
     dplyr::mutate(
       load_kg = dplyr::case_when(
-        coastid %in% spcoastid & var == 'tn_mgl'~ load_kg * 0.05, # 95% reduction for all
+        permit %in% 'STPETE' & var == 'tn_mgl'~ load_kg * 0.05, # 95% reduction
         coastid %in% thcoastid & var == 'tn_mgl' ~ load_kg * 0.1, # 90% reduction
-        (!coastid %in% c(spcoastid, thcoastid)) & var == 'tn_mgl' ~ load_kg * 0.3, # 70% reduction
+        (!coastid %in% thcoastid) & (!permit %in% 'STPETE') & var == 'tn_mgl' ~ load_kg * 0.3, # 70% reduction
         T ~ load_kg
       )
     )
