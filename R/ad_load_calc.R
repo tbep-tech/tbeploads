@@ -71,17 +71,11 @@ tb_mo_rain <- tbrain %>%
 tb_mo_rain_2022 <- tb_mo_rain %>%
                      filter(yr == 2022)
 
-# Create data frame for NWS station coordinates
-nwssite <- data.frame(
-  nwssite = c(228, 478, 520, 940, 945, 1046, 1163, 1632, 1641, 3153, 3986, 4707, 5973, 6065, 6880, 7205, 7851, 7886, 8788, 8824, 9176, 9401, 2806),
-  nws_x = c(415826, 417986, 352595, 343572, 355056, 366389, 394141, 327864, 423324, 388119, 378897, 427950, 440969, 369648, 360167, 388579, 377469, 339071, 349179, 324855, 356254, 419381, 339071),
-  nws_y = c(3010551, 3086233, 3105324, 3040799, 3036965, 3166106, 3171362, 3094572, 3150822, 3049544, 3114262, 3106479, 3089791, 3014643, 3051678, 3099395, 3134590, 3074100, 3094285, 3113086, 2998172, 3049298, 3074100)
-)
-
+# Load data frame for NWS rainfall station coordinates
+nwssite <- read.csv(file = "./data-raw/nwssite.csv")
 
 # Create data frame for target coordinates
-targetxy <- read.csv(file = "./data-raw/ad_targetxy.csv") %>%
-            select(-c(X))
+targetxy <- read.csv(file = "./data-raw/ad_targetxy.csv")
 
 # Create a data frame to store distance calculations
 distance <- data.frame(target = numeric(),
@@ -157,7 +151,7 @@ rain <- db2 %>%
                  source = "Atmospheric Deposition")
 
 #Acquire and read-in Verna NTN atmospheric deposition concentration data over the period of interest from: https://nadp.slh.wisc.edu/sites/ntn-FL41/
-verna <- read.csv(file = "./data-raw/NTN-fl41-i-mgl.csv") %>%
+verna <- read.csv(file = "./data-raw/NADP/NTN-fl41-i-mgl.csv") %>%
           mutate(mo = seas+ 0) %>%
           mutate(nh4 = case_when(yr == 2022 & mo == 12 ~ mean(c(0.046, 0.063, 0.09, 0.105, 0.173)), #Dec. NH4 mean from 2017-2021 to fill in missing data
                                  TRUE ~ NH4)) %>%
