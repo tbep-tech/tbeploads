@@ -30,7 +30,7 @@ anlz_dps <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summ
   dpsld <- dpsbyfac  |>
     dplyr::filter(coastco != "580") |>
     dplyr::arrange(coastco) |>
-    dplyr::inner_join(dbasing, by = "coastco")
+    dplyr::left_join(dbasing, by = "coastco")
 
   # create bcb north and south load subsets
   bcbnorth <- dpsbyfac |>
@@ -44,7 +44,7 @@ anlz_dps <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summ
            bayseg = 55)
 
   bcb <- dplyr::bind_rows(bcbnorth, bcbsouth) |>
-    dplyr::inner_join(dbasing, by = c("coastco", "bayseg"))
+    dplyr::left_join(dbasing, by = c("coastco", "bayseg"))
 
   # combine orig with refactored bcb data, redo segment
   dpsld <- dplyr::bind_rows(dpsld, bcb) |>
@@ -104,9 +104,9 @@ anlz_dps <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summ
     ) |>
     dplyr::select(-basin, -hectare, -coastco, -name, -bayseg)
 
-  # remove south cross bayou, not in RA
-  dpsld <- dpsld |>
-    dplyr::filter(!(facility %in% 'South Cross Bayou WRF'))
+  # # remove south cross bayou (pinellas co as entity), not in RA
+  # dpsld <- dpsld |>
+  #   dplyr::filter(!(facility %in% 'South Cross Bayou WRF'))
 
   ##
   # summarize by selection
