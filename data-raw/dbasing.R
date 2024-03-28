@@ -22,8 +22,8 @@ dbasing <- dbasing |>
       T ~ hectare
     ),
     name = case_when(
-      bayseg == 1 ~ "Hillsborough Bay",
-      bayseg == 2 ~ "Old Tampa Bay",
+      bayseg == 1 ~ "Old Tampa Bay",
+      bayseg == 2 ~ "Hillsborough Bay",
       bayseg == 3 ~ "Middle Tampa Bay",
       bayseg == 4 ~ "Lower Tampa Bay",
       bayseg == 5 ~ "Boca Ciega Bay",
