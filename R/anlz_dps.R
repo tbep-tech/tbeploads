@@ -7,12 +7,12 @@
 #' @param summtime chr string indicating how the returned data are summarized temporally (month or year), see details
 #'
 #' @details
-#' Input data files in \code{fls} are first processed by \code{\link{anlz_dps_entity}} to calculate DPS reuse and end of pipe for each facility and outfall.  The data can then be summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed basd on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}).
+#' Input data files in \code{fls} are first processed by \code{\link{anlz_dps_facility}} to calculate DPS reuse and end of pipe for each facility and outfall.  The data can then be summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed basd on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}).
 #'
 #' @return data frame with loading data for TP, TN, TSS, and BOD as tons per month/year and hydro load as million cubic meters per month/year
 #' @export
 #'
-#' @seealso \code{\link{anlz_dps_entity}}
+#' @seealso \code{\link{anlz_dps_facility}}
 #'
 #' @examples
 #' fls <- list.files(system.file('extdata/', package = 'tbeploads'),
@@ -24,7 +24,7 @@ anlz_dps <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summ
   summtime <- match.arg(summtime)
 
   # get facility and outfall level data
-  dpsbyfac <- anlz_dps_entity(fls)
+  dpsbyfac <- anlz_dps_facility(fls)
 
   # remove bcb, bcbs from dpsbyfac
   dpsld <- dpsbyfac  |>
@@ -103,6 +103,10 @@ anlz_dps <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summ
       )
     ) |>
     dplyr::select(-basin, -hectare, -coastco, -name, -bayseg)
+
+  # remove south cross bayou, not in RA
+  dpsld <- dpsld |>
+    dplyr::filter(!(facility %in% 'South Cross Bayou WRF'))
 
   ##
   # summarize by selection

@@ -1,8 +1,8 @@
-#' Calculate DPS reuse and end of pipe from raw entity data
+#' Calculate DPS reuse and end of pipe from raw facility data
 #'
-#' Calculate DPS reuse and end of pipe from raw entity data
+#' Calculate DPS reuse and end of pipe from raw facility data
 #'
-#' @param fls vector of file paths to raw entity data, one to many
+#' @param fls vector of file paths to raw facility data, one to many
 #'
 #' @details
 #' Input data should include flow as million gallons per day, and conc as mg/L.  Steps include:
@@ -23,8 +23,8 @@
 #' @examples
 #' fls <- list.files(system.file('extdata/', package = 'tbeploads'),
 #'   pattern = '\\.txt$', full.names = TRUE)
-#' anlz_dps_entity(fls)
-anlz_dps_entity <- function(fls){
+#' anlz_dps_facility(fls)
+anlz_dps_facility <- function(fls){
 
   ##
   # import and prep all data
@@ -39,7 +39,7 @@ anlz_dps_entity <- function(fls){
       dat = purrr::map(dat, util_dps_addcol),
       dat = purrr::map(dat, util_dps_checkuni),
       dat = purrr::map(dat, util_dps_fillmis),
-      entinfo = purrr::map(fls, util_dps_entinfo, asdf = T)
+      entinfo = purrr::map(fls, util_dps_facinfo, asdf = T)
     ) |>
     dplyr::ungroup() |>
     tidyr::unnest('entinfo') |>

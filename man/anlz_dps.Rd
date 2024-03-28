@@ -24,7 +24,7 @@ data frame with loading data for TP, TN, TSS, and BOD as tons per month/year and
 Calculate DPS reuse and end of pipe and summarize
 }
 \details{
-Input data files in \code{fls} are first processed by \code{\link{anlz_dps_entity}} to calculate DPS reuse and end of pipe for each facility and outfall.  The data can then be summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed basd on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}).
+Input data files in \code{fls} are first processed by \code{\link{anlz_dps_facility}} to calculate DPS reuse and end of pipe for each facility and outfall.  The data can then be summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed basd on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}).
 }
 \examples{
 fls <- list.files(system.file('extdata/', package = 'tbeploads'),
@@ -32,5 +32,5 @@ fls <- list.files(system.file('extdata/', package = 'tbeploads'),
 anlz_dps(fls)
 }
 \seealso{
-\code{\link{anlz_dps_entity}}
+\code{\link{anlz_dps_facility}}
 }

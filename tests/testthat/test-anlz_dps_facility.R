@@ -20,7 +20,7 @@ test_that("Check outfall not found", {
   tmpfl <- file.path(tempdir(), basename(pth))
   write.table(tmp, tmpfl, sep = '\t', row.names = F, quote = F)
 
-  expect_error(anlz_dps_entity(tmpfl), "outfall id not in data: ps_dom_hillsco_falkenburg_2019.txt, R-007")
+  expect_error(anlz_dps_facility(tmpfl), "outfall id not in data: ps_dom_hillsco_falkenburg_2019.txt, R-007")
 
   file.remove(tmpfl)
 
@@ -28,7 +28,7 @@ test_that("Check outfall not found", {
 
 test_that("Verify output class", {
 
-  result <- anlz_dps_entity(fls)
+  result <- anlz_dps_facility(fls)
 
   expect_s3_class(result, "data.frame")
 

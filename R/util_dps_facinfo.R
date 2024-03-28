@@ -13,8 +13,8 @@
 #'
 #' @examples
 #' pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
-#' util_dps_entinfo(pth)
-util_dps_entinfo <- function(pth, asdf = FALSE){
+#' util_dps_facinfo(pth)
+util_dps_facinfo <- function(pth, asdf = FALSE){
 
   # get entity and facility from path
   flentfac <- gsub('\\.txt$', '', basename(pth)) |>
