@@ -107,7 +107,7 @@ are build around these source with unique inputs for each.</p>
 <h3 id="dps">DPS<a class="anchor" aria-label="anchor" href="#dps"></a>
 </h3>
 <p>The DPS functions are designed to work with raw entity data provided
-by partners. The core function is <code><a href="../reference/anlz_dps_entity.html">anlz_dps_entity()</a></code> that
+by partners. The core function is <code><a href="../reference/anlz_dps_facility.html">anlz_dps_facility()</a></code> that
 requires only a vector of file paths as input, where each path points to
 a file with monthly parameter concentration (mg/L) and flow data
 (million gallons per day). The data also describe whether the
@@ -128,7 +128,7 @@ for TN, TP, TSS, and BOD and million cubic meters per month for flow
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span>,</span>
 <span>  pattern <span class="op">=</span> <span class="st">'\\.txt$'</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/anlz_dps_entity.html">anlz_dps_entity</a></span><span class="op">(</span><span class="va">fls</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/anlz_dps_facility.html">anlz_dps_facility</a></span><span class="op">(</span><span class="va">fls</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 120 × 11</span></span></span>
 <span><span class="co">#&gt;     Year Month entity  facility coastco source tn_load tp_load tss_load bod_load</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -145,12 +145,12 @@ for TN, TP, TSS, and BOD and million cubic meters per month for flow
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 110 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: hy_load &lt;dbl&gt;</span></span></span></code></pre></div>
 <p>The <code><a href="../reference/anlz_dps.html">anlz_dps()</a></code> function uses
-<code><a href="../reference/anlz_dps_entity.html">anlz_dps_entity()</a></code> to summarize the DPS results by location
-as facility (combines outfall data), entity (combines facility data),
-bay segment (combines entity data), and as all (combines bay segment
-data). The results can also be temporally summarized as monthly or
-annual totals. The location summary is defined by the <code>summ</code>
-argument and the temporal summary is defined by the
+<code><a href="../reference/anlz_dps_facility.html">anlz_dps_facility()</a></code> to summarize the DPS results by
+location as facility (combines outfall data), entity (combines facility
+data), bay segment (combines entity data), and as all (combines bay
+segment data). The results can also be temporally summarized as monthly
+or annual totals. The location summary is defined by the
+<code>summ</code> argument and the temporal summary is defined by the
 <code>summtime</code> argument. The <code>fls</code> argument used by
 <code>anlz_dpd_entity()</code> is also used by <code><a href="../reference/anlz_dps.html">anlz_dps()</a></code>.
 The output is tons per month for TN, TP, TSS, and BOD and as million
