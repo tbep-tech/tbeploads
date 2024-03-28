@@ -13,7 +13,7 @@ dpsfac <- read_sas(paste0(pth, '2017-2021DPSMonthlyEntityBasin/dps1721monthentba
   distinct() |>
   mutate( # make ototw its own entity
     entity = case_when(
-      entity == 'St Pete Facilities' & facname == 'On Top Of The World WWTP' ~ 'On Top Of The World',
+      entity == 'Pinellas Co.' & facname == 'On Top Of The World WWTP' ~ 'On Top Of The World',
       T ~ entity
     ),
     entityshr = case_when(
