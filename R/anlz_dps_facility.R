@@ -68,7 +68,7 @@ anlz_dps_facility <- function(fls){
     dpsnopasco <- dps |>
       dplyr::filter(!grepl('pasco', fls))
 
-    dps <- bind_rows(dpsnopasco, dpspasco189, dpspasco193)
+    dps <- dplyr::bind_rows(dpsnopasco, dpspasco189, dpspasco193)
 
   }
 
