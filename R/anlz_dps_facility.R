@@ -53,6 +53,26 @@ anlz_dps_facility <- function(fls){
     dplyr::filter(!(grepl('^R', outfall) & permit == 'FL0028061SW'))
 
   ##
+  # add coastal code 189, 193 for pasco (input is half of reported to account for two coastal codes)
+  # add back to dps
+  if(any(grepl('pasco', dps$fls))){
+
+    dpspasco189 <- dps |>
+      dplyr::filter(grepl('pasco', fls)) |>
+      dplyr::mutate(coastco = '189')
+
+    dpspasco193 <- dps |>
+      dplyr::filter(grepl('pasco', fls)) |>
+      dplyr::mutate(coastco = '193')
+
+    dpsnopasco <- dps |>
+      dplyr::filter(!grepl('pasco', fls))
+
+    dps <- bind_rows(dpsnopasco, dpspasco189, dpspasco193)
+
+  }
+
+  ##
   # calc loads
 
   # convert flow as mgd to mgm
@@ -169,7 +189,7 @@ anlz_dps_facility <- function(fls){
 
   # TN attenuation varies
   # 95% for st pete coastsid
-  # 90% for those in thcoastid (Van Dyke, Polk SW, Polk NW, Zephyrhills, Pinellas WEDunn, SouthCross (outside of RA), MacDill, Manatee North Reg, Manatee SE Reg, Largo, HillsCoSouthCo_SW, HillsCoSouthCo_LA)
+  # 90% for those in thcoastid (Van Dyke, Polk SW, Polk NW, Zephyrhills, Pinellas WEDunn, SouthCross (outside of RA), MacDill, Manatee North Reg, Manatee SE Reg, Largo, HillsCoSouthCo_SW, HillsCoSouthCo_LA), added pasco manually
   # 70% all others
   thcoastid <- c("D_HC_002", "D_PK_001", "D_PK_002", "D_PA_001", "PINNW", "SCROSSB", "D_HC_12",
                  "D_MC_1", "D_MC_4", "D_PC_9", "D_HC18D1", "D_HC18D2")
@@ -178,7 +198,8 @@ anlz_dps_facility <- function(fls){
     dplyr::mutate(
       load_kg = dplyr::case_when(
         permit %in% 'STPETE' & var == 'tn_mgl'~ load_kg * 0.05, # 95% reduction
-        coastid %in% thcoastid & var == 'tn_mgl' ~ load_kg * 0.1, # 90% reduction
+        coastid %in% thcoastid & var == 'tn_mgl' ~ load_kg * 0.1, # 90% reduction,
+        entity %in% 'Pasco Co.' & var == 'tn_mgl' ~ load_kg * 0.1, # 90% reduction for pasco
         (!coastid %in% thcoastid) & (!permit %in% 'STPETE') & var == 'tn_mgl' ~ load_kg * 0.3, # 70% reduction
         T ~ load_kg
       )
