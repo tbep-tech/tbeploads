@@ -54,6 +54,11 @@ ipsfac <- read_sas(here('data-raw/ips1721monthentbas.sas7bdat')) |>
       facname == 'TECO - Big Bend' ~ 'bigbend',
       facname == 'HRK Piney Point' ~ 'pineypoint',
       T ~ entityshr
+    ),
+    mutate(
+      permit = case_when(
+        facname == 'busch' ~ 'FL0185833'
+      )
     )
   )
 
