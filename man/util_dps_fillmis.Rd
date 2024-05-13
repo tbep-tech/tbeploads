@@ -21,6 +21,6 @@ Missing concentration data are replaced with the average for the outfall in a gi
 \examples{
 pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
 dat <- read.table(pth, skip = 0, sep = '\t', header = TRUE)
-dat <- util_dps_checkuni(dat)
+dat <- util_ps_checkuni(dat)
 util_dps_fillmis(dat)
 }

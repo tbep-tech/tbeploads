@@ -1,5 +1,5 @@
 dirpth <- dirname(pth)
-chkfls <- util_dps_checkfls(dirpth)
+chkfls <- util_ps_checkfls(dirpth)
 
 test_that("Check output class", {
 
@@ -17,7 +17,7 @@ test_that("Check file incorrect columns", {
 
   tmpfl <- tempfile(fileext = '.txt')
   write.table(NA, tmpfl)
-  chkfls <- util_dps_checkfls(dirname(tmpfl))
+  chkfls <- util_ps_checkfls(dirname(tmpfl))
 
   expect_true(chkfls$chk == 'check columns')
 
@@ -29,7 +29,7 @@ test_that("Check file read error", {
 
   tmpfl <- tempfile(fileext = '.txt')
   writeLines(c("header1\theader2\theader3", "1\t2\t3", "a\tb"), tmpfl)
-  chkfls <- util_dps_checkfls(dirname(tmpfl))
+  chkfls <- util_ps_checkfls(dirname(tmpfl))
 
   expect_true(chkfls$chk == 'read error')
 

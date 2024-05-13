@@ -1,6 +1,6 @@
-#' Check units for DPS reuse and end of pipe from raw entity data
+#' Check units for point source from raw entity data
 #'
-#' Check units for DPS reuse and end of pipe from raw entity data
+#' Check units for point source from raw entity data
 #'
 #' @param dat data frame from raw entity data as \code{data.frame}
 #'
@@ -14,8 +14,8 @@
 #' @examples
 #' pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
 #' dat <- read.table(pth, skip = 0, sep = '\t', header = TRUE)
-#' util_dps_checkuni(dat)
-util_dps_checkuni <- function(dat){
+#' util_ps_checkuni(dat)
+util_ps_checkuni <- function(dat){
 
   # check flow units
   if(!'Average.Daily.Flow..ADF...mgd.' %in% names(dat)){

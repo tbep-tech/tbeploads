@@ -1,6 +1,6 @@
 pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
 dat <- read.table(pth, skip = 0, sep = '\t', header = TRUE)
-dat <- util_dps_checkuni(dat)
+dat <- util_ps_checkuni(dat)
 
 test_that("Check concentration and flow zero if flow is NA", {
 

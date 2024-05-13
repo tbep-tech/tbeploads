@@ -37,7 +37,7 @@ anlz_dps_facility <- function(fls){
     dplyr::mutate(
       dat = purrr::map(fls, read.table, skip = 0, sep = '\t', header = T),
       dat = purrr::map(dat, util_dps_addcol),
-      dat = purrr::map(dat, util_dps_checkuni),
+      dat = purrr::map(dat, util_ps_checkuni),
       dat = purrr::map(dat, util_dps_fillmis),
       entinfo = purrr::map(fls, util_dps_facinfo, asdf = T)
     ) |>
