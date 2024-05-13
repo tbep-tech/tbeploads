@@ -6,7 +6,56 @@ library(here)
 # original T:/03_BOARDS_COMMITTEES/05_TBNMC/2022_RA_Update/01_FUNDING_OUT/DELIVERABLES/TO-9/datastick_deliverables/2017-2021LUEntityLoads/2017-2021IPSMonthlyEntityBasin/ips1721monthentbas.sas7bdat
 ipsfac <- read_sas(here('data-raw/ips1721monthentbas.sas7bdat')) |>
   select(bayseg, basin = BASIN, entity, facname, source = source2) |>
-  distinct()
+  distinct() |>
+  mutate(
+    entityshr = case_when(
+      entity == 'Alpha/Owens Corning' ~ 'aoc' ,
+      entity == 'Cytech Brewster' ~ 'brewster',
+      entity == 'Busch Gardens' ~ 'busch' ,
+      entity == 'CSX' ~ 'csx',
+      entity == 'Coronet' ~ 'coronet',
+      entity == 'Duke Energy' ~ 'duke' ,
+      entity == 'Estech Agricola' ~ 'estech',
+      entity == 'HRK' ~ 'hrk',
+      entity == 'Kerry' ~ 'kerry',
+      entity == 'Kinder Morgan' ~ 'kinder',
+      entity == 'Lowry Park Zoo' ~ 'lowry',
+      entity == 'Mosaic' ~ 'mosaic',
+      entity == 'TECO' ~ 'teco',
+      entity == 'Trademark Nitrogen' ~ 'trademark',
+      entity == 'Yara' ~ 'yara'
+    )
+  ) |>
+  mutate(
+    facnameshr = case_when(
+      facname == 'CSX - Rockport Newport' ~ 'rocknewp' ,
+      facname == 'CSX Winston Yard' ~ 'winston',
+      facname == 'Kinder Morgan Port Sutton' ~ 'portsutt',
+      facname == 'Kinder Morgan Tampaplex' ~ 'tampaplex',
+      facname == 'Mosaic - Bartow' ~ 'bartow',
+      facname == 'Mosaic - Bonnie' ~ 'bonnie',
+      facname == 'Mosaic - Four Corners' ~ 'fourcorners',
+      facname == 'Mosaic - Ft. Lonesome' ~ 'ftlone',
+      facname == 'Mosaic - Green Bay' ~ 'greenbay',
+      facname == 'Mosaic - Hookers Prairie' ~ 'hookers',
+      facname == 'Mosaic - Kingsford' ~ 'kingsford',
+      facname == 'Mosaic - Mulberry Phospho Stack' ~ 'mulbphosph',
+      facname == 'Mosaic - Mulberry Plant' ~ 'mulbplant',
+      facname == 'Mosaic - New Wales Chemical Plant' ~ 'newwales',
+      facname == 'Mosaic - Nichols Mine' ~ 'nichols',
+      facname == 'Mosaic - Plant City' ~ 'plantcity',
+      facname == 'Mosaic - Port Sutton' ~ 'portsutt',
+      facname == 'Mosaic - Riverview' ~ 'riverview',
+      facname == 'Mosaic - Riverview Stack Closure' ~ 'riverviewstack',
+      facname == 'Mosaic - South Pierce' ~ 'spierce',
+      facname == 'Mosaic - Tampa Ammonia Terminal' ~ 'tampamm',
+      facname == 'Mosaic - Tampa Marine Terminal' ~ 'tampamar',
+      facname == 'TECO - Bayside (fka Gannon)' ~ 'bayside',
+      facname == 'TECO - Big Bend' ~ 'bigbend',
+      facname == 'HRK Piney Point' ~ 'pineypoint',
+      T ~ entityshr
+    )
+  )
 
 # original T:/03_BOARDS_COMMITTEES/05_TBNMC/2022_RA_Update/01_FUNDING_OUT/DELIVERABLES/TO-9/datastick_deliverables/2017-2021LUEntityLoads/2017-2021DPSMonthlyEntityBasin/dps1721monthentbas.sas7bdat
 dpsfac <- read_sas(here('data-raw/dps1721monthentbas.sas7bdat')) |>
