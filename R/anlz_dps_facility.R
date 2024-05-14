@@ -38,6 +38,7 @@ anlz_dps_facility <- function(fls){
       dat = purrr::map(fls, read.table, skip = 0, sep = '\t', header = T),
       dat = purrr::map(dat, util_ps_addcol),
       dat = purrr::map(dat, util_ps_checkuni),
+      dat = purrr::map(dat, util_ps_fixoutfall),
       dat = purrr::map(dat, util_ps_fillmis),
       entinfo = purrr::map(fls, util_ps_facinfo, asdf = T)
     ) |>
