@@ -44,7 +44,7 @@ For convenience, three example files are included with the package. The paths to
 
 ```{r}
 fls <- list.files(system.file('extdata/', package = 'tbeploads'),
-  pattern = '\\.txt$', full.names = TRUE)
+  pattern = 'ps_dom', full.names = TRUE)
 anlz_dps_facility(fls)
 ```
 

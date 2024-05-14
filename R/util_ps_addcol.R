@@ -1,6 +1,6 @@
-#' Add column names for DPS reuse and end of pipe from raw entity data
+#' Add column names for point source data from raw entity data
 #'
-#' Add column names for DPS reuse and end of pipe from raw entity data
+#' Add column names for point source from raw entity data
 #'
 #' @param dat data frame from raw entity data as \code{data.frame}
 #'
@@ -12,8 +12,8 @@
 #' @examples
 #' pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
 #' dat <- read.table(pth, skip = 0, sep = '\t', header = TRUE)
-#' util_dps_addcol(dat)
-util_dps_addcol <- function(dat){
+#' util_ps_addcol(dat)
+util_ps_addcol <- function(dat){
 
   # check tn
   chktn <- grepl('^Total.N', names(dat))

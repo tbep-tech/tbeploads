@@ -16,7 +16,7 @@
 #'
 #' @examples
 #' fls <- list.files(system.file('extdata/', package = 'tbeploads'),
-#'   pattern = '\\.txt$', full.names = TRUE)
+#'   pattern = 'ps_dom', full.names = TRUE)
 #' anlz_dps(fls)
 anlz_dps <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summtime = c('month', 'year')){
 

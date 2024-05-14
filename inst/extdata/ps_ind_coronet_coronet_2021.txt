@@ -1,0 +1,13 @@
+Permit Number	Facility Name	Outfall ID	Year	Month	Average Daily Flow (ADF) (mgd)	BOD 	BOD  Unit	QBOD	TSS	TSS Unit	QTSS	Total N	Total N Unit	Q Total N	NO2+NO3	NO2+NO3 Unit	Q NO2+NO3	NH4	NH4 Unit	Q NH4	TKN	TKN Unit	Q TKN	Organic N	Organic N Unit	Q Organic N	Total P	Total P Unit	Q Total P	PO4	PO4 Unit	Q PO4	Other N (species)	Other N Unit	Q Other N	Other P (species)	Other P Unit	Q Other P
+FL0034657	"Coronet Industries, Inc."	D-001	2021	1	0																																	
+FL0034657	"Coronet Industries, Inc."	D-001	2021	2	0																																	
+FL0034657	"Coronet Industries, Inc."	D-001	2021	3	0																																	
+FL0034657	"Coronet Industries, Inc."	D-001	2021	4	0																																	
+FL0034657	"Coronet Industries, Inc."	D-001	2021	5	0																																	
+FL0034657	"Coronet Industries, Inc."	D-001	2021	6	0																																	
+FL0034657	"Coronet Industries, Inc."	D-001	2021	7	0																																	
+FL0034657	"Coronet Industries, Inc."	D-001	2021	8	3.932				3.3	mg/l	Mo. Avg	1.4		Mo. Avg	0.022	mg/l	Mo. Avg	0.27	mg/l		1.4		Mo. Avg				3.4	mg/l	Mo. Avg	3.6	mg/l	Mo. Avg						
+FL0034657	"Coronet Industries, Inc."	D-001	2021	9	3.274				3.1	mg/l	Mo. Avg	1.2		Mo. Avg	0.01	mg/l	Mo. Avg	0.1	mg/l		1.2		Mo. Avg				2.5	mg/l	Mo. Avg	2.5	mg/l	Mo. Avg						
+FL0034657	"Coronet Industries, Inc."	D-001	2021	10	4.097				3.2	mg/l	Mo. Avg	1.8		Mo. Avg	0.009	mg/l	Mo. Avg	0.1	mg/l		1.8		Mo. Avg				3.8	mg/l	Mo. Avg	5.8	mg/l	Mo. Avg						
+FL0034657	"Coronet Industries, Inc."	D-001	2021	11	0																																	
+FL0034657	"Coronet Industries, Inc."	D-001	2021	12	0																																	

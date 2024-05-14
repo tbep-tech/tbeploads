@@ -1,6 +1,6 @@
-#' Get DPS entity information from file name
+#' Get point source entity information from file name
 #'
-#' Get DPS entity information from file name
+#' Get point source entity information from file name
 #'
 #' @param pth path to raw entity data
 #' @param asdf logical, if \code{TRUE} return as \code{data.frame}
@@ -13,8 +13,8 @@
 #'
 #' @examples
 #' pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
-#' util_dps_facinfo(pth)
-util_dps_facinfo <- function(pth, asdf = FALSE){
+#' util_ps_facinfo(pth)
+util_ps_facinfo <- function(pth, asdf = FALSE){
 
   # get entity and facility from path
   flentfac <- gsub('\\.txt$', '', basename(pth)) |>

@@ -28,7 +28,7 @@ Input data files in \code{fls} are first processed by \code{\link{anlz_dps_facil
 }
 \examples{
 fls <- list.files(system.file('extdata/', package = 'tbeploads'),
-  pattern = '\\\\.txt$', full.names = TRUE)
+  pattern = 'ps_dom', full.names = TRUE)
 anlz_dps(fls)
 }
 \seealso{

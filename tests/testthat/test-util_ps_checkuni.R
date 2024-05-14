@@ -1,5 +1,4 @@
-pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
-dat <- read.table(pth, skip = 0, sep = '\t', header = T)
+dat <- read.table(psdompth, skip = 0, sep = '\t', header = T)
 
 # Test 1: Check if the function throws an error when flow units are not in mgd
 test_that("Flow units are checked correctly", {

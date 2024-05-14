@@ -9,7 +9,7 @@
 #'
 #' 1. Multiply flow by day in month to get million gallons per month
 #' 1. Multiply flow by 3785.412 to get cubic meters per month
-#' 1. Multiply N by flow and divide by 1000 to get kg N per month
+#' 1. Multiply conc by flow and divide by 1000 to get kg var per month
 #' 1. Multiply m3 by 1000 to get L, then divide by 1e6 to convert mg to kg, same as dividing by 1000
 #' 1. TN, TP, TSS, BOD dps reuse is multiplied by attenuation factor for land application (varies by location)
 #' 1. Hydro load (m3 / mo) is also attenuated for the reuse, multiplied by 0.6 (40% attenuation)
@@ -22,7 +22,7 @@
 #'
 #' @examples
 #' fls <- list.files(system.file('extdata/', package = 'tbeploads'),
-#'   pattern = '\\.txt$', full.names = TRUE)
+#'   pattern = 'ps_dom', full.names = TRUE)
 #' anlz_dps_facility(fls)
 anlz_dps_facility <- function(fls){
 
@@ -36,10 +36,10 @@ anlz_dps_facility <- function(fls){
     tidyr::nest(.key = 'dat') |>
     dplyr::mutate(
       dat = purrr::map(fls, read.table, skip = 0, sep = '\t', header = T),
-      dat = purrr::map(dat, util_dps_addcol),
+      dat = purrr::map(dat, util_ps_addcol),
       dat = purrr::map(dat, util_ps_checkuni),
-      dat = purrr::map(dat, util_dps_fillmis),
-      entinfo = purrr::map(fls, util_dps_facinfo, asdf = T)
+      dat = purrr::map(dat, util_ps_fillmis),
+      entinfo = purrr::map(fls, util_ps_facinfo, asdf = T)
     ) |>
     dplyr::ungroup() |>
     tidyr::unnest('entinfo') |>
@@ -154,9 +154,9 @@ anlz_dps_facility <- function(fls){
     tibble::tibble(
       coastco = c('508', '544', '566', '573', '580', '586', '588', '594'), #, '594a'),
       spccpro = c(0.16, 0.233, 0.161, 0.06, 0.131, 0.07, 0.04, 0.145), #0.085, 0.06),
-      data = _
+      dat = _
     ) |>
-    unnest(data) |>
+    unnest('dat') |>
     dplyr::mutate(
       flow_m3m = flow_m3m * spccpro,
       load_kg = load_kg * spccpro,

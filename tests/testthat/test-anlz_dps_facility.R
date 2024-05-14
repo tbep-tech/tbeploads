@@ -15,9 +15,9 @@ test_that("Check end of pipe load calculations", {
 
 test_that("Check outfall not found", {
 
-  tmp <- read.table(pth, skip = 0, sep = '\t', header = T)
+  tmp <- read.table(psdompth, skip = 0, sep = '\t', header = T)
   tmp$Outfall.ID[tmp$Outfall.ID == 'R-001'] <- 'R-007'
-  tmpfl <- file.path(tempdir(), basename(pth))
+  tmpfl <- file.path(tempdir(), basename(psdompth))
   write.table(tmp, tmpfl, sep = '\t', row.names = F, quote = F)
 
   expect_error(anlz_dps_facility(tmpfl), "outfall id not in data: ps_dom_hillsco_falkenburg_2019.txt, R-007")
@@ -28,8 +28,6 @@ test_that("Check outfall not found", {
 
 test_that("Verify output class", {
 
-  result <- anlz_dps_facility(fls)
-
-  expect_s3_class(result, "data.frame")
+  expect_s3_class(dps, "data.frame")
 
 })

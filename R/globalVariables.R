@@ -3,7 +3,7 @@ globalVariables(c(".", "Facility.Name", "Month", "Outfall.ID", "Permit.Number", 
                   "facname", "facnameshr", "flow_m3m", "flow_mgd", "flow_mgm", "hy_load",
                   "load_kg", "outfall", "outfallno", "tn_load", "tp_load", "tss_load", "var",
                   "basin", "coastco", "coastid", "facid", "permit", "dat", "dbasing", "hectare",
-                  "name", "segment"))
+                  "name", "segment", "spccpro"))
 
 #' @importFrom utils read.table
 NULL

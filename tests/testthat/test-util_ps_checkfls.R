@@ -1,4 +1,4 @@
-dirpth <- dirname(pth)
+dirpth <- unique(dirname(fls))
 chkfls <- util_ps_checkfls(dirpth)
 
 test_that("Check output class", {
