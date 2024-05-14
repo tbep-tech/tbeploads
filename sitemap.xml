@@ -37,6 +37,9 @@
     <loc>https://tbep-tech.github.io/tbeploads/reference/anlz_dps_facility.html</loc>
   </url>
   <url>
+    <loc>https://tbep-tech.github.io/tbeploads/reference/anlz_ips_facility.html</loc>
+  </url>
+  <url>
     <loc>https://tbep-tech.github.io/tbeploads/reference/dbasing.html</loc>
   </url>
   <url>
@@ -46,18 +49,18 @@
     <loc>https://tbep-tech.github.io/tbeploads/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/util_dps_addcol.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/util_dps_facinfo.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/util_dps_fillmis.html</loc>
+    <loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_addcol.html</loc>
   </url>
   <url>
     <loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_checkfls.html</loc>
   </url>
   <url>
     <loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_checkuni.html</loc>
+  </url>
+  <url>
+    <loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_facinfo.html</loc>
+  </url>
+  <url>
+    <loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_fillmis.html</loc>
   </url>
 </urlset>

@@ -127,7 +127,7 @@ returned as tons per month for TN, TP, TSS, and BOD and million cubic
 meters per month for flow (hy).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span>,</span>
-<span>  pattern <span class="op">=</span> <span class="st">'\\.txt$'</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  pattern <span class="op">=</span> <span class="st">'ps_dom'</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/anlz_dps_facility.html">anlz_dps_facility</a></span><span class="op">(</span><span class="va">fls</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 144 × 11</span></span></span>
 <span><span class="co">#&gt;     Year Month entity  facility coastco source tn_load tp_load tss_load bod_load</span></span>
