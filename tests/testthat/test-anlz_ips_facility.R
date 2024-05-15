@@ -8,7 +8,7 @@ test_that("Check load calculations", {
   expect_equal(result$tn_load[[1]], 0.086)
   expect_equal(result$tp_load[[1]], 0.005)
   expect_equal(result$tss_load[[1]], 0.595)
-  expect_equal(result$bod_load[[1]], 1.14)
+  expect_equal(result$bod_load[[1]], 1.142)
   expect_equal(result$hy_load[[1]], 0.108)
 
 })

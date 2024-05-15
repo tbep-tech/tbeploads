@@ -3,11 +3,11 @@
 #' Calculate IPS loads and summarize
 #'
 #' @param fls vector of file paths to raw entity data, one to many
-#' @param summ chr string indicating how the returned data are summarized, see details
-#' @param summtime chr string indicating how the returned data are summarized temporally (month or year), see details
+#' @param summ `r summ_params('summ')`
+#' @param summtime `r summ_params('summtime')`
 #'
 #' @details
-#' Input data files in \code{fls} are first processed by \code{\link{anlz_ips_facility}} to calculate IPS loads for each facility and outfall.  The data can then be summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed based on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}).
+#' Input data files in \code{fls} are first processed by \code{\link{anlz_ips_facility}} to calculate IPS loads for each facility and outfall.  `r summ_params('descrip')`
 #'
 #' @return data frame with loading data for TP, TN, TSS, and BOD as tons per month/year and hydro load as million cubic meters per month/year
 #' @export
@@ -19,9 +19,6 @@
 #'   pattern = 'ps_ind', full.names = TRUE)
 #' anlz_ips(fls)
 anlz_ips <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summtime = c('month', 'year')){
-
-  summ <- match.arg(summ)
-  summtime <- match.arg(summtime)
 
   # get facility and outfall level data
   ipsbyfac <- anlz_ips_facility(fls)
@@ -45,68 +42,7 @@ anlz_ips <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summ
   ##
   # summarize by selection
 
-  out <- ipsld
-  if(summtime == 'month'){
-
-    if(summ == 'facility')
-
-      out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, Month, source, entity, facility, segment))
-
-    if(summ == 'entity')
-
-      out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, Month, source, entity, segment))
-
-    if(summ == 'segment')
-
-      out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, Month, source, segment))
-
-    if(summ == 'all')
-
-      out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, Month, source))
-
-    out <- out |>
-      dplyr::arrange(source, Year, Month)
-
-  }
-
-  if(summtime == 'year'){
-
-    if(summ == 'facility')
-
-      out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, source, entity, facility, segment))
-
-    if(summ == 'entity')
-
-      out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, source, entity, segment))
-
-    if(summ == 'segment')
-
-      out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, source, segment))
-
-    if(summ == 'all')
-
-      out <- out |>
-        dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, source))
-
-    out <- out |>
-      dplyr::arrange(source, Year)
-
-  }
+  out <- util_ps_summ(ipsld, summ = summ, summtime = summtime)
 
   return(out)
 
