@@ -43,18 +43,39 @@ The DPS functions are designed to work with raw entity data provided by partners
 For convenience, three example files are included with the package. The paths to these files are used as input to the function. Non-trivial data pre-processing and quality control is needed for each file and those included in the package are the correct format. The output is returned as tons per month for TN, TP, TSS, and BOD and million cubic meters per month for flow (hy).
 
 ```{r}
-fls <- list.files(system.file('extdata/', package = 'tbeploads'),
+dpsfls <- list.files(system.file('extdata/', package = 'tbeploads'),
   pattern = 'ps_dom', full.names = TRUE)
-anlz_dps_facility(fls)
+anlz_dps_facility(dpsfls)
 ```
 
 The `anlz_dps()` function uses `anlz_dps_facility()` to summarize the DPS results by location as facility (combines outfall data), entity (combines facility data), bay segment (combines entity data), and as all (combines bay segment data).  The results can also be temporally summarized as monthly or annual totals.  The location summary is defined by the `summ` argument and the temporal summary is defined by the `summtime` argument.  The `fls` argument used by `anlz_dps_facility()` is also used by `anlz_dps()`.  The output is tons per month for TN, TP, TSS, and BOD and as million cubic meters per month for flow (hy) if `summtime = 'month'` or tons per year for TN, TP, TSS, and BOD and million cubic meters per year for flow (hy) if `summtime = 'year'`. 
 
 ```{r}
 # combine by enity and month
-anlz_dps(fls, summ = 'entity', summtime = 'month')
+anlz_dps(dpsfls, summ = 'entity', summtime = 'month')
 
 # combine by bay segment and year
-anlz_dps(fls, summ = "segment", summtime = "year")
+anlz_dps(dpsfls, summ = "segment", summtime = "year")
 ```
 
+### IPS
+
+The IPS functions are designed to work with raw entity data provided by partners and are similar in functionality to the DPS functions.  The core function is `anlz_ips_facility()` that requires only a vector of file paths as input, where each path points to a file with monthly parameter concentration (mg/L) and flow data (million gallons per day). Loads are estimated as concentration times flow.  The file names must follow a specific convention, where metadata for each entity is found in the `facilities()` data object using information in the file name. 
+
+For convenience, three example files are included with the package. The paths to these files are used as input to the function. As before, non-trivial data pre-processing and quality control is needed for each file and those included in the package are the correct format. The output is returned as tons per month for TN, TP, TSS, and BOD and million cubic meters per month for flow (hy).
+
+```{r}
+ipsfls <- list.files(system.file('extdata/', package = 'tbeploads'),
+  pattern = 'ps_ind', full.names = TRUE)
+anlz_dps_facility(ipsfls)
+```
+
+The `anlz_ips()` function uses `anlz_ips_facility()` to summarize the IPS results by location as facility (combines outfall data), entity (combines facility data), bay segment (combines entity data), and as all (combines bay segment data).  The results can also be temporally summarized as monthly or annual totals.  The location summary is defined by the `summ` argument and the temporal summary is defined by the `summtime` argument.  The `fls` argument used by `anlz_ips_facility()` is also used by `anlz_ips()`.  The output is tons per month for TN, TP, TSS, and BOD and as million cubic meters per month for flow (hy) if `summtime = 'month'` or tons per year for TN, TP, TSS, and BOD and million cubic meters per year for flow (hy) if `summtime = 'year'`. 
+
+```{r}
+# combine by enity and month
+anlz_ips(ipsfls, summ = 'entity', summtime = 'month')
+
+# combine by bay segment and year
+anlz_ips(ipsfls, summ = "segment", summtime = "year")
+```
