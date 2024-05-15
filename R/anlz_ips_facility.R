@@ -33,7 +33,7 @@ anlz_ips_facility <- function(fls){
     dplyr::group_by(fls) |>
     tidyr::nest(.key = 'dat') |>
     dplyr::mutate(
-      dat = purrr::map(fls, read.table, skip = 0, sep = '\t', header = T),
+      dat = purrr::map(fls, read.table, skip = 0, sep = '\t', header = T, na.strings = c('NA', 'NOD', 'IFS', '.')),
       dat = purrr::map(dat, util_ps_addcol),
       dat = purrr::map(dat, util_ps_fixoutfall),
       dat = purrr::map(dat, util_ps_checkuni),
@@ -44,7 +44,81 @@ anlz_ips_facility <- function(fls){
     tidyr::unnest('entinfo') |>
     tidyr::unnest('dat')
 
-  out <- ipsprep
+  ##
+  # calc loads
+
+  # convert flow as mgd to mgm
+  ips <- ipsprep |>
+    dplyr::rename(flow_mgm = flow_mgd) |>
+    dplyr::mutate(
+      dys = lubridate::days_in_month(lubridate::ymd(paste(Year, Month, '01', sep = '-'))),
+      flow_mgm = flow_mgm * dys
+    ) |>
+    dplyr::select(-dys)
+
+  outfall <- c("D-001", "D-002", "D-004", "D-008", "D-010", "D-003", "D-02R",
+                 "EMD", "FLW-3", "D-005", "D-006", "D-007A", "D-04A", "D-009",
+                 "D-001F", "D-005A", "D-005B", "D-021", "D-022", "D-025", "D-023",
+                 "D-024", "SW-1", "SW-3", "I-038", "I-130", "EFF-001", "I-002"
+  )
+
+  chk <- !ips$outfall %in% outfall
+  if(any(chk)){
+
+    msg <- ips[which(chk),] |>
+      dplyr::select(fls, outfall) |>
+      unique() |>
+      dplyr::mutate(fls = basename(fls)) |>
+      tidyr::unite('msg', fls, outfall, sep = ', ') |>
+      dplyr::pull(msg) |>
+      paste(collapse = '; ')
+
+    stop("outfall id not in data: ", msg)
+
+  }
+
+  # remove fls
+  ips <- dplyr::select(ips, -fls)
+
+  # actual load calc
+  ips <- ips |>
+    tidyr::pivot_longer(c('tn_mgl', 'tp_mgl', 'tss_mgl', 'bod_mgl'), names_to = 'var', values_to = 'conc_mgl') |>
+    dplyr::rename(flow_m3m = flow_mgm) |>
+    dplyr::mutate(
+      flow_m3m = flow_m3m * 3785.412, # mgm to m3m,
+      load_kg = conc_mgl * flow_m3m / 1000 # kg var per month,
+    )
+
+  # flow as mill m3 per month
+  # load as tons per month
+  ips <- ips |>
+    dplyr::arrange(entity, facname, outfall, Year, Month) |>
+    dplyr::select(-conc_mgl) |>
+    dplyr::rename(
+      hy_load = flow_m3m,
+      load = load_kg
+    ) |>
+    dplyr::mutate(
+      load = load / 907.1847, # kg to tons,
+      hy_load = hy_load / 1e6,
+      var = gsub('mgl$', 'load', var)
+    ) |>
+    tidyr::pivot_wider(names_from = var, values_from = load) |>
+    dplyr::select(
+      Year,
+      Month,
+      entity,
+      facility = facname,
+      coastco,
+      source = outfall,
+      tn_load,
+      tp_load,
+      tss_load,
+      bod_load,
+      hy_load
+    )
+
+  out <- ips
 
   return(out)
 

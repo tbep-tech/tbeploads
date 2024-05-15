@@ -1,6 +1,6 @@
-#' Calculate DPS reuse and end of pipe from raw facility data
+#' Calculate DPS reuse and end of pipe loads from raw facility data
 #'
-#' Calculate DPS reuse and end of pipe from raw facility data
+#' Calculate DPS reuse and end of pipe loads from raw facility data
 #'
 #' @param fls vector of file paths to raw facility data, one to many
 #'

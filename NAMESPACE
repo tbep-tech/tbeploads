@@ -2,6 +2,7 @@
 
 export(anlz_dps)
 export(anlz_dps_facility)
+export(anlz_ips)
 export(anlz_ips_facility)
 export(util_ps_addcol)
 export(util_ps_checkfls)
