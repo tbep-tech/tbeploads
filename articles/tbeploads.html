@@ -126,9 +126,9 @@ those included in the package are the correct format. The output is
 returned as tons per month for TN, TP, TSS, and BOD and million cubic
 meters per month for flow (hy).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span>,</span>
+<code class="sourceCode R"><span><span class="va">dpsfls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span>,</span>
 <span>  pattern <span class="op">=</span> <span class="st">'ps_dom'</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/anlz_dps_facility.html">anlz_dps_facility</a></span><span class="op">(</span><span class="va">fls</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/anlz_dps_facility.html">anlz_dps_facility</a></span><span class="op">(</span><span class="va">dpsfls</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 144 × 11</span></span></span>
 <span><span class="co">#&gt;     Year Month entity  facility coastco source tn_load tp_load tss_load bod_load</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -160,7 +160,7 @@ BOD and million cubic meters per year for flow (hy) if
 <code>summtime = 'year'</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># combine by enity and month</span></span>
-<span><span class="fu"><a href="../reference/anlz_dps.html">anlz_dps</a></span><span class="op">(</span><span class="va">fls</span>, summ <span class="op">=</span> <span class="st">'entity'</span>, summtime <span class="op">=</span> <span class="st">'month'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/anlz_dps.html">anlz_dps</a></span><span class="op">(</span><span class="va">dpsfls</span>, summ <span class="op">=</span> <span class="st">'entity'</span>, summtime <span class="op">=</span> <span class="st">'month'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 108 × 10</span></span></span>
 <span><span class="co">#&gt;     Year Month source   entity segment tn_load tp_load tss_load bod_load hy_load</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -177,7 +177,7 @@ BOD and million cubic meters per year for flow (hy) if
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 98 more rows</span></span></span>
 <span></span>
 <span><span class="co"># combine by bay segment and year</span></span>
-<span><span class="fu"><a href="../reference/anlz_dps.html">anlz_dps</a></span><span class="op">(</span><span class="va">fls</span>, summ <span class="op">=</span> <span class="st">"segment"</span>, summtime <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/anlz_dps.html">anlz_dps</a></span><span class="op">(</span><span class="va">dpsfls</span>, summ <span class="op">=</span> <span class="st">"segment"</span>, summtime <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 9 × 8</span></span></span>
 <span><span class="co">#&gt;    Year source            segment      tn_load tp_load tss_load bod_load hy_load</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -190,6 +190,86 @@ BOD and million cubic meters per year for flow (hy) if
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span>  <span style="text-decoration: underline;">2</span>019 DPS - reuse       Hillsboroug…   3.84  0.077<span style="text-decoration: underline;">8</span>   0.123    0.408     3.44 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span>  <span style="text-decoration: underline;">2</span>021 DPS - reuse       Hillsboroug…   2.87  0        0        0         1.74 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span>  <span style="text-decoration: underline;">2</span>021 DPS - reuse       Old Tampa B…   1.19  0.177    0.097<span style="text-decoration: underline;">2</span>   0.379     1.99</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="ips">IPS<a class="anchor" aria-label="anchor" href="#ips"></a>
+</h3>
+<p>The IPS functions are designed to work with raw entity data provided
+by partners and are similar in functionality to the DPS functions. The
+core function is <code><a href="../reference/anlz_ips_facility.html">anlz_ips_facility()</a></code> that requires only a
+vector of file paths as input, where each path points to a file with
+monthly parameter concentration (mg/L) and flow data (million gallons
+per day). Loads are estimated as concentration times flow. The file
+names must follow a specific convention, where metadata for each entity
+is found in the <code><a href="../reference/facilities.html">facilities()</a></code> data object using information
+in the file name.</p>
+<p>For convenience, three example files are included with the package.
+The paths to these files are used as input to the function. As before,
+non-trivial data pre-processing and quality control is needed for each
+file and those included in the package are the correct format. The
+output is returned as tons per month for TN, TP, TSS, and BOD and
+million cubic meters per month for flow (hy).</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ipsfls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span>,</span>
+<span>  pattern <span class="op">=</span> <span class="st">'ps_ind'</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/anlz_dps_facility.html">anlz_dps_facility</a></span><span class="op">(</span><span class="va">ipsfls</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 60 × 11</span></span></span>
+<span><span class="co">#&gt;     Year Month entity  facility coastco source tn_load tp_load tss_load bod_load</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">2</span>020     1 Busch … Busch G… 191a    D-002   0.085<span style="text-decoration: underline;">7</span> 0.004<span style="text-decoration: underline;">76</span>    0.595    1.14 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">2</span>020     2 Busch … Busch G… 191a    D-002   0.037<span style="text-decoration: underline;">8</span> 0.002<span style="text-decoration: underline;">52</span>    0.629    1.21 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">2</span>020     3 Busch … Busch G… 191a    D-002   0.014<span style="text-decoration: underline;">5</span> 0.001<span style="text-decoration: underline;">45</span>    0.181    0.348</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  <span style="text-decoration: underline;">2</span>020     4 Busch … Busch G… 191a    D-002   0.049<span style="text-decoration: underline;">1</span> 0.001<span style="text-decoration: underline;">75</span>    0.438    0.841</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  <span style="text-decoration: underline;">2</span>020     5 Busch … Busch G… 191a    D-002   0.022<span style="text-decoration: underline;">3</span> 0.002<span style="text-decoration: underline;">17</span>    0.272    0.522</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  <span style="text-decoration: underline;">2</span>020     6 Busch … Busch G… 191a    D-002   0.042<span style="text-decoration: underline;">8</span> 0.004<span style="text-decoration: underline;">99</span>    0.357    0.685</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  <span style="text-decoration: underline;">2</span>020     7 Busch … Busch G… 191a    D-002   0.057<span style="text-decoration: underline;">3</span> 0.010<span style="text-decoration: underline;">6</span>     0.530    1.02 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  <span style="text-decoration: underline;">2</span>020     8 Busch … Busch G… 191a    D-002   0.113  0.015<span style="text-decoration: underline;">8</span>     0.660    1.27 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">2</span>020     9 Busch … Busch G… 191a    D-002   0.056<span style="text-decoration: underline;">7</span> 0.010<span style="text-decoration: underline;">3</span>     0.645    1.24 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>020    10 Busch … Busch G… 191a    D-002   0.045<span style="text-decoration: underline;">0</span> 0.009<span style="text-decoration: underline;">92</span>    0.382    0.733</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 50 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: hy_load &lt;dbl&gt;</span></span></span></code></pre></div>
+<p>The <code><a href="../reference/anlz_ips.html">anlz_ips()</a></code> function uses
+<code><a href="../reference/anlz_ips_facility.html">anlz_ips_facility()</a></code> to summarize the IPS results by
+location as facility (combines outfall data), entity (combines facility
+data), bay segment (combines entity data), and as all (combines bay
+segment data). The results can also be temporally summarized as monthly
+or annual totals. The location summary is defined by the
+<code>summ</code> argument and the temporal summary is defined by the
+<code>summtime</code> argument. The <code>fls</code> argument used by
+<code><a href="../reference/anlz_ips_facility.html">anlz_ips_facility()</a></code> is also used by
+<code><a href="../reference/anlz_ips.html">anlz_ips()</a></code>. The output is tons per month for TN, TP, TSS,
+and BOD and as million cubic meters per month for flow (hy) if
+<code>summtime = 'month'</code> or tons per year for TN, TP, TSS, and
+BOD and million cubic meters per year for flow (hy) if
+<code>summtime = 'year'</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># combine by enity and month</span></span>
+<span><span class="fu"><a href="../reference/anlz_ips.html">anlz_ips</a></span><span class="op">(</span><span class="va">ipsfls</span>, summ <span class="op">=</span> <span class="st">'entity'</span>, summtime <span class="op">=</span> <span class="st">'month'</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 60 × 10</span></span></span>
+<span><span class="co">#&gt;     Year Month source entity   segment tn_load tp_load tss_load bod_load hy_load</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">2</span>017     1 IPS    Lowry P… Hillsb…  0.017<span style="text-decoration: underline;">6</span> 0.003<span style="text-decoration: underline;">83</span>        0        0  0.016<span style="text-decoration: underline;">4</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">2</span>017     2 IPS    Lowry P… Hillsb…  0.015<span style="text-decoration: underline;">6</span> 0.003<span style="text-decoration: underline;">86</span>        0        0  0.014<span style="text-decoration: underline;">5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">2</span>017     3 IPS    Lowry P… Hillsb…  0.014<span style="text-decoration: underline;">5</span> 0.004<span style="text-decoration: underline;">41</span>        0        0  0.014<span style="text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  <span style="text-decoration: underline;">2</span>017     4 IPS    Lowry P… Hillsb…  0.010<span style="text-decoration: underline;">1</span> 0.002<span style="text-decoration: underline;">92</span>        0        0  0.013<span style="text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  <span style="text-decoration: underline;">2</span>017     5 IPS    Lowry P… Hillsb…  0.011<span style="text-decoration: underline;">0</span> 0.002<span style="text-decoration: underline;">90</span>        0        0  0.012<span style="text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  <span style="text-decoration: underline;">2</span>017     6 IPS    Lowry P… Hillsb…  0.025<span style="text-decoration: underline;">7</span> 0.005<span style="text-decoration: underline;">69</span>        0        0  0.018<span style="text-decoration: underline;">3</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  <span style="text-decoration: underline;">2</span>017     7 IPS    Lowry P… Hillsb…  0.020<span style="text-decoration: underline;">5</span> 0.003<span style="text-decoration: underline;">59</span>        0        0  0.014<span style="text-decoration: underline;">3</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  <span style="text-decoration: underline;">2</span>017     8 IPS    Lowry P… Hillsb…  0.021<span style="text-decoration: underline;">1</span> 0.003<span style="text-decoration: underline;">97</span>        0        0  0.018<span style="text-decoration: underline;">0</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">2</span>017     9 IPS    Lowry P… Hillsb…  0.025<span style="text-decoration: underline;">8</span> 0.005<span style="text-decoration: underline;">45</span>        0        0  0.016<span style="text-decoration: underline;">1</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>017    10 IPS    Lowry P… Hillsb…  0.025<span style="text-decoration: underline;">9</span> 0.005<span style="text-decoration: underline;">55</span>        0        0  0.021<span style="text-decoration: underline;">4</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 50 more rows</span></span></span>
+<span></span>
+<span><span class="co"># combine by bay segment and year</span></span>
+<span><span class="fu"><a href="../reference/anlz_ips.html">anlz_ips</a></span><span class="op">(</span><span class="va">ipsfls</span>, summ <span class="op">=</span> <span class="st">"segment"</span>, summtime <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 8</span></span></span>
+<span><span class="co">#&gt;    Year source segment          tn_load tp_load tss_load bod_load hy_load</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>017 IPS    Hillsborough Bay   0.223  0.048<span style="text-decoration: underline;">7</span>     0         0    0.191 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  <span style="text-decoration: underline;">2</span>018 IPS    Hillsborough Bay   0.165  0.046<span style="text-decoration: underline;">3</span>     0         0    0.136 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  <span style="text-decoration: underline;">2</span>019 IPS    Hillsborough Bay   0.106  0.022<span style="text-decoration: underline;">9</span>     0         0    0.073<span style="text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">2</span>020 IPS    Hillsborough Bay   0.554  0.082<span style="text-decoration: underline;">7</span>     5.84     11.2  1.06  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>021 IPS    Hillsborough Bay   2.16   4.77       4.64      0    1.31</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
