@@ -174,8 +174,9 @@ BOD and million cubic meters per year for flow (hy) if
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  <span style="text-decoration: underline;">2</span>017     8 DPS - e… Hills… Hillsb… 0.369   1.05<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span> 0.188     0.493   0.341  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">2</span>017     9 DPS - e… Hills… Hillsb… 0.603   1.51<span style="color: #949494;">e</span><span style="color: #BB0000;">-1</span> 0.202     0.548   0.360  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>017    10 DPS - e… Hills… Hillsb… 0.286   6.08<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span> 0.113     0.371   0.204  </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 98 more rows</span></span></span>
-<span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 98 more rows</span></span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># combine by bay segment and year</span></span>
 <span><span class="fu"><a href="../reference/anlz_dps.html">anlz_dps</a></span><span class="op">(</span><span class="va">dpsfls</span>, summ <span class="op">=</span> <span class="st">"segment"</span>, summtime <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 9 × 8</span></span></span>
@@ -209,7 +210,7 @@ non-trivial data pre-processing and quality control is needed for each
 file and those included in the package are the correct format. The
 output is returned as tons per month for TN, TP, TSS, and BOD and
 million cubic meters per month for flow (hy).</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ipsfls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span>,</span>
 <span>  pattern <span class="op">=</span> <span class="st">'ps_ind'</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/anlz_dps_facility.html">anlz_dps_facility</a></span><span class="op">(</span><span class="va">ipsfls</span><span class="op">)</span></span>
@@ -242,7 +243,7 @@ and BOD and as million cubic meters per month for flow (hy) if
 <code>summtime = 'month'</code> or tons per year for TN, TP, TSS, and
 BOD and million cubic meters per year for flow (hy) if
 <code>summtime = 'year'</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># combine by enity and month</span></span>
 <span><span class="fu"><a href="../reference/anlz_ips.html">anlz_ips</a></span><span class="op">(</span><span class="va">ipsfls</span>, summ <span class="op">=</span> <span class="st">'entity'</span>, summtime <span class="op">=</span> <span class="st">'month'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 60 × 10</span></span></span>
@@ -258,8 +259,9 @@ BOD and million cubic meters per year for flow (hy) if
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  <span style="text-decoration: underline;">2</span>017     8 IPS    Lowry P… Hillsb…  0.021<span style="text-decoration: underline;">1</span> 0.003<span style="text-decoration: underline;">97</span>        0        0  0.018<span style="text-decoration: underline;">0</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">2</span>017     9 IPS    Lowry P… Hillsb…  0.025<span style="text-decoration: underline;">8</span> 0.005<span style="text-decoration: underline;">45</span>        0        0  0.016<span style="text-decoration: underline;">1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>017    10 IPS    Lowry P… Hillsb…  0.025<span style="text-decoration: underline;">9</span> 0.005<span style="text-decoration: underline;">55</span>        0        0  0.021<span style="text-decoration: underline;">4</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 50 more rows</span></span></span>
-<span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 50 more rows</span></span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># combine by bay segment and year</span></span>
 <span><span class="fu"><a href="../reference/anlz_ips.html">anlz_ips</a></span><span class="op">(</span><span class="va">ipsfls</span>, summ <span class="op">=</span> <span class="st">"segment"</span>, summtime <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 8</span></span></span>
