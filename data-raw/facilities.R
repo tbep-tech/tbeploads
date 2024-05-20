@@ -10,6 +10,7 @@ ipsfac <- read_sas(here('data-raw/ips1721monthentbas.sas7bdat')) |>
   mutate(
     entity = case_when(
       entity == 'Cytech Brewster' ~ 'Brewster Phosphogypsum', # entity is same as facility elsewhere
+      entity == 'HRK' ~ 'Piney Point Facility', # to match allocation tables
       T ~ entity
     )
   ) |>
@@ -22,7 +23,7 @@ ipsfac <- read_sas(here('data-raw/ips1721monthentbas.sas7bdat')) |>
       entity == 'Coronet' ~ 'coronet',
       entity == 'Duke Energy' ~ 'duke' ,
       entity == 'Estech Agricola' ~ 'estech',
-      entity == 'HRK' ~ 'hrk',
+      entity == 'Piney Point Facility' ~ 'pineypoint',
       entity == 'Kerry' ~ 'kerry',
       entity == 'Kinder Morgan' ~ 'kinder',
       entity == 'Lowry Park Zoo' ~ 'lowry',
