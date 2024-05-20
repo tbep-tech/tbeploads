@@ -118,7 +118,7 @@ wq_pin <- read.table(file = "./data-raw/PIN_CO/FDEP_WIN_WAVES_06-06_WQData_2021-
   select(-Activity.Start.Date.Time, -tkn_mgl, -nox_mgl) %>%
   arrange(station, date)
 
-# End Manatee County WQ data input
+# End Pinellas County WQ data input
 
 # Get EPCHC data through tbeptools
 
@@ -190,3 +190,6 @@ wq_fldata_corrected <- wq_fldata %>%
                                 tpload = tp_mgl * flow * 0.001 * 0.001,
                                 tssload = tss_mgl * flow * 0.001 * 0.001,
                                 bodload = bod_mgl * flow * 0.001 * 0.001)
+
+nps_gaged_load <- wq_fldata_corrected %>%
+  save(file = "./data/nps_gaged_loads_2021-2023.Rdata")
