@@ -8,9 +8,15 @@ ipsfac <- read_sas(here('data-raw/ips1721monthentbas.sas7bdat')) |>
   select(bayseg, basin = BASIN, entity, facname, source = source2) |>
   distinct() |>
   mutate(
+    entity = case_when(
+      entity == 'Cytech Brewster' ~ 'Brewster Phosphogypsum', # entity is same as facility elsewhere
+      T ~ entity
+    )
+  ) |>
+  mutate(
     entityshr = case_when(
       entity == 'Alpha/Owens Corning' ~ 'aoc' ,
-      entity == 'Cytech Brewster' ~ 'brewster',
+      entity == 'Brewster Phosphogypsum' ~ 'brewster',
       entity == 'Busch Gardens' ~ 'busch' ,
       entity == 'CSX' ~ 'csx',
       entity == 'Coronet' ~ 'coronet',
