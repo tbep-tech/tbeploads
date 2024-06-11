@@ -404,8 +404,22 @@ dpsfac <- dpsfac |>
     )
   )
 
-# combine ips dps
-facilities <- bind_rows(ipsfac, dpsfac) |>
+# add ips material loss
+ipsmat <- tribble(
+  ~bayseg, ~basin, ~entity, ~facname, ~source, ~entityshr, ~facnameshr, ~permit, ~facid,
+  2, NA_character_, 'CSX',           'Rockport',                   'PS - Industrial - Material Losses',  'csx',     'rock',      NA_character_,  NA_character_,
+  2, NA_character_, 'CSX',           'Newport',                    'PS - Industrial - Material Losses',  'csx',     'newp',      NA_character_,  NA_character_,
+  2, NA_character_, 'Mosaic',        'Tampa Marine',               'PS - Industrial - Material Losses',  'mosaic',  'tampamar',  NA_character_,  NA_character_,
+  2, NA_character_, 'Mosaic',        'Big Bend',                   'PS - Industrial - Material Losses',  'mosaic',  'bigbend',   NA_character_,  NA_character_,
+  2, NA_character_, 'Mosaic',        'Riverview',                  'PS - Industrial - Material Losses',  'mosaic',  'riverview', NA_character_,  NA_character_,
+  2, NA_character_, 'Kinder Morgan', 'Kinder Morgan Tampaplex',    'PS - Industrial - Material Losses',  'kinder',  'tampaplex', NA_character_,  NA_character_,
+  2, NA_character_, 'Kinder Morgan', 'Kinder Morgan Port Sutton',  'PS - Industrial - Material Losses',  'kinder',  'portsutt',  NA_character_,  NA_character_,
+  4, NA_character_, 'Kinder Morgan', 'Kinder Morgan Port Manatee', 'PS - Industrial - Material Losses',  'kinder',  'portmana',  NA_character_,  NA_character_,
+)
+
+
+# combine ips dps ipsmat
+facilities <- bind_rows(ipsfac, dpsfac, ipsmat) |>
   arrange(entity, facname)
 
 usethis::use_data(facilities, overwrite = TRUE)

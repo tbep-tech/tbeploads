@@ -3,7 +3,7 @@
 \docType{data}
 \name{facilities}
 \alias{facilities}
-\title{Domestic and industrial point source facilities}
+\title{Domestic and industrial point source facilities, including industrial with material losses}
 \format{
 A \code{data.frame}
 }
@@ -11,7 +11,7 @@ A \code{data.frame}
 facilities
 }
 \description{
-Domestic and industrial point source facilities
+Domestic and industrial point source facilities, including industrial with material losses
 }
 \examples{
 facilities
