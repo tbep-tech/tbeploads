@@ -16,12 +16,20 @@
 #' util_ps_facinfo(pth)
 util_ps_facinfo <- function(pth, asdf = FALSE){
 
+  srcs <- list(
+    ind = 'PS - Industrial',
+    dom = c('PS - Domestic - REUSE', 'PS - Domestic - SW'),
+    indml = 'PS - Industrial - Material Losses'
+  )
+
   # get entity and facility from path
-  flentfac <- gsub('\\.txt$', '', basename(pth)) |>
+  flsplit <- gsub('\\.txt$', '', basename(pth)) |>
     strsplit('_')
-  flentfac <- flentfac[[1]][c(3, 4)]
+  flsource <- flsplit[[1]][2]
+  flentfac <- flsplit[[1]][c(3, 4)]
 
   facinfo <- facilities |>
+    dplyr::filter(source %in% srcs[[flsource]]) |>
     dplyr::filter(entityshr == flentfac[1] & facnameshr == flentfac[2]) |>
     dplyr::select(-bayseg, -source, -basin) |>
     unique()
