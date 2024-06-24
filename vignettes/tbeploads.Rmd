@@ -66,8 +66,8 @@ For convenience, three example files are included with the package. The paths to
 
 ```{r}
 ipsfls <- list.files(system.file('extdata/', package = 'tbeploads'),
-  pattern = 'ps_ind', full.names = TRUE)
-anlz_dps_facility(ipsfls)
+  pattern = 'ps_ind_', full.names = TRUE)
+anlz_ips_facility(ipsfls)
 ```
 
 The `anlz_ips()` function uses `anlz_ips_facility()` to summarize the IPS results by location as facility (combines outfall data), entity (combines facility data), bay segment (combines entity data), and as all (combines bay segment data).  The results can also be temporally summarized as monthly or annual totals.  The location summary is defined by the `summ` argument and the temporal summary is defined by the `summtime` argument.  The `fls` argument used by `anlz_ips_facility()` is also used by `anlz_ips()`.  The output is tons per month for TN, TP, TSS, and BOD and as million cubic meters per month for flow (hy) if `summtime = 'month'` or tons per year for TN, TP, TSS, and BOD and million cubic meters per year for flow (hy) if `summtime = 'year'`. 

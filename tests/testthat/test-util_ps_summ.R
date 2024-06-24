@@ -1,5 +1,5 @@
 fls <- list.files(system.file('extdata/', package = 'tbeploads'),
-  pattern = 'ps_ind', full.names = TRUE)
+  pattern = 'ps_ind_', full.names = TRUE)
 
 ipsbyfac <- anlz_ips_facility(fls)
 
