@@ -80,17 +80,21 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">pth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/ps_dom_hillsco_falkenburg_2019.txt'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">pth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">pth</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">util_ps_checkfls</span><span class="op">(</span><span class="va">pth</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 8 × 3</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   name                               chk   nms                                  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> ps_dom_clearwater_ne_2021.txt      ok    Permit.Number, Facility.Name, Year, …</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> ps_dom_hillsco_dalemabry_1718.txt  ok    Permit.Number, Facility.Name, Outfal…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> ps_dom_hillsco_falkenburg_2019.txt ok    Permit.Number, Facility.Name, Outfal…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> ps_dom_pasco_pasco_2021.txt        ok    Year, Month, Outfall.ID, Total.N, To…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> ps_ind_busch_busch_2020.txt        ok    Permit.Number, Facility.Name, Outfal…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> ps_ind_coronet_coronet_2021.txt    ok    Permit.Number, Facility.Name, Outfal…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">7</span> ps_ind_lowry_lowry_1718.txt        ok    Permit.Number, Facility.Name, Outfal…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">8</span> ps_ind_lowry_lowry_2019.txt        ok    Permit.Number, Facility.Name, Outfal…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 12 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    name                               chk           nms                         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> ps_dom_clearwater_ne_2021.txt      ok            Permit.Number, Facility.Nam…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> ps_dom_hillsco_dalemabry_1718.txt  ok            Permit.Number, Facility.Nam…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> ps_dom_hillsco_falkenburg_2019.txt ok            Permit.Number, Facility.Nam…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> ps_dom_pasco_pasco_2021.txt        ok            Year, Month, Outfall.ID, To…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> ps_ind_busch_busch_2020.txt        ok            Permit.Number, Facility.Nam…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> ps_ind_coronet_coronet_2021.txt    ok            Permit.Number, Facility.Nam…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> ps_ind_lowry_lowry_1718.txt        ok            Permit.Number, Facility.Nam…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> ps_ind_lowry_lowry_2019.txt        ok            Permit.Number, Facility.Nam…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> ps_indml_csx_rock_2020.txt         check columns Facility.Name, year, tn_ton…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> ps_indml_kinder_tampaplex_1718.txt check columns Facility.Name, year, tn_ton…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span> ps_indml_kinder_tampaplex_2019.txt check columns Facility.Name, year, tn_ton…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span> ps_indml_mosaic_riverview_2021.txt check columns Facility.Name, year, tn_ton…</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
