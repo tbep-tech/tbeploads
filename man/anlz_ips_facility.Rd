@@ -2,7 +2,7 @@
 % Please edit documentation in R/anlz_ips_facility.R
 \name{anlz_ips_facility}
 \alias{anlz_ips_facility}
-\title{Calculate IPS from raw facility data}
+\title{Calculate IPS loads from raw facility data}
 \usage{
 anlz_ips_facility(fls)
 }
@@ -13,7 +13,7 @@ anlz_ips_facility(fls)
 data frame with loading data for TP, TN, TSS, and BOD as tons per month and hydro load as million cubic meters per month.  Information for each entity, facility, and outfall is retained.
 }
 \description{
-Calculate IPS from raw facility data
+Calculate IPS loads from raw facility data
 }
 \details{
 Input data should include flow as million gallons per day, and conc as mg/L.  Steps include:

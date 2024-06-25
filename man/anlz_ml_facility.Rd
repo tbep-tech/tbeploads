@@ -2,7 +2,7 @@
 % Please edit documentation in R/anlz_ml_facility.R
 \name{anlz_ml_facility}
 \alias{anlz_ml_facility}
-\title{Calculate material losses (ML) from raw facility data}
+\title{Calculate material loss (ML) loads from raw facility data}
 \usage{
 anlz_ml_facility(fls)
 }
@@ -10,13 +10,13 @@ anlz_ml_facility(fls)
 \item{fls}{vector of file paths to raw facility data, one to many}
 }
 \value{
-data frame that is nearly identical to the input data except results are shown as monthly load as the annual estimate divided by 12.  This is for consistency of reporting without sources.
+data frame that is nearly identical to the input data except results are shown as monthly load as the annual loss estimate divided by 12.  This is for consistency of reporting with other loading sources.
 }
 \description{
-Calculate material losses (ML) from raw facility data
+Calculate material loss (ML) loads from raw facility data
 }
 \details{
-Input data should one row per year per facility, where the row shows the total tons per year of total nitrogen loss.
+Input data should be one row per year per facility, where the row shows the total tons per year of total nitrogen loss.  Input files are often created by hand based on reported annual tons of nitrogen shipped at each facility.  The material losses as tons/yr are estimated from the tons shipped using an agreed upon loss rate.  Values reported in the example files represent the estimated loss as the total tons of N shipped each year multiplied by 0.0023 and divided by 2000. The total N shipped at a facility each year can be obtained using a simple back-calculation (multiply by 2000, divide by 0.0023).
 }
 \examples{
 fls <- list.files(system.file('extdata/', package = 'tbeploads'),

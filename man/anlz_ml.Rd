@@ -18,7 +18,7 @@ anlz_ml(
 \item{summtime}{chr string indicating how the returned data are summarized temporally (month or year), see details}
 }
 \value{
-data frame with loading data for TN as tons per month/year.  Empty colmns for TP, TSS, BOD, and hydrologic load are also returned for consistency with other point source load calculation functions.
+data frame with loading data for TN as tons per month/year.  Columns for TP, TSS, BOD, and hydrologic load are also returned with zero load for consistency with other point source load calculation functions.
 }
 \description{
 Calculate material loss (ML) loads and summarize

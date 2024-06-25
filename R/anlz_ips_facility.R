@@ -1,6 +1,6 @@
-#' Calculate IPS from raw facility data
+#' Calculate IPS loads from raw facility data
 #'
-#' Calculate IPS from raw facility data
+#' Calculate IPS loads from raw facility data
 #'
 #' @param fls vector of file paths to raw facility data, one to many
 #'
