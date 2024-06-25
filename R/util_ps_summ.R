@@ -48,28 +48,29 @@ util_ps_summ <- function(dat, summ = c('entity', 'facility', 'segment', 'all'), 
 
       out <- dat |>
         dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, Month, source, entity, facility, segment))
+                         .by = c(Year, Month, source, entity, facility, segment)) |>
+        dplyr::arrange(entity, facility, segment, Year, Month, source)
 
     if(summ == 'entity')
 
       out <- dat |>
         dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, Month, source, entity, segment))
+                         .by = c(Year, Month, source, entity, segment)) |>
+        dplyr::arrange(entity, segment, Year, Month, source)
 
     if(summ == 'segment')
 
       out <- dat |>
         dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, Month, source, segment))
+                         .by = c(Year, Month, source, segment)) |>
+        dplyr::arrange(segment, Year, Month, source)
 
     if(summ == 'all')
 
       out <- dat |>
         dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, Month, source))
-
-    out <- out |>
-      dplyr::arrange(source, Year, Month)
+                         .by = c(Year, Month, source)) |>
+        dplyr::arrange(Year, Month, source)
 
   }
 
@@ -79,28 +80,29 @@ util_ps_summ <- function(dat, summ = c('entity', 'facility', 'segment', 'all'), 
 
       out <- dat |>
         dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, source, entity, facility, segment))
+                         .by = c(Year, source, entity, facility, segment)) |>
+        dplyr::arrange(entity, facility, segment, Year, source)
 
     if(summ == 'entity')
 
       out <- dat |>
         dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, source, entity, segment))
+                         .by = c(Year, source, entity, segment)) |>
+        dplyr::arrange(entity, segment, Year, source)
 
     if(summ == 'segment')
 
       out <- dat |>
         dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, source, segment))
+                         .by = c(Year, source, segment)) |>
+        dplyr::arrange(segment, Year, source)
 
     if(summ == 'all')
 
       out <- dat |>
         dplyr::summarise(dplyr::across(dplyr::contains("load"), ~ sum(., na.rm = TRUE)),
-                         .by = c(Year, source))
-
-    out <- out |>
-      dplyr::arrange(source, Year)
+                         .by = c(Year, source)) |>
+        dplyr::arrange(Year, source)
 
   }
 
