@@ -54,13 +54,13 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_ps_checkfls</span><span class="op">(</span><span class="va">pth</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_ps_checkfls</span><span class="op">(</span><span class="va">fls</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>pth</dt>
-<dd><p>path to parent directory of raw entity data</p></dd>
+    <dl><dt>fls</dt>
+<dd><p>vector of file paths to raw facility data, one to many</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -73,28 +73,17 @@
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The <code>chk</code> column indicates the issue with the file and will indicate <code>"ok"</code> if no issues are found, <code>"read error"</code> if the file cannot be read, and <code>"check columns"</code> if the column names are not as expected.  Any file not showing <code>"ok"</code> should be checked for issues.</p>
 <p>All files are checked with <code><a href="util_ps_checkuni.html">util_ps_checkuni</a></code> if a file does not have a read error.</p>
+<p>The function cannot be used with files for material losses.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">pth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/ps_dom_hillsco_falkenburg_2019.txt'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">pth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">pth</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">util_ps_checkfls</span><span class="op">(</span><span class="va">pth</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 12 × 3</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    name                               chk           nms                         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> ps_dom_clearwater_ne_2021.txt      ok            Permit.Number, Facility.Nam…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> ps_dom_hillsco_dalemabry_1718.txt  ok            Permit.Number, Facility.Nam…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> ps_dom_hillsco_falkenburg_2019.txt ok            Permit.Number, Facility.Nam…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> ps_dom_pasco_pasco_2021.txt        ok            Year, Month, Outfall.ID, To…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> ps_ind_busch_busch_2020.txt        ok            Permit.Number, Facility.Nam…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> ps_ind_coronet_coronet_2021.txt    ok            Permit.Number, Facility.Nam…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> ps_ind_lowry_lowry_1718.txt        ok            Permit.Number, Facility.Nam…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> ps_ind_lowry_lowry_2019.txt        ok            Permit.Number, Facility.Nam…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> ps_indml_csx_rock_2020.txt         check columns Facility.Name, year, tn_ton…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> ps_indml_kinder_tampaplex_1718.txt check columns Facility.Name, year, tn_ton…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span> ps_indml_kinder_tampaplex_2019.txt check columns Facility.Name, year, tn_ton…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span> ps_indml_mosaic_riverview_2021.txt check columns Facility.Name, year, tn_ton…</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/ps_dom_hillsco_falkenburg_2019.txt'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">util_ps_checkfls</span><span class="op">(</span><span class="va">fls</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   name                               chk   nms                                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> ps_dom_hillsco_falkenburg_2019.txt ok    Permit.Number, Facility.Name, Outfal…</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

@@ -75,7 +75,7 @@
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code>anlz_ml</code></p></div>
+    <div class="dont-index"><p><code><a href="anlz_ml.html">anlz_ml</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -83,19 +83,6 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  pattern <span class="op">=</span> <span class="st">'ps_indml'</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">anlz_ml_facility</span><span class="op">(</span><span class="va">fls</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Called from: anlz_ml_facility(fls)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> debug: mlprep &lt;- tidyr::unnest(tidyr::unnest(dplyr::ungroup(dplyr::mutate(tidyr::nest(dplyr::group_by(tibble::tibble(fls = fls), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     fls), .key = "dat"), dat = purrr::map(fls, read.table, skip = 0, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     sep = "\t", header = T), entinfo = purrr::map(fls, util_ps_facinfo, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     asdf = T))), "entinfo"), "dat")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> debug: ml &lt;- dplyr::select(dplyr::mutate(dplyr::full_join(tidyr::crossing(unique(mlprep[, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     c("year", "entity", "facname")]), Month = 1:12), mlprep, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     by = c("year", "entity", "facname")), tn_load = tn_tonsyr/12, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     tp_load = NA, tss_load = NA, bod_load = NA, hy_load = NA, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     source = NA), Year = year, Month, entity, facility = facname, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     coastco, source, tn_load, tp_load, tss_load, bod_load, hy_load)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> debug: out &lt;- ml</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> debug: return(out)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 60 × 11</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Year Month entity  facility coastco source tn_load tp_load tss_load bod_load</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   </span>

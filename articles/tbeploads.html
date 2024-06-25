@@ -119,7 +119,7 @@ attenuation factor for land application depending on location. The file
 names must follow a specific convention, where metadata for each entity
 is found in the <code><a href="../reference/facilities.html">facilities()</a></code> data object using information
 in the file name.</p>
-<p>For convenience, three example files are included with the package.
+<p>For convenience, four example files are included with the package.
 The paths to these files are used as input to the function. Non-trivial
 data pre-processing and quality control is needed for each file and
 those included in the package are the correct format. The output is
@@ -159,7 +159,7 @@ and BOD and as million cubic meters per month for flow (hy) if
 BOD and million cubic meters per year for flow (hy) if
 <code>summtime = 'year'</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># combine by enity and month</span></span>
+<code class="sourceCode R"><span><span class="co"># combine by entity and month</span></span>
 <span><span class="fu"><a href="../reference/anlz_dps.html">anlz_dps</a></span><span class="op">(</span><span class="va">dpsfls</span>, summ <span class="op">=</span> <span class="st">'entity'</span>, summtime <span class="op">=</span> <span class="st">'month'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 108 × 10</span></span></span>
 <span><span class="co">#&gt;     Year Month source   entity segment tn_load tp_load tss_load bod_load hy_load</span></span>
@@ -204,7 +204,7 @@ per day). Loads are estimated as concentration times flow. The file
 names must follow a specific convention, where metadata for each entity
 is found in the <code><a href="../reference/facilities.html">facilities()</a></code> data object using information
 in the file name.</p>
-<p>For convenience, three example files are included with the package.
+<p>For convenience, four example files are included with the package.
 The paths to these files are used as input to the function. As before,
 non-trivial data pre-processing and quality control is needed for each
 file and those included in the package are the correct format. The
@@ -244,7 +244,7 @@ and BOD and as million cubic meters per month for flow (hy) if
 BOD and million cubic meters per year for flow (hy) if
 <code>summtime = 'year'</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># combine by enity and month</span></span>
+<code class="sourceCode R"><span><span class="co"># combine by entity and month</span></span>
 <span><span class="fu"><a href="../reference/anlz_ips.html">anlz_ips</a></span><span class="op">(</span><span class="va">ipsfls</span>, summ <span class="op">=</span> <span class="st">'entity'</span>, summtime <span class="op">=</span> <span class="st">'month'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 60 × 10</span></span></span>
 <span><span class="co">#&gt;     Year Month source entity   segment tn_load tp_load tss_load bod_load hy_load</span></span>
@@ -272,6 +272,95 @@ BOD and million cubic meters per year for flow (hy) if
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  <span style="text-decoration: underline;">2</span>019 IPS    Hillsborough Bay   0.106  0.022<span style="text-decoration: underline;">9</span>     0         0    0.073<span style="text-decoration: underline;">9</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">2</span>020 IPS    Hillsborough Bay   0.554  0.082<span style="text-decoration: underline;">7</span>     5.84     11.2  1.06  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>021 IPS    Hillsborough Bay   2.16   4.77       4.64      0    1.31</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="material-losses-ml">Material Losses (ML)<a class="anchor" aria-label="anchor" href="#material-losses-ml"></a>
+</h3>
+<p>Material losses are estimates of nutrient loads to the bay primarily
+from fertilizer shipping activities at ports. Historically, loadings
+from material losses were much higher than at present. Only a few
+entities report material losses, typically as a total for the year and
+only for total nitrogen. The material losses as tons/yr are estimated
+from the tons shipped using an agreed upon loss rate. Values reported in
+the example files represent the estimated loss as the total tons of N
+shipped each year multiplied by 0.0023 and divided by 2000. The total N
+shipped at a facility each year can be obtained using a simple
+back-calculation (multiply by 2000, divide by 0.0023).</p>
+<p>The core function is <code><a href="../reference/anlz_ml_facility.html">anlz_ml_facility()</a></code> that requires
+only a vector of file paths as input, where each file should be one row
+per year per facility, where the row shows the total tons per year of
+total nitrogen loss. The file names must follow a specific convention,
+where metadata for each entity is found in the <code><a href="../reference/facilities.html">facilities()</a></code>
+data object using information in the file name.</p>
+<p>For convenience, four example files are included with the package.
+The paths to these files are used as input to the function. The output
+is nearly identical to the input data since no load calculations are
+used, except results are shown as monthly load as the annual loss
+divided by 12. Additional empty columns (e.g., TP load, TSS load, etc.)
+are also returned for consistency of reporting with other loading
+sources.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mlfls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span>,</span>
+<span>  pattern <span class="op">=</span> <span class="st">'ps_indml'</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/anlz_ml_facility.html">anlz_ml_facility</a></span><span class="op">(</span><span class="va">mlfls</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 60 × 11</span></span></span>
+<span><span class="co">#&gt;     Year Month entity  facility coastco source tn_load tp_load tss_load bod_load</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">2</span>017     1 Kinder… Kinder … <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      0.015<span style="text-decoration: underline;">6</span> <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">2</span>017     2 Kinder… Kinder … <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      0.015<span style="text-decoration: underline;">6</span> <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">2</span>017     3 Kinder… Kinder … <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      0.015<span style="text-decoration: underline;">6</span> <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  <span style="text-decoration: underline;">2</span>017     4 Kinder… Kinder … <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      0.015<span style="text-decoration: underline;">6</span> <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  <span style="text-decoration: underline;">2</span>017     5 Kinder… Kinder … <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      0.015<span style="text-decoration: underline;">6</span> <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  <span style="text-decoration: underline;">2</span>017     6 Kinder… Kinder … <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      0.015<span style="text-decoration: underline;">6</span> <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  <span style="text-decoration: underline;">2</span>017     7 Kinder… Kinder … <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      0.015<span style="text-decoration: underline;">6</span> <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  <span style="text-decoration: underline;">2</span>017     8 Kinder… Kinder … <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      0.015<span style="text-decoration: underline;">6</span> <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">2</span>017     9 Kinder… Kinder … <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      0.015<span style="text-decoration: underline;">6</span> <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>017    10 Kinder… Kinder … <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      0.015<span style="text-decoration: underline;">6</span> <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 50 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: hy_load &lt;lgl&gt;</span></span></span></code></pre></div>
+<p>The <code><a href="../reference/anlz_ml.html">anlz_ml()</a></code> function uses
+<code><a href="../reference/anlz_ml_facility.html">anlz_ml_facility()</a></code> to summarize the IPS results by location
+as facility, entity (combines facility data), bay segment (combines
+entity data), and as all (combines bay segment data). The results can
+also be temporally summarized as monthly or annual totals. The location
+summary is defined by the <code>summ</code> argument and the temporal
+summary is defined by the <code>summtime</code> argument. The
+<code>fls</code> argument used by <code><a href="../reference/anlz_ml_facility.html">anlz_ml_facility()</a></code> is
+also used by <code><a href="../reference/anlz_ml.html">anlz_ml()</a></code>. The output is tons per month of TN
+if <code>summtime = 'month'</code> or tons per year of TN if
+<code>summtime = 'year'</code>. Columns for TP, TSS, BOD, and hydrologic
+load are also returned with zero load for consistency with other point
+source load calculation functions. Material loss loads are often
+combined with IPS loads for reporting.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># combine by entity and month</span></span>
+<span><span class="fu"><a href="../reference/anlz_ml.html">anlz_ml</a></span><span class="op">(</span><span class="va">mlfls</span>, summ <span class="op">=</span> <span class="st">'entity'</span>, summtime <span class="op">=</span> <span class="st">'month'</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 60 × 10</span></span></span>
+<span><span class="co">#&gt;     Year Month source entity   segment tn_load tp_load tss_load bod_load hy_load</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">2</span>017     1 ML     Kinder … Hillsb…  0.015<span style="text-decoration: underline;">6</span>       0        0        0       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">2</span>017     2 ML     Kinder … Hillsb…  0.015<span style="text-decoration: underline;">6</span>       0        0        0       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">2</span>017     3 ML     Kinder … Hillsb…  0.015<span style="text-decoration: underline;">6</span>       0        0        0       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  <span style="text-decoration: underline;">2</span>017     4 ML     Kinder … Hillsb…  0.015<span style="text-decoration: underline;">6</span>       0        0        0       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  <span style="text-decoration: underline;">2</span>017     5 ML     Kinder … Hillsb…  0.015<span style="text-decoration: underline;">6</span>       0        0        0       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  <span style="text-decoration: underline;">2</span>017     6 ML     Kinder … Hillsb…  0.015<span style="text-decoration: underline;">6</span>       0        0        0       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  <span style="text-decoration: underline;">2</span>017     7 ML     Kinder … Hillsb…  0.015<span style="text-decoration: underline;">6</span>       0        0        0       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  <span style="text-decoration: underline;">2</span>017     8 ML     Kinder … Hillsb…  0.015<span style="text-decoration: underline;">6</span>       0        0        0       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">2</span>017     9 ML     Kinder … Hillsb…  0.015<span style="text-decoration: underline;">6</span>       0        0        0       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>017    10 ML     Kinder … Hillsb…  0.015<span style="text-decoration: underline;">6</span>       0        0        0       0</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 50 more rows</span></span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># combine by bay segment and year</span></span>
+<span><span class="fu"><a href="../reference/anlz_ml.html">anlz_ml</a></span><span class="op">(</span><span class="va">mlfls</span>, summ <span class="op">=</span> <span class="st">"segment"</span>, summtime <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 8</span></span></span>
+<span><span class="co">#&gt;    Year source segment          tn_load tp_load tss_load bod_load hy_load</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>017 ML     Hillsborough Bay   0.188       0        0        0       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  <span style="text-decoration: underline;">2</span>018 ML     Hillsborough Bay   0.190       0        0        0       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  <span style="text-decoration: underline;">2</span>019 ML     Hillsborough Bay   0.193       0        0        0       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">2</span>020 ML     Hillsborough Bay   0.884       0        0        0       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>021 ML     Hillsborough Bay   0.987       0        0        0       0</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
