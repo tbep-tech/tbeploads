@@ -1,5 +1,6 @@
-dirpth <- unique(dirname(fls))
-chkfls <- util_ps_checkfls(dirpth)
+fls <- list.files(system.file('extdata/', package = 'tbeploads'),
+  pattern = 'ps_ind_|ps_dom_', full.names = TRUE)
+chkfls <- util_ps_checkfls(fls)
 
 test_that("Check output class", {
 
@@ -17,7 +18,7 @@ test_that("Check file incorrect columns", {
 
   tmpfl <- tempfile(fileext = '.txt')
   write.table(NA, tmpfl)
-  chkfls <- util_ps_checkfls(dirname(tmpfl))
+  chkfls <- util_ps_checkfls(tmpfl)
 
   expect_true(chkfls$chk == 'check columns')
 
@@ -29,7 +30,7 @@ test_that("Check file read error", {
 
   tmpfl <- tempfile(fileext = '.txt')
   writeLines(c("header1\theader2\theader3", "1\t2\t3", "a\tb"), tmpfl)
-  chkfls <- util_ps_checkfls(dirname(tmpfl))
+  chkfls <- util_ps_checkfls(tmpfl)
 
   expect_true(chkfls$chk == 'read error')
 

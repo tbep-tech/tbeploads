@@ -4,10 +4,10 @@
 \alias{util_ps_checkfls}
 \title{Create a data frame of formatting issues with point source input files}
 \usage{
-util_ps_checkfls(pth)
+util_ps_checkfls(fls)
 }
 \arguments{
-\item{pth}{path to parent directory of raw entity data}
+\item{fls}{vector of file paths to raw facility data, one to many}
 }
 \value{
 A \code{data.frame} with three columns indicating \code{name} for the file name, \code{chk} for the file issue, and \code{nms} for a concatenated string of column names for the file
@@ -19,9 +19,10 @@ Create a data frame of formatting issues with point source input files
 The \code{chk} column indicates the issue with the file and will indicate \code{"ok"} if no issues are found, \code{"read error"} if the file cannot be read, and \code{"check columns"} if the column names are not as expected.  Any file not showing \code{"ok"} should be checked for issues.
 
 All files are checked with \code{\link{util_ps_checkuni}} if a file does not have a read error.
+
+The function cannot be used with files for material losses.
 }
 \examples{
-pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
-pth <- dirname(pth)
-util_ps_checkfls(pth)
+fls <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
+util_ps_checkfls(fls)
 }
