@@ -5,9 +5,9 @@
 #' @param fls vector of file paths to raw facility data, one to many
 #'
 #' @details
-#' Input data should one row per year per facility, where the row shows the total tons per year of total nitrogen loss.
+#' Input data should be one row per year per facility, where the row shows the total tons per year of total nitrogen loss.  Input files are often created by hand based on reported annual tons of nitrogen shipped at each facility.  The material losses as tons/yr are estimated from the tons shipped using an agreed upon loss rate.  Values reported in the example files represent the estimated loss as the total tons of N shipped each year multiplied by 0.0023 and divided by 2000. The total N shipped at a facility each year can be obtained using a simple back-calculation (multiply by 2000, divide by 0.0023).
 #'
-#' @return data frame that is nearly identical to the input data except results are shown as monthly load as the annual estimate divided by 12.  This is for consistency of reporting without sources.
+#' @return data frame that is nearly identical to the input data except results are shown as monthly load as the annual loss estimate divided by 12.  This is for consistency of reporting with other loading sources.
 #'
 #' @seealso \code{\link{anlz_ml}}
 #'
@@ -21,7 +21,7 @@ anlz_ml_facility <- function(fls){
 
   ##
   # import and prep all data
-  browser()
+
   mlprep <- tibble::tibble(
       fls = fls
     ) |>
@@ -35,12 +35,14 @@ anlz_ml_facility <- function(fls){
     tidyr::unnest('entinfo') |>
     tidyr::unnest('dat')
 
+  ##
   # expand to monthly
+
   ml <- tidyr::crossing(
-      unique(mlprep[, c('year', 'entity', 'facname')]),
+      unique(mlprep[, c('Year', 'entity', 'facname')]),
       Month = 1:12
     ) |>
-    dplyr::full_join(mlprep, by = c('year', 'entity', 'facname')) |>
+    dplyr::full_join(mlprep, by = c('Year', 'entity', 'facname')) |>
     dplyr::mutate(
       tn_load = tn_tonsyr / 12,
       tp_load = NA,
@@ -50,7 +52,7 @@ anlz_ml_facility <- function(fls){
       source = NA
     ) |>
     dplyr::select(
-      Year = year,
+      Year,
       Month,
       entity,
       facility = facname,
