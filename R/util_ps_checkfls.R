@@ -1,12 +1,14 @@
-#' Create a data frame of formatting issues with DPS input files
+#' Create a data frame of formatting issues with point source input files
 #'
-#' Create a data frame of formatting issues with DPS input files
+#' Create a data frame of formatting issues with point source input files
 #'
-#' @param pth path to parent directory of raw entity data
+#' @param fls vector of file paths to raw facility data, one to many
 #'
 #' @details The \code{chk} column indicates the issue with the file and will indicate \code{"ok"} if no issues are found, \code{"read error"} if the file cannot be read, and \code{"check columns"} if the column names are not as expected.  Any file not showing \code{"ok"} should be checked for issues.
 #'
-#' All files are checked with \code{\link{util_dps_checkuni}} if a file does not have a read error.
+#' All files are checked with \code{\link{util_ps_checkuni}} if a file does not have a read error.
+#'
+#' The function cannot be used with files for material losses.
 #'
 #' @importFrom tidyr unnest
 #' @importFrom tibble enframe
@@ -16,12 +18,9 @@
 #' @export
 #'
 #' @examples
-#' pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
-#' pth <- dirname(pth)
-#' util_dps_checkfls(pth)
-util_dps_checkfls <- function(pth){
-
-  fls <- list.files(pth, pattern = '\\.txt$', full.names = T)
+#' fls <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
+#' util_ps_checkfls(fls)
+util_ps_checkfls <- function(fls){
 
   out <- vector(length = length(fls), mode = 'list')
   names(out) <- basename(fls)
@@ -39,7 +38,7 @@ util_dps_checkfls <- function(pth){
     }
 
     # check column names
-    chk <- try(util_dps_checkuni(dat), silent = T)
+    chk <- try(util_ps_checkuni(dat), silent = T)
     if(inherits(chk, 'try-error')){
       chk <- 'check columns'
     } else {

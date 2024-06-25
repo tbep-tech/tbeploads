@@ -1,19 +1,193 @@
 library(haven)
 library(dplyr)
 library(tibble)
+library(here)
 
-pth <- 'T:/03_BOARDS_COMMITTEES/05_TBNMC/2022_RA_Update/01_FUNDING_OUT/DELIVERABLES/TO-9/datastick_deliverables/2017-2021LUEntityLoads/'
-
-ipsfac <- read_sas(paste0(pth, '2017-2021IPSMonthlyEntityBasin/ips1721monthentbas.sas7bdat')) |>
+# original T:/03_BOARDS_COMMITTEES/05_TBNMC/2022_RA_Update/01_FUNDING_OUT/DELIVERABLES/TO-9/datastick_deliverables/2017-2021LUEntityLoads/2017-2021IPSMonthlyEntityBasin/ips1721monthentbas.sas7bdat
+ipsfac <- read_sas(here('data-raw/ips1721monthentbas.sas7bdat')) |>
   select(bayseg, basin = BASIN, entity, facname, source = source2) |>
-  distinct()
+  distinct() |>
+  mutate(
+    entity = case_when(
+      entity == 'Cytech Brewster' ~ 'Brewster Phosphogypsum', # entity is same as facility elsewhere
+      entity == 'HRK' ~ 'Piney Point Facility', # to match allocation tables
+      T ~ entity
+    )
+  ) |>
+  mutate(
+    entityshr = case_when(
+      entity == 'Alpha/Owens Corning' ~ 'aoc' ,
+      entity == 'Brewster Phosphogypsum' ~ 'brewster',
+      entity == 'Busch Gardens' ~ 'busch' ,
+      entity == 'CSX' ~ 'csx',
+      entity == 'Coronet' ~ 'coronet',
+      entity == 'Duke Energy' ~ 'duke' ,
+      entity == 'Estech Agricola' ~ 'estech',
+      entity == 'Piney Point Facility' ~ 'pineypoint',
+      entity == 'Kerry' ~ 'kerry',
+      entity == 'Kinder Morgan' ~ 'kinder',
+      entity == 'Lowry Park Zoo' ~ 'lowry',
+      entity == 'Mosaic' ~ 'mosaic',
+      entity == 'TECO' ~ 'teco',
+      entity == 'Trademark Nitrogen' ~ 'trademark',
+      entity == 'Yara' ~ 'yara'
+    )
+  ) |>
+  mutate(
+    facnameshr = case_when(
+      facname == 'CSX - Rockport Newport' ~ 'rocknewp' ,
+      facname == 'CSX Winston Yard' ~ 'winston',
+      facname == 'Kinder Morgan Port Sutton' ~ 'portsutt',
+      facname == 'Kinder Morgan Tampaplex' ~ 'tampaplex',
+      facname == 'Mosaic - Bartow' ~ 'bartow',
+      facname == 'Mosaic - Bonnie' ~ 'bonnie',
+      facname == 'Mosaic - Four Corners' ~ 'fourcorners',
+      facname == 'Mosaic - Ft. Lonesome' ~ 'ftlone',
+      facname == 'Mosaic - Green Bay' ~ 'greenbay',
+      facname == 'Mosaic - Hookers Prairie' ~ 'hookers',
+      facname == 'Mosaic - Kingsford' ~ 'kingsford',
+      facname == 'Mosaic - Mulberry Phospho Stack' ~ 'mulbphosph',
+      facname == 'Mosaic - Mulberry Plant' ~ 'mulbplant',
+      facname == 'Mosaic - New Wales Chemical Plant' ~ 'newwales',
+      facname == 'Mosaic - Nichols Mine' ~ 'nichols',
+      facname == 'Mosaic - Plant City' ~ 'plantcity',
+      facname == 'Mosaic - Port Sutton' ~ 'portsutt',
+      facname == 'Mosaic - Riverview' ~ 'riverview',
+      facname == 'Mosaic - Riverview Stack Closure' ~ 'riverviewstack',
+      facname == 'Mosaic - South Pierce' ~ 'spierce',
+      facname == 'Mosaic - Tampa Ammonia Terminal' ~ 'tampaamm',
+      facname == 'Mosaic - Tampa Marine Terminal' ~ 'tampamar',
+      facname == 'TECO - Bayside (fka Gannon)' ~ 'bayside',
+      facname == 'TECO - Big Bend' ~ 'bigbend',
+      facname == 'HRK Piney Point' ~ 'pineypoint',
+      T ~ entityshr
+    )
+  ) |>
+  mutate(
+    permit = case_when(
+      facname == 'Alpha/Owens Corning' ~ 'FL0029653',
+      facname == 'Brewster Phosphogypsum' ~ 'FL0132381',
+      facname == 'Busch Gardens' ~ 'FL0185833',
+      facname == 'Coronet Industries' ~ 'FL0034657',
+      facname == 'CSX - Rockport Newport' ~ 'FL0450600',
+      facname == 'CSX Winston Yard' ~ 'FL0032581',
+      facname == 'Duke Energy-Bartow Plant' ~ 'FL0000132',
+      facname == 'Estech Agricola' ~ 'FL0160083',
+      facname == 'HRK Piney Point' ~ 'FL0000124',
+      facname == 'Kerry I and F' ~ 'FL0037389',
+      facname == 'Kinder Morgan Port Sutton' ~ 'FL0122904',
+      facname == 'Kinder Morgan Tampaplex' ~ 'FL0321486',
+      facname == 'Lowry Park Zoo' ~ 'FL0188651',
+      facname == 'Mosaic - Bartow' ~ 'FL0001589',
+      facname == 'Mosaic - Bonnie' ~ 'FL0000523',
+      facname == 'Mosaic - Four Corners' ~ 'FL0036412',
+      facname == 'Mosaic - Ft. Lonesome' ~ 'FL0033332',
+      facname == 'Mosaic - Green Bay' ~ 'FL0000752',
+      facname == 'Mosaic - Hookers Prairie' ~ 'FL0033294',
+      facname == 'Mosaic - Kingsford' ~ 'FL0000256',
+      facname == 'Mosaic - Mulberry Phospho Stack' ~ 'FL0334944',
+      facname == 'Mosaic - Mulberry Plant' ~ 'FL0000671',
+      facname == 'Mosaic - New Wales Chemical Plant' ~ 'FL0036421',
+      facname == 'Mosaic - Nichols Mine' ~ 'FL0030139',
+      facname == 'Mosaic - Plant City' ~ 'FL0000078',
+      facname == 'Mosaic - Port Sutton' ~ 'FL0000264',
+      facname == 'Mosaic - Riverview' ~ 'FL0000761',
+      facname == 'Mosaic - Riverview Stack Closure' ~ 'FL0177130',
+      facname == 'Mosaic - South Pierce' ~ 'FL0000370',
+      facname == 'Mosaic - Tampa Ammonia Terminal' ~ 'FL0187313',
+      facname == 'Mosaic - Tampa Marine Terminal' ~ 'FL0166057',
+      facname == 'TECO - Bayside (fka Gannon)' ~ 'FL0000809',
+      facname == 'TECO - Big Bend' ~ 'FL0000817',
+      facname == 'Trademark Nitrogen Corporation' ~ 'FL0000647',
+      facname == 'Yara North America, Inc.' ~ 'FL0038652'
+    )
+  ) |>
+  mutate(
+    facid = case_when(
+      permit == 'FL0000078' ~ '4029P20023',
+      permit == 'FL0000124' ~ '4041P20001',
+      permit == 'FL0000132' ~ 'FL0000132',
+      permit == 'FL0000256' ~ 'FL0000256',
+      permit == 'FL0000264' ~ '4029P20045',
+      permit == 'FL0000370' ~ 'FL0000370',
+      permit == 'FL0000523' ~ 'FL0000523',
+      permit == 'FL0000647' ~ '4029P20048',
+      permit == 'FL0000671' ~ '4053P20111',
+      permit == 'FL0000752' ~ '4053P20061',
+      permit == 'FL0000761' ~ '4029P20038',
+      permit == 'FL0000809' ~ '4029P20086',
+      permit == 'FL0000817' ~ 'FL0000817',
+      permit == 'FL0001589' ~ 'FL0001589',
+      permit == 'FL0029653' ~ 'FL0029653',
+      permit == 'FL0030139' ~ '4053P20098',
+      permit == 'FL0032581' ~ '4053P20113',
+      permit == 'FL0033294' ~ 'FL0033294 ',
+      permit == 'FL0033332' ~ '4029P02755',
+      permit == 'FL0034657' ~ '4029P20001',
+      permit == 'FL0036412' ~ '4041P20020',
+      permit == 'FL0036421' ~ 'FL0036421',
+      permit == 'FL0037389' ~ '4029P20030',
+      permit == 'FL0038652' ~ '4029P20069',
+      permit == 'FL0122904' ~ 'FL0122904',
+      permit == 'FL0132381' ~ 'FL0132381',
+      permit == 'FL0160083' ~ '4053P20049',
+      permit == 'FL0166057' ~ 'FL0166057',
+      permit == 'FL0177130' ~ 'FL0177130',
+      permit == 'FL0185833' ~ 'FL0185833',
+      permit == 'FL0187313' ~ 'FL0187313',
+      permit == 'FL0188651' ~ 'FL0188651',
+      permit == 'FL0321486' ~ 'FL0321486',
+      permit == 'FL0334944' ~ 'FL0334944',
+      permit == 'FL0450600' ~ 'FL0450600'
+    )
+  ) |>
+  mutate(
+    coastco = case_when(
+      permit == 'FL0000078' ~ '238',
+      permit == 'FL0000124' ~ '687a',
+      permit == 'FL0000132' ~ '543',
+      permit == 'FL0000256' ~ '593',
+      permit == 'FL0000264' ~ '528',
+      permit == 'FL0000370' ~ '568',
+      permit == 'FL0000523' ~ '515b',
+      permit == 'FL0000647' ~ '381',
+      permit == 'FL0000671' ~ '515b',
+      permit == 'FL0000752' ~ '515b',
+      permit == 'FL0000761' ~ '515',
+      permit == 'FL0000809' ~ '495',
+      permit == 'FL0000817' ~ '585a',
+      permit == 'FL0001589' ~ '515b',
+      permit == 'FL0029653' ~ '327',
+      permit == 'FL0030139' ~ '533',
+      permit == 'FL0032581' ~ '423',
+      permit == 'FL0033294' ~ '568',
+      permit == 'FL0033332' ~ '549a',
+      permit == 'FL0034657' ~ '431',
+      permit == 'FL0036412' ~ '660',
+      permit == 'FL0036421' ~ '515b',
+      permit == 'FL0037389' ~ '403',
+      permit == 'FL0038652' ~ '528',
+      permit == 'FL0122904' ~ '528',
+      permit == 'FL0132381' ~ '549a',
+      permit == 'FL0160083' ~ '565',
+      permit == 'FL0166057' ~ '461',
+      permit == 'FL0177130' ~ '539',
+      permit == 'FL0185833' ~ '191a',
+      permit == 'FL0187313' ~ '461',
+      permit == 'FL0188651' ~ '191',
+      permit == 'FL0321486' ~ '528',
+      permit == 'FL0334944' ~ '515b',
+      permit == 'FL0450600' ~ '504'
+    )
+  )
 
-dpsfac <- read_sas(paste0(pth, '2017-2021DPSMonthlyEntityBasin/dps1721monthentbas.sas7bdat')) |>
+# original T:/03_BOARDS_COMMITTEES/05_TBNMC/2022_RA_Update/01_FUNDING_OUT/DELIVERABLES/TO-9/datastick_deliverables/2017-2021LUEntityLoads/2017-2021DPSMonthlyEntityBasin/dps1721monthentbas.sas7bdat
+dpsfac <- read_sas(here('data-raw/dps1721monthentbas.sas7bdat')) |>
   select(bayseg, basin, entity, facname, source = source2) |>
   distinct() |>
   mutate( # make ototw its own entity
     entity = case_when(
-      entity == 'St Pete Facilities' & facname == 'On Top Of The World WWTP' ~ 'On Top Of The World',
+      entity == 'Pinellas Co.' & facname == 'On Top Of The World WWTP' ~ 'On Top Of The World',
       T ~ entity
     ),
     entityshr = case_when(
@@ -230,8 +404,22 @@ dpsfac <- dpsfac |>
     )
   )
 
-# combine ips dps
-facilities <- bind_rows(ipsfac, dpsfac) |>
+# add ips material loss
+ipsmat <- tribble(
+  ~bayseg, ~basin, ~entity, ~facname, ~source, ~entityshr, ~facnameshr, ~permit, ~facid,
+  2, NA_character_, 'CSX',           'Rockport',                   'PS - Industrial - Material Losses',  'csx',     'rock',      NA_character_,  NA_character_,
+  2, NA_character_, 'CSX',           'Newport',                    'PS - Industrial - Material Losses',  'csx',     'newp',      NA_character_,  NA_character_,
+  2, NA_character_, 'Mosaic',        'Tampa Marine',               'PS - Industrial - Material Losses',  'mosaic',  'tampamar',  NA_character_,  NA_character_,
+  2, NA_character_, 'Mosaic',        'Big Bend',                   'PS - Industrial - Material Losses',  'mosaic',  'bigbend',   NA_character_,  NA_character_,
+  2, NA_character_, 'Mosaic',        'Riverview',                  'PS - Industrial - Material Losses',  'mosaic',  'riverview', NA_character_,  NA_character_,
+  2, NA_character_, 'Kinder Morgan', 'Kinder Morgan Tampaplex',    'PS - Industrial - Material Losses',  'kinder',  'tampaplex', NA_character_,  NA_character_,
+  2, NA_character_, 'Kinder Morgan', 'Kinder Morgan Port Sutton',  'PS - Industrial - Material Losses',  'kinder',  'portsutt',  NA_character_,  NA_character_,
+  4, NA_character_, 'Kinder Morgan', 'Kinder Morgan Port Manatee', 'PS - Industrial - Material Losses',  'kinder',  'portmana',  NA_character_,  NA_character_,
+)
+
+
+# combine ips dps ipsmat
+facilities <- bind_rows(ipsfac, dpsfac, ipsmat) |>
   arrange(entity, facname)
 
 usethis::use_data(facilities, overwrite = TRUE)

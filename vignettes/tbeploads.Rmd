@@ -31,3 +31,76 @@ Load the package in an R session after installation:
 ```{r}
 library(tbeploads)
 ```
+
+## Usage
+
+Load estimates are broadly defined as domestic point source (DPS), industrial point source (IPS), nonpoint source (NPS), atmospheric deposition (AD), and groundwater sources and springs (GW).  The functions are built around these sources with unique inputs for each. 
+
+### DPS
+
+The DPS functions are designed to work with raw entity data provided by partners.  The core function is `anlz_dps_facility()` that requires only a vector of file paths as input, where each path points to a file with monthly parameter concentration (mg/L) and flow data (million gallons per day).  The data also describe whether the observations are end of pipe (direct inflow to the bay) or reuse (applied to the land), with each defined by outfall Ids typically noted as D-001, D-002, etc. and R-001, R-002, etc, respectively. Both are estimated as concentration times flow, whereas reuse includes an attenuation factor for land application depending on location.  The file names must follow a specific convention, where metadata for each entity is found in the `facilities()` data object using information in the file name. 
+
+For convenience, four example files are included with the package. The paths to these files are used as input to the function. Non-trivial data pre-processing and quality control is needed for each file and those included in the package are the correct format. The output is returned as tons per month for TN, TP, TSS, and BOD and million cubic meters per month for flow (hy).
+
+```{r}
+dpsfls <- list.files(system.file('extdata/', package = 'tbeploads'),
+  pattern = 'ps_dom', full.names = TRUE)
+anlz_dps_facility(dpsfls)
+```
+
+The `anlz_dps()` function uses `anlz_dps_facility()` to summarize the DPS results by location as facility (combines outfall data), entity (combines facility data), bay segment (combines entity data), and as all (combines bay segment data).  The results can also be temporally summarized as monthly or annual totals.  The location summary is defined by the `summ` argument and the temporal summary is defined by the `summtime` argument.  The `fls` argument used by `anlz_dps_facility()` is also used by `anlz_dps()`.  The output is tons per month for TN, TP, TSS, and BOD and as million cubic meters per month for flow (hy) if `summtime = 'month'` or tons per year for TN, TP, TSS, and BOD and million cubic meters per year for flow (hy) if `summtime = 'year'`. 
+
+```{r}
+# combine by entity and month
+anlz_dps(dpsfls, summ = 'entity', summtime = 'month')
+
+# combine by bay segment and year
+anlz_dps(dpsfls, summ = "segment", summtime = "year")
+```
+
+### IPS
+
+The IPS functions are designed to work with raw entity data provided by partners and are similar in functionality to the DPS functions.  The core function is `anlz_ips_facility()` that requires only a vector of file paths as input, where each path points to a file with monthly parameter concentration (mg/L) and flow data (million gallons per day). Loads are estimated as concentration times flow.  The file names must follow a specific convention, where metadata for each entity is found in the `facilities()` data object using information in the file name. 
+
+For convenience, four example files are included with the package. The paths to these files are used as input to the function. As before, non-trivial data pre-processing and quality control is needed for each file and those included in the package are the correct format. The output is returned as tons per month for TN, TP, TSS, and BOD and million cubic meters per month for flow (hy).
+
+```{r}
+ipsfls <- list.files(system.file('extdata/', package = 'tbeploads'),
+  pattern = 'ps_ind_', full.names = TRUE)
+anlz_ips_facility(ipsfls)
+```
+
+The `anlz_ips()` function uses `anlz_ips_facility()` to summarize the IPS results by location as facility (combines outfall data), entity (combines facility data), bay segment (combines entity data), and as all (combines bay segment data).  The results can also be temporally summarized as monthly or annual totals.  The location summary is defined by the `summ` argument and the temporal summary is defined by the `summtime` argument.  The `fls` argument used by `anlz_ips_facility()` is also used by `anlz_ips()`.  The output is tons per month for TN, TP, TSS, and BOD and as million cubic meters per month for flow (hy) if `summtime = 'month'` or tons per year for TN, TP, TSS, and BOD and million cubic meters per year for flow (hy) if `summtime = 'year'`. 
+
+```{r}
+# combine by entity and month
+anlz_ips(ipsfls, summ = 'entity', summtime = 'month')
+
+# combine by bay segment and year
+anlz_ips(ipsfls, summ = "segment", summtime = "year")
+```
+
+### Material Losses (ML)
+
+Material losses are estimates of nutrient loads to the bay primarily from fertilizer shipping activities at ports.  Historically, loadings from material losses were much higher than at present.  Only a few entities report material losses, typically as a total for the year and only for total nitrogen. The material losses as tons/yr are estimated from the tons shipped using an agreed upon loss rate.  Values reported in the example files represent the estimated loss as the total tons of N shipped each year multiplied by 0.0023 and divided by 2000. The total N shipped at a facility each year can be obtained using a simple back-calculation (multiply by 2000, divide by 0.0023). 
+
+The core function is `anlz_ml_facility()` that requires only a vector of file paths as input, where each file should be one row per year per facility, where the row shows the total tons per year of total nitrogen loss. The file names must follow a specific convention, where metadata for each entity is found in the `facilities()` data object using information in the file name. 
+
+For convenience, four example files are included with the package. The paths to these files are used as input to the function. The output is nearly identical to the input data since no load calculations are used, except results are shown as monthly load as the annual loss divided by 12.  Additional empty columns (e.g., TP load, TSS load, etc.) are also returned for consistency of reporting with other loading sources. 
+
+```{r}
+mlfls <- list.files(system.file('extdata/', package = 'tbeploads'),
+  pattern = 'ps_indml', full.names = TRUE)
+anlz_ml_facility(mlfls)
+```
+
+The `anlz_ml()` function uses `anlz_ml_facility()` to summarize the IPS results by location as facility, entity (combines facility data), bay segment (combines entity data), and as all (combines bay segment data).  The results can also be temporally summarized as monthly or annual totals.  The location summary is defined by the `summ` argument and the temporal summary is defined by the `summtime` argument.  The `fls` argument used by `anlz_ml_facility()` is also used by `anlz_ml()`.  The output is tons per month of TN if `summtime = 'month'` or tons per year of TN if `summtime = 'year'`. Columns for TP, TSS, BOD, and hydrologic load are also returned with zero load for consistency with other point source load calculation functions. Material loss loads are often combined with IPS loads for reporting.
+
+```{r}
+# combine by entity and month
+anlz_ml(mlfls, summ = 'entity', summtime = 'month')
+
+# combine by bay segment and year
+anlz_ml(mlfls, summ = "segment", summtime = "year")
+```
+

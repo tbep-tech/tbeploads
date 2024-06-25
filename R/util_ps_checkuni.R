@@ -1,6 +1,6 @@
-#' Check units for DPS reuse and end of pipe from raw entity data
+#' Check units for point source from raw entity data
 #'
-#' Check units for DPS reuse and end of pipe from raw entity data
+#' Check units for point source from raw entity data
 #'
 #' @param dat data frame from raw entity data as \code{data.frame}
 #'
@@ -11,13 +11,11 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr matches rename_at select vars
-#'
 #' @examples
 #' pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
 #' dat <- read.table(pth, skip = 0, sep = '\t', header = TRUE)
-#' util_dps_checkuni(dat)
-util_dps_checkuni <- function(dat){
+#' util_ps_checkuni(dat)
+util_ps_checkuni <- function(dat){
 
   # check flow units
   if(!'Average.Daily.Flow..ADF...mgd.' %in% names(dat)){
@@ -25,20 +23,20 @@ util_dps_checkuni <- function(dat){
   }
 
   dat <- dat |>
-    select(
+    dplyr::select(
       Year,
       Month,
       outfall = Outfall.ID,
-      flow_mgd = matches('^Average.Daily.Flow'),
-      tn_mgl = matches('^Total.N'),
-      tp_mgl = matches('^Total.P'),
-      tss_mgl = matches('^TSS'),
-      bod_mgl = matches('^BOD')
+      flow_mgd = dplyr::matches('^Average.Daily.Flow'),
+      tn_mgl = dplyr::matches('^Total.N'),
+      tp_mgl = dplyr::matches('^Total.P'),
+      tss_mgl = dplyr::matches('^TSS'),
+      bod_mgl = dplyr::matches('^BOD')
     )
 
   # check mgl
   chk_mgl <- dat |>
-    select(matches('2$')) |>
+    dplyr::select(dplyr::matches('2$')) |>
     unlist() |>
     unique() |>
     na.omit() |>
@@ -49,8 +47,8 @@ util_dps_checkuni <- function(dat){
   }
 
   out <- dat |>
-    select(-matches('2$')) |>
-    rename_at(vars(matches('1$')), ~ gsub('1$', '', .x))
+    dplyr::select(-dplyr::matches('2$')) |>
+    dplyr::rename_at(dplyr::vars(dplyr::matches('1$')), ~ gsub('1$', '', .x))
 
   return(out)
 

@@ -1,6 +1,6 @@
-#' Add column names for DPS reuse and end of pipe from raw entity data
+#' Add column names for point source data from raw entity data
 #'
-#' Add column names for DPS reuse and end of pipe from raw entity data
+#' Add column names for point source from raw entity data
 #'
 #' @param dat data frame from raw entity data as \code{data.frame}
 #'
@@ -12,14 +12,14 @@
 #' @examples
 #' pth <- system.file('extdata/ps_dom_hillsco_falkenburg_2019.txt', package = 'tbeploads')
 #' dat <- read.table(pth, skip = 0, sep = '\t', header = TRUE)
-#' util_dps_addcol(dat)
-util_dps_addcol <- function(dat){
+#' util_ps_addcol(dat)
+util_ps_addcol <- function(dat){
 
   # check tn
   chktn <- grepl('^Total.N', names(dat))
   if(!any(chktn))
     dat <- dat |>
-      mutate(
+      dplyr::mutate(
         Total.N = NA_real_,
         Total.N.Unit = 'mg/l'
         )
@@ -28,7 +28,7 @@ util_dps_addcol <- function(dat){
   chktp <- grepl('^Total.P', names(dat))
   if(!any(chktp))
     dat <- dat |>
-      mutate(
+      dplyr::mutate(
         Total.P = NA_real_,
         Total.P.Unit = 'mg/l'
         )
@@ -37,7 +37,7 @@ util_dps_addcol <- function(dat){
   chktss <- grepl('^TSS', names(dat))
   if(!any(chktss))
     dat <- dat |>
-      mutate(
+      dplyr::mutate(
         TSS = NA_real_,
         TSS.Unit = 'mg/l'
         )
@@ -48,13 +48,13 @@ util_dps_addcol <- function(dat){
     chkbod <- grepl('^CBOD$', names(dat))
     if(any(chkbod)){
       dat <- dat |>
-        rename(
-          BOD = matches('^CBOD$'),
-          BOD.Unit = matches('^CBOD.*Unit')
+        dplyr::rename(
+          BOD = dplyr::matches('^CBOD$'),
+          BOD.Unit = dplyr::matches('^CBOD.*Unit')
           )
     } else {
       dat <- dat |>
-        mutate(
+        dplyr::mutate(
           BOD = NA_real_,
           BOD.Unit = 'mg/l'
           )

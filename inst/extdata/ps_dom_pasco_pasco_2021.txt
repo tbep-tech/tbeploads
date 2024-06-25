@@ -1,0 +1,13 @@
+Year	Month	Outfall.ID	Total.N	Total.P	TSS	BOD	Total.N.Unit	Total.P.Unit	TSS.Unit	BOD.Unit	Average.Daily.Flow..ADF...mgd.
+2021	1	R-001	9	0	0	0	mg/l	mg/l	mg/l	mg/l	1.02809139784946
+2021	2	R-001	9	0	0	0	mg/l	mg/l	mg/l	mg/l	1.13824404761905
+2021	3	R-001	9	0	0	0	mg/l	mg/l	mg/l	mg/l	1.02809139784946
+2021	4	R-001	9	0	0	0	mg/l	mg/l	mg/l	mg/l	1.06236111111111
+2021	5	R-001	9	0	0	0	mg/l	mg/l	mg/l	mg/l	1.02809139784946
+2021	6	R-001	9	0	0	0	mg/l	mg/l	mg/l	mg/l	1.06236111111111
+2021	7	R-001	9	0	0	0	mg/l	mg/l	mg/l	mg/l	1.02809139784946
+2021	8	R-001	9	0	0	0	mg/l	mg/l	mg/l	mg/l	1.02809139784946
+2021	9	R-001	9	0	0	0	mg/l	mg/l	mg/l	mg/l	1.06236111111111
+2021	10	R-001	9	0	0	0	mg/l	mg/l	mg/l	mg/l	1.02809139784946
+2021	11	R-001	9	0	0	0	mg/l	mg/l	mg/l	mg/l	1.06236111111111
+2021	12	R-001	9	0	0	0	mg/l	mg/l	mg/l	mg/l	1.02809139784946

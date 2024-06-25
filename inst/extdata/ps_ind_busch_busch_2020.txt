@@ -1,0 +1,13 @@
+Permit.Number	Facility.Name	Outfall.ID	Year	Month	Average.Daily.Flow..ADF...mgd.	BOD	BOD..Unit	QBOD	TSS	TSS.Unit	QTSS	Total.N	Total.N.Unit	Q.Total.N	NO2.NO3	NO2.NO3.Unit	Q.NO2.NO3	NH4	NH4.Unit	Q.NH4	TKN	TKN.Unit	Q.TKN	Organic.N	Organic.N.Unit	Q.Organic.N	Total.P	Total.P.Unit	Q.Total.P	PO4	PO4.Unit	Q.PO4	Other.N..species.	Other.N.Unit	Q.Other.N	Other.P..species.	Other.P.Unit	Q.Other.P
+FL0185833	NA	D002	2020	1	0.92	9.6	NA	NA	5	NA	NA	0.72	mg/L	Average	0.06	mg/L	Average	< 0.02	mg/L	<	0.67	mg/L	Average	0.67	mg/L	Average	0.04	mg/L	Average	0.02	mg/L	Average	NA	NA	NA	NA	NA	NA
+FL0185833	NA	D002	2020	2	1.04	9.6	NA	NA	5	NA	NA	0.3	mg/L	Average	0.03	mg/L	Average	< 0.02	mg/L	<	0.39	mg/L	Average	0.39	mg/L	Average	0.02	mg/L	Average	0.01	mg/L	Average	NA	NA	NA	NA	NA	NA
+FL0185833	NA	D002	2020	3	0.28	9.6	NA	NA	5	NA	NA	0.4	mg/L	Average	< 0.01	mg/L	<	< 0.02	mg/L	<	0.4	mg/L	Average	0.4	mg/L	Average	0.04	mg/L	Average	0.02	mg/L	Average	NA	NA	NA	NA	NA	NA
+FL0185833	NA	D002	2020	4	0.7	9.6	NA	NA	5	NA	NA	0.56	mg/L	Average	< 0.01	mg/L	<	< 0.02	mg/L	<	0.56	mg/L	Average	0.56	mg/L	Average	0.02	mg/L	Average	0.01	mg/L	Average	NA	NA	NA	NA	NA	NA
+FL0185833	NA	D002	2020	5	0.42	9.6	NA	NA	5	NA	NA	0.41	mg/L	Average	0.01	mg/L	Average	< 0.02	mg/L	<	0.41	mg/L	Average	0.41	mg/L	Average	0.04	mg/L	Average	0.03	mg/L	Average	NA	NA	NA	NA	NA	NA
+FL0185833	NA	D002	2020	6	0.57	9.6	NA	NA	5	NA	NA	0.6	mg/L	Average	0.03	mg/L	Average	< 0.02	mg/L	<	0.57	mg/L	Average	0.57	mg/L	Average	0.07	mg/L	Average	0.05	mg/L	Average	NA	NA	NA	NA	NA	NA
+FL0185833	NA	D002	2020	7	0.82	9.6	NA	NA	5	NA	NA	0.54	mg/L	Average	0.02	mg/L	Average	0.02	mg/L	Average	0.52	mg/L	Average	0.5	mg/L	Average	0.1	mg/L	Average	0.02	mg/L	Average	NA	NA	NA	NA	NA	NA
+FL0185833	NA	D002	2020	8	1.02	9.6	NA	NA	5	NA	NA	0.86	mg/L	Average	0.01	mg/L	Average	< 0.02	mg/L	<	0.85	mg/L	Average	0.85	mg/L	Average	0.12	mg/L	Average	0.06	mg/L	Average	NA	NA	NA	NA	NA	NA
+FL0185833	NA	D002	2020	9	1.03	9.6	NA	NA	5	NA	NA	0.44	mg/L	Average	0.03	mg/L	Average	0.03	mg/L	Average	0.41	mg/L	Average	0.38	mg/L	Average	0.08	mg/L	Average	0.06	mg/L	Average	NA	NA	NA	NA	NA	NA
+FL0185833	NA	D002	2020	10	0.59	9.6	NA	NA	5	NA	NA	0.59	mg/L	Average	0.05	mg/L	Average	< 0.02	mg/L	<	0.59	mg/L	Average	0.59	mg/L	Average	0.13	mg/L	Average	0.02	mg/L	Average	NA	NA	NA	NA	NA	NA
+FL0185833	NA	D002	2020	11	0.97	9.6	NA	NA	5	NA	NA	0.19	mg/L	Average	0.04	mg/L	Average	0.02	mg/L	Average	0.17	mg/L	Average	0.15	mg/L	Average	0.08	mg/L	Average	0.05	mg/L	Average	NA	NA	NA	NA	NA	NA
+FL0185833	NA	D002	2020	12	0.84	9.6	NA	NA	5	NA	NA	0.06	mg/L	Average	0.04	mg/L	Average	< 0.02	mg/L	<	0.04	mg/L	Average	0.04	mg/L	Average	0.08	mg/L	Average	0.01	mg/L	Average	NA	NA	NA	NA	NA	NA
