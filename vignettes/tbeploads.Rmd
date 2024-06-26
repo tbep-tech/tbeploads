@@ -34,7 +34,7 @@ library(tbeploads)
 
 ## Usage
 
-Load estimates are broadly defined as domestic point source (DPS), industrial point source (IPS), nonpoint source (NPS), atmospheric deposition (AD), and groundwater sources and springs (GW).  The functions are built around these sources with unique inputs for each. 
+Load estimates are broadly defined as domestic point source (DPS), industrial point source (IPS), material losses (ML), nonpoint source (NPS), atmospheric deposition (AD), and groundwater sources and springs (GW).  The functions are built around these sources with unique inputs for each. 
 
 ### DPS
 
