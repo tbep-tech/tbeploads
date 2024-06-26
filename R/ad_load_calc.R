@@ -151,7 +151,7 @@ rain <- db2 %>%
                  source = "Atmospheric Deposition")
 
 #Acquire and read-in Verna NTN atmospheric deposition concentration data over the period of interest from: https://nadp.slh.wisc.edu/sites/ntn-FL41/
-verna <- read.csv(file = "./data-raw/NADP/NTN-fl41-i-mgl.csv") %>%
+verna <- read.csv(file = "./data-raw/NADP/NTN-fl41-i-mgl_2017-2022.csv") %>%
           mutate(mo = seas+ 0) %>%
           mutate(nh4 = case_when(yr == 2022 & mo == 12 ~ mean(c(0.046, 0.063, 0.09, 0.105, 0.173)), #Dec. NH4 mean from 2017-2021 to fill in missing data
                                  TRUE ~ NH4)) %>%

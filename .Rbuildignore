@@ -11,3 +11,4 @@
 ^data-raw/dbasing_0407\.sas7bdat$
 ^data-raw/*$
 ^R/helpers\.R$
+^data-raw$
