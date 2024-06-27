@@ -1,3 +1,18 @@
+#' Prep Verna Wellfield data for use in AD calculations
+#'
+#' Prep Verna Wellfield data for use in AD calculations
+#'
+#' @param fl text string for the file path to the Verna Wellfield data
+#' @param fillmis logical indicating whether to fill missing data with monthly means
+#'
+#' @return A data frame with total nitrogen and phosphorus estimates as mg/l for each year and month of the input data
+#'
+#' @export
+#'
+#' @examples
+#' fl <- list.files(system.file('extdata/', package = 'tbeploads'),
+#'   pattern = 'verna\-raw', full.names = TRUE)
+#' util_ad_prepverna(fl)
 util_ad_prepverna <- function(fl, fillmis = T){
 
   dat <- read.csv(fl, header = T, stringsAsFactors = F) |>
@@ -24,5 +39,9 @@ util_ad_prepverna <- function(fl, fillmis = T){
       TPConc = 0.01262 * TNConc + 0.00110 # from regression relationship between TBADS TN and TP, applied to Verna;
     ) %>%
     select(yr, mo, TNConc, TPConc)
+
+  out <- dat
+
+  return(out)
 
 }

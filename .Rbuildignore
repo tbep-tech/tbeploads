@@ -12,3 +12,4 @@
 ^data-raw/*$
 ^R/helpers\.R$
 ^data-raw$
+^R/ad_load_calc\.R$
