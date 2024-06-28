@@ -45,4 +45,6 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
+Remotes:
+  ropensci/rnoaa
 Config/testthat/edition: 3
