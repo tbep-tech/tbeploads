@@ -11,3 +11,7 @@
 ^data-raw/dbasing_0407\.sas7bdat$
 ^data-raw/*$
 ^R/helpers\.R$
+^data-raw$
+^R/ad_load_calc\.R$
+^data/ad_rain_2021-2023\.Rdata$
+^data/ad_loads_2021-2023\.Rdata$

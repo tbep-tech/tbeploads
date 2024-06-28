@@ -1,0 +1,144 @@
+library(haven)
+library(tidyverse)
+library(rnoaa)
+library(tbeptools)
+
+noaa_key <- Sys.getenv('NOAA_KEY')
+
+# Placeholder section to improve future AD calculations by utilizing any active
+# rainfall stations within TB region over the time period of interest, you would then:
+# 1) pass these stations to the NCDC function to get daily data (to sum to monthly totals)
+# 2) still need to identify and assign UTM coordinates to these "new" stations
+# 3) find the invdist2 value to each segment grid point in the targetxy dataframe using the loop starting on line 98
+#
+# flrain <- read_sas("./data-raw/fl_rain_por_220223v93.sas7bdat")
+#
+# cenflrainid <- ncdc_stations(extent=c(27.2,-83,28.7,-81.5), datasetid='GHCND', startdate = "2022-01-01", enddate = "2023-12-31", limit = 1000)
+# tbrainid <- cenflrainid$data %>%
+#               mutate(stationid = unique(id)) %>%
+#               select(stationid, name)
+
+stationid <- c("GHCND:USC00080228", "GHCND:USC00080478", "GHCND:USC00080520", "GHCND:USC00080940", "GHCND:USC00080945",
+               "GHCND:USC00081046", "GHCND:USC00081163", "GHCND:USC00081632", "GHCND:USC00081641", "GHCND:USW00092806",
+               "GHCND:USC00083153", "GHCND:USC00083986", "GHCND:USC00084707", "GHCND:USC00085973", "GHCND:USC00086065",
+               "GHCND:USC00086880", "GHCND:USC00087205", "GHCND:USC00087851", "GHCND:USC00087886", "GHCND:USW00012842",
+               "GHCND:USC00088824", "GHCND:USC00089176", "GHCND:USC00089401")
+station <- c(228, 478, 520, 940, 945,
+             1046, 1163, 1632, 1641, 2806,
+             3153, 3986, 4707, 5973, 6065,
+             6880, 7205, 7851, 7886, 8788,
+             8824, 9176, 9401)
+
+rainid <- data.frame(stationid, station)
+
+results <- list()  # list as storage variable for the loop results
+i <- 1              # indexing variable
+
+for(sid in unique(rainid$stationid)) { # each station in your stationid dataframe **tbrainid can be substituted here to get all active sites in the TB region from the NCDC
+  for(year in 2022:2023) { # each year you care about, this can be updated to the entire RA period
+    data <- ncdc(datasetid='GHCND', stationid = sid,
+                 datatypeid='PRCP', startdate = paste0(year, '-01-01'),
+                 enddate = paste0(year, '-12-31'), limit=400, add_units = TRUE,
+                 token = noaa_key)$data # subset the returned list right away here with $data
+
+    # add info from each loop iteration
+    data$stationid <- rainid[rainid$stationid == sid,]$stationid
+    data$station <- rainid[rainid$stationid == sid,]$station
+    data$year <- year
+
+    results[[i]] <- data # store it
+    i <- i + 1 # rinse and repeat
+  }
+}
+
+new_rain <- do.call(rbind, results) %>% # stack all of the data frames together rowwise
+  dplyr::mutate(date = date(date), yr = year(date), mo = month(date), day = day(date), rainfall = round((value/254),digits = 2)) %>%
+  dplyr::select(stationid, station, date, yr, mo, day, rainfall)
+
+
+tbrain <- flrain %>%
+              filter(COOPID %in% c(228, 478, 520, 940, 945, 1046, 1163, 1632, 1641, 2806, 3153, 3986, 4707, 5973, 6065, 6880, 7205, 7851, 7886, 8788, 8824, 9176, 9401)) %>%
+              mutate(station = COOPID, yr = year(date), mo = month(date), day = day(date), rainfall = Prcp) %>%
+              select(station, date, yr, mo, day, rainfall)
+
+tbrain <-    right_join(rainid, tbrain, by = "station") #Add true NCDC stationid
+tbrain <-    bind_rows(tbrain, new_rain) #Add new data from RA period
+
+tb_mo_rain <- tbrain %>%
+              group_by(station, yr, mo) %>%
+              summarise(tpcp_in = sum(rainfall), n=n())
+
+tb_mo_rain_2022 <- tb_mo_rain %>%
+                     filter(yr == 2022)
+
+data(ad_distance)
+
+# Merge distance and precipitation datasets
+all_data <- merge(ad_distance, tb_mo_rain, by.x = "matchsit", by.y = "station")
+
+# Sort the data frame by specified columns
+all <- all_data[order(all_data$target, all_data$targ_x, all_data$targ_y, all_data$yr, all_data$mo), ]
+
+# Calculate weighted mean of 'tpcp_in' using 'invdist2' as weight
+db <- all %>%
+  group_by(target, targ_x, targ_y, yr, mo) %>%
+  summarise(tpcp = weighted.mean(tpcp_in, w = invdist2, na.rm = T), .groups = "drop")
+
+# Compute average rainfall at all grid points
+db2 <- db %>%
+  group_by(target, yr, mo) %>%
+  summarise(tpcp = mean(tpcp), .groups = "drop") %>%
+  filter(yr >= 2021) %>%
+  rename(segment = target)
+
+db3 <- db2 %>%
+       save(file = "./data/ad_rain_2021-2023.Rdata")
+
+trdb <- db2 %>%
+  pivot_wider(names_from = c(yr,mo), values_from = tpcp, names_sort = TRUE) %>%
+  rowwise() %>%
+  mutate(annual_2021 = sum(across("2021_1":"2021_12"), na.rm = T),
+         annual_2022 = sum(across("2022_1":"2022_12"), na.rm = T),
+         annual_2023 = sum(across("2023_1":"2023_12"), na.rm = T),)
+
+rain <- db2 %>%
+          mutate(area = case_when(segment == 1 ~ 23407.05,
+                                  segment == 2 ~ 10778.41,
+                                  segment == 3 ~ 29159.64,
+                                  segment == 4 ~ 24836.54,
+                                  segment == 5 ~ 9121.87,
+                                  segment == 6 ~ 1619.89,
+                                  segment == 7 ~ 4153.22,
+                                  TRUE ~ NA)) %>%
+          mutate(h2oload = (tpcp*10000*area/39.37),
+                 source = "Atmospheric Deposition")
+
+#Acquire and read-in Verna NTN atmospheric deposition concentration data over the period of interest from: https://nadp.slh.wisc.edu/sites/ntn-FL41/
+vernafl <- list.files(system.file('extdata/', package = 'tbeploads'),
+  pattern = 'verna-raw', full.names = TRUE)
+verna <- util_ad_prepverna(vernafl)
+
+load <- left_join(rain, verna, by = c("yr", "mo")) %>%
+          mutate(tnwet = TNConc*h2oload/1000,
+                 tpwet = TPConc*h2oload/1000) %>%
+          mutate(tndry = case_when(mo<=6 ~ tnwet*1.05,
+                                   mo>=11 ~ tnwet*1.05,
+                                   mo >= 7 & mo <= 10 ~ tnwet*0.66,
+                                   TRUE ~ NA),
+                 tpdry = case_when(mo<=6 ~ tpwet*1.05,
+                                   mo>=11 ~ tpwet*1.05,
+                                   mo >= 7 & mo <= 10 ~ tpwet*0.66,
+                                   TRUE ~ NA)) %>%
+          mutate(tntot = tnwet+tndry,
+                 tptot = tpwet+tpdry)
+
+annual_load <- load %>%
+               group_by(segment, yr) %>%
+               summarise(tntot = sum(tntot, na.rm = T),
+                         tptot = sum(tptot, na.rm = T),
+                         sum_h2oload = sum(h2oload)) %>%
+               mutate(tntons = tntot*0.0011023113,
+                      tptons = tptot*0.0011023113,
+                      source = "Atmospheric Deposition")
+ann_load <- annual_load %>%
+            save(file = "./data/ad_loads_2021-2023.Rdata")
