@@ -22,7 +22,6 @@
 #'   pattern = 'verna-raw', full.names = TRUE)
 #' util_ad_prepverna(fl)
 util_ad_prepverna <- function(fl, fillmis = T){
-browser()
 
   # import raw, subset relevant, fill -9 as NA
   dat <- read.csv(fl, header = T, stringsAsFactors = F) |>
@@ -59,19 +58,19 @@ browser()
         nh4 = ifelse(is.na(nh4), nh4ave, nh4),
         no3 = ifelse(is.na(no3), no3ave, no3)
       ) |>
-      select(-nh4ave, -no3ave)
+      dplyr::select(-nh4ave, -no3ave)
 
   }
 
   # create tn and tp estimates from nh4 and no3
   out <- dat |>
-    mutate(
+    dplyr::mutate(
       nh4 = nh4 * 0.78, # NADP data are reported as mg NO3 and mg NH4, this corrects for % of ions that is N;
       no3 = no3 * 0.23,
       TNConc = nh4 + no3,
       TPConc = 0.01262 * TNConc + 0.00110 # from regression relationship between TBADS TN and TP, applied to Verna;
     ) %>%
-    select(Year, Month, TNConc, TPConc)
+    dplyr::select(Year, Month, TNConc, TPConc)
 
   return(out)
 
