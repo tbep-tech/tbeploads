@@ -71,47 +71,10 @@ tb_mo_rain <- tbrain %>%
 tb_mo_rain_2022 <- tb_mo_rain %>%
                      filter(yr == 2022)
 
-# Load data frame for NWS rainfall station coordinates
-nwssite <- read.csv(file = "./data-raw/nwssite.csv")
-
-# Create data frame for target coordinates
-targetxy <- read.csv(file = "./data-raw/ad_targetxy.csv")
-
-# Create a data frame to store distance calculations
-distance <- data.frame(target = numeric(),
-                       targ_x = numeric(),
-                       targ_y = numeric(),
-                       matchsit = character(),
-                       distance = numeric(),
-                       invdist2 = numeric(),
-                       stringsAsFactors = FALSE)
-
-# Define labels for the variables
-names(distance) <- c("target", "targ_x", "targ_y", "matchsit", "distance", "invdist2")
-
-# Loop through each target location
-for (i in 1:nrow(targetxy)) {
-  # Loop through each National Weather Service (NWS) site
-  for (j in 1:nrow(nwssite)) {
-    # Calculate distance between the target and NWS site
-    distance_ij <- sqrt((targetxy$targ_x[i] - nwssite$nws_x[j])^2 + (targetxy$targ_y[i] - nwssite$nws_y[j])^2)
-
-    # Check if the distance is within the radius
-    if (distance_ij < 50000) {
-      # Store the information in the distance data frame
-      distance[nrow(distance) + 1, ] <- c(targetxy$target[i],
-                                          targetxy$targ_x[i],
-                                          targetxy$targ_y[i],
-                                          nwssite$nwssite[j],
-                                          distance_ij,
-                                          1/(distance_ij^2))
-    }
-  }
-}
-
+data(ad_distance)
 
 # Merge distance and precipitation datasets
-all_data <- merge(distance, tb_mo_rain, by.x = "matchsit", by.y = "station")
+all_data <- merge(ad_distance, tb_mo_rain, by.x = "matchsit", by.y = "station")
 
 # Sort the data frame by specified columns
 all <- all_data[order(all_data$target, all_data$targ_x, all_data$targ_y, all_data$yr, all_data$mo), ]
@@ -151,17 +114,9 @@ rain <- db2 %>%
                  source = "Atmospheric Deposition")
 
 #Acquire and read-in Verna NTN atmospheric deposition concentration data over the period of interest from: https://nadp.slh.wisc.edu/sites/ntn-FL41/
-verna <- read.csv(file = "./data-raw/NADP/NTN-fl41-i-mgl_2017-2022.csv") %>%
-          mutate(mo = seas+ 0) %>%
-          mutate(nh4 = case_when(yr == 2022 & mo == 12 ~ mean(c(0.046, 0.063, 0.09, 0.105, 0.173)), #Dec. NH4 mean from 2017-2021 to fill in missing data
-                                 TRUE ~ NH4)) %>%
-          mutate(no3 = case_when(yr == 2022 & mo == 12 ~ mean(c(0.194, 0.257, 0.364, 0.327, 1.41)), #Dec. NO3 mean from 2017-2021 to fill in missing data
-                         TRUE ~ NO3)) %>%
-          mutate(nh4 = nh4*0.78,   #NADP data are reported as mg NO3 and mg NH4, this corrects for % of ions that is N;
-                 no3 = no3*0.23,
-                 TNConc = nh4+no3,
-                 TPConc = 0.01262*TNConc+0.00110) %>%  #from regression relationship between TBADS TN and TP, applied to Verna;
-          select(yr, mo, TNConc, TPConc)
+vernafl <- list.files(system.file('extdata/', package = 'tbeploads'),
+  pattern = 'verna-raw', full.names = TRUE)
+verna <- util_ad_prepverna(vernafl)
 
 load <- left_join(rain, verna, by = c("yr", "mo")) %>%
           mutate(tnwet = TNConc*h2oload/1000,
