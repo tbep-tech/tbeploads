@@ -19,15 +19,14 @@ util_ad_getrain(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE)
 }
 \value{
 a data frame with the following columns:
-\itemize{
 
+\itemize{
 \item{stationid}{character, the station id}
 \item{date}{Date, the date of the observation}
 \item{Year}{numeric, the year of the observation}
 \item{Month}{numeric, the month of the observation}
 \item{Day}{numeric, the day of the observation}
 \item{rainfall}{numeric, the amount of rainfall in inches}
-
 }
 }
 \description{
@@ -41,4 +40,7 @@ By default, rainfall data is retrieved for the stations 228, 478, 520, 940, 945,
 \examples{
 noaa_key <- Sys.getenv('NOAA_KEY')
 util_ad_getrain(2021, 228, noaa_key)
+}
+\seealso{
+\code{\link{ad_rain}}
 }

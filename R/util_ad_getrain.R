@@ -13,18 +13,19 @@
 #' By default, rainfall data is retrieved for the stations 228, 478, 520, 940, 945, 1046, 1163, 1632, 1641, 2806, 3153, 3986, 4707, 5973, 6065, 6880, 7205, 7851, 7886, 8788, 8824, 9176, and 9401.
 #'
 #' @return a data frame with the following columns:
-#' \itemize{
 #'
+#' \itemize{
 #'  \item{stationid}{character, the station id}
 #'  \item{date}{Date, the date of the observation}
 #'  \item{Year}{numeric, the year of the observation}
 #'  \item{Month}{numeric, the month of the observation}
 #'  \item{Day}{numeric, the day of the observation}
 #'  \item{rainfall}{numeric, the amount of rainfall in inches}
-#'
 #'  }
 #'
 #' @export
+#'
+#' @seealso \code{\link{ad_rain}}
 #'
 #' @examples
 #' noaa_key <- Sys.getenv('NOAA_KEY')

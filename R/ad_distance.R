@@ -1,7 +1,7 @@
 #' Data frame of distances of target locations to National Weather Service (NWS) sites
 #'
 #' Data frame of distances of target locations to National Weather Service (NWS) sites
-
+#'
 #' @format A \code{data.frame}
 #'
 #' @details Used for estimating atmospheric deposition. The data frame contains the following columns:
