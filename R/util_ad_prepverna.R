@@ -69,7 +69,7 @@ util_ad_prepverna <- function(fl, fillmis = T){
       no3 = no3 * 0.23,
       TNConc = nh4 + no3,
       TPConc = 0.01262 * TNConc + 0.00110 # from regression relationship between TBADS TN and TP, applied to Verna;
-    ) %>%
+    )  |>
     dplyr::select(Year, Month, TNConc, TPConc)
 
   return(out)
