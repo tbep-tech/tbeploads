@@ -4,16 +4,18 @@
 \alias{util_ad_getrain}
 \title{Get rainfall data for a given year at NOAA NCDC sites}
 \usage{
-util_ad_getrain(yr, station = NULL, noaa_key, quiet = FALSE)
+util_ad_getrain(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE)
 }
 \arguments{
-\item{yr}{numeric for the year of data to retrieve}
-
 \item{station}{numeric vector of station numbers to retrieve, see details}
 
 \item{noaa_key}{character for the NOAA API key}
 
+\item{ntry}{numeric for the number of times to try to download the data}
+
 \item{quiet}{logical to print progress in the console}
+
+\item{yr}{numeric vector for the years of data to retrieve}
 }
 \value{
 a data frame with the following columns:

@@ -2,9 +2,10 @@
 #'
 #' Get rainfall data for a given year at NOAA NCDC sites
 #'
-#' @param yr numeric for the year of data to retrieve
+#' @param yr numeric vector for the years of data to retrieve
 #' @param station numeric vector of station numbers to retrieve, see details
 #' @param noaa_key character for the NOAA API key
+#' @param ntry numeric for the number of times to try to download the data
 #' @param quiet logical to print progress in the console
 #'
 #' @details This function is used to retrieve a long-term record of rainfall for estimating AD loads.  It is used to create an input data file for load calculations and it is not used directly by any other functions due to download time.  A NOAA API key is required to use the function.
@@ -28,7 +29,7 @@
 #' @examples
 #' noaa_key <- Sys.getenv('NOAA_KEY')
 #' util_ad_getrain(2021, 228, noaa_key)
-util_ad_getrain <- function(yr, station = NULL, noaa_key, quiet = FALSE){
+util_ad_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE){
 
   if(is.null(station))
     station <- c(228, 478, 520, 940, 945,
@@ -38,27 +39,50 @@ util_ad_getrain <- function(yr, station = NULL, noaa_key, quiet = FALSE){
                  8824, 9176, 9401)
   stationid <- paste0('GHCND:USC0008', sprintf('%04d', station))
 
-  res <- vector("list", length(stationid))
-  names(res) <- stationid
-  for(i in stationid){
+  stayr <- tidyr::crossing(yrs, stationid) |>
+    dplyr::mutate(data = NA)
+  for(i in 1:nrow(stayr)){
+
+    sta <- stayr$stationid[i]
+    yr <- stayr$yrs[i]
 
     if(!quiet)
-      cat(i, which(i == stationid), 'of', length(stationid), '\n')
+      cat(yr, sta, i, 'of', nrow(stayr), '\n')
 
-    dat <- rnoaa::ncdc(datasetid = 'GHCND', stationid = i,
-                       datatypeid = 'PRCP', startdate=paste0(yr, '-01-01'),
-                       enddate = paste0(yr, '-12-31'), limit = 400, add_units = TRUE,
-                       token = noaa_key)
+    dat <- try(rnoaa::ncdc(datasetid = 'GHCND', stationid = sta,
+                           datatypeid = 'PRCP', startdate = paste0(yr, '-01-01'),
+                           enddate = paste0(yr, '-12-31'), limit = 400, add_units = TRUE,
+                           token = noaa_key)$data, silent = TRUE)
 
-    res[[i]] <- dat$data
+    tryi <- 0
+    while(inherits(dat, 'try-error') & tryi < ntry) {
+
+      if(!quiet)
+        cat('Retrying...\n')
+
+      dat <- try(rnoaa::ncdc(datasetid = 'GHCND', stationid = sta,
+                             datatypeid = 'PRCP', startdate = paste0(yr, '-01-01'),
+                             enddate = paste0(yr, '-12-31'), limit = 400, add_units = TRUE,
+                             token = noaa_key)$data, silent = TRUE)
+      tryi <- tryi + 1
+
+    }
+
+    if(tryi == ntry){
+      if(!quiet) cat('Failed...\t')
+      next()
+    }
+
+    stayr$data[[i]] <- list(dat)
 
   }
 
-  out <- tibble::enframe(res, name = 'stationid') |>
-    tidyr::unnest('value') |>
+  out <- stayr |>
+    tidyr::unnest('data') |>
+    tidyr::unnest('data') |>
     dplyr::mutate(
       date = lubridate::date(date),
-      Year = lubridate::year(date),
+      Year = yrs,
       Month = lubridate::month(date),
       Day = lubridate::day(date),
       rainfall = round(value / 254, 2)
