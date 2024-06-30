@@ -2,7 +2,7 @@
 #'
 #' Get rainfall data for a given year at NOAA NCDC sites
 #'
-#' @param yr numeric vector for the years of data to retrieve
+#' @param yrs numeric vector for the years of data to retrieve
 #' @param station numeric vector of station numbers to retrieve, see details
 #' @param noaa_key character for the NOAA API key
 #' @param ntry numeric for the number of times to try to download the data
@@ -57,9 +57,6 @@
 #' noaa_key <- Sys.getenv('NOAA_KEY')
 #' util_ad_getrain(2021, 228, noaa_key)
 util_ad_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE){
-
-  if(!requireNamespace('rnoaa', quietly = TRUE))
-    stop("Package \"noaa\" needed for this function to work. Please install it.", call. = FALSE)
 
   if(is.null(station))
     station <- c(228, 478, 520, 940, 945,
@@ -117,7 +114,7 @@ util_ad_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FAL
       Month = lubridate::month(date),
       Day = lubridate::day(date),
       rainfall = round(value / 254, 2)
-      ) %>%
+      ) |>
     dplyr::select(station, date, Year, Month, Day, rainfall) |>
     dplyr::arrange(station, date)
 

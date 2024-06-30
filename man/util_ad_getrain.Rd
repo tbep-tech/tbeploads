@@ -7,6 +7,8 @@
 util_ad_getrain(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE)
 }
 \arguments{
+\item{yrs}{numeric vector for the years of data to retrieve}
+
 \item{station}{numeric vector of station numbers to retrieve, see details}
 
 \item{noaa_key}{character for the NOAA API key}
@@ -14,8 +16,6 @@ util_ad_getrain(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE)
 \item{ntry}{numeric for the number of times to try to download the data}
 
 \item{quiet}{logical to print progress in the console}
-
-\item{yr}{numeric vector for the years of data to retrieve}
 }
 \value{
 a data frame with the following columns:

@@ -2,7 +2,7 @@
 #'
 #' Calculate AD loads and summarize
 #'
-#' @param rain data frame of daily rainfall data from NOAA NCDC, obtained using \code{\link{util_ad_getrain}}
+#' @param ad_rain data frame of daily rainfall data from NOAA NCDC, obtained using \code{\link{util_ad_getrain}}
 #' @param vernafl character vector of file path to Verna Wellfield atmospheric concentration data
 #' @param summ `r summ_params('summ')`
 #' @param summtime `r summ_params('summtime')`
@@ -40,7 +40,7 @@ anlz_ad <- function(ad_rain, vernafl, summ = c('segment', 'all'), summtime = c('
   loadrain <- ad_rain |>
     dplyr::summarise(
       tpcp_in = sum(rainfall),
-      n=n(),
+      n = dplyr::n(),
       .by = c('station', 'Year', 'Month')
     ) |>
     dplyr::inner_join(ad_distance, by = c('station' = 'matchsit'), relationship = 'many-to-many') |>
