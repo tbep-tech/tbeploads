@@ -9,5 +9,5 @@ globalVariables(c(".", "Facility.Name", "Month", "Outfall.ID", "Permit.Number", 
 #' @importFrom utils read.csv read.table
 NULL
 
-#' @importFrom stats na.omit
+#' @importFrom stats na.omit weighted.mean
 NULL

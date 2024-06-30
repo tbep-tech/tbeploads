@@ -3,7 +3,7 @@
 \docType{data}
 \name{ad_rain}
 \alias{ad_rain}
-\title{Data frame of daily rainfall data from NOAA NCDC from 2017 to 2023}
+\title{Data frame of daily rainfall data from NOAA NCDC National Weather Service (NWS) from 2017 to 2023}
 \format{
 A \code{data.frame}
 }
@@ -11,13 +11,13 @@ A \code{data.frame}
 ad_rain
 }
 \description{
-Data frame of daily rainfall data from NOAA NCDC from 2017 to 2023
+Data frame of daily rainfall data from NOAA NCDC National Weather Service (NWS) from 2017 to 2023
 }
 \details{
 Used for estimating atmospheric deposition and created using the \code{\link{util_ad_getrain}} function. The data frame contains the following columns:
 
 \itemize{
-\item \code{stationid}: Character string for the station id
+\item \code{station}: Character string for the station id
 \item \code{date}: Date for the observation
 \item \code{Year}: Numeric value for the year of the observation
 \item \code{Month}: Numeric value for the month of the observation

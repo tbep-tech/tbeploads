@@ -17,7 +17,7 @@
 #'
 #' ipsbyfac <- anlz_ips_facility(fls)
 #'
-#' # add bay segment and source, there should only b loads to hills, middle, and lower tampa bay
+#' # add bay segment and source, there should only be loads to hills, middle, and lower tampa bay
 #' ipsld <- ipsbyfac  |>
 #'   dplyr::arrange(coastco) |>
 #'   dplyr::left_join(dbasing, by = "coastco") |>

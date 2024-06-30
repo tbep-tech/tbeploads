@@ -58,6 +58,9 @@
 #' util_ad_getrain(2021, 228, noaa_key)
 util_ad_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE){
 
+  if(!requireNamespace('rnoaa', quietly = TRUE))
+    stop("Package \"noaa\" needed for this function to work. Please install it.", call. = FALSE)
+
   if(is.null(station))
     station <- c(228, 478, 520, 940, 945,
                  1046, 1163, 1632, 1641, 2806,
