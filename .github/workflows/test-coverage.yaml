@@ -8,6 +8,10 @@ on:
 
 name: test-coverage
 
+runs:
+  using: 'node20'
+  main: 'index.js'
+
 jobs:
   test-coverage:
     runs-on: ubuntu-latest
