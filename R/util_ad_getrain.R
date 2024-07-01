@@ -51,11 +51,15 @@
 #'
 #' @export
 #'
+#' @importFrom rnoaa ncdc
+#'
 #' @seealso \code{\link{ad_rain}}
 #'
 #' @examples
+#' \donttest{
 #' noaa_key <- Sys.getenv('NOAA_KEY')
 #' util_ad_getrain(2021, 228, noaa_key)
+#' }
 util_ad_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE){
 
   if(is.null(station))
@@ -76,9 +80,11 @@ util_ad_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FAL
     if(!quiet)
       cat(yr, sta, i, 'of', nrow(stayr), '\n')
 
-    dat <- try(rnoaa::ncdc(datasetid = 'GHCND', stationid = sta,
-                           datatypeid = 'PRCP', startdate = paste0(yr, '-01-01'),
-                           enddate = paste0(yr, '-12-31'), limit = 400, add_units = TRUE,
+    startdate <- paste0(yr, '-01-01')
+    enddate <- paste0(yr, '-12-31')
+    dat <- try(ncdc(datasetid = 'GHCND', stationid = sta,
+                           datatypeid = 'PRCP', startdate = startdate,
+                           enddate = enddate, limit = 400, add_units = TRUE,
                            token = noaa_key)$data, silent = TRUE)
 
     tryi <- 0
@@ -87,16 +93,16 @@ util_ad_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FAL
       if(!quiet)
         cat('Retrying...\n')
 
-      dat <- try(rnoaa::ncdc(datasetid = 'GHCND', stationid = sta,
-                             datatypeid = 'PRCP', startdate = paste0(yr, '-01-01'),
-                             enddate = paste0(yr, '-12-31'), limit = 400, add_units = TRUE,
+      dat <- try(ncdc(datasetid = 'GHCND', stationid = sta,
+                             datatypeid = 'PRCP', startdate = startdate,
+                             enddate = enddate, limit = 400, add_units = TRUE,
                              token = noaa_key)$data, silent = TRUE)
       tryi <- tryi + 1
 
     }
 
     if(tryi == ntry){
-      if(!quiet) cat('Failed...\t')
+      if(!quiet) cat('Failed...\n')
       next()
     }
 
@@ -105,7 +111,13 @@ util_ad_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FAL
   }
 
   out <- stayr |>
-    tidyr::unnest('data') |>
+    tidyr::unnest('data')
+
+  # NULL if no data
+  if(all(is.na(out$data)))
+    return(NULL)
+
+  out <- out |>
     tidyr::unnest('data') |>
     dplyr::mutate(
       station = as.numeric(gsub('GHCND:USC0008', '', stationid)),
