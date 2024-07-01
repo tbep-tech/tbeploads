@@ -8,7 +8,7 @@
 #' @return A data frame with total nitrogen and phosphorus estimates as mg/l for each year and month of the input data
 #'
 #' @details
-#' Raw data can be obtained from <https://nadp.slh.wisc.edu/sites/ntn-FL41/>.  Total nitrogen and phosphorus concentrations are estimated from ammonium and nitrate concentrations using the following relationships:
+#' Raw data can be obtained from <https://nadp.slh.wisc.edu/sites/ntn-FL41/> as monthly observations.  Total nitrogen and phosphorus concentrations are estimated from ammonium and nitrate concentrations (mg/L) using the following relationships:
 #'
 #' \deqn{TNConc = NH4 * 0.78 + NO3 * 0.23}
 #' \deqn{TPConc = 0.01262 * TNConc + 0.00110}
@@ -18,8 +18,7 @@
 #' @export
 #'
 #' @examples
-#' fl <- list.files(system.file('extdata/', package = 'tbeploads'),
-#'   pattern = 'verna-raw', full.names = TRUE)
+#' fl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
 #' util_ad_prepverna(fl)
 util_ad_prepverna <- function(fl, fillmis = T){
 
