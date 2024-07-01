@@ -107,19 +107,19 @@ for each.</p>
 <div class="section level3">
 <h3 id="dps">DPS<a class="anchor" aria-label="anchor" href="#dps"></a>
 </h3>
-<p>The DPS functions are designed to work with raw entity data provided
-by partners. The core function is <code><a href="../reference/anlz_dps_facility.html">anlz_dps_facility()</a></code> that
-requires only a vector of file paths as input, where each path points to
-a file with monthly parameter concentration (mg/L) and flow data
-(million gallons per day). The data also describe whether the
-observations are end of pipe (direct inflow to the bay) or reuse
-(applied to the land), with each defined by outfall Ids typically noted
-as D-001, D-002, etc. and R-001, R-002, etc, respectively. Both are
-estimated as concentration times flow, whereas reuse includes an
-attenuation factor for land application depending on location. The file
-names must follow a specific convention, where metadata for each entity
-is found in the <code><a href="../reference/facilities.html">facilities()</a></code> data object using information
-in the file name.</p>
+<p>The domestic point source (DPS) functions are designed to work with
+raw entity data provided by partners. The core function is
+<code><a href="../reference/anlz_dps_facility.html">anlz_dps_facility()</a></code> that requires only a vector of file
+paths as input, where each path points to a file with monthly parameter
+concentration (mg/L) and flow data (million gallons per day). The data
+also describe whether the observations are end of pipe (direct inflow to
+the bay) or reuse (applied to the land), with each defined by outfall
+Ids typically noted as D-001, D-002, etc. and R-001, R-002, etc,
+respectively. Both are estimated as concentration times flow, whereas
+reuse includes an attenuation factor for land application depending on
+location. The file names must follow a specific convention, where
+metadata for each entity is found in the <code><a href="../reference/facilities.html">facilities()</a></code> data
+object using information in the file name.</p>
 <p>For convenience, four example files are included with the package.
 The paths to these files are used as input to the function. Non-trivial
 data pre-processing and quality control is needed for each file and
@@ -196,15 +196,15 @@ BOD and million cubic meters per year for flow (hy) if
 <div class="section level3">
 <h3 id="ips">IPS<a class="anchor" aria-label="anchor" href="#ips"></a>
 </h3>
-<p>The IPS functions are designed to work with raw entity data provided
-by partners and are similar in functionality to the DPS functions. The
-core function is <code><a href="../reference/anlz_ips_facility.html">anlz_ips_facility()</a></code> that requires only a
-vector of file paths as input, where each path points to a file with
-monthly parameter concentration (mg/L) and flow data (million gallons
-per day). Loads are estimated as concentration times flow. The file
-names must follow a specific convention, where metadata for each entity
-is found in the <code><a href="../reference/facilities.html">facilities()</a></code> data object using information
-in the file name.</p>
+<p>The industrial point source (IPS) functions are designed to work with
+raw entity data provided by partners and are similar in functionality to
+the DPS functions. The core function is <code><a href="../reference/anlz_ips_facility.html">anlz_ips_facility()</a></code>
+that requires only a vector of file paths as input, where each path
+points to a file with monthly parameter concentration (mg/L) and flow
+data (million gallons per day). Loads are estimated as concentration
+times flow. The file names must follow a specific convention, where
+metadata for each entity is found in the <code><a href="../reference/facilities.html">facilities()</a></code> data
+object using information in the file name.</p>
 <p>For convenience, four example files are included with the package.
 The paths to these files are used as input to the function. As before,
 non-trivial data pre-processing and quality control is needed for each
@@ -275,18 +275,18 @@ BOD and million cubic meters per year for flow (hy) if
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>021 IPS    Hillsborough Bay   2.16   4.77       4.64      0    1.31</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="material-losses-ml">Material Losses (ML)<a class="anchor" aria-label="anchor" href="#material-losses-ml"></a>
+<h3 id="ml">ML<a class="anchor" aria-label="anchor" href="#ml"></a>
 </h3>
-<p>Material losses are estimates of nutrient loads to the bay primarily
-from fertilizer shipping activities at ports. Historically, loadings
-from material losses were much higher than at present. Only a few
-entities report material losses, typically as a total for the year and
-only for total nitrogen. The material losses as tons/yr are estimated
-from the tons shipped using an agreed upon loss rate. Values reported in
-the example files represent the estimated loss as the total tons of N
-shipped each year multiplied by 0.0023 and divided by 2000. The total N
-shipped at a facility each year can be obtained using a simple
-back-calculation (multiply by 2000, divide by 0.0023).</p>
+<p>Material losses (ML) are estimates of nutrient loads to the bay
+primarily from fertilizer shipping activities at ports. Historically,
+loadings from material losses were much higher than at present. Only a
+few entities report material losses, typically as a total for the year
+and only for total nitrogen. The material losses as tons/yr are
+estimated from the tons shipped using an agreed upon loss rate. Values
+reported in the example files represent the estimated loss as the total
+tons of N shipped each year multiplied by 0.0023 and divided by 2000.
+The total N shipped at a facility each year can be obtained using a
+simple back-calculation (multiply by 2000, divide by 0.0023).</p>
 <p>The core function is <code><a href="../reference/anlz_ml_facility.html">anlz_ml_facility()</a></code> that requires
 only a vector of file paths as input, where each file should be one row
 per year per facility, where the row shows the total tons per year of
@@ -397,25 +397,25 @@ data using the <code><a href="../reference/util_ad_prepverna.html">util_ad_prepv
 and phosphorus concentrations are estimated from ammonium and nitrate
 concentrations (mg/L) using the following relationships:</p>
 <p><span class="math display">\[
-TNConc = NH4 * 0.78 + NO3 * 0.23}
-TPConc = 0.01262 * TNConc + 0.00110}
+TN = NH_4^+ * 0.78 + NO_3^- * 0.23 \\
+TP = 0.01262 * TN + 0.00110
 \]</span></p>
-<p>The first equation corrects for the % of ions in either that is N,
-and the second is a regression relationship between TBADS TN and TP,
-applied to Verna.</p>
-<p>AD loads are estimated using the <code><a href="../reference/anlz_ad.html">anlz_ad()</a></code> function
+<p>The first equation corrects for the % of ions in ammonium and nitrate
+that is N, and the second is a regression relationship between TBADS TN
+and TP, applied to Verna.</p>
+<p>AD loads are estimated using the <code><a href="../reference/anlz_ad.html">anlz_ad()</a></code> function,
 where total hydrologic load by bay segment is calculated from the rain
-data and total load is calculated by multiplying hydrologic load by
-atmospheric deposition concentrations from the Verna data. Total
-hydrologic load for each bay segment is calculated using daily estimates
-of rainfall at NWIS NCDC sites in the watershed. This is done as a
-weighted mean of rainfall at the measured sites relative to grid
-locations in each sub-watershed for the bay segments. The weights are
-based on distance of the grid cells from the closest site as inverse
-distance squared. Total hydrologic load for a sub-watershed is then
-estimated by converting inches/month to m3/month using the area of each
-watershed. The distance data and sub-watershed areas are contained in
-the file included with the package.</p>
+data and total nitrogen and phosphorus load is calculated by multiplying
+hydrologic load by the atmospheric deposition concentrations from the
+Verna data. Total hydrologic load for each bay segment is calculated
+using daily estimates of rainfall at NWIS NCDC sites in the watershed.
+This is done as a weighted mean of rainfall at the measured sites
+relative to grid locations in each bay segment. The weights are based on
+distance of the grid cells from the closest site as inverse distance
+squared. Total hydrologic load for a sub-watershed is then estimated by
+converting inches/month to m3/month using the area of each bay segment.
+The distance data and bay segment areas are contained in the file
+included with the package.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ad_distance</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   segment    seg_x   seg_y matchsit  distance     invdist2     area</span></span>
@@ -430,8 +430,9 @@ bay segment by multiplying the total hydrologic load by the total
 nitrogen and phosphorus concentrations in the Verna data. The loading
 calculations also include a wet/dry deposition conversion factor to
 account for differences in loading during the rainy and dry seasons.</p>
-<p>Using <code><a href="../reference/anlz_ad.html">anlz_ad()</a></code> load to estimate AD is done as
-follow:</p>
+<p>Using <code><a href="../reference/anlz_ad.html">anlz_ad()</a></code> to estimate AD load is done as follows,
+where <code>ad_rain</code> is the rain data and <code>vernafl</code> is
+the path to the Verna Wellfield data.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/anlz_ad.html">anlz_ad</a></span><span class="op">(</span><span class="va">ad_rain</span>, <span class="va">vernafl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 672 × 7</span></span></span>
