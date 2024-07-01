@@ -38,7 +38,7 @@ Load estimates are broadly defined as domestic point source (DPS), industrial po
 
 ### DPS
 
-The DPS functions are designed to work with raw entity data provided by partners.  The core function is `anlz_dps_facility()` that requires only a vector of file paths as input, where each path points to a file with monthly parameter concentration (mg/L) and flow data (million gallons per day).  The data also describe whether the observations are end of pipe (direct inflow to the bay) or reuse (applied to the land), with each defined by outfall Ids typically noted as D-001, D-002, etc. and R-001, R-002, etc, respectively. Both are estimated as concentration times flow, whereas reuse includes an attenuation factor for land application depending on location.  The file names must follow a specific convention, where metadata for each entity is found in the `facilities()` data object using information in the file name. 
+The domestic point source (DPS) functions are designed to work with raw entity data provided by partners.  The core function is `anlz_dps_facility()` that requires only a vector of file paths as input, where each path points to a file with monthly parameter concentration (mg/L) and flow data (million gallons per day).  The data also describe whether the observations are end of pipe (direct inflow to the bay) or reuse (applied to the land), with each defined by outfall Ids typically noted as D-001, D-002, etc. and R-001, R-002, etc, respectively. Both are estimated as concentration times flow, whereas reuse includes an attenuation factor for land application depending on location.  The file names must follow a specific convention, where metadata for each entity is found in the `facilities()` data object using information in the file name. 
 
 For convenience, four example files are included with the package. The paths to these files are used as input to the function. Non-trivial data pre-processing and quality control is needed for each file and those included in the package are the correct format. The output is returned as tons per month for TN, TP, TSS, and BOD and million cubic meters per month for flow (hy).
 
@@ -60,7 +60,7 @@ anlz_dps(dpsfls, summ = "segment", summtime = "year")
 
 ### IPS
 
-The IPS functions are designed to work with raw entity data provided by partners and are similar in functionality to the DPS functions.  The core function is `anlz_ips_facility()` that requires only a vector of file paths as input, where each path points to a file with monthly parameter concentration (mg/L) and flow data (million gallons per day). Loads are estimated as concentration times flow.  The file names must follow a specific convention, where metadata for each entity is found in the `facilities()` data object using information in the file name. 
+The industrial point source (IPS) functions are designed to work with raw entity data provided by partners and are similar in functionality to the DPS functions.  The core function is `anlz_ips_facility()` that requires only a vector of file paths as input, where each path points to a file with monthly parameter concentration (mg/L) and flow data (million gallons per day). Loads are estimated as concentration times flow.  The file names must follow a specific convention, where metadata for each entity is found in the `facilities()` data object using information in the file name. 
 
 For convenience, four example files are included with the package. The paths to these files are used as input to the function. As before, non-trivial data pre-processing and quality control is needed for each file and those included in the package are the correct format. The output is returned as tons per month for TN, TP, TSS, and BOD and million cubic meters per month for flow (hy).
 
@@ -80,9 +80,9 @@ anlz_ips(ipsfls, summ = 'entity', summtime = 'month')
 anlz_ips(ipsfls, summ = "segment", summtime = "year")
 ```
 
-### Material Losses (ML)
+### ML
 
-Material losses are estimates of nutrient loads to the bay primarily from fertilizer shipping activities at ports.  Historically, loadings from material losses were much higher than at present.  Only a few entities report material losses, typically as a total for the year and only for total nitrogen. The material losses as tons/yr are estimated from the tons shipped using an agreed upon loss rate.  Values reported in the example files represent the estimated loss as the total tons of N shipped each year multiplied by 0.0023 and divided by 2000. The total N shipped at a facility each year can be obtained using a simple back-calculation (multiply by 2000, divide by 0.0023). 
+Material losses (ML) are estimates of nutrient loads to the bay primarily from fertilizer shipping activities at ports.  Historically, loadings from material losses were much higher than at present.  Only a few entities report material losses, typically as a total for the year and only for total nitrogen. The material losses as tons/yr are estimated from the tons shipped using an agreed upon loss rate.  Values reported in the example files represent the estimated loss as the total tons of N shipped each year multiplied by 0.0023 and divided by 2000. The total N shipped at a facility each year can be obtained using a simple back-calculation (multiply by 2000, divide by 0.0023). 
 
 The core function is `anlz_ml_facility()` that requires only a vector of file paths as input, where each file should be one row per year per facility, where the row shows the total tons per year of total nitrogen loss. The file names must follow a specific convention, where metadata for each entity is found in the `facilities()` data object using information in the file name. 
 
@@ -122,13 +122,13 @@ vernafl
 During load calculation, the Verna data are converted to total nitrogen and total phosphorus from ammonium and nitrate concentration data using the `util_ad_prepverna()` function. Total nitrogen and phosphorus concentrations are estimated from ammonium and nitrate concentrations (mg/L) using the following relationships:
 
 $$
-TNConc = NH4 * 0.78 + NO3 * 0.23}
-TPConc = 0.01262 * TNConc + 0.00110}
+TN = NH_4^+ * 0.78 + NO_3^- * 0.23 \\
+TP = 0.01262 * TN + 0.00110
 $$
 
-The first equation corrects for the % of ions in either that is N, and the second is a regression relationship between TBADS TN and TP, applied to Verna.
+The first equation corrects for the % of ions in ammonium and nitrate that is N, and the second is a regression relationship between TBADS TN and TP, applied to Verna.
 
-AD loads are estimated using the `anlz_ad()` function where total hydrologic load by bay segment is calculated from the rain data and total load is calculated by multiplying hydrologic load by atmospheric deposition concentrations from the Verna data. Total hydrologic load for each bay segment is calculated using daily estimates of rainfall at NWIS NCDC sites in the watershed.  This is done as a weighted mean of rainfall at the measured sites relative to grid locations in each sub-watershed for the bay segments.  The weights are based on distance of the grid cells from the closest site as inverse distance squared.  Total hydrologic load for a sub-watershed is then estimated by converting inches/month to m3/month using the area of each watershed.  The distance data and sub-watershed areas are contained in the \code{\link{ad_distance}} file included with the package.
+AD loads are estimated using the `anlz_ad()` function, where total hydrologic load by bay segment is calculated from the rain data and total nitrogen and phosphorus load is calculated by multiplying hydrologic load by the atmospheric deposition concentrations from the Verna data. Total hydrologic load for each bay segment is calculated using daily estimates of rainfall at NWIS NCDC sites in the watershed.  This is done as a weighted mean of rainfall at the measured sites relative to grid locations in each bay segment.  The weights are based on distance of the grid cells from the closest site as inverse distance squared.  Total hydrologic load for a sub-watershed is then estimated by converting inches/month to m3/month using the area of each bay segment.  The distance data and bay segment areas are contained in the \code{\link{ad_distance}} file included with the package.
 
 ```{r}
 head(ad_distance)
@@ -136,7 +136,7 @@ head(ad_distance)
 
 The total nitrogen and phosphorus loads are then estimated for each bay segment by multiplying the total hydrologic load by the total nitrogen and phosphorus concentrations in the Verna data.  The loading calculations also include a wet/dry deposition conversion factor to account for differences in loading during the rainy and dry seasons.
 
-Using `anlz_ad()` load to estimate AD is done as follow: 
+Using `anlz_ad()` to estimate AD load is done as follows, where `ad_rain` is the rain data and `vernafl` is the path to the Verna Wellfield data. 
 
 ```{r}
 anlz_ad(ad_rain, vernafl)

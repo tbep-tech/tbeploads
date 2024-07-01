@@ -10,10 +10,10 @@
 #' @details
 #' Raw data can be obtained from <https://nadp.slh.wisc.edu/sites/ntn-FL41/> as monthly observations.  Total nitrogen and phosphorus concentrations are estimated from ammonium and nitrate concentrations (mg/L) using the following relationships:
 #'
-#' \deqn{TNConc = NH4 * 0.78 + NO3 * 0.23}
-#' \deqn{TPConc = 0.01262 * TNConc + 0.00110}
+#' \deqn{TN = NH_4^+ * 0.78 + NO_3^- * 0.23}
+#' \deqn{TP = 0.01262 * TN + 0.00110}
 #'
-#' The first equation corrects for the % of ions in either that is N, and the second is a regression relationship between TBADS TN and TP, applied to Verna.
+#' The first equation corrects for the % of ions in ammonium and nitrate that is N, and the second is a regression relationship between TBADS TN and TP, applied to Verna.
 #'
 #' @export
 #'

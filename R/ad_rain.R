@@ -1,6 +1,6 @@
-#' Data frame of daily rainfall data from NOAA NCDC National Weather Service (NWS) from 2017 to 2023
+#' Data frame of daily rainfall data from NOAA NCDC National Weather Service (NWS) sites from 2017 to 2023
 #'
-#' Data frame of daily rainfall data from NOAA NCDC National Weather Service (NWS) from 2017 to 2023
+#' Data frame of daily rainfall data from NOAA NCDC National Weather Service (NWS) sites from 2017 to 2023
 #'
 #' @format A \code{data.frame}
 #'

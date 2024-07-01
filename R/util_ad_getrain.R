@@ -1,6 +1,6 @@
-#' Get rainfall data for a given year at NOAA NCDC sites
+#' Get rainfall data at NOAA NCDC sites
 #'
-#' Get rainfall data for a given year at NOAA NCDC sites
+#' Get rainfall data at NOAA NCDC sites
 #'
 #' @param yrs numeric vector for the years of data to retrieve
 #' @param station numeric vector of station numbers to retrieve, see details

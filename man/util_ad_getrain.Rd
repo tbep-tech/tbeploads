@@ -2,7 +2,7 @@
 % Please edit documentation in R/util_ad_getrain.R
 \name{util_ad_getrain}
 \alias{util_ad_getrain}
-\title{Get rainfall data for a given year at NOAA NCDC sites}
+\title{Get rainfall data at NOAA NCDC sites}
 \usage{
 util_ad_getrain(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE)
 }
@@ -30,7 +30,7 @@ a data frame with the following columns:
 }
 }
 \description{
-Get rainfall data for a given year at NOAA NCDC sites
+Get rainfall data at NOAA NCDC sites
 }
 \details{
 This function is used to retrieve a long-term record of rainfall for estimating AD loads.  It is used to create an input data file for load calculations and it is not used directly by any other functions due to download time.  A NOAA API key is required to use the function.
