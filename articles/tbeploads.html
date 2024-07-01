@@ -363,6 +363,97 @@ combined with IPS loads for reporting.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">2</span>020 ML     Hillsborough Bay   0.884       0        0        0       0</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>021 ML     Hillsborough Bay   0.987       0        0        0       0</span></span></code></pre></div>
 </div>
+<div class="section level3">
+<h3 id="ad">AD<a class="anchor" aria-label="anchor" href="#ad"></a>
+</h3>
+<p>Loading from atmospheric deposition (AD) for bay segments in the
+Tampa Bay watershed are calculated using rainfall data and atmospheric
+concentration data from the Verna Wellfield site. Rainfall data must be
+obtained using the <code><a href="../reference/util_ad_getrain.html">util_ad_getrain()</a></code> function before
+calculating loads. For convenience, daily rainfall data from 2017 to
+2023 at sites in the watershed are included with the package in the
+<code>ad_rain</code> object.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ad_rain</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 6</span></span></span>
+<span><span class="co">#&gt;   station date        Year Month   Day rainfall</span></span>
+<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     228 2017-01-01  <span style="text-decoration: underline;">2</span>017     1     1     0   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     228 2017-01-02  <span style="text-decoration: underline;">2</span>017     1     2     0   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     228 2017-01-03  <span style="text-decoration: underline;">2</span>017     1     3     0   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     228 2017-01-04  <span style="text-decoration: underline;">2</span>017     1     4     0   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     228 2017-01-05  <span style="text-decoration: underline;">2</span>017     1     5     0.02</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     228 2017-01-06  <span style="text-decoration: underline;">2</span>017     1     6     0</span></span></code></pre></div>
+<p>The Verna Wellfield data must also be obtained from <a href="https://nadp.slh.wisc.edu/sites/ntn-FL41/" class="external-link uri">https://nadp.slh.wisc.edu/sites/ntn-FL41/</a> as monthly
+observations. This file is also included with the package and can be
+found using <code><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file()</a></code> as follows:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">vernafl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/verna-raw.csv'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span><span class="va">vernafl</span></span>
+<span><span class="co">#&gt; [1] "/home/runner/work/_temp/Library/tbeploads/extdata/verna-raw.csv"</span></span></code></pre></div>
+<p>During load calculation, the Verna data are converted to total
+nitrogen and total phosphorus from ammonium and nitrate concentration
+data using the <code><a href="../reference/util_ad_prepverna.html">util_ad_prepverna()</a></code> function. Total nitrogen
+and phosphorus concentrations are estimated from ammonium and nitrate
+concentrations (mg/L) using the following relationships:</p>
+<p><span class="math display">\[
+TNConc = NH4 * 0.78 + NO3 * 0.23}
+TPConc = 0.01262 * TNConc + 0.00110}
+\]</span></p>
+<p>The first equation corrects for the % of ions in either that is N,
+and the second is a regression relationship between TBADS TN and TP,
+applied to Verna.</p>
+<p>AD loads are estimated using the <code><a href="../reference/anlz_ad.html">anlz_ad()</a></code> function
+where total hydrologic load by bay segment is calculated from the rain
+data and total load is calculated by multiplying hydrologic load by
+atmospheric deposition concentrations from the Verna data. Total
+hydrologic load for each bay segment is calculated using daily estimates
+of rainfall at NWIS NCDC sites in the watershed. This is done as a
+weighted mean of rainfall at the measured sites relative to grid
+locations in each sub-watershed for the bay segments. The weights are
+based on distance of the grid cells from the closest site as inverse
+distance squared. Total hydrologic load for a sub-watershed is then
+estimated by converting inches/month to m3/month using the area of each
+watershed. The distance data and sub-watershed areas are contained in
+the file included with the package.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ad_distance</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   segment    seg_x   seg_y matchsit  distance     invdist2     area</span></span>
+<span><span class="co">#&gt; 1       1 344902.2 3080488      520 26000.117 1.479277e-09 23407.05</span></span>
+<span><span class="co">#&gt; 2       1 344902.2 3080488      940 39711.285 6.341210e-10 23407.05</span></span>
+<span><span class="co">#&gt; 3       1 344902.2 3080488      945 44691.735 5.006631e-10 23407.05</span></span>
+<span><span class="co">#&gt; 4       1 344902.2 3080488     1632 22105.640 2.046416e-09 23407.05</span></span>
+<span><span class="co">#&gt; 5       1 344902.2 3080488     2806  8649.245 1.336730e-08 23407.05</span></span>
+<span><span class="co">#&gt; 6       1 344902.2 3080488     3986 47920.032 4.354776e-10 23407.05</span></span></code></pre></div>
+<p>The total nitrogen and phosphorus loads are then estimated for each
+bay segment by multiplying the total hydrologic load by the total
+nitrogen and phosphorus concentrations in the Verna data. The loading
+calculations also include a wet/dry deposition conversion factor to
+account for differences in loading during the rainy and dry seasons.</p>
+<p>Using <code><a href="../reference/anlz_ad.html">anlz_ad()</a></code> load to estimate AD is done as
+follow:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/anlz_ad.html">anlz_ad</a></span><span class="op">(</span><span class="va">ad_rain</span>, <span class="va">vernafl</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 672 × 7</span></span></span>
+<span><span class="co">#&gt;     Year Month source bayseg         tn_load tp_load hy_load</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">2</span>017     1 AD     Boca Ciega Bay   2.38  0.040<span style="text-decoration: underline;">4</span>    4.17 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">2</span>017     2 AD     Boca Ciega Bay   1.78  0.031<span style="text-decoration: underline;">6</span>    3.68 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">2</span>017     3 AD     Boca Ciega Bay   0.751 0.014<span style="text-decoration: underline;">3</span>    1.96 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  <span style="text-decoration: underline;">2</span>017     4 AD     Boca Ciega Bay   0.490 0.007<span style="text-decoration: underline;">65</span>   0.591</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  <span style="text-decoration: underline;">2</span>017     5 AD     Boca Ciega Bay  10.5   0.152     7.98 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  <span style="text-decoration: underline;">2</span>017     6 AD     Boca Ciega Bay  12.6   0.232    29.4  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  <span style="text-decoration: underline;">2</span>017     7 AD     Boca Ciega Bay   7.69  0.135    18.6  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  <span style="text-decoration: underline;">2</span>017     8 AD     Boca Ciega Bay  10.5   0.226    46.4  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">2</span>017     9 AD     Boca Ciega Bay   2.45  0.063<span style="text-decoration: underline;">5</span>   16.2  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>017    10 AD     Boca Ciega Bay   0.709 0.025<span style="text-decoration: underline;">0</span>    7.99 </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 662 more rows</span></span></span></code></pre></div>
+<p>Results can be summarized by segment, baywide, monthly, or annually
+using the <code>summ</code> and <code>summtime</code> arguments. By
+default, loads are returned monthly for each segment. Note that Boca
+Ciega Bay and Boca Ciega Bay South results are returned separately. Only
+Boca Ciega Bay South is used when estimating total bay loads.</p>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

@@ -34,6 +34,12 @@
     <loc>https://tbep-tech.github.io/tbeploads/reference/ad_distance.html</loc>
   </url>
   <url>
+    <loc>https://tbep-tech.github.io/tbeploads/reference/ad_rain.html</loc>
+  </url>
+  <url>
+    <loc>https://tbep-tech.github.io/tbeploads/reference/anlz_ad.html</loc>
+  </url>
+  <url>
     <loc>https://tbep-tech.github.io/tbeploads/reference/anlz_dps.html</loc>
   </url>
   <url>
@@ -59,6 +65,9 @@
   </url>
   <url>
     <loc>https://tbep-tech.github.io/tbeploads/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://tbep-tech.github.io/tbeploads/reference/util_ad_getrain.html</loc>
   </url>
   <url>
     <loc>https://tbep-tech.github.io/tbeploads/reference/util_ad_prepverna.html</loc>
