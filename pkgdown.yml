@@ -1,10 +1,9 @@
 pandoc: 3.1.11
-pkgdown: 2.0.9
+pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
   tbeploads: tbeploads.html
-last_built: 2024-07-01T14:22Z
+last_built: 2024-07-23T14:08Z
 urls:
   reference: https://tbep-tech.github.io/tbeploads/reference
   article: https://tbep-tech.github.io/tbeploads/articles
-

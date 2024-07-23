@@ -1,96 +1,34 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/404.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/CODE_OF_CONDUCT.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/CONTRIBUTING.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/articles/tbeploads.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/index.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/ad_distance.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/ad_rain.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/anlz_ad.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/anlz_dps.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/anlz_dps_facility.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/anlz_ips.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/anlz_ips_facility.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/anlz_ml.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/anlz_ml_facility.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/dbasing.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/facilities.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/util_ad_getrain.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/util_ad_prepverna.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_addcol.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_checkfls.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_checkuni.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_facinfo.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_fillmis.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_fixoutfall.html</loc>
-  </url>
-  <url>
-    <loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_summ.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://tbep-tech.github.io/tbeploads/404.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/CONTRIBUTING.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/LICENSE-text.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/LICENSE.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/articles/index.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/articles/tbeploads.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/authors.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/index.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/news/index.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/ad_distance.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/ad_rain.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/anlz_ad.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/anlz_dps.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/anlz_dps_facility.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/anlz_ips.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/anlz_ips_facility.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/anlz_ml.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/anlz_ml_facility.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/dbasing.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/facilities.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/index.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ad_getrain.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ad_prepverna.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_addcol.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_checkfls.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_checkuni.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_facinfo.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_fillmis.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_fixoutfall.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_summ.html</loc></url>
 </urlset>
+
