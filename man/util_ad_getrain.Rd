@@ -64,7 +64,7 @@ By default, rainfall data is retrieved for the following stations:
 }
 }
 \examples{
-\donttest{
+\dontrun{
 noaa_key <- Sys.getenv('NOAA_KEY')
 util_ad_getrain(2021, 228, noaa_key)
 }

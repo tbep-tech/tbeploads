@@ -1,3 +1,3 @@
 Facility.Name	Year	tn_tonsyr
-Kinder Morgan Tampaplex	2017	0.18758685
-Kinder Morgan Tampaplex	2018	0.1896925
+Kinder Morgan Tampaplex	2017	0.18582744117932
+Kinder Morgan Tampaplex	2018	0.188465317807955

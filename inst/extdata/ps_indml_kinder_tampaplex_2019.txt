@@ -1,2 +1,2 @@
 Facility.Name	Year	tn_tonsyr
-Kinder Morgan Tampaplex	2019	0.192658902
+Kinder Morgan Tampaplex	2019	0.0224486590878418

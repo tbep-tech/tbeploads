@@ -1,2 +1,2 @@
 Facility.Name	Year	tn_tonsyr
-CSX Rockport	2020	0.88388253765
+CSX Rockport	2020	0.891729562047903

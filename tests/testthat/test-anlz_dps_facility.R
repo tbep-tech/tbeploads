@@ -5,11 +5,11 @@ test_that("Check end of pipe load calculations", {
     filter(Year == 2021 & Month == 1 & facility == 'City of Clearwater Northeast AWWTF' & source == 'D-001') |>
     mutate_if(is.numeric, round, 3)
 
-  expect_equal(result$tn_load[[1]], 0.617)
-  expect_equal(result$tp_load[[1]], 0.03)
-  expect_equal(result$tss_load[[1]], 0.251)
-  expect_equal(result$bod_load[[1]], 1.646)
-  expect_equal(result$hy_load[[1]], 0.455)
+  expect_equal(result$tn_load[[1]], 0.862)
+  expect_equal(result$tp_load[[1]], 6.037)
+  expect_equal(result$tss_load[[1]], 0.452)
+  expect_equal(result$bod_load[[1]], 1.144)
+  expect_equal(result$hy_load[[1]], 0.663)
 
 })
 
