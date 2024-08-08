@@ -374,7 +374,8 @@ and phosphorus concentrations are estimated from ammonium and nitrate
 concentrations (mg/L) using the following relationships:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>N</mi><mo>=</mo><mi>N</mi><msubsup><mi>H</mi><mn>4</mn><mo>+</mo></msubsup><mo>*</mo><mn>0.78</mn><mo>+</mo><mi>N</mi><msubsup><mi>O</mi><mn>3</mn><mo>−</mo></msubsup><mo>*</mo><mn>0.23</mn></mrow><annotation encoding="application/x-tex">
 TN = NH_4^+ * 0.78 + NO_3^- * 0.23
-</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>P</mi><mo>=</mo><mn>0.01262</mn><mo>*</mo><mi>T</mi><mi>N</mi><mo>+</mo><mn>0.00110</mn></mrow><annotation encoding="application/x-tex">
+</annotation></semantics></math></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>P</mi><mo>=</mo><mn>0.01262</mn><mo>*</mo><mi>T</mi><mi>N</mi><mo>+</mo><mn>0.00110</mn></mrow><annotation encoding="application/x-tex">
 TP = 0.01262 * TN + 0.00110
 </annotation></semantics></math></p>
 <p>The first equation corrects for the % of ions in ammonium and nitrate
@@ -413,7 +414,7 @@ the path to the Verna Wellfield data.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/anlz_ad.html">anlz_ad</a></span><span class="op">(</span><span class="va">ad_rain</span>, <span class="va">vernafl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 672 × 7</span></span></span>
-<span><span class="co">#&gt;     Year Month source bayseg         tn_load tp_load hy_load</span></span>
+<span><span class="co">#&gt;     Year Month source segment        tn_load tp_load hy_load</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">2</span>017     1 AD     Boca Ciega Bay   2.38  0.040<span style="text-decoration: underline;">4</span>    4.17 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">2</span>017     2 AD     Boca Ciega Bay   1.78  0.031<span style="text-decoration: underline;">6</span>    3.68 </span></span>

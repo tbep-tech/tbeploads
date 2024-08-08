@@ -69,7 +69,7 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame with nitrogen and phosphorus loads in tons/month, hydrologic load in million m3/month, and segment, year, and month as columns if <code>summ = 'segment'</code> and <code>summtime = 'month'</code>. Total load to all segments can be returned if <code>summ = 'all'</code> and annual summaries can be returned if <code>summtime = 'year'</code>.  In the latter case, loads are the sum of monthly estimates such that output is tons/yr for TN and TP and as million m3/yr for hydrologic load.</p>
+    <p>A data frame with nitrogen and phosphorus loads in tons/month, hydrologic load in million m3/month, and segment, year, and month as columns if <code>summ = 'segment'</code> and <code>summtime = 'month'</code>. Total load to all segments can be returned if <code>summ = 'all'</code> and annual summaries can be returned if <code>summtime = 'year'</code>.  In the former case, the total excludes the northern portion of Boca Ciega Bay that is not included in the reasonable assurance boundaries. In the latter case, loads are the sum of monthly estimates such that output is tons/yr for TN and TP and as million m3/yr for hydrologic load.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -88,7 +88,7 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">ad_rain</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">anlz_ad</span><span class="op">(</span><span class="va">ad_rain</span>, <span class="va">vernafl</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 672 × 7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Year Month source bayseg         tn_load tp_load hy_load</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Year Month source segment        tn_load tp_load hy_load</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">2</span>017     1 AD     Boca Ciega Bay   2.38  0.040<span style="text-decoration: underline;">4</span>    4.17 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">2</span>017     2 AD     Boca Ciega Bay   1.78  0.031<span style="text-decoration: underline;">6</span>    3.68 </span>
