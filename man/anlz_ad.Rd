@@ -21,7 +21,7 @@ anlz_ad(
 \item{summtime}{chr string indicating how the returned data are summarized temporally (month or year), see details}
 }
 \value{
-A data frame with nitrogen and phosphorus loads in tons/month, hydrologic load in million m3/month, and segment, year, and month as columns if \code{summ = 'segment'} and \code{summtime = 'month'}. Total load to all segments can be returned if \code{summ = 'all'} and annual summaries can be returned if \code{summtime = 'year'}.  In the latter case, loads are the sum of monthly estimates such that output is tons/yr for TN and TP and as million m3/yr for hydrologic load.
+A data frame with nitrogen and phosphorus loads in tons/month, hydrologic load in million m3/month, and segment, year, and month as columns if \code{summ = 'segment'} and \code{summtime = 'month'}. Total load to all segments can be returned if \code{summ = 'all'} and annual summaries can be returned if \code{summtime = 'year'}.  In the former case, the total excludes the northern portion of Boca Ciega Bay that is not included in the reasonable assurance boundaries. In the latter case, loads are the sum of monthly estimates such that output is tons/yr for TN and TP and as million m3/yr for hydrologic load.
 }
 \description{
 Calculate AD loads and summarize

@@ -124,6 +124,7 @@ During load calculation, the Verna data are converted to total nitrogen and tota
 $$
 TN = NH_4^+ * 0.78 + NO_3^- * 0.23
 $$
+
 $$
 TP = 0.01262 * TN + 0.00110
 $$

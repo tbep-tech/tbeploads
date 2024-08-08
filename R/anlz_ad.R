@@ -14,7 +14,7 @@
 #'
 #' The total nitrogen and phosphorus loads are then estimated for each bay segment by multiplying the total hydrologic load by the total nitrogen and phosphorus concentrations in the Verna data.  The loading calculations also include a wet/dry deposition conversion factor to account for differences in loading during the rainy and dry seasons.
 #'
-#' @return A data frame with nitrogen and phosphorus loads in tons/month, hydrologic load in million m3/month, and segment, year, and month as columns if \code{summ = 'segment'} and \code{summtime = 'month'}. Total load to all segments can be returned if \code{summ = 'all'} and annual summaries can be returned if \code{summtime = 'year'}.  In the latter case, loads are the sum of monthly estimates such that output is tons/yr for TN and TP and as million m3/yr for hydrologic load.
+#' @return A data frame with nitrogen and phosphorus loads in tons/month, hydrologic load in million m3/month, and segment, year, and month as columns if \code{summ = 'segment'} and \code{summtime = 'month'}. Total load to all segments can be returned if \code{summ = 'all'} and annual summaries can be returned if \code{summtime = 'year'}.  In the former case, the total excludes the northern portion of Boca Ciega Bay that is not included in the reasonable assurance boundaries. In the latter case, loads are the sum of monthly estimates such that output is tons/yr for TN and TP and as million m3/yr for hydrologic load.
 #'
 #' @export
 #'
@@ -88,7 +88,7 @@ anlz_ad <- function(ad_rain, vernafl, summ = c('segment', 'all'), summtime = c('
   # add bay segment names
   lddat <- lddat |>
     dplyr::mutate(
-      bayseg = dplyr::case_when(
+      segment = dplyr::case_when(
         segment == 1 ~ "Old Tampa Bay",
         segment == 2 ~ "Hillsborough Bay",
         segment == 3 ~ "Middle Tampa Bay",
@@ -98,13 +98,13 @@ anlz_ad <- function(ad_rain, vernafl, summ = c('segment', 'all'), summtime = c('
         segment == 7 ~ "Manatee River"
       )
     ) |>
-    dplyr::select(Year, Month, source, bayseg, tn_load, tp_load, hy_load)
+    dplyr::select(Year, Month, source, segment, tn_load, tp_load, hy_load)
 
   # create bcb south
   bcbld <- lddat |>
-    dplyr::filter(bayseg == "Boca Ciega Bay") |>
+    dplyr::filter(segment == "Boca Ciega Bay") |>
     dplyr::mutate(
-      bayseg = "Boca Ciega Bay South",
+      segment = "Boca Ciega Bay South",
       tn_load = tn_load * 0.7,
       tp_load = tp_load * 0.7,
       hy_load = hy_load * 0.7
@@ -112,7 +112,7 @@ anlz_ad <- function(ad_rain, vernafl, summ = c('segment', 'all'), summtime = c('
 
   # add bcbs to lddat
   lddat <- rbind(lddat, bcbld) |>
-    dplyr::arrange(bayseg, Year, Month)
+    dplyr::arrange(segment, Year, Month)
 
   ##
   # output based on summ and summtime
@@ -126,12 +126,12 @@ anlz_ad <- function(ad_rain, vernafl, summ = c('segment', 'all'), summtime = c('
         tn_load = sum(tn_load),
         tp_load = sum(tp_load),
         hy_load = sum(hy_load),
-        .by = c(Year, source, bayseg)
+        .by = c(Year, source, segment)
       )
 
   if(summ == 'all' & summtime == 'month')
     out <- lddat |>
-      dplyr::filter(bayseg != "Boca Ciega Bay") |>
+      dplyr::filter(segment != "Boca Ciega Bay") |>
       dplyr::summarise(
         tn_load = sum(tn_load),
         tp_load = sum(tp_load),
@@ -141,7 +141,7 @@ anlz_ad <- function(ad_rain, vernafl, summ = c('segment', 'all'), summtime = c('
 
   if(summ == 'all' & summtime == 'year')
     out <- lddat |>
-      dplyr::filter(bayseg != "Boca Ciega Bay") |>
+      dplyr::filter(segment != "Boca Ciega Bay") |>
       dplyr::summarise(
         tn_load = sum(tn_load),
         tp_load = sum(tp_load),
