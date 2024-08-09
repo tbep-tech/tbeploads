@@ -68,7 +68,11 @@ util_ad_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FAL
                  3153, 3986, 4707, 5973, 6065,
                  6880, 7205, 7851, 7886, 8788,
                  8824, 9176, 9401)
-  stationid <- paste0('GHCND:USC0008', sprintf('%04d', station))
+  stationid <- dplyr::case_when(
+    station == 2806 ~ 'GHCND:USW00092806',
+    station == 8788 ~ 'GHCND:USW00012842',
+    T ~ paste0('GHCND:USC0008', sprintf('%04d', station))
+  )
 
   stayr <- tidyr::crossing(yrs, stationid) |>
     dplyr::mutate(data = NA)
@@ -117,16 +121,23 @@ util_ad_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FAL
   if(all(is.na(out$data)))
     return(NULL)
 
+  # station and stationid crosswalk
+  stations <- tibble(
+    station = station,
+    stationid = stationid
+  )
+
   out <- out |>
     tidyr::unnest('data') |>
+    dplyr::select(-station) |>
     dplyr::mutate(
-      station = as.numeric(gsub('GHCND:USC0008', '', stationid)),
       date = lubridate::date(date),
       Year = yrs,
       Month = lubridate::month(date),
       Day = lubridate::day(date),
       rainfall = round(value / 254, 2)
       ) |>
+    dplyr::left_join(stations, by = 'stationid') |>
     dplyr::select(station, date, Year, Month, Day, rainfall) |>
     dplyr::arrange(station, date)
 
