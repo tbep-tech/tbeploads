@@ -66,6 +66,10 @@ wq_pin <- read.table(file = "./data-raw/PIN_CO/FDEP_WIN_WAVES_06-06_WQData_1985-
   arrange(station, date)
 # End Pinellas County WQ data input
 
+wq_pin <- read_xlsx("./data-raw/USF_WATERATLAS/PC_Lake_Tarpon_DataDownload_1991-2024-02.xlsx") %>%
+          dplyr::filter()
+
+
 ltoc_wq_fldata <- wq_pin %>%
              mutate(basin = case_when(station == "06-06" ~ "LTARPON",
                                       TRUE ~ NA),
@@ -127,5 +131,5 @@ old_ltoc <- dplyr::bind_rows(old_ltoc_1992_94, old_ltoc_1995_98, old_ltoc_1999_0
             select(basin, yr, mo, jei_h2oload, jei_tnload, jei_tpload, jei_bodload, jei_tssload)
 
 ltoc_data <- full_join(old_ltoc, ltoc_wq_fldata_corrected, by = c("basin", "yr", "mo")) #%>%
-             save(file = "./data/ltoc_loads_1992-2023.Rdata")
+             save(ltoc_data, file = "./data/ltoc_loads_1992-2023.Rdata")
 

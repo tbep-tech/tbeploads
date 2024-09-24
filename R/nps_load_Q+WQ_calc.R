@@ -191,5 +191,5 @@ wq_fldata_corrected <- wq_fldata %>%
                                 tssload = tss_mgl * flow * 0.001 * 0.001,
                                 bodload = bod_mgl * flow * 0.001 * 0.001)
 
-nps_gaged_load <- wq_fldata_corrected %>%
-  save(file = "./data/nps_gaged_loads_2021-2023.Rdata")
+nps_gaged_load <- wq_fldata_corrected #%>%
+  save(nps_gaged_load, file = "./data/nps_gaged_loads_2021-2023.Rdata")
