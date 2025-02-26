@@ -53,18 +53,17 @@ new_flow <- do.call(rbind, fl_results) %>%
               dplyr::full_join(TBW_BellSHWD, by = c("site_no", "date"))  #Add in TBW AR-Bell Shoals withdrawals here
 
 new_flow_corrected <- new_flow %>%
+                       complete(date, nesting(site_no), fill = list(flow_cfs = NA)) %>% # Fill in missing dates, if any
                        mutate(flow_cfs = case_when(site_no == "02301500" ~ flow_cfs-wd_cfs, # Subtract TBW AR-Bell Shoals withdrawals from site 02301500 flows
-                                                 TRUE ~ flow_cfs)) %>%
-                       select(site_no, date, flow_cfs) %>%
-                       complete(date, nesting(site_no), fill = list(flow_cfs = NA)) %>%     # Fill in missing dates, if any
-                       arrange(site_no, date) %>%
-                       mutate(flow_cfs = zoo::na.approx(flow_cfs), .by = site_no) %>%       # Linear interpolate missing daily values
+                              TRUE ~ flow_cfs)) %>%
                        mutate(basin = case_when(site_no == "02307498" ~ "LTARPON",
                                                 site_no == "02300042" ~ "EVERSRES",
                                                 TRUE ~ site_no),
                               yr = year(date),
                               mo = month(date)) %>%
-                       select(basin, date, yr, mo, flow_cfs)
+                       mutate(flow_cfs = zoo::na.approx(flow_cfs), .by = site_no) %>%       # Linear interpolate missing daily values
+                       arrange(site_no, date) %>%
+                       select(basin, date, yr, mo, flow_cfs, wd_cfs)
 
 check_plots <- new_flow_corrected %>%
               ggplot(aes(x = date, y = flow_cfs)) +
@@ -191,5 +190,8 @@ wq_fldata_corrected <- wq_fldata %>%
                                 tssload = tss_mgl * flow * 0.001 * 0.001,
                                 bodload = bod_mgl * flow * 0.001 * 0.001)
 
-nps_gaged_load <- wq_fldata_corrected #%>%
-  save(nps_gaged_load, file = "./data/nps_gaged_loads_2021-2023.Rdata")
+nps_gaged_load <- wq_fldata_corrected %>%
+  saveRDS(file = "./data/nps_gaged_loads_2021-2023.rds")
+
+save(nps_gaged_load, file = "./data/nps_gaged_loads_2021-2023.Rdata")
+
