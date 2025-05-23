@@ -4,6 +4,7 @@
 [![R-CMD-check](https://github.com/tbep-tech/tbeploads/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tbep-tech/tbeploads/actions/workflows/R-CMD-check.yaml)
 [![pkgdown](https://github.com/tbep-tech/tbeploads/workflows/pkgdown/badge.svg)](https://github.com/tbep-tech/tbeploads/actions)
 [![Codecov test coverage](https://codecov.io/gh/tbep-tech/tbeploads/branch/main/graph/badge.svg)](https://codecov.io/gh/tbep-tech/tbeploads?branch=main)
+[![tbeploads status badge](https://tbep-tech.r-universe.dev/tbeploads/badges/version)](https://tbep-tech.r-universe.dev/tbeploads)
 <!-- badges: end -->
   
 R Package for estimating nutrient loading to Tampa Bay.
