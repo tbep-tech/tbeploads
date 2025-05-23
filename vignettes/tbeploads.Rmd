@@ -146,3 +146,24 @@ anlz_ad(ad_rain, vernafl)
 ```
 
 Results can be summarized by segment, baywide, monthly, or annually using the `summ` and `summtime` arguments.  By default, loads are returned monthly for each segment.  Note that Boca Ciega Bay and Boca Ciega Bay South results are returned separately.  Only Boca Ciega Bay South is used when estimating total bay loads. 
+
+### NPS
+
+Two processes - gauged locations and ungauged locatoins. 
+
+#### Gauged locations
+
+1. Get flow data - three sites from external sources, 15 from USGS download
+
+```r
+pth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
+extflo <- util_nps_getextflow(pth, loc = "LMANATEE")
+
+# tampa bypass
+pth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
+extflo <- util_nps_getextflow(pth, loc = "TBYPASS")
+
+# bell shoals
+pth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
+extflo <- util_nps_getextflow(pth, loc = "02301500")
+```
