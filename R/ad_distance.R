@@ -1,0 +1,23 @@
+#' Data frame of distances of segment locations to National Weather Service (NWS) sites
+#'
+#' Data frame of distances of segment locations to National Weather Service (NWS) sites
+#'
+#' @format A \code{data.frame}
+#'
+#' @details Used for estimating atmospheric deposition. The data frame contains the following columns:
+#'
+#' \itemize{
+#'  \item \code{segment}: Numeric identifier for the segment location
+#'  \item \code{seg_x}: Numeric value for the x-coordinate of the segment location (WGS 84, UTM Zone 17N, CRS 32617)
+#'  \item \code{seg_y}: Numeric value for the y-coordinate of the segment location (WGS 84, UTM Zone 17N, CRS 32617)
+#'  \item \code{matchsit}: Numeric for the NWS site that matches the segment location
+#'  \item \code{distance}: Numeric value for the distance (m) between the segment coordinate and NWS site
+#'  \item \code{invdist2}: Numeric value for the inverse distance squared (1/m^2) between the segment coordinate and NWS site
+#'  \item \code{area}: Numeric value for the area of the segment (ha)
+#'}
+#'
+#'Segment numbers are 1-7 for Old Tampa Bay, Hillsborough Bay, Middle Tampa Bay, Lower Tampa Bay, Boca Ciega Bay, Terra Ceia Bay, and Manatee River.
+#'
+#' @examples
+#' ad_distance
+"ad_distance"

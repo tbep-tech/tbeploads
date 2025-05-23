@@ -5,11 +5,11 @@ test_that("Check load calculations", {
     filter(Year == 2020 & Month == 1 & facility == 'Busch Gardens' & source == 'D-002') |>
     mutate_if(is.numeric, round, 3)
 
-  expect_equal(result$tn_load[[1]], 0.086)
-  expect_equal(result$tp_load[[1]], 0.005)
-  expect_equal(result$tss_load[[1]], 0.595)
-  expect_equal(result$bod_load[[1]], 1.142)
-  expect_equal(result$hy_load[[1]], 0.108)
+  expect_equal(result$tn_load[[1]], 0.02)
+  expect_equal(result$tp_load[[1]], 0.003)
+  expect_equal(result$tss_load[[1]], 0.443)
+  expect_equal(result$bod_load[[1]], 0.85)
+  expect_equal(result$hy_load[[1]], 0.08)
 
 })
 

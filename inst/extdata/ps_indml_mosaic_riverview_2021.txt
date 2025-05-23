@@ -1,2 +1,2 @@
 Facility.Name	Year	tn_tonsyr
-Mosaic Riverview	2021	0.986666666666667
+Mosaic Riverview	2021	0.989439753566114
