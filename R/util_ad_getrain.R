@@ -122,7 +122,7 @@ util_ad_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FAL
     return(NULL)
 
   # station and stationid crosswalk
-  stations <- tibble(
+  stations <- tibble::tibble(
     station = station,
     stationid = stationid
   )

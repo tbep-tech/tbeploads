@@ -2,8 +2,8 @@
 test_that("Check load calculations", {
 
   result <- ips |>
-    filter(Year == 2020 & Month == 1 & facility == 'Busch Gardens' & source == 'D-002') |>
-    mutate_if(is.numeric, round, 3)
+    dplyr::filter(Year == 2020 & Month == 1 & facility == 'Busch Gardens' & source == 'D-002') |>
+    dplyr::mutate_if(is.numeric, round, 3)
 
   expect_equal(result$tn_load[[1]], 0.02)
   expect_equal(result$tp_load[[1]], 0.003)

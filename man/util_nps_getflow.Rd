@@ -16,14 +16,20 @@ util_nps_getflow(pth1, pth2, pth3, yrrng = c(2021, 2023))
 \item{yrrng}{vector of two integers, the year range for which to retrieve flow data. Default is c(2021, 2023).}
 }
 \value{
-A data frame of monthly mean flow
+A data frame of monthly mean flow or fifteen USGS stations and three external flow sites
 }
 \description{
 Get flow data from for NPS calculations at gaged sites
 }
+\details{
+Missing flow values are linearly interpolated using \code{\link[zoo]{na.approx}}.
+}
 \examples{
 pth1 <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
 pth2 <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
-pth2 <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
+pth3 <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 allflo <- util_nps_getflow(pth1, pth2, pth3)
+}
+\seealso{
+\code{\link{util_nps_getextflow}}, \code{\link{util_nps_getusgsflow}}
 }

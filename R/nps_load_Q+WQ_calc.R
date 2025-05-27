@@ -10,18 +10,18 @@
 #
 # ## This section begins import of daily discharge data for select tributary sites
 #
-# lman <- read_xlsx("./data-raw/MAN_CO/Daily Discharge 2021-2023.xlsx") %>%
+# lman <- read_xlsx("inst/extdata/nps_extflow_lakemanatee.xlsx") %>%
 #                 rename(date = 1, flow_cfs = 2) %>%
 #                 mutate(site_no = "LMANATEE") %>%
 #                 select(site_no, date, flow_cfs)
 #
-# s160 <- read_xlsx("./data-raw/TBW/TBW Device ID 957 Data (2021-2023).xlsx") %>%
+# s160 <- read_xlsx("inst/extdata/nps_extflow_tampabypass.xlsx") %>%
 #                 rename(date = MeasureDateTime) %>%
 #                 mutate(site_no = "TBYPASS",
 #                        flow_cfs = round(Value*1.53723, digits = 4)) %>%
 #                 select(site_no, date, flow_cfs)
 #
-# TBW_BellSHWD <- read_xls("./data-raw/SWFWMD_REG/Withdrawal_Pumpage_Report_TBW-AR-BS.xls", sheet = "Pumpage") %>%  #SWFWMD WMIS Pumpage Reports for Permit 11794 OR Optional: You can substitute TBW reported withdrawals for Site 4626 here instead (Cathleen Jonas, cjonas@tampabaywater.org)
+# TBW_BellSHWD <- read_xls("inst/extdata/nps_extflow_bellshoals.xls", sheet = "Pumpage") %>%  #SWFWMD WMIS Pumpage Reports for Permit 11794 OR Optional: You can substitute TBW reported withdrawals for Site 4626 here instead (Cathleen Jonas, cjonas@tampabaywater.org)
 #                   filter(`DID#` == 1) %>%
 #                   rename(date = `RECORDED DATE`) %>%
 #                   mutate(site_no = "02301500",
@@ -64,7 +64,7 @@
 #                        mutate(flow_cfs = zoo::na.approx(flow_cfs), .by = site_no) %>%       # Linear interpolate missing daily values
 #                        arrange(site_no, date) %>%
 #                        select(basin, date, yr, mo, flow_cfs, wd_cfs)
-#
+
 # check_plots <- new_flow_corrected %>%
 #               ggplot(aes(x = date, y = flow_cfs)) +
 #                 geom_line() +

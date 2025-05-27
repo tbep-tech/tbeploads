@@ -5,8 +5,12 @@
 #' @param pth3 character, path to the file containing the Bell shoals data
 #' @param yrrng vector of two integers, the year range for which to retrieve flow data. Default is c(2021, 2023).
 #'
-#' @returns A data frame of monthly mean flow
+#' @returns A data frame of monthly mean flow or fifteen USGS stations and three external flow sites
 #' @export
+#'
+#' @details Missing flow values are linearly interpolated using \code{\link[zoo]{na.approx}}.
+#'
+#' @seealso \code{\link{util_nps_getextflow}}, \code{\link{util_nps_getusgsflow}}
 #'
 #' @examples
 #' pth1 <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
@@ -21,7 +25,7 @@ util_nps_getflow <- function(pth1, pth2, pth3, yrrng = c(2021, 2023)){
   blsh <- util_nps_getextflow(pth3, '02301500', yrrng = yrrng)
 
   # usgs api flow data
-  yrrng <- as.Date(paste0(yrrng, '-01-01'))
+  yrrng <- as.Date(c(paste0(yrrng[1], '-01-01'), paste0(yrrng[2], '-12-31')))
   intflo <- util_nps_getusgsflow(yrrng = yrrng)
 
   # combine all
@@ -48,15 +52,9 @@ util_nps_getflow <- function(pth1, pth2, pth3, yrrng = c(2021, 2023)){
     dplyr::mutate(flow_cfs = zoo::na.approx(flow_cfs), .by = site_no) |>  # Linear interpolate missing daily values
     dplyr::select(basin, date, yr, mo, flow_cfs, wd_cfs)
 
-  # check_plots <- new_flow_corrected |>
-  #   ggplot(aes(x = date, y = flow_cfs)) +
-  #   geom_line() +
-  #   facet_wrap(~ basin, scales = "free")
-  # check_plots
-
   # get monthly means
   out <- new_flow_corrected |>
-    summarise(
+    dplyr::summarise(
       flow_cfs = mean(flow_cfs),
       .by = c(basin, yr, mo)
     )

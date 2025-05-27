@@ -39,7 +39,7 @@ util_nps_getextflow <- function(pth, loc, yrrng = c(2021, 2023)){
   # lake manatee
   if(loc == 'LMANATEE'){
 
-    out <- readxl::read_xlsx(pth) |>
+    out <- suppressMessages(readxl::read_xlsx(pth)) |>
       dplyr::rename(date = 1, flow_cfs = 2) |>
       dplyr::mutate(site_no = "LMANATEE")
 
@@ -48,7 +48,7 @@ util_nps_getextflow <- function(pth, loc, yrrng = c(2021, 2023)){
   # tampa bypass
   if(loc == 'TBYPASS'){
 
-    out <- readxl::read_xlsx(pth) |>
+    out <- suppressMessages(readxl::read_xlsx(pth)) |>
       dplyr::rename(date = MeasureDateTime) |>
       dplyr::mutate(site_no = "TBYPASS",
            flow_cfs = round(Value*1.53723, digits = 4))
@@ -58,7 +58,7 @@ util_nps_getextflow <- function(pth, loc, yrrng = c(2021, 2023)){
   # bell shoals
   if(loc == '02301500'){
 
-    out <- readxl::read_xls(pth, sheet = "Pumpage") |>
+    out <- suppressMessages(readxl::read_xls(pth, sheet = "Pumpage")) |>
       dplyr::filter(`DID#` == 1) |>
       dplyr::rename(date = `RECORDED DATE`) |>
       dplyr::mutate(
