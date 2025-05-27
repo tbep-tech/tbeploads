@@ -36,7 +36,8 @@ Imports:
   purrr,
   rnoaa,
   tibble,
-  tidyr
+  tidyr, 
+  zoo
 LazyData: true
 LazyDataCompression: xz
 VignetteBuilder: knitr

@@ -31,6 +31,15 @@ External data can be obtained as follows:
 System files are included in the package which can be updated annually.
 }
 \examples{
+# lake manatee
+pth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
+extflo <- util_nps_getextflow(pth, loc = "LMANATEE")
+
+# tampa bypass
+pth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
+extflo <- util_nps_getextflow(pth, loc = "TBYPASS")
+
+# bell shoals
 pth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 extflo <- util_nps_getextflow(pth, loc = "02301500")
 }
