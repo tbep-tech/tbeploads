@@ -149,21 +149,18 @@ Results can be summarized by segment, baywide, monthly, or annually using the `s
 
 ### NPS
 
-Two processes - gauged locations and ungauged locatoins. 
+Two processes - gauged locations and ungauged locations. 
 
 #### Gauged locations
 
 1. Get flow data - three sites from external sources, 15 from USGS download
 
 ```r
-pth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
-extflo <- util_nps_getextflow(pth, loc = "LMANATEE")
+# lake manatee, tampa bypass, bell shoals
+pth1 <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
+pth2 <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
+pth3 <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 
-# tampa bypass
-pth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
-extflo <- util_nps_getextflow(pth, loc = "TBYPASS")
-
-# bell shoals
-pth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
-extflo <- util_nps_getextflow(pth, loc = "02301500")
+# get flows
+flos <- util_nps_getflow(pth1, pth2, pth3, yrrng = c(2021, 2023))
 ```

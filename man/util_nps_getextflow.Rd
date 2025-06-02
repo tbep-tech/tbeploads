@@ -24,7 +24,7 @@ External data can be obtained as follows:
 
 \itemize{
 \item LMANATEE: Lake Manatee flow for the Manatee River dam, from Manatee County Utilities, input flow is cfs.
-\item TBYPASS: Tampa Bypass Canal flow from Tampa Bay Water.  Input flow is MGD and is converted to cfs.
+\item TBYPASS: Tampa Bypass Canal flow from Tampa Bay Water.  Input flow is MGD and is converted to cfs (TBW contact is Cathleen Jonas, \href{mailto:cjonas@tampabaywater.org}{cjonas@tampabaywater.org}).
 \item 02301500: Alafia River Bell Shoals flow data from SWFWMD WMIS Pumpage Reports for Permit 11794 or optionally from Tampa Bay Water reported withdrawals for Site 4626 (Cathleen Jonas, \href{mailto:cjonas@tampabaywater.org}{cjonas@tampabaywater.org}).  Input flow from latter is daily average converted to cfs.
 }
 
