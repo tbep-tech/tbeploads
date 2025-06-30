@@ -4,14 +4,14 @@
 \alias{util_nps_getflow}
 \title{Get flow data from for NPS calculations at gaged sites}
 \usage{
-util_nps_getflow(pth1, pth2, pth3, yrrng = c(2021, 2023))
+util_nps_getflow(lakemanpth, tampabypth, bellshlpth, yrrng = c(2021, 2023))
 }
 \arguments{
-\item{pth1}{character, path to the file containing the Lake Manatee flow data}
+\item{lakemanpth}{character, path to the file containing the Lake Manatee flow data}
 
-\item{pth2}{character, path to the file containing the Tampa Bypass flow data}
+\item{tampabypth}{character, path to the file containing the Tampa Bypass flow data}
 
-\item{pth3}{character, path to the file containing the Bell shoals data}
+\item{bellshlpth}{character, path to the file containing the Bell shoals data}
 
 \item{yrrng}{vector of two integers, the year range for which to retrieve flow data. Default is c(2021, 2023).}
 }
@@ -22,13 +22,13 @@ A data frame of monthly mean flow or fifteen USGS stations and three external fl
 Get flow data from for NPS calculations at gaged sites
 }
 \details{
-Missing flow values are linearly interpolated using \code{\link[zoo]{na.approx}}.
+Missing flow values are linearly interpolated using \code{\link[zoo]{na.approx}}.  The function combines external and USGS API flow data using the \code{util_nps_getextflow} and \code{util_nps_getusgsflow} functions.
 }
 \examples{
-pth1 <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
-pth2 <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
-pth3 <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
-allflo <- util_nps_getflow(pth1, pth2, pth3)
+lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
+tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
+bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
+allflo <- util_nps_getflow(lakemanpth, tampabypth, bellshlpth)
 }
 \seealso{
 \code{\link{util_nps_getextflow}}, \code{\link{util_nps_getusgsflow}}

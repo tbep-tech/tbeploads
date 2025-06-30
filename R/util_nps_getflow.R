@@ -1,28 +1,28 @@
 #' Get flow data from for NPS calculations at gaged sites
 #'
-#' @param pth1 character, path to the file containing the Lake Manatee flow data
-#' @param pth2 character, path to the file containing the Tampa Bypass flow data
-#' @param pth3 character, path to the file containing the Bell shoals data
+#' @param lakemanpth character, path to the file containing the Lake Manatee flow data
+#' @param tampabypth character, path to the file containing the Tampa Bypass flow data
+#' @param bellshlpth character, path to the file containing the Bell shoals data
 #' @param yrrng vector of two integers, the year range for which to retrieve flow data. Default is c(2021, 2023).
 #'
 #' @returns A data frame of monthly mean flow or fifteen USGS stations and three external flow sites
 #' @export
 #'
-#' @details Missing flow values are linearly interpolated using \code{\link[zoo]{na.approx}}.
+#' @details Missing flow values are linearly interpolated using \code{\link[zoo]{na.approx}}.  The function combines external and USGS API flow data using the `util_nps_getextflow` and `util_nps_getusgsflow` functions.
 #'
 #' @seealso \code{\link{util_nps_getextflow}}, \code{\link{util_nps_getusgsflow}}
 #'
 #' @examples
-#' pth1 <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
-#' pth2 <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
-#' pth3 <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
-#' allflo <- util_nps_getflow(pth1, pth2, pth3)
-util_nps_getflow <- function(pth1, pth2, pth3, yrrng = c(2021, 2023)){
+#' lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
+#' tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
+#' bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
+#' allflo <- util_nps_getflow(lakemanpth, tampabypth, bellshlpth)
+util_nps_getflow <- function(lakemanpth, tampabypth, bellshlpth, yrrng = c(2021, 2023)){
 
   # external files
-  lman <- util_nps_getextflow(pth1, 'LMANATEE', yrrng = yrrng)
-  s160 <- util_nps_getextflow(pth2, 'TBYPASS', yrrng = yrrng)
-  blsh <- util_nps_getextflow(pth3, '02301500', yrrng = yrrng)
+  lman <- util_nps_getextflow(lakemanpth, 'LMANATEE', yrrng = yrrng)
+  s160 <- util_nps_getextflow(tampabypth, 'TBYPASS', yrrng = yrrng)
+  blsh <- util_nps_getextflow(bellshlpth, '02301500', yrrng = yrrng)
 
   # usgs api flow data
   yrrng <- as.Date(c(paste0(yrrng[1], '-01-01'), paste0(yrrng[2], '-12-31')))

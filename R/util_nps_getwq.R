@@ -85,8 +85,9 @@ util_nps_getwq <- function(yrrng = c('2021-01-01', '2023-12-31'), mancopth = NUL
       date = as.Date(lubridate::mdy_hms(activityStartDate)),
       tn_mgl = tkn_mgl + nox_mgl
     ) |>
-    dplyr::filter(date >= as.Date(paste0(yrrng[1], '-01-01')) &
-                    date <= as.Date(paste0(yrrng[2] , '-12-31'))) |>
+    dplyr::filter(date >= as.Date(yrrng[1]) &
+                    date <= as.Date(yrrng[2])
+    ) |>
     dplyr::select(station, date, tn_mgl, tp_mgl, tss_mgl) |>
     dplyr::arrange(station, date)
 
@@ -133,7 +134,12 @@ util_nps_getwq <- function(yrrng = c('2021-01-01', '2023-12-31'), mancopth = NUL
       yr = lubridate::year(date),
       mo = lubridate::month(date)
     ) |>
-    dplyr::select(basin, yr, mo, tn_mgl, tp_mgl, tss_mgl, bod_mgl)
+    dplyr::select(basin, yr, mo, tn_mgl, tp_mgl, tss_mgl, bod_mgl) |>
+    dplyr::arrange(basin, yr, mo) |>
+    dplyr::filter(basin %in% c("02300500", "02300700", "02301500", "02301750",
+                               "02304500", "02306647", "02307000", "EVERSRES",
+                               "LMANATEE", "LTARPON", "TBYPASS")
+    )
 
   return(out)
 
