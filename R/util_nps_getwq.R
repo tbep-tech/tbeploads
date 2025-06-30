@@ -1,32 +1,67 @@
 #' Get water quality data for NPS gaged flows
 #'
 #' @param yrrng A vector of two dates in 'YYYY-MM-DD' format, specifying the date range to retrieve flow data. Default is from '2021-01-01' to '2023-12-31'.
+#' @param mancopth character, path to the Manatee County water quality data file, see details
+#' @param pincopth character, path to the Pinellas County water quality data file, see details
 #' @param verbose logical indicating whether to print verbose output
 #'
 #' @importFrom tbeptools read_importepc
 #'
 #' @returns A data frame of water quality data for Manatee, Pinellas, and Hillsborough County
 #'
-#' @details Manatee and Pinellas County data is retrieved from the FDEP WIN database using \code{\link[tbeptools]{read_importwqwin}}.  Hillsborough County data is retrieved using \code{\link[tbeptools]{read_importwq}}.
+#' @details If \code{mancopth} or \code{pincopth} are \code{NULL}, Manatee and Pinellas County data are retrieved from the FDEP WIN database using \code{\link[tbeptools]{read_importwqwin}}.  Hillsborough County data is retrieved using \code{\link[tbeptools]{read_importwq}}. If \code{mancopth} or \code{pincopth} are not \code{NULL}, then data are imported from disk using the path specified. Data from the Environmental Protection Commission (EPC) of Hillsborough County are imported using \code{read_importepc} from the tbeptools R package.
+#'
+#' Local data files can be downloaded from the FDEP WIN database at <https://prodenv.dep.state.fl.us/DearWin/public/wavesSearchFilter?calledBy=menu>, using filters for 21FLMANA and 21FLPDEM for Manatee and Pinellas County, respectively. Activity start and end dates are bounded by the values in \code{yrrng}.  Chosen analytes are Nitrate-Nitrite (N), Nitrogen- Total Kjeldahl, Phosphorus- Total, and Residues- Nonfilterable (TSS). Chosen stations are ER2 and UM2 for Manatee County and station 06-06 for Pinellas County.  EPC stations retained are 105, 113, 114, 132, 141, 138, 142, and 147.
+#'
+#' The data are filtered to include only the following analytes: "Nitrate-Nitrite (N)", "Nitrogen- Total Kjeldahl", "Phosphorus- Total", and "Residues- Nonfilterable (TSS)". The units for all analytes are assumed to be mg/L.
+#'
 #' @export
 #'
 #' @examples
 #' \dontrun{
+#' # import from WIN
 #' wqdat <- util_nps_getwq(c('2021-01-01', '2023-12-31'))
+#'
+#' # use system files
+#' mancopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
+#' pincopth <- system.file('extdata/nps_wq_pinco.txt', package = 'tbeploads')
+#' wqdat <- util_nps_getwq(c('2021-01-01', '2023-12-31'), mancopth = mancopth, pincopth = pincopth)
 #' }
-util_nps_getwq <- function(yrrng = c('2021-01-01', '2023-12-31'), verbose = TRUE){
+util_nps_getwq <- function(yrrng = c('2021-01-01', '2023-12-31'), mancopth = NULL, pincopth = NULL, verbose = TRUE){
 
   if(verbose)
     cat('Retrieving Manatee County data...\n')
 
   # manatee
-  mancoraw <- tbeptools::read_importwqwin(yrrng[1], yrrng[2], '21FLMANA', verbose = verbose)
+  if(is.null(mancopth)){
+    mancoraw <- tbeptools::read_importwqwin(yrrng[1], yrrng[2], '21FLMANA', verbose = verbose)
+  } else {
+    mancoraw <- read.table(mancopth, sep = '|', header = TRUE, stringsAsFactors = FALSE, skip = 8) |>
+      dplyr::rename(
+        monitoringLocId = Monitoring.Location.ID,
+        activityStartDate = Activity.Start.Date.Time,
+        depAnalytePrimaryName = DEP.Analyte.Name,
+        depResultValue = DEP.Result.Value.Number,
+        depResultUnit = DEP.Result.Unit
+        )
+  }
 
   if(verbose)
     cat('Retreiving Pinellas County data...\n')
 
   # pinellas
-  pincoraw <- tbeptools::read_importwqwin(yrrng[1], yrrng[2], '21FLPDEM', verbose = verbose)
+  if(is.null(pincopth)){
+    pincoraw <- tbeptools::read_importwqwin(yrrng[1], yrrng[2], '21FLPDEM', verbose = verbose)
+  } else {
+    pincoraw <- read.table(pincopth, sep = '|', header = TRUE, stringsAsFactors = FALSE, skip = 8) |>
+      dplyr::rename(
+        monitoringLocId = Monitoring.Location.ID,
+        activityStartDate = Activity.Start.Date.Time,
+        depAnalytePrimaryName = DEP.Analyte.Name,
+        depResultValue = DEP.Result.Value.Number,
+        depResultUnit = DEP.Result.Unit
+      )
+  }
 
   # combine manatee and pinellas
   codat <- dplyr::bind_rows(mancoraw, pincoraw) |>
@@ -34,7 +69,7 @@ util_nps_getwq <- function(yrrng = c('2021-01-01', '2023-12-31'), verbose = TRUE
     dplyr::filter(monitoringLocId %in% c('ER2', 'UM2', '06-06'))
 
   # make sure units are mg/L
-  stopifnot(unique(codat$depResultUnit) == "mg/L")
+  stopifnot(any(codat$depResultUnit %in% c("", "mg/L")))
 
   # process remaining manco, pinco
   codat <- codat |>
@@ -50,6 +85,8 @@ util_nps_getwq <- function(yrrng = c('2021-01-01', '2023-12-31'), verbose = TRUE
       date = as.Date(lubridate::mdy_hms(activityStartDate)),
       tn_mgl = tkn_mgl + nox_mgl
     ) |>
+    dplyr::filter(date >= as.Date(paste0(yrrng[1], '-01-01')) &
+                    date <= as.Date(paste0(yrrng[2] , '-12-31'))) |>
     dplyr::select(station, date, tn_mgl, tp_mgl, tss_mgl) |>
     dplyr::arrange(station, date)
 
