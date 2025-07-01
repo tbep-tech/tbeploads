@@ -6,7 +6,6 @@
 # library(esri2sf) # yonghah/esri2sf on github
 # library(tbeptools)
 # library(zoo)
-# #library(FedData)
 # library(httr)
 # library(units)
 # library(sjlabelled)
@@ -16,108 +15,25 @@
 #
 # noaa_key <- Sys.getenv('NOAA_KEY')
 #
-# ## Begin TBEP subbasin, TBNMC jurisdictions, DISTRICT landuse, and SSURGO Soils GIS merge
-# ## Ignore this for now as the R union process to join all these layers isn't working
-# ## Circumvented by developing a tb_base.shp file within ArcGIS using these layer source files
-# ## Note: tb_juris.shp file contains geometry/projection errors for municipalities in Pinellas County
-#
-# # NAD83(2011) / Florida West (ftUS)
-# # this is the projection used in original report
+## Begin TBEP subbasin, TBNMC jurisdictions, DISTRICT landuse, and SSURGO Soils GIS merge
+## Ignore this for now as the R union process to join all these layers isn't working
+## Circumvented by developing a tb_base.shp file within ArcGIS using these layer source files
+## Note: tb_juris.shp file contains geometry/projection errors for municipalities in Pinellas County
+
+# NAD83(2011) / Florida West (ftUS)
+# this is the projection used in original report
 # prj <- 6443
 #
-# tb_fullshed <- st_read("./data-raw/TBEP/gis/TBEP_Watershed_Correct_Projection.shp") %>%
-#   st_transform(prj) %>%
-#   st_union(by_feature = T) %>%
-#   st_buffer(dist = 0) %>%
-#   dplyr::select(Name, Hectares)
+# data(tbfullshed)
+# data(tbshed)
+# data(tbjuris)
+# data(tblu2020)
+# data(tblu2023)
 #
-# tbep_bb <- st_bbox(tb_fullshed)
-#
-# tbshed <- st_read("./data-raw/TBEP/gis/TBEP_dBasins_FIPS0902_Projection.shp") %>%
-#   st_transform(prj) %>%
-# #  st_union(by_feature = T) %>%
-#   st_buffer(dist = 0) %>%
-#   group_by(BAY_SEGMEN, NEWGAGE, DRNFEATURE) %>%
-#   summarise() %>%
-#   rename(bay_seg = BAY_SEGMEN,
-#          basin = NEWGAGE,
-#          drnfeat = DRNFEATURE) %>%
-#   arrange(bay_seg, basin, drnfeat)
-#
-# tbjuris <- st_read("./data-raw/TBEP/gis/TB_Juris.shp") %>%
-#   st_transform(prj) %>%
-# #  st_union(by_feature = T) %>%
-#   st_buffer(dist = 0) %>%
-#   rename(entity = NAME_FINAL) %>%
-#   select(entity)
-#
-# # Download latest DISTRICT LULC zip file and subset accordingly
-# tblu2020 <- st_read("./data-raw/SWFWMD_REG/lulc2020/LANDUSELANDCOVER2020.shp") %>%
-#   st_transform(prj) %>%
-#   st_intersection(tb_fullshed) %>%
-# #  st_union(by_feature = T) %>%
-#   st_buffer(dist = 0) %>%
-#   group_by(FLUCCSCODE, FLUCSDESC) %>%
-#   summarise()
-#
-# #
-# ## Alternatively, begin download of SWFWMD soil and lulc data, constructed from their ArcGIS REST URL and the TBEP bounding box parameters above
-#
-# # soil_url <- "https://www25.swfwmd.state.fl.us/arcgis12/rest/services/BaseVector/Soils/MapServer/0/query"
-# # lulc2020_url <- "https://www25.swfwmd.state.fl.us/arcgis12/rest/services/OpenData/LandUseLandCoverPost2014/MapServer/2/query"
-#
-# # params <- list(
-# #   f = "json", # Response format
-# #   geometryType = "esriGeometryEnvelope", # Bounding box geometry type
-# #   geometry = paste0('{"xmin":', tbep_bb[1], ',"ymin":', tbep_bb[2], ',"xmax":', tbep_bb[3], ',"ymax":', tbep_bb[4], '}'),
-# #   spatialRel = "esriSpatialRelIntersects", # Spatial relationship
-# #   outFields = "muid, hydgrp", # Fields to include in the response
-# #   returnGeometry = T # Return geometry information
-# #  )
-#
-# # Make the API request to SWFWMD servers
-# # soil_response <- GET(soil_url, query = params)
-# # lulc_response <- GET(lulc2020_url, query = params)
-#
-# # Download the data
-# # tbsoil_raw <- fromJSON(content(soil_response, "text", encoding = "UTF-8"))
-# # tblu2020_raw <- fromJSON(content(lulc_response, "text", encoding = "UTF-8"))
-#
-# #  tbsoil <- tbsoil_raw$hydgrp %>%
-# #            st_transform(prj) %>%
-# #            st_intersection(tb_fullshed) %>%
-# #            st_union(by_feature = T)
-#
-# ## Alternatively, download directly from USDA-NRCS, requires library(FedData) -- I couldn't get this fully working
-#
-# # tbsoil_raw2 <- get_ssurgo(template = c("FL057", "FL081", "FL101", "FL103", "FL105", "FL115"),
-# #                     label = "TBEP_Watershed",
-# #                     raw.dir = paste0(tempdir(), "./data-raw/USDA/raw/ssurgo"),
-# #                     extraction.dir = paste0("./data-raw/USDA/"),
-# #                     force.redo = F)
-#
-# # tbsoil2 <-  tbsoil_raw2$spatial
-# # soilclass <- tbsoil_raw2$tabular$mus
-# #              st_as_sfc(tbsoil_raw2[["tabular"]][["component"]][["hydgrp"]]) %>%
-# #              st_transform(prj) %>%
-# #              st_buffer(dist = 0) %>%
-# #              st_intersection(tb_fullshed) %>%
-# #              st_union(by_feature = T)
-# #
-# ## End optional download from USDA -- I couldn't figure out how to get to a muid or HSG from the databases downloaded
-#
-# ## Alternatively, download directly from ArcGIS REST Services and convert to shapefile from here: https://www.arcgis.com/home/item.html?id=be2124509b064754875b8f0d6176cc4c
-#
-# tb_soils <- st_read("./data-raw/TBEP/gis/USDA_SSURGO_CLIP_FIPS0902.shp") %>%
-#               st_transform(prj) %>%
-#               st_intersection(tb_fullshed) %>%
-#               #  st_union(by_feature = T) %>%
-#               st_buffer(dist = 0) %>%
-#               rename(hydrgrp = SDV_Hydr_1) %>%
-#               group_by(hydrgrp) %>%
-#               summarise()
-# ##End raw GIS layer inputs
-#
+# # Alternatively, begin download of SWFWMD soil and lulc data, constructed from their ArcGIS REST URL and the TBEP bounding box parameters above
+
+##End raw GIS layer inputs
+
 # ## Union not working in R, so imported GIS layer from ArcGIS union instead ...
 # #tb_base <- st_union(tbshed, tbjuris)
 # #tb_base1 <- st_union(tbshed, tbjuris) %>%
