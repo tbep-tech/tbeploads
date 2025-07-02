@@ -15,40 +15,39 @@
 #
 # noaa_key <- Sys.getenv('NOAA_KEY')
 #
-## Begin TBEP subbasin, TBNMC jurisdictions, DISTRICT landuse, and SSURGO Soils GIS merge
-## Ignore this for now as the R union process to join all these layers isn't working
-## Circumvented by developing a tb_base.shp file within ArcGIS using these layer source files
-## Note: tb_juris.shp file contains geometry/projection errors for municipalities in Pinellas County
-
-# NAD83(2011) / Florida West (ftUS)
-# this is the projection used in original report
+# # Begin TBEP subbasin, TBNMC jurisdictions, DISTRICT landuse, and SSURGO Soils GIS merge
+# # Ignore this for now as the R union process to join all these layers isn't working
+# # Circumvented by developing a tb_base.shp file within ArcGIS using these layer source files
+# # Note: tb_juris.shp file contains geometry/projection errors for municipalities in Pinellas County
+#
+# # NAD83(2011) / Florida West (ftUS)
+# # this is the projection used in original report
 # prj <- 6443
 #
 # data(tbfullshed)
-# data(tbshed)
+# data(tbsubshed)
 # data(tbjuris)
 # data(tblu2020)
 # data(tblu2023)
+# data(tbsoil)
 #
-# # Alternatively, begin download of SWFWMD soil and lulc data, constructed from their ArcGIS REST URL and the TBEP bounding box parameters above
-
-##End raw GIS layer inputs
-
-# ## Union not working in R, so imported GIS layer from ArcGIS union instead ...
-# #tb_base <- st_union(tbshed, tbjuris)
-# #tb_base1 <- st_union(tbshed, tbjuris) %>%
-# #            group_by(bay_seg, basin, drnfeat, entity) %>%
-# #            summarise()
-# #tb_base2 <- st_union(tb_base1, tblu2020) %>%
-# #            group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE) %>%
-# #            summarise()
-# #tb_base3 <- st_union(tb_base2, tb_soils) %>%
-# #            group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE, hydrgrp) %>%
-# #            summarise()
+# ##End raw GIS layer inputs
 #
-# #tb_base <- tb_base3 %>%
-# #              dplyr::mutate(FLUCCSCODE = replace_na(FLUCCSCODE,0),
-# #                            hydrgrp = replace_na(hydrgrp, "D"))
+# # Union not working in R, so imported GIS layer from ArcGIS union instead ...
+# tb_base <- st_union(tbsubshed, tbjuris)
+# tb_base1 <- st_union(tbsubshed, tbjuris) %>%
+#            group_by(bay_seg, basin, drnfeat, entity) %>%
+#            summarise()
+# tb_base2 <- st_union(tb_base1, tblu2020) %>%
+#            group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE) %>%
+#            summarise()
+# tb_base3 <- st_union(tb_base2, tb_soils) %>%
+#            group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE, hydrgrp) %>%
+#            summarise()
+#
+# tb_base <- tb_base3 %>%
+#              dplyr::mutate(FLUCCSCODE = replace_na(FLUCCSCODE,0),
+#                            hydrgrp = replace_na(hydrgrp, "D"))
 #
 # tb_base1 <- st_read("./data-raw/TBEP/gis/tb_base.shp") %>%
 #            st_transform(prj) %>%
@@ -56,6 +55,8 @@
 #            mutate(CLUCSID = case_when(FLUCCSCODE == 2100 ~ 10,
 #                                       TRUE ~ CLUCSID)) %>%
 #            summarise()
+#
+# tb_base <- readRDS('data/tb_base.rds')
 #
 # tb_base1$area_ha <- sf::st_area(tb_base1) * 0.000009290304 # Projection is in feet, converting to ha
 #

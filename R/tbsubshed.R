@@ -19,12 +19,11 @@
 #' \dontrun{
 #' prj <- 6443
 #'
-#' tbshed <- sf::st_read("./data-raw/TBEP/gis/TBEP_dBasins_Correct_Projection.shp") |>
+#' tbsubshed <- sf::st_read("./data-raw/TBEP/gis/TBEP_dBasins_Correct_Projection.shp") |>
 #'   sf::st_transform(prj) |>
 #'   sf::st_buffer(dist = 0) |>
 #'   dplyr::group_by(BAY_SEGMEN, NEWGAGE, DRNFEATURE) |>
-#'   dplyr::summarise() |>
-#'   dplyr::ungroup() |>
+#'   dplyr::summarise(geometry = sf::st_union(geometry), .groups = "drop") |>
 #'   dplyr::rename(
 #'     bay_seg = BAY_SEGMEN,
 #'     basin = NEWGAGE,
@@ -32,7 +31,7 @@
 #'   ) |>
 #'   dplyr::arrange(bay_seg, basin, drnfeat)
 #'
-#' save(tbshed, file = 'data/tbshed.RData', compress = 'xz')
+#' save(tbsubshed, file = 'data/tbsubshed.RData', compress = 'xz')
 #' }
-#' tbshed
-"tbshed"
+#' tbssubshed
+"tbsubshed"

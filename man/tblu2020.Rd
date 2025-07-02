@@ -26,6 +26,8 @@ Projection is NAD83(2011) / Florida West (ftUS), CRS 6443.
 }
 \examples{
 \dontrun{
+
+# import from local source
 prj <- 6443
 
 tblu2020 <- sf::st_read("T:/05_GIS/SWFWMD/LULC_2020/LANDUSELANDCOVER2020.shp") |>
@@ -35,6 +37,9 @@ tblu2020 <- sf::st_read("T:/05_GIS/SWFWMD/LULC_2020/LANDUSELANDCOVER2020.shp") |
   dplyr::group_by(FLUCCSCODE, FLUCSDESC) |>
   dplyr::summarise() |>
   dplyr::ungroup()
+
+# or use SWFWMD API
+tblu2020 <- util_nps_getswfwmd('lulc2020')
 
 save(tblu2020, file = 'data/tblu2020.RData', compress = 'xz')
 }
