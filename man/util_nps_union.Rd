@@ -2,18 +2,20 @@
 % Please edit documentation in R/util_nps_union.R
 \name{util_nps_union}
 \alias{util_nps_union}
-\title{Fast Spatial Intersection Union Using GDAL}
+\title{Fast Spatial Intersection and Union Using GDAL}
 \usage{
-util_nps_union(sf1, sf2, gdal_path = NULL, chunk_size = NULL)
+util_nps_union(sf1, sf2, gdal_path = NULL, chunk_size = NULL, cast = FALSE)
 }
 \arguments{
 \item{sf1}{An sf object containing polygons. All non-geometry columns will be preserved in the output}
 
 \item{sf2}{An sf object containing polygons. All non-geometry columns will be preserved in the output}
 
-\item{gdal_path}{Character string specifying the path to GDAL binaries (e.g., "C:/OSGeo4W/bin"). If NULL (default), assumes GDAL is in system PATH or uses sf's internal GDAL installation}
+\item{gdal_path}{Character string specifying the path to GDAL binaries (e.g., "C:/OSGeo4W/bin"). If NULL (default), assumes GDAL is in system PATH}
 
 \item{chunk_size}{Integer. For large datasets, process in chunks of this many features from sf1. Set to NULL (default) to process all at once}
+
+\item{cast}{Logical. If TRUE, will cast multipolygon geometries to polygons before processing. Default is FALSE, which keeps multipolygons as is (usually faster).}
 }
 \value{
 An sf object containing the spatial intersection of sf1 and sf2, with geometries unioned by unique combinations of all attributes from both input objects

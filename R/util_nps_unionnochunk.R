@@ -9,7 +9,7 @@
 #'
 #' @return An sf object containing the spatial intersection of sf1 and sf2, with geometries unioned by unique combinations of all attributes from both input objects.
 #'
-#' @example
+#' @examples
 #' \dontrun{
 #' data(tbjuris)
 #' data(tbsubshed)
@@ -75,7 +75,7 @@ util_nps_unionnochunk <- function(sf1, sf2) {
                        all_select, layer_names[1], layer_names[2],
                        first_sf1_col, first_sf2_col, all_group)
 
-  result_code <- system(sprintf('ogr2ogr -f "GPKG" "%s" "%s" -dialect SQLite -sql "%s"',
+  result_code <- system(sprintf('ogr2ogr -f "GPKG" -nlt PROMOTE_TO_MULTI "%s" "%s" -dialect SQLite -sql "%s"',
                                 temp_result, temp_combined, sql_query))
 
   if (result_code != 0) {

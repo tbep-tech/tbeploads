@@ -22,3 +22,10 @@ Helper function for union operation
 \details{
 Used internally by \code{\link{util_nps_union}}. See the help file for more details.
 }
+\examples{
+\dontrun{
+data(tbjuris)
+data(tbsubshed)
+result <- util_nps_unionchunk(tbsubshed, tbjuris)
+}
+}

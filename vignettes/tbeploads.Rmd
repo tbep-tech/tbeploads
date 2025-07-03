@@ -180,3 +180,23 @@ head(nps_gaged)
 ```
 
 #### Ungaged locations
+
+Steps:
+
+Update spatial data.
+
+```{r eval = F}
+tbluxxxx <- util_nps_getswfwmd('lulc2023')
+tbsoil <- util_nps_getswfwmd('soil')
+```
+
+Create tbbase if spatial data have changed (takes an hour or two).
+
+```{r eval = F}
+data(tbsubshed)
+data(tbjuris)
+data(tblu2020)
+data(tbsoil)
+tbbase <- util_nps_tbbase(tbsubshed, tbjuris, tblu2020, tbsoil, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
+```
+

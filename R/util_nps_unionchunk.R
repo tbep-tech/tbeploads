@@ -10,7 +10,7 @@
 #'
 #' @return An sf object containing the spatial intersection of sf1 and sf2, with geometries unioned by unique combinations of all attributes from both input objects.
 #'
-#' @example
+#' @examples
 #' \dontrun{
 #' data(tbjuris)
 #' data(tbsubshed)
@@ -25,7 +25,7 @@ util_nps_unionchunk <- function(sf1, sf2, chunk_size) {
     start_idx <- (i - 1) * chunk_size + 1
     end_idx <- min(i * chunk_size, nrow(sf1))
 
-    message("Processing chunk ", i, " of ", n_chunks, " (rows ", start_idx, "-", end_idx, ")")
+    cat(paste0("Processing chunk ", i, " of ", n_chunks, " (rows ", start_idx, " - ", end_idx, ")\n"))
 
     # Get chunk of sf1
     sf1_chunk <- sf1[start_idx:end_idx, ]

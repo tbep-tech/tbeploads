@@ -20,7 +20,7 @@ A simple features object for the relevant data, clipped by the Tampa Bay watersh
 Retrieve non-point source (NPS) supporting data from SWFWMD web services
 }
 \details{
-This function retrieves data from the SWFWMD web services for soils and land use/land cover (LULC) for the years 2020 and 2023. See available data at \url{https://www25.swfwmd.state.fl.us/arcgis12/rest/services/OpenData}.
+This function retrieves data from the SWFWMD web services for soils and land use/land cover (LULC) for the years 2020 and 2023. Soils data from \url{https://www25.swfwmd.state.fl.us/arcgis12/rest/services/BaseVector} and land use data from \url{https://www25.swfwmd.state.fl.us/arcgis12/rest/services/OpenData}.
 }
 \examples{
 \dontrun{

@@ -6,7 +6,7 @@
 #'
 #' @returns A simple features object for the relevant data, clipped by the Tampa Bay watershed boundary (\code{\link{tbfullshed}}).
 #'
-#' @details This function retrieves data from the SWFWMD web services for soils and land use/land cover (LULC) for the years 2020 and 2023. See available data at <https://www25.swfwmd.state.fl.us/arcgis12/rest/services/OpenData>.
+#' @details This function retrieves data from the SWFWMD web services for soils and land use/land cover (LULC) for the years 2020 and 2023. Soils data from <https://www25.swfwmd.state.fl.us/arcgis12/rest/services/BaseVector> and land use data from <https://www25.swfwmd.state.fl.us/arcgis12/rest/services/OpenData>.
 #'
 #' @export
 #'
