@@ -1,7 +1,5 @@
 # Helper function to create mock sf objects
 create_mock_sf <- function(coords = NULL, crs = 4326, id = 1) {
-  # Load required library
-  library(sf)
 
   # Handle vector of IDs - create multiple polygons
   if (length(id) > 1) {
@@ -62,8 +60,6 @@ create_mock_sf <- function(coords = NULL, crs = 4326, id = 1) {
 
 # Mock function to create a simple sf multipolygon object for unit testing
 create_mock_multisf <- function(n_polygons = 2, coords_list = NULL, crs = 4326, id = 1) {
-  # Load required library
-  library(sf)
 
   # Handle vector of IDs - create multiple multipolygons
   if (length(id) > 1) {
