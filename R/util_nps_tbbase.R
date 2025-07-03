@@ -30,6 +30,14 @@ util_nps_tbbase <- function(tbsubshed, tbjuris, tblu, tbsoil, gdal_path = NULL,
 
   str <- Sys.time()
 
+  # Ensure all inputs are sf objects
+  if (!all(inherits(tbsubshed, "sf"),
+           inherits(tbjuris, "sf"),
+           inherits(tblu, "sf"),
+           inherits(tbsoil, "sf"))) {
+    stop("All inputs must be sf objects.")
+  }
+
   # check all sf inputs have the right projection
   prj <- 6443 # NAD83(2011) / Florida West (ftUS)
   if (!all(sf::st_crs(tbsubshed)$epsg == prj,
@@ -37,12 +45,6 @@ util_nps_tbbase <- function(tbsubshed, tbjuris, tblu, tbsoil, gdal_path = NULL,
            sf::st_crs(tblu)$epsg == prj,
            sf::st_crs(tbsoil)$epsg == prj)) {
     stop("All inputs must have CRS of NAD83(2011) / Florida West (ftUS), EPSG:6443.")
-  }
-
-  # Ensure all inputs are sf objects
-  if (!inherits(tbsubshed, "sf") || !inherits(tbjuris, "sf") ||
-      !inherits(tblu, "sf") || !inherits(tbsoil, "sf")) {
-    stop("All inputs must be sf objects.")
   }
 
   if(verbose)
@@ -76,18 +78,19 @@ util_nps_tbbase <- function(tbsubshed, tbjuris, tblu, tbsoil, gdal_path = NULL,
       hydgrp = tidyr::replace_na(hydgrp, "D")
       ) |>
     sf::st_transform(prj) |>
-    dplyr::group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE, CLUCSID, IMPROVED, hydgrp) %>%
+    dplyr::group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE, CLUCSID, IMPROVED, hydgrp) |>
+    dplyr::summarise(.groups = 'drop')
+
+  out$area_ha <- as.numeric(sf::st_area(out) * 0.000009290304) # Convert from ft^2 to ha
+
+  out <- out |>
+    sf::st_drop_geometry() |>
     dplyr::mutate(
       CLUCSID = dplyr::case_when(
         FLUCCSCODE == 2100 ~ 10,
-        TRUE ~ CLUCSID)
-      ) |>
-    dplyr::summarise(.groups = 'drop') |>
-    dplyr::mutate(
-      area_ha = as.numeric(sf::st_area(geom) * 0.000009290304), # Convert from ft^2 to ha
+        TRUE ~ CLUCSID),
       drnfeat = ifelse(is.na(drnfeat), "CON", drnfeat)
-    ) |>
-    sf::st_drop_geometry()
+    )
 
   dif <- capture.output(Sys.time() - str)
   if(verbose)
