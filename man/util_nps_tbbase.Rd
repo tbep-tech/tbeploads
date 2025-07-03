@@ -11,7 +11,8 @@ util_nps_tbbase(
   tbsoil,
   gdal_path = NULL,
   chunk_size = NULL,
-  cast = FALSE
+  cast = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -28,14 +29,17 @@ util_nps_tbbase(
 \item{chunk_size}{Integer. For large datasets, process in chunks of this many features. Set to NULL (default) to process all at once.  This applies only to the final union with the soils data.}
 
 \item{cast}{Logical. If TRUE, will cast multipolygon geometries to polygons before processing. Default is FALSE, which keeps multipolygons as is (usually faster).}
+
+\item{verbose}{Logical. If TRUE, will print progress messages. Default is TRUE.}
 }
 \value{
 A summarized data frame containing the union of all inputs showing major bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED, hydrologic group (hydgrp), and area in hectures.  These represent all relevant spatial combinations in the Tampa Bay watershed.
-
-Relies heavily on \code{\link{util_nps_union}} to perform the union operations efficiently using GDAL/OGR.
 }
 \description{
 Create unioned base layer for non-point source (NPS) ungaged load estimation in the Tampa Bay watershed
+}
+\details{
+Relies heavily on \code{\link{util_nps_union}} to perform the union operations efficiently using GDAL/OGR.  All input must have the CRS of NAD83(2011) / Florida West (ftUS), EPSG:6443.
 }
 \examples{
 \dontrun{

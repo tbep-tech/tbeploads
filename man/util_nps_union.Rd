@@ -4,7 +4,14 @@
 \alias{util_nps_union}
 \title{Fast Spatial Intersection and Union Using GDAL}
 \usage{
-util_nps_union(sf1, sf2, gdal_path = NULL, chunk_size = NULL, cast = FALSE)
+util_nps_union(
+  sf1,
+  sf2,
+  gdal_path = NULL,
+  chunk_size = NULL,
+  cast = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{sf1}{An sf object containing polygons. All non-geometry columns will be preserved in the output}
@@ -16,6 +23,8 @@ util_nps_union(sf1, sf2, gdal_path = NULL, chunk_size = NULL, cast = FALSE)
 \item{chunk_size}{Integer. For large datasets, process in chunks of this many features from sf1. Set to NULL (default) to process all at once}
 
 \item{cast}{Logical. If TRUE, will cast multipolygon geometries to polygons before processing. Default is FALSE, which keeps multipolygons as is (usually faster).}
+
+\item{verbose}{Logical. If TRUE, will print progress messages. Default is TRUE.}
 }
 \value{
 An sf object containing the spatial intersection of sf1 and sf2, with geometries unioned by unique combinations of all attributes from both input objects

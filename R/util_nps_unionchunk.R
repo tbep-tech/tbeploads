@@ -3,6 +3,7 @@
 #' @param sf1 First sf object
 #' @param sf2 Second sf object
 #' @param chunk_size Integer. For large datasets, process in chunks of this many features from sf1.
+#' @param verbose Logical. If TRUE, will print progress messages. Default is TRUE.
 #'
 #' @details Used internally by \code{\link{util_nps_union}}. See the help file for more details.
 #'
@@ -16,7 +17,7 @@
 #' data(tbsubshed)
 #' result <- util_nps_unionchunk(tbsubshed, tbjuris)
 #' }
-util_nps_unionchunk <- function(sf1, sf2, chunk_size) {
+util_nps_unionchunk <- function(sf1, sf2, chunk_size, verbose = TRUE) {
 
   n_chunks <- ceiling(nrow(sf1) / chunk_size)
   results <- list()
@@ -25,7 +26,8 @@ util_nps_unionchunk <- function(sf1, sf2, chunk_size) {
     start_idx <- (i - 1) * chunk_size + 1
     end_idx <- min(i * chunk_size, nrow(sf1))
 
-    cat(paste0("Processing chunk ", i, " of ", n_chunks, " (rows ", start_idx, " - ", end_idx, ")\n"))
+    if(verbose)
+      cat(paste0("Processing chunk ", i, " of ", n_chunks, " (rows ", start_idx, " - ", end_idx, ")\n"))
 
     # Get chunk of sf1
     sf1_chunk <- sf1[start_idx:end_idx, ]

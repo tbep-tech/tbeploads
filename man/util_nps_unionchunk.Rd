@@ -4,7 +4,7 @@
 \alias{util_nps_unionchunk}
 \title{Helper function for union operation}
 \usage{
-util_nps_unionchunk(sf1, sf2, chunk_size)
+util_nps_unionchunk(sf1, sf2, chunk_size, verbose = TRUE)
 }
 \arguments{
 \item{sf1}{First sf object}
@@ -12,6 +12,8 @@ util_nps_unionchunk(sf1, sf2, chunk_size)
 \item{sf2}{Second sf object}
 
 \item{chunk_size}{Integer. For large datasets, process in chunks of this many features from sf1.}
+
+\item{verbose}{Logical. If TRUE, will print progress messages. Default is TRUE.}
 }
 \value{
 An sf object containing the spatial intersection of sf1 and sf2, with geometries unioned by unique combinations of all attributes from both input objects.

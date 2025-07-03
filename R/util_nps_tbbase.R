@@ -7,10 +7,12 @@
 #' @param gdal_path Character string specifying the path to GDAL binaries (e.g., "C:/OSGeo4W/bin"). If NULL (default), assumes GDAL is in system PATH.
 #' @param chunk_size Integer. For large datasets, process in chunks of this many features. Set to NULL (default) to process all at once.  This applies only to the final union with the soils data.
 #' @param cast Logical. If TRUE, will cast multipolygon geometries to polygons before processing. Default is FALSE, which keeps multipolygons as is (usually faster).
+#' @param verbose Logical. If TRUE, will print progress messages. Default is TRUE.
 #'
 #' @returns A summarized data frame containing the union of all inputs showing major bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED, hydrologic group (hydgrp), and area in hectures.  These represent all relevant spatial combinations in the Tampa Bay watershed.
 #'
-#' Relies heavily on \code{\link{util_nps_union}} to perform the union operations efficiently using GDAL/OGR.
+#' @details
+#' Relies heavily on \code{\link{util_nps_union}} to perform the union operations efficiently using GDAL/OGR.  All input must have the CRS of NAD83(2011) / Florida West (ftUS), EPSG:6443.
 #'
 #' @export
 #'
@@ -24,9 +26,18 @@
 #' result <- util_nps_tbbase(tbsubshed, tbjuris, tblu2020, tbsoil, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
 #' }
 util_nps_tbbase <- function(tbsubshed, tbjuris, tblu, tbsoil, gdal_path = NULL,
-                            chunk_size = NULL, cast = FALSE) {
+                            chunk_size = NULL, cast = FALSE, verbose = TRUE) {
 
   str <- Sys.time()
+
+  # check all sf inputs have the right projection
+  prj <- 6443 # NAD83(2011) / Florida West (ftUS)
+  if (!all(sf::st_crs(tbsubshed)$epsg == prj,
+           sf::st_crs(tbjuris)$epsg == prj,
+           sf::st_crs(tblu)$epsg == prj,
+           sf::st_crs(tbsoil)$epsg == prj)) {
+    stop("All inputs must have CRS of NAD83(2011) / Florida West (ftUS), EPSG:6443.")
+  }
 
   # Ensure all inputs are sf objects
   if (!inherits(tbsubshed, "sf") || !inherits(tbjuris, "sf") ||
@@ -34,21 +45,53 @@ util_nps_tbbase <- function(tbsubshed, tbjuris, tblu, tbsoil, gdal_path = NULL,
     stop("All inputs must be sf objects.")
   }
 
-  tb_base1 <- util_nps_union(tbsubshed, tbjuris, gdal_path = gdal_path, cast = cast) |>
+  if(verbose)
+    cat('Combining Tampa Bay basins with TBNMC jurisdictions...\n')
+  tbbase1 <- util_nps_union(tbsubshed, tbjuris, gdal_path = gdal_path, cast = cast) |>
     dplyr::group_by(bay_seg, basin, drnfeat, entity) |>
     dplyr::summarise()
-  tb_base2 <- util_nps_union(tb_base1, tblu, gdal_path = gdal_path, cast = cast) |>
+
+  if(verbose)
+    cat('Combining results with land use...\n')
+  tbbase2 <- util_nps_union(tbbase1, tblu, gdal_path = gdal_path, cast = cast) |>
     dplyr::group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE) |>
     dplyr::summarise()
-  tb_base3a <- util_nps_union(tb_base2, tbsoil, gdal_path = gdal_path, chunk_size = chunk_size, cast = cast) |>
+
+  if(verbose)
+    cat('Combining results with soils...\n')
+  tbbase3 <- util_nps_union(tbbase2, tbsoil, gdal_path = gdal_path, chunk_size = chunk_size, cast = cast, verbose = verbose) |>
     dplyr::group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE, hydgrp) |>
     dplyr::summarise()
 
+  if(verbose)
+    cat('Summarizing...\n')
+
   # Join with CLUCSID lookup table
-  out <- dplyr::left_join(tbbase, clucsid, by = "FLUCCSCODE", relationship = 'one-to-many')
+  tbbase <- dplyr::left_join(tbbase3, clucsid, by = "FLUCCSCODE", relationship = 'many-to-one')
+
+  # summarize
+  out <- tbbase |>
+    dplyr::mutate(
+      FLUCCSCODE = tidyr::replace_na(FLUCCSCODE, 0),
+      hydgrp = tidyr::replace_na(hydgrp, "D")
+      ) |>
+    sf::st_transform(prj) |>
+    dplyr::group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE, CLUCSID, IMPROVED, hydgrp) %>%
+    dplyr::mutate(
+      CLUCSID = dplyr::case_when(
+        FLUCCSCODE == 2100 ~ 10,
+        TRUE ~ CLUCSID)
+      ) |>
+    dplyr::summarise(.groups = 'drop') |>
+    dplyr::mutate(
+      area_ha = as.numeric(sf::st_area(geom) * 0.000009290304), # Convert from ft^2 to ha
+      drnfeat = ifelse(is.na(drnfeat), "CON", drnfeat)
+    ) |>
+    sf::st_drop_geometry()
 
   dif <- capture.output(Sys.time() - str)
-  cat(dif, '\n')
+  if(verbose)
+    cat(dif, '\n')
 
   return(out)
 

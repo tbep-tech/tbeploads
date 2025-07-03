@@ -7,6 +7,7 @@
 #' @param gdal_path Character string specifying the path to GDAL binaries (e.g., "C:/OSGeo4W/bin"). If NULL (default), assumes GDAL is in system PATH
 #' @param chunk_size Integer. For large datasets, process in chunks of this many features from sf1. Set to NULL (default) to process all at once
 #' @param cast Logical. If TRUE, will cast multipolygon geometries to polygons before processing. Default is FALSE, which keeps multipolygons as is (usually faster).
+#' @param verbose Logical. If TRUE, will print progress messages. Default is TRUE.
 #'
 #' @return An sf object containing the spatial intersection of sf1 and sf2, with geometries unioned by unique combinations of all attributes from both input objects
 #'
@@ -38,7 +39,7 @@
 #'   sf2 = tbjuris,
 #'   "C:/OSGeo4W/bin"
 #' }
-util_nps_union <- function(sf1, sf2, gdal_path = NULL, chunk_size = NULL, cast = FALSE) {
+util_nps_union <- function(sf1, sf2, gdal_path = NULL, chunk_size = NULL, cast = FALSE, verbose = TRUE) {
 
   # Store original PATH to restore later
   original_path <- Sys.getenv("PATH")
@@ -80,8 +81,9 @@ util_nps_union <- function(sf1, sf2, gdal_path = NULL, chunk_size = NULL, cast =
 
   # Check if chunking is needed
   if (!is.null(chunk_size) && nrow(sf1) > chunk_size) {
-    cat("Processing in chunks of", chunk_size, "features\n")
-    return(util_nps_unionchunk(sf1, sf2, chunk_size))
+    if(verbose)
+      cat("Processing in chunks of", chunk_size, "features\n")
+    return(util_nps_unionchunk(sf1, sf2, chunk_size, verbose))
   }
 
   # Process normally for smaller datasets
