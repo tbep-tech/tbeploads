@@ -4,7 +4,7 @@
 \alias{util_nps_union}
 \title{Fast Spatial Intersection Union Using GDAL}
 \usage{
-util_nps_union(sf1, sf2, gdal_path = NULL)
+util_nps_union(sf1, sf2, gdal_path = NULL, chunk_size = NULL)
 }
 \arguments{
 \item{sf1}{An sf object containing polygons. All non-geometry columns will be preserved in the output}
@@ -12,15 +12,14 @@ util_nps_union(sf1, sf2, gdal_path = NULL)
 \item{sf2}{An sf object containing polygons. All non-geometry columns will be preserved in the output}
 
 \item{gdal_path}{Character string specifying the path to GDAL binaries (e.g., "C:/OSGeo4W/bin"). If NULL (default), assumes GDAL is in system PATH or uses sf's internal GDAL installation}
+
+\item{chunk_size}{Integer. For large datasets, process in chunks of this many features from sf1. Set to NULL (default) to process all at once}
 }
 \value{
 An sf object containing the spatial intersection of sf1 and sf2, with geometries unioned by unique combinations of all attributes from both input objects
-}
-\description{
-Performs a spatial intersection and union of two sf objects using GDAL's optimized spatial operations. This function is significantly faster than native sf operations for large datasets.
-}
-\details{
+
 This function uses GDAL's ogr2ogr utility to perform spatial intersection operations, which can be much faster than sf's native functions for large datasets. The process:
+
 \enumerate{
 \item Exports both sf objects to temporary GeoPackage files
 \item Combines them into a single file
@@ -29,21 +28,23 @@ This function uses GDAL's ogr2ogr utility to perform spatial intersection operat
 \item Groups and unions results by all attribute combinations
 }
 
+For very large datasets that cause memory issues, the function can process data in chunks.
+
 The function automatically detects all non-geometry columns from both input objects and includes them in the intersection operation.
 }
+\description{
+Performs a spatial intersection and union of two sf objects using GDAL's optimized spatial operations. This function is significantly faster than native sf operations for large datasets.
+}
 \note{
-Requires GDAL/OGR to be installed and accessible. On Windows, this is typically provided by OSGeo4W or QGIS installations, downloadable at \url{https://trac.osgeo.org/osgeo4w/}
+Requires GDAL/OGR to be installed and accessible. On Windows, this is typically provided by OSGeo4W or QGIS installations, downloadable at \url{https://trac.osgeo.org/osgeo4w/}.
 }
 \examples{
 \dontrun{
-
 data(tbsubshed)
 data(tbjuris)
-
 result <- util_nps_union(
   sf1 = tbsubshed,
   sf2 = tbjuris,
   "C:/OSGeo4W/bin"
-)
 }
 }
