@@ -42,16 +42,16 @@
 #            group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE) %>%
 #            summarise()
 # tb_base3 <- st_union(tb_base2, tb_soils) %>%
-#            group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE, hydrgrp) %>%
+#            group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE, hydgrp) %>%
 #            summarise()
 #
 # tb_base <- tb_base3 %>%
 #              dplyr::mutate(FLUCCSCODE = replace_na(FLUCCSCODE,0),
-#                            hydrgrp = replace_na(hydrgrp, "D"))
+#                            hydgrp = replace_na(hydgrp, "D"))
 #
 # tb_base1 <- st_read("./data-raw/TBEP/gis/tb_base.shp") %>%
 #            st_transform(prj) %>%
-#            group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE, CLUCSID, IMPROVED, hydrgrp) %>%
+#            group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE, CLUCSID, IMPROVED, hydgrp) %>%
 #            mutate(CLUCSID = case_when(FLUCCSCODE == 2100 ~ 10,
 #                                       TRUE ~ CLUCSID)) %>%
 #            summarise()
@@ -75,13 +75,13 @@
 # lsd <- tb_base %>%
 #         mutate(drnfeat = case_when(drnfeat != "NONCON" ~ "CON",
 #                          TRUE ~ drnfeat)) %>%
-#         mutate(hydrgrp = case_when(hydrgrp == "A/D" ~ "A",
-#                                    hydrgrp == "B/D" ~ "B",
-#                                    hydrgrp == "C/D" ~ "C",
-#                          TRUE ~ hydrgrp)) %>%
+#         mutate(hydgrp = case_when(hydgrp == "A/D" ~ "A",
+#                                    hydgrp == "B/D" ~ "B",
+#                                    hydgrp == "C/D" ~ "C",
+#                          TRUE ~ hydgrp)) %>%
 #         rename(clucsid = CLUCSID,
 #                improved = IMPROVED) %>%
-#         group_by(bay_seg, basin, drnfeat, clucsid, hydrgrp, improved) %>%
+#         group_by(bay_seg, basin, drnfeat, clucsid, hydgrp, improved) %>%
 #         summarise(area = sum(area_ha))
 #
 # tbland_202x <- lsd %>%
@@ -90,10 +90,10 @@
 # f3d <- lsd %>%
 #        mutate(bay_seg = case_when(basin == "206-5" ~ 55,
 #               TRUE ~ bay_seg)) %>%
-#        mutate(grp = case_when(drnfeat == "CON" & clucsid < 10 ~ paste0("C_C0",as.character(clucsid),as.character(hydrgrp)),
-#                               drnfeat == "CON" & clucsid > 9 ~ paste0("C_C",as.character(clucsid),as.character(hydrgrp)),
-#                               drnfeat == "NONCON" & clucsid < 10 ~ paste0("NC_C0",as.character(clucsid),as.character(hydrgrp)),
-#                               drnfeat == "NONCON" & clucsid > 9 ~ paste0("NC_C",as.character(clucsid),as.character(hydrgrp)),
+#        mutate(grp = case_when(drnfeat == "CON" & clucsid < 10 ~ paste0("C_C0",as.character(clucsid),as.character(hydgrp)),
+#                               drnfeat == "CON" & clucsid > 9 ~ paste0("C_C",as.character(clucsid),as.character(hydgrp)),
+#                               drnfeat == "NONCON" & clucsid < 10 ~ paste0("NC_C0",as.character(clucsid),as.character(hydgrp)),
+#                               drnfeat == "NONCON" & clucsid > 9 ~ paste0("NC_C",as.character(clucsid),as.character(hydgrp)),
 #                     TRUE ~ NA))
 # tbland <- f3d %>%
 #           group_by(bay_seg, basin, grp) %>%
@@ -128,15 +128,15 @@
 #
 # tbnestl_202x <- tbnestland %>%
 #   saveRDS(file = "./data/nps_nestl_2021-2023.rds")
+
+##This section assimilates rainfall data and parses to NPS drainage basins
 #
-# ##This section assimilates rainfall data and parses to NPS drainage basins
+# Placeholder section to improve future AD calculations by utilizing any active
+# rainfall stations within TB region over the time period of interest, you would then:
+# 1) pass these stations to the NCDC function to get daily data (to sum to monthly totals)
+# 2) still need to identify and assign UTM coordinates to these "new" stations
+# 3) find the invdist2 value to each segment grid point in the targetxy dataframe using the loop starting on line 98
 #
-# # Placeholder section to improve future AD calculations by utilizing any active
-# # rainfall stations within TB region over the time period of interest, you would then:
-# # 1) pass these stations to the NCDC function to get daily data (to sum to monthly totals)
-# # 2) still need to identify and assign UTM coordinates to these "new" stations
-# # 3) find the invdist2 value to each segment grid point in the targetxy dataframe using the loop starting on line 98
-# #
 #
 # flrain <- read_sas("./data-raw/JEI_PRIOR/fl_rain_por_220223v93.sas7bdat") #Import historic JEI rainfall dataset
 #
@@ -495,34 +495,8 @@
 #            filter(! basin %in% c("02301000", "02301300", "02303000", "02303330", "02307359")) %>%  #Remove 02307359 when LTARPON missing
 #            select(bay_seg, basin, bas_area, yr, mo, flow, flowhat)
 #
-# landsoil1 <- readRDS("./data/npsag3.rds") %>% # or lsd in this long script
-#              filter(drnfeat != "NONCON") %>%
-#              mutate(basin = case_when(basin == "02303000" ~ "02304500",
-#                                       basin == "02303330" ~ "02304500",
-#                                       basin == "02301000" ~ "02301500",
-#                                       basin == "02301300" ~ "02301500",
-#                                       TRUE ~ basin)) %>%
-#              filter(! basin %in% c("02301000", "02301300", "02303000", "02303330", "02307359")) %>%
-#              select(bay_seg, basin, drnfeat, clucsid, hydrgrp, area)
-#
-# rc <- read.csv(file="./data-raw/rc_clucsid.csv") %>%
-#       rename(hydrgrp = hsg)
-#
-# landsoil_rc <- landsoil1 %>%
-#                inner_join(rc, by = c("clucsid", "hydrgrp"))
-#
-# landsoil2 <- landsoil_rc %>%
-#               tidyr::expand_grid(mo = 1:12) %>%
-#               mutate(rc = ifelse(mo %in% c(7, 8, 9, 10), wet_rc, dry_rc),
-#               rca = rc * area)
-#
-# tot_rca <- landsoil2 %>%
-#              group_by(basin, bay_seg, mo) %>%
-#              summarise(tot_rca = sum(rca, na.rm = TRUE), .groups = 'drop')
-#
-# landsoil <- landsoil2 %>%
-#              left_join(tot_rca, by = c("bay_seg", "basin", "mo")) %>%
-#              tidyr::expand_grid(yr = 2021:2023)
+# # this is from util_nps_landsoilrc
+# landsoil <- util_nps_landsoil(tbbase)
 #
 # pflow1 <- flowhat %>%
 #            left_join(landsoil, by = c("yr", "mo", "bay_seg", "basin")) %>%
