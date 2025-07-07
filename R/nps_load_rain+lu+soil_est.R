@@ -24,110 +24,13 @@
 # # this is the projection used in original report
 # prj <- 6443
 #
-# data(tbfullshed)
 # data(tbsubshed)
 # data(tbjuris)
 # data(tblu2020)
-# data(tblu2023)
 # data(tbsoil)
+# tbbase <- util_nps_tbbase(tbsubshed, tbjuris, tblu2020, tbsoil, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
 #
-# ##End raw GIS layer inputs
-#
-# # Union not working in R, so imported GIS layer from ArcGIS union instead ...
-# tb_base <- st_union(tbsubshed, tbjuris)
-# tb_base1 <- st_union(tbsubshed, tbjuris) %>%
-#            group_by(bay_seg, basin, drnfeat, entity) %>%
-#            summarise()
-# tb_base2 <- st_union(tb_base1, tblu2020) %>%
-#            group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE) %>%
-#            summarise()
-# tb_base3 <- st_union(tb_base2, tb_soils) %>%
-#            group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE, hydgrp) %>%
-#            summarise()
-#
-# tb_base <- tb_base3 %>%
-#              dplyr::mutate(FLUCCSCODE = replace_na(FLUCCSCODE,0),
-#                            hydgrp = replace_na(hydgrp, "D"))
-#
-# tb_base1 <- st_read("./data-raw/TBEP/gis/tb_base.shp") %>%
-#            st_transform(prj) %>%
-#            group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE, CLUCSID, IMPROVED, hydgrp) %>%
-#            mutate(CLUCSID = case_when(FLUCCSCODE == 2100 ~ 10,
-#                                       TRUE ~ CLUCSID)) %>%
-#            summarise()
-#
-# tb_base <- readRDS('data/tb_base.rds')
-#
-# tb_base1$area_ha <- sf::st_area(tb_base1) * 0.000009290304 # Projection is in feet, converting to ha
-#
-# #st_write(tb_base, "./data/tb_base.shp")
-#
-# #JEI SAS NPS Protocols pickup at 11_F3D... here
-#
-# tb_base <- tb_base1 %>%
-#              sf::st_drop_geometry() %>%
-#              drop_units() %>%
-#              mutate(drnfeat = ifelse(is.na(drnfeat), "CON", drnfeat))
-#
-# tbbase_202x <- tb_base %>%
-#   saveRDS(file = "./data/tb_base.rds")
-#
-# lsd <- tb_base %>%
-#         mutate(drnfeat = case_when(drnfeat != "NONCON" ~ "CON",
-#                          TRUE ~ drnfeat)) %>%
-#         mutate(hydgrp = case_when(hydgrp == "A/D" ~ "A",
-#                                    hydgrp == "B/D" ~ "B",
-#                                    hydgrp == "C/D" ~ "C",
-#                          TRUE ~ hydgrp)) %>%
-#         rename(clucsid = CLUCSID,
-#                improved = IMPROVED) %>%
-#         group_by(bay_seg, basin, drnfeat, clucsid, hydgrp, improved) %>%
-#         summarise(area = sum(area_ha))
-#
-# tbland_202x <- lsd %>%
-#                 saveRDS(file = "./data/npsag3.rds")
-#
-# f3d <- lsd %>%
-#        mutate(bay_seg = case_when(basin == "206-5" ~ 55,
-#               TRUE ~ bay_seg)) %>%
-#        mutate(grp = case_when(drnfeat == "CON" & clucsid < 10 ~ paste0("C_C0",as.character(clucsid),as.character(hydgrp)),
-#                               drnfeat == "CON" & clucsid > 9 ~ paste0("C_C",as.character(clucsid),as.character(hydgrp)),
-#                               drnfeat == "NONCON" & clucsid < 10 ~ paste0("NC_C0",as.character(clucsid),as.character(hydgrp)),
-#                               drnfeat == "NONCON" & clucsid > 9 ~ paste0("NC_C",as.character(clucsid),as.character(hydgrp)),
-#                     TRUE ~ NA))
-# tbland <- f3d %>%
-#           group_by(bay_seg, basin, grp) %>%
-#           summarise(area = sum(area)) %>%
-#           spread(grp, area)
-#
-# tbland2 <- f3d %>%
-#            group_by(bay_seg, basin) %>%
-#            summarise(tot_area = sum(area))
-#
-# tbland <- left_join(tbland,tbland2, by = c("bay_seg", "basin"))
-#
-# write.csv(as.data.frame(tbland), file = "./data/tbland.csv")
-#
-# #Nests and combines certain basins for logistic model
-# tbnestland <- tbland %>%
-#               mutate(original_basin = basin) %>%
-#               bind_rows(
-#                 filter(., basin == "02301000") %>% mutate(basin = "02301500"),
-#                 filter(., basin == "02301300") %>% mutate(basin = "02301500"),
-#                 filter(., basin == "02303330") %>% mutate(basin = "02304500"),
-#                 filter(., basin == "02303000") %>%
-#                   bind_rows(
-#                     mutate(., basin = "02304500"),
-#                     mutate(., basin = "02303330")),
-#                 filter(., basin == "02307359") %>% mutate(basin = "LTARPON")
-#               ) %>%
-#               group_by(bay_seg, basin) %>%
-#               summarise(across(.cols = where(is.numeric), .fns = sum))
-#
-# write.csv(as.data.frame(tbnestland), file = "./data/tbnestland.csv")
-#
-# tbnestl_202x <- tbnestland %>%
-#   saveRDS(file = "./data/nps_nestl_2021-2023.rds")
+# tbnestland <- util_nps_preplog(tbbase)
 
 ##This section assimilates rainfall data and parses to NPS drainage basins
 #

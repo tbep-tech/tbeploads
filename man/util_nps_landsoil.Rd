@@ -2,7 +2,7 @@
 % Please edit documentation in R/util_nps_landsoil.R
 \name{util_nps_landsoil}
 \alias{util_nps_landsoil}
-\title{Utility function for non-point source (NPS) workflow to create land use and soil data}
+\title{Utility function for non-point source (NPS) ungaged workflow to create land use and soil data}
 \usage{
 util_nps_landsoil(tbbase)
 }
@@ -13,7 +13,7 @@ util_nps_landsoil(tbbase)
 A data frame summarizing land use and soil by bay segment, sub-basin, drainage feature, CLUCSID, hydrologic group, and improved status.
 }
 \description{
-Utility function for non-point source (NPS) workflow to create land use and soil data
+Utility function for non-point source (NPS) ungaged workflow to create land use and soil data
 }
 \examples{
 data(tbbase)

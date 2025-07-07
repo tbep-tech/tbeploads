@@ -1,4 +1,4 @@
-#' Utility function for non-point source (NPS) workflow to create land use and soil data
+#' Utility function for non-point source (NPS) ungaged workflow to create land use and soil data
 #'
 #' @param tbbase Input data frame returned from \code{\link{util_nps_tbbase}}
 #'

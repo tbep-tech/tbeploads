@@ -2,7 +2,7 @@
 % Please edit documentation in R/util_nps_landsoilrc.R
 \name{util_nps_landsoilrc}
 \alias{util_nps_landsoilrc}
-\title{Utility function to create non-point source (NPS) land use and soil runoff coefficients}
+\title{Utility function to create non-point source (NPS) ungaged land use and soil runoff coefficients}
 \usage{
 util_nps_landsoilrc(tbbase, yrexp = c(2021:2023))
 }
@@ -15,7 +15,7 @@ util_nps_landsoilrc(tbbase, yrexp = c(2021:2023))
 A data frame with land use (CLUCSID) and soil runoff coefficients by year and month.
 }
 \description{
-Utility function to create non-point source (NPS) land use and soil runoff coefficients
+Utility function to create non-point source (NPS) ungaged land use and soil runoff coefficients
 }
 \examples{
 data(tbbase)

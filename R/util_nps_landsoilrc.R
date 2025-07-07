@@ -1,4 +1,4 @@
-#' Utility function to create non-point source (NPS) land use and soil runoff coefficients
+#' Utility function to create non-point source (NPS) ungaged land use and soil runoff coefficients
 #'
 #' @param tbbase Data frame returned from \code{\link{util_nps_tbbase}} containing land use and soil data.
 #' @param yrexp Years to expand the data frame to include all months for each year.
