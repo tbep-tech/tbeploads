@@ -106,10 +106,10 @@ anlz_ml(mlfls, summ = "segment", summtime = "year")
 
 ### AD
 
-Loading from atmospheric deposition (AD) for bay segments in the Tampa Bay watershed are calculated using rainfall data from weather stations in the watershed and atmospheric concentration data from the Verna Wellfield site.  Rainfall data must be obtained using the `util_ad_getrain()` function before calculating loads.  For convenience, daily rainfall data from 2017 to 2023 at sites in the watershed are included with the package in the `ad_rain` object. 
+Loading from atmospheric deposition (AD) for bay segments in the Tampa Bay watershed are calculated using rainfall data from weather stations in the watershed and atmospheric concentration data from the Verna Wellfield site.  Rainfall data must be obtained using the `util_getrain()` function before calculating loads.  For convenience, daily rainfall data from 2017 to 2023 at sites in the watershed are included with the package in the `rain` object. 
 
 ```{r}
-head(ad_rain)
+head(rain)
 ```
 
 The Verna Wellfield data must also be obtained from <https://nadp.slh.wisc.edu/sites/ntn-FL41/> as monthly observations. This file is also included with the package and can be found using `system.file()` as follows:
@@ -139,10 +139,10 @@ head(ad_distance)
 
 The total nitrogen and phosphorus loads are then estimated for each bay segment by multiplying the total hydrologic load by the total nitrogen and phosphorus concentrations in the Verna data.  The loading calculations also include a wet/dry deposition conversion factor to account for differences in loading during the rainy and dry seasons.
 
-Using `anlz_ad()` to estimate AD load is done as follows, where `ad_rain` is the rain data and `vernafl` is the path to the Verna Wellfield data. 
+Using `anlz_ad()` to estimate AD load is done as follows, where `rain` is the rain data and `vernafl` is the path to the Verna Wellfield data. 
 
 ```{r}
-anlz_ad(ad_rain, vernafl)
+anlz_ad(rain, vernafl)
 ```
 
 Results can be summarized by segment, baywide, monthly, or annually using the `summ` and `summtime` arguments.  By default, loads are returned monthly for each segment.  Note that Boca Ciega Bay and Boca Ciega Bay South results are returned separately.  Only Boca Ciega Bay South is used when estimating total bay loads. 

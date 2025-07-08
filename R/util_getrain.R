@@ -1,6 +1,6 @@
-#' Get rainfall data at NOAA NCDC sites
+#' Get rainfall data at NOAA NCDC sites for atmospheric deposition and non-point source ungaged calculations
 #'
-#' Get rainfall data at NOAA NCDC sites
+#' Get rainfall data at NOAA NCDC sites for atmospheric deposition and non-point source ungaged calculations
 #'
 #' @param yrs numeric vector for the years of data to retrieve
 #' @param station numeric vector of station numbers to retrieve, see details
@@ -8,7 +8,7 @@
 #' @param ntry numeric for the number of times to try to download the data
 #' @param quiet logical to print progress in the console
 #'
-#' @details This function is used to retrieve a long-term record of rainfall for estimating AD loads.  It is used to create an input data file for load calculations and it is not used directly by any other functions due to download time.  A NOAA API key is required to use the function.
+#' @details This function is used to retrieve a long-term record of rainfall for estimating AD and NPS ungaged loads.  It is used to create an input data file for load calculations and it is not used directly by any other functions due to download time.  A NOAA API key is required to use the function.
 #'
 #' By default, rainfall data is retrieved for the following stations:
 #'
@@ -53,14 +53,14 @@
 #'
 #' @importFrom rnoaa ncdc
 #'
-#' @seealso \code{\link{ad_rain}}
+#' @seealso \code{\link{rain}}
 #'
 #' @examples
 #' \dontrun{
 #' noaa_key <- Sys.getenv('NOAA_KEY')
-#' util_ad_getrain(2021, 228, noaa_key)
+#' util_getrain(2021, 228, noaa_key)
 #' }
-util_ad_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE){
+util_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE){
 
   if(is.null(station))
     station <- c(228, 478, 520, 940, 945,

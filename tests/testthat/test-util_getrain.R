@@ -1,8 +1,8 @@
 # noaa_key <- Sys.getenv("NOAA_KEY")
 #
-# test_that("util_ad_getrain returns a data frame", {
+# test_that("util_getrain returns a data frame", {
 #
-#   result <- util_ad_getrain(2021, 228, noaa_key)
+#   result <- util_getrain(2021, 228, noaa_key)
 #   expect_s3_class(result, "data.frame")
 #
 # })
@@ -53,13 +53,13 @@ mock_ncdc_retry <- function(datasetid = 'GHCND', stationid,
   )
 }
 
-test_that("util_ad_getrain returns correct structure and data", {
+test_that("util_getrain returns correct structure and data", {
   # Mock rnoaa::ncdc function
-  stub(util_ad_getrain, "ncdc", mock_ncdc)
+  stub(util_getrain, "ncdc", mock_ncdc)
 
   # Test with a single year and station
   noaa_key <- "test_key"
-  result <- util_ad_getrain(2021, 228, noaa_key, ntry = 1)
+  result <- util_getrain(2021, 228, noaa_key, ntry = 1)
 
   expect_s3_class(result, "data.frame")
   expect_true(all(c("station", "date", "Year", "Month", "Day", "rainfall") %in% colnames(result)))
@@ -67,7 +67,7 @@ test_that("util_ad_getrain returns correct structure and data", {
   expect_equal(result$station[1], 228)
 
   # Test with multiple years and default stations
-  result <- util_ad_getrain(c(2021, 2022), noaa_key = noaa_key, ntry = 1)
+  result <- util_getrain(c(2021, 2022), noaa_key = noaa_key, ntry = 1)
 
   expect_s3_class(result, "data.frame")
   expect_true(all(c("station", "date", "Year", "Month", "Day", "rainfall") %in% colnames(result)))
@@ -77,20 +77,20 @@ test_that("util_ad_getrain returns correct structure and data", {
 
 })
 
-test_that("util_ad_getrain retry mechanism works", {
+test_that("util_getrain retry mechanism works", {
 
   # Mock rnoaa::ncdc function with retry behavior
-  stub(util_ad_getrain, "ncdc", mock_ncdc_retry)
+  stub(util_getrain, "ncdc", mock_ncdc_retry)
 
   noaa_key <- "test_key"
-  result <- util_ad_getrain(2021, 228, noaa_key, ntry = 2)
+  result <- util_getrain(2021, 228, noaa_key, ntry = 2)
 
   expect_s3_class(result, "data.frame")
   expect_true(all(c("station", "date", "Year", "Month", "Day", "rainfall") %in% colnames(result)))
   expect_equal(result$Year[1], 2021)
   expect_equal(result$station[1], 228)
 
-  result <- util_ad_getrain(2021, c(1111, 9999), noaa_key, ntry = 0)
+  result <- util_getrain(2021, c(1111, 9999), noaa_key, ntry = 0)
   expect_null(result)
 
 })

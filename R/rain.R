@@ -4,7 +4,7 @@
 #'
 #' @format A \code{data.frame}
 #'
-#' @details Used for estimating atmospheric deposition and created using the \code{\link{util_ad_getrain}} function. The data frame contains the following columns:
+#' @details Used for estimating atmospheric deposition and non-point source ungaged loads.  Created using the \code{\link{util_getrain}} function. The data frame contains the following columns:
 #'
 #' \itemize{
 #'    \item \code{station}: Character string for the station id
@@ -15,8 +15,8 @@
 #'    \item \code{rainfall}: Numeric value for the amount of rainfall in inches
 #'}
 #'
-#' @seealso \code{\link{util_ad_getrain}}
+#' @seealso \code{\link{util_getrain}}
 #'
 #' @examples
-#' ad_rain
-"ad_rain"
+#' rain
+"rain"
