@@ -5,8 +5,6 @@
 \title{Create unioned base layer for non-point source (NPS) ungaged load estimation in the Tampa Bay watershed}
 \usage{
 util_nps_tbbase(
-  tbsubshed,
-  tbjuris,
   tblu,
   tbsoil,
   gdal_path = NULL,
@@ -16,10 +14,6 @@ util_nps_tbbase(
 )
 }
 \arguments{
-\item{tbsubshed}{sf object \code{link{tbsubshed}} of major drainage basins in the Tampa Bay watershed}
-
-\item{tbjuris}{sf object \code{link{tbjuris}} of TBNMC jurisdictions in the Tampa Bay watershed}
-
 \item{tblu}{sf object of land use/land cover in the Tampa Bay watershed, currently either \code{link{tblu2020}} or \code{link{tblu2023}}}
 
 \item{tbsoil}{sf object \code{link{tbsoil}} of soil data in the Tampa Bay watershed}
@@ -44,10 +38,8 @@ Relies heavily on \code{\link{util_nps_union}} to perform the union operations e
 \examples{
 \dontrun{
 # Load required data
-data(tbsubshed)
-data(tbjuris)
 data(tblu2020)
 data(tbsoil)
-result <- util_nps_tbbase(tbsubshed, tbjuris, tblu2020, tbsoil, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
+result <- util_nps_tbbase(tblu2020, tbsoil, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
 }
 }
