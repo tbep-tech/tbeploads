@@ -59,44 +59,28 @@ create_mock_sf <- function(coords = NULL, crs = 4326, id = 1) {
 
 test_that("util_nps_tbbase validates CRS requirements", {
   # Create mock data with wrong CRS
-  tbsubshed <- create_mock_sf(crs = 4326)  # Wrong CRS
-  tbjuris <- create_mock_sf(crs = 6443)    # Correct CRS
-  tblu <- create_mock_sf(crs = 6443)
+  tblu <- create_mock_sf(crs = 4326)
   tbsoil <- create_mock_sf(crs = 6443)
 
   expect_error(
-    util_nps_tbbase(tbsubshed, tbjuris, tblu, tbsoil),
+    util_nps_tbbase(tblu, tbsoil),
     "All inputs must have CRS of NAD83\\(2011\\) / Florida West \\(ftUS\\), EPSG:6443"
   )
 })
 
 test_that("util_nps_tbbase validates sf object inputs", {
   # Create mock data with non-sf object
-  tbsubshed <- data.frame(x = 1, y = 2)  # Not an sf object
-  tbjuris <- create_mock_sf(crs = 6443)
-  tblu <- create_mock_sf(crs = 6443)
+  tblu <- data.frame(x = 1, y = 2)  # Not an sf object
   tbsoil <- create_mock_sf(crs = 6443)
 
   expect_error(
-    util_nps_tbbase(tbsubshed, tbjuris, tblu, tbsoil),
+    util_nps_tbbase(tblu, tbsoil),
     "All inputs must be sf objects"
   )
 })
 
 test_that("util_nps_tbbase processes successfully with valid inputs", {
   # Create mock data with correct CRS
-  tbsubshed <- st_sf(
-    bay_seg = "TS1",
-    basin = "Basin1",
-    drnfeat = "Feature1",
-    geometry = st_sfc(st_polygon(list(matrix(c(0,0, 1,0, 1,1, 0,1, 0,0), ncol=2, byrow=TRUE))), crs = 6443)
-  )
-
-  tbjuris <- st_sf(
-    entity = "City1",
-    geometry = st_sfc(st_polygon(list(matrix(c(0,0, 1,0, 1,1, 0,1, 0,0), ncol=2, byrow=TRUE))), crs = 6443)
-  )
-
   tblu <- st_sf(
     FLUCCSCODE = 1100,
     geometry = st_sfc(st_polygon(list(matrix(c(0,0, 1,0, 1,1, 0,1, 0,0), ncol=2, byrow=TRUE))), crs = 6443)
@@ -109,16 +93,21 @@ test_that("util_nps_tbbase processes successfully with valid inputs", {
 
   # Mock intermediate results
   tbbase1_mock <- st_sf(
-    bay_seg = "TS1", basin = "Basin1", drnfeat = "Feature1", entity = "City1",
+    bay_seg = "TS1", basin = "Basin1", drnfeat = "Feature1",
     geometry = st_sfc(st_polygon(list(matrix(c(0,0, 1,0, 1,1, 0,1, 0,0), ncol=2, byrow=TRUE))), crs = 6443)
   )
 
   tbbase2_mock <- st_sf(
-    bay_seg = "TS1", basin = "Basin1", drnfeat = "Feature1", entity = "City1", FLUCCSCODE = 1100,
+    bay_seg = "TS1", basin = "Basin1", drnfeat = "Feature1", entity = "City1",
     geometry = st_sfc(st_polygon(list(matrix(c(0,0, 1,0, 1,1, 0,1, 0,0), ncol=2, byrow=TRUE))), crs = 6443)
   )
 
   tbbase3_mock <- st_sf(
+    bay_seg = "TS1", basin = "Basin1", drnfeat = "Feature1", entity = "City1", FLUCCSCODE = 1100,
+    geometry = st_sfc(st_polygon(list(matrix(c(0,0, 1,0, 1,1, 0,1, 0,0), ncol=2, byrow=TRUE))), crs = 6443)
+  )
+
+  tbbase4_mock <- st_sf(
     bay_seg = "TS1", basin = "Basin1", drnfeat = "Feature1", entity = "City1", FLUCCSCODE = 1100, hydgrp = "A",
     geometry = st_sfc(st_polygon(list(matrix(c(0,0, 1,0, 1,1, 0,1, 0,0), ncol=2, byrow=TRUE))), crs = 6443)
   )
@@ -141,14 +130,15 @@ test_that("util_nps_tbbase processes successfully with valid inputs", {
     if (union_call_count == 1) return(tbbase1_mock)
     if (union_call_count == 2) return(tbbase2_mock)
     if (union_call_count == 3) return(tbbase3_mock)
+    if (union_call_count == 4) return(tbbase4_mock)
   })
 
-  result <- util_nps_tbbase(tbsubshed, tbjuris, tblu, tbsoil, verbose = FALSE)
+  result <- util_nps_tbbase(tblu, tbsoil, verbose = FALSE)
 
   expect_s3_class(result, "data.frame")
   expect_false("geometry" %in% names(result))  # Should be dropped
   expect_true("area_ha" %in% names(result))
-  expect_equal(union_call_count, 3)
+  expect_equal(union_call_count, 4)
 
   # Clean up
   rm(clucsid, envir = .GlobalEnv)
@@ -156,13 +146,11 @@ test_that("util_nps_tbbase processes successfully with valid inputs", {
 
 test_that("util_nps_tbbase handles missing drnfeat values", {
   # Create mock data where drnfeat might be NA
-  tbsubshed <- create_mock_sf(crs = 6443)
-  tbjuris <- create_mock_sf(crs = 6443)
   tblu <- create_mock_sf(crs = 6443)
   tbsoil <- create_mock_sf(crs = 6443)
 
   # Mock result with NA drnfeat
-  tbbase3_mock <- st_sf(
+  tbbase4_mock <- st_sf(
     bay_seg = "TS1", basin = "Basin1", drnfeat = NA_character_, entity = "City1",
     FLUCCSCODE = 1100, hydgrp = "A",
     geometry = st_sfc(st_polygon(list(matrix(c(0,0, 1,0, 1,1, 0,1, 0,0), ncol=2, byrow=TRUE))), crs = 6443)
@@ -178,9 +166,9 @@ test_that("util_nps_tbbase handles missing drnfeat values", {
   assign("clucsid", data.frame(FLUCCSCODE = 1100, CLUCSID = 1, IMPROVED = 0), envir = .GlobalEnv)
 
   # Stub util_nps_union
-  stub(util_nps_tbbase, "util_nps_union", function(...) tbbase3_mock)
+  stub(util_nps_tbbase, "util_nps_union", function(...) tbbase4_mock)
 
-  result <- util_nps_tbbase(tbsubshed, tbjuris, tblu, tbsoil, verbose = FALSE)
+  result <- util_nps_tbbase(tblu, tbsoil, verbose = FALSE)
 
   # Check that NA drnfeat is replaced with "CON"
   expect_equal(result$drnfeat, "CON")

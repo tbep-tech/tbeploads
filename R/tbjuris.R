@@ -19,7 +19,9 @@
 #'   sf::st_transform(prj) |>
 #'   sf::st_buffer(dist = 0) |>
 #'   dplyr::rename(entity = NAME_FINAL) |>
-#'   dplyr::select(entity)
+#'   dplyr::select(entity) |>
+#'   dplyr::group_by(entity) |>
+#'   dplyr::summarise()
 #'
 #' save(tbjuris, file = 'data/tbjuris.RData', compress = 'xz')
 #' }

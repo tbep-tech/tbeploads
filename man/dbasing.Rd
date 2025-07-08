@@ -17,8 +17,8 @@ Basin information for coastal subbasin codes
 Used for domestic point source summaries, bay segments are as follows:
 
 \itemize{
-\item 1: Hillsborough Bay
-\item 2: Old Tampa Bay
+\item 1: Old Tampa Bay
+\item 2: Hillsborough Bay
 \item 3: Middle Tampa Bay
 \item 4: Lower Tampa Bay
 \item 5: Boca Ciega Bay
