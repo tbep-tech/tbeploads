@@ -33,6 +33,6 @@ dbasing <- dbasing |>
       TRUE ~ NA_character_
     )
   ) |>
-  dplyr::select(coastco, basin = newgage, bayseg, name, hectare)
+  dplyr::select(coastco, coastco, gagetype, basin = newgage, bayseg, name, hectare)
 
 usethis::use_data(dbasing, overwrite = TRUE)

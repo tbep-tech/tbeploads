@@ -40,7 +40,7 @@ util_nps_tbbase <- function(tblu, tbsoil, gdal_path = NULL,
   }
 
   if(verbose)
-    cat('Combing drainage basins with sub-watersheds...\n')
+    cat('Combining drainage basins with sub-watersheds...\n')
 
   tbbase1 <- util_nps_union(tbsubshed, tbdbasin, gdal_path = gdal_path, cast = cast) |>
     dplyr::group_by(bay_seg, basin, drnfeat) |>

@@ -15,6 +15,8 @@
 #'   \item 55: Boca Ciega Bay South
 #'}
 #'
+#' See "data-raw/dbasing.R" for creation.
+#'
 #' @examples
 #' dbasing
 "dbasing"

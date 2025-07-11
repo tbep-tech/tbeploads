@@ -26,6 +26,8 @@ Used for domestic point source summaries, bay segments are as follows:
 \item 7: Manatee River
 \item 55: Boca Ciega Bay South
 }
+
+See "data-raw/dbasing.R" for creation.
 }
 \examples{
 dbasing
