@@ -18,23 +18,94 @@ anlz_nps_ungaged(tbbase, rain, lakemanpth, tampabypth, bellshlpth)
 \item{bellshlpth}{character, path to the file containing the Bell shoals data, see details}
 }
 \value{
-A data frame
+A data frame with monthly pollutant load estimates containing the following columns:
+\itemize{
+\item \code{bay_seg}: Bay segment identifier (1: Old Tampa Bay, 2: Hillsborough Bay, 3: Middle Tampa Bay, 4: Lower Tampa Bay, 5: Upper Boca Ciega Bay, 6: Terra Ceia Bay, 7: Manatee River, 55: Lower Boca Ciega Bay)
+\item \code{basin}: Basin identifier (USGS gage number or internal code)
+\item \code{yr}: Year
+\item \code{mo}: Month (1-12)
+\item \code{clucsid}: Consolidated Land Use Classification System ID
+\item \code{h2oload}: Water load (cubic meters)
+\item \code{tnload}: Total nitrogen load (kg)
+\item \code{tpload}: Total phosphorus load (kg)
+\item \code{tssload}: Total suspended solids load (kg)
+\item \code{stnload}: Stormwater total nitrogen load (kg)
+\item \code{stpload}: Stormwater total phosphorus load (kg)
+\item \code{stssload}: Stormwater total suspended solids load (kg)
+\item \code{bodload}: Biochemical oxygen demand load (kg)
+\item \code{area}: Land use area (hectares)
+\item \code{bas_area}: Total basin area (hectares)
+}
 }
 \description{
 Estimated non-point source (NPS) ungaged loads
 }
 \details{
+This function estimates pollutant loads from non-point sources in ungaged (unmonitored) basins within the Tampa Bay watershed. The approach combines spatial land use data, rainfall patterns, hydrologic modeling, and empirical relationships to estimate monthly nutrient and sediment loads.
+
+\strong{Methodology Overview:}
+
+The function implements a multi-step process:
+
+\enumerate{
+\item \strong{Data Preparation}: Processes land use data for logistic regression modeling and calculates inverse distance-weighted rainfall data for each sub-basin.
+
+\item \strong{Flow Estimation}: Uses a logistic regression model to predict monthly streamflow in ungaged basins based on:
+\itemize{
+\item Current month rainfall and 2-month lagged rainfall
+\item Land use percentages (urban, agriculture, wetlands, forest)
+\item Seasonal patterns (wet season: July-October, dry season: November-June)
+\item Urban development intensity (Group A: <19\% urban, Group B: ≥19\% urban)
+\item Hydrologic soil group characteristics
+}
+
+\item \strong{Runoff Coefficient Application}: Applies land use and soil-specific runoff coefficients to distribute predicted flows across different landscape types within each basin.
+
+\item \strong{Load Calculation}: Estimates pollutant loads using Event Mean Concentrations (EMCs) for different land use categories (CLUCSID), calculating:
+\itemize{
+\item Total Nitrogen (TN) loads
+\item Total Phosphorus (TP) loads
+\item Total Suspended Solids (TSS) loads
+\item Biochemical Oxygen Demand (BOD) loads
+\item Stormwater-specific loads (with different EMCs for certain categories)
+}
+}
+
+\strong{Spatial Framework:}
+
+The analysis operates on a nested spatial hierarchy:
+\itemize{
+\item \strong{Bay Segments}: Major subdivisions of Tampa Bay (1-7, with 55 as a special case)
+\item \strong{Basins}: Hydrologic sub-basins, including both USGS gaged and ungaged areas
+\item \strong{Land Use Polygons}: Detailed spatial units combining jurisdiction, land use (FLUCCS codes), and soil characteristics
+}
+
+\strong{Flow Prediction Models:}
+
+The function uses season- and development-specific regression equations:
+\itemize{
+\item Separate models for wet vs. dry seasons
+\item Separate models for low-development (Group A) vs. high-development (Group B) areas
+\item Models account for antecedent moisture conditions through lagged rainfall terms
+}
+
+\strong{Load Estimation:}
+
+Pollutant loads are calculated as: \code{Load = Flow × EMC × Unit Conversions}
+
+Where EMCs vary by land use category (CLUCSID) and special handling is applied for water bodies and certain wetland types (CLUCSIDs 18, 20) which are assigned zero stormwater loads.
+
 Requires the following inputs:
 
 \itemize{
 \item \code{tbbase}: A data frame containing polygon areas for the combined data layer of bay segment, basin, jurisdiction, land use data, and soils, Stored as \code{\link{tbbase}} or created (takes an hour or so) with \code{\link{util_nps_gettbbase}}.
-\item \code{rain}: A data frame of rainfall data see \code{\link{rain}}.
+\item \code{rain}: A data frame of rainfall data. See \code{\link{rain}}.
 \item \code{lakemanpth}: character, path to the file containing the Lake Manatee flow data. See \code{\link{util_nps_getextflow}}.
 \item \code{tampabypth}: character, path to the file containing the Tampa Bypass flow data. See \code{\link{util_nps_getextflow}}.
 \item \code{bellshlpth}: character, path to the file containing the Bell shoals data. See \code{\link{util_nps_getextflow}}.
 }
 
-USGS gaged flows are also used as returned by \code{\link{util_nps_getusgsflow}}.
+USGS gaged flows are also used, as returned by \code{\link{util_nps_getusgsflow}}.
 }
 \examples{
 # external flow sources

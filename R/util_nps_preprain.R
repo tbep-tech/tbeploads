@@ -20,7 +20,7 @@ util_nps_preprain <- function(rain, yrrng = NULL){
       yr = Year,
       mo = Month
     ) |>
-    summarise(
+    dplyr::summarise(
       tpcp_in = sum(rainfall),
       n = dplyr::n(),
       .by = c(station, yr, mo)
@@ -36,7 +36,7 @@ util_nps_preprain <- function(rain, yrrng = NULL){
 
   # Calculate weighted mean of 'tpcp_in' using 'invdist2' as weight
   db <- all |>
-    summarise(
+    dplyr::summarise(
       tpcp = weighted.mean(tpcp_in, as.numeric(invdist2), na.rm = T),
       .by = c(target, yr, mo)
     ) |>
@@ -56,7 +56,7 @@ util_nps_preprain <- function(rain, yrrng = NULL){
   rainnest <- npsrain |>
     dplyr::filter(basin %in% c("02301500", "02301000", "02301300",
                         "02303000", "02303330", "02304500")) |>
-    mutate(
+    dplyr::mutate(
       landarea = dplyr::case_when(
         basin == "02301000" ~ 34978.50,
         basin == "02301300" ~ 14599.80,
