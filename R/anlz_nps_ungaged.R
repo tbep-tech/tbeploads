@@ -1,10 +1,12 @@
 #' Estimated non-point source (NPS) ungaged loads
 #'
+#' @param yrrng A vector of two dates in 'YYYY-MM-DD' format, specifying the date range to retrieve flow data. Default is from '2021-01-01' to '2023-12-31'.
 #' @param tbbase data frame containing polygon areas for the combined data layer of bay segment, basin, jurisdiction, land use data, and soils, see details
 #' @param rain data frame of rainfall data, see details
 #' @param lakemanpth character, path to the file containing the Lake Manatee flow data, see details
 #' @param tampabypth character, path to the file containing the Tampa Bypass flow data, see details
 #' @param bellshlpth character, path to the file containing the Bell shoals data, see details
+#' @param verbose logical indicating whether to print verbose output
 #'
 #' @details
 #' This function estimates pollutant loads from non-point sources in ungaged (unmonitored) basins within the Tampa Bay watershed. The approach combines spatial land use data, rainfall patterns, hydrologic modeling, and empirical relationships to estimate monthly nutrient and sediment loads.
@@ -101,19 +103,28 @@
 #' bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 #'
 #' anlz_nps_ungaged(tbbase, rain, lakemanpth, tampabypth, bellshlpth)
-anlz_nps_ungaged <- function(tbbase, rain, lakemanpth, tampabypth, bellshlpth){
+anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, lakemanpth, tampabypth, bellshlpth, verbose = TRUE) {
+
+  yrrng <- lubridate::ymd(yrrng)
+  yrs <- lubridate::year(yrrng)
 
   # get data prepped for logistic regression
   tbnestland <- util_nps_preplog(tbbase)
 
-  # get inverse weighted distance data from rainfall to sub-bains
-  npsrain <- util_nps_preprain(rain)
+  # get inverse weighted distance data from rainfall to sub-basins
+  # get flow data
+  if(verbose)
+    cat('Prepping rain data...\n')
+  npsrain <- util_nps_preprain(rain, yrrng = yrs)
 
   # flow_monthly_means
-  allflo <- util_nps_getflow(lakemanpth, tampabypth, bellshlpth)
+  if(verbose)
+    cat('Retrieving flow data...\n')
+  allflo <- util_nps_getflow(lakemanpth, tampabypth, bellshlpth, yrrng = yrs)
 
   # start assembling NPS model parameters
-
+  if(verbose)
+    cat('Estimating NPS ungaged...\n')
   rainflow <- dplyr::full_join(npsrain, allflo, by = c("basin", "yr", "mo"))
 
   rainflow <- rainflow |>
@@ -304,6 +315,10 @@ anlz_nps_ungaged <- function(tbbase, rain, lakemanpth, tampabypth, bellshlpth){
       bas_area = dplyr::first(bas_area),
       .groups = 'drop'
     )
+
+  # filter by yrrng
+  out <- out |>
+    dplyr::filter((yr >= yrs[1] & yr <= yrs[2]) | is.na(yr))
 
   return(out)
 

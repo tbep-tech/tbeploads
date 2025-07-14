@@ -4,9 +4,19 @@
 \alias{anlz_nps_ungaged}
 \title{Estimated non-point source (NPS) ungaged loads}
 \usage{
-anlz_nps_ungaged(tbbase, rain, lakemanpth, tampabypth, bellshlpth)
+anlz_nps_ungaged(
+  yrrng = c("2021-01-01", "2023-12-31"),
+  tbbase,
+  rain,
+  lakemanpth,
+  tampabypth,
+  bellshlpth,
+  verbose = TRUE
+)
 }
 \arguments{
+\item{yrrng}{A vector of two dates in 'YYYY-MM-DD' format, specifying the date range to retrieve flow data. Default is from '2021-01-01' to '2023-12-31'.}
+
 \item{tbbase}{data frame containing polygon areas for the combined data layer of bay segment, basin, jurisdiction, land use data, and soils, see details}
 
 \item{rain}{data frame of rainfall data, see details}
@@ -16,6 +26,8 @@ anlz_nps_ungaged(tbbase, rain, lakemanpth, tampabypth, bellshlpth)
 \item{tampabypth}{character, path to the file containing the Tampa Bypass flow data, see details}
 
 \item{bellshlpth}{character, path to the file containing the Bell shoals data, see details}
+
+\item{verbose}{logical indicating whether to print verbose output}
 }
 \value{
 A data frame with monthly pollutant load estimates containing the following columns:

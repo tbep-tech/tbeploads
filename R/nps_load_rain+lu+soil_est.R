@@ -1,22 +1,7 @@
-# library(haven)
-# library(sf)
-# library(readxl)
-# library(tidyverse)
-# library(rnoaa)
-# library(esri2sf) # yonghah/esri2sf on github
-# library(tbeptools)
-# library(zoo)
-# library(httr)
-# library(units)
-# library(sjlabelled)
-# #library(jsonlite)
-# #library(tmap)
-# #library(terra)
-#
-# # get combined subwatershed, drainage basin, jurisdiction, land use, and soils data
-# data(tblu2023)
-# data(tbsoil)
-# tbbase <- util_nps_tbbase(tbsubshed, tbjuris, tblu2023, tbsoil, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
+# # # get combined subwatershed, drainage basin, jurisdiction, land use, and soils data
+# # data(tblu2023)
+# # data(tbsoil)
+# # tbbase <- util_nps_tbbase(tbsubshed, tbjuris, tblu2023, tbsoil, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
 #
 # # ungaged
 # data(tbbase)
@@ -25,8 +10,12 @@
 # tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
 # bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 #
-# anlz_nps_ungaged(tbbase, rain, lakemanpth, tampabypth, bellshlpth)
-
+# nps_ungaged <- anlz_nps_ungaged(tbbase, rain, lakemanpth, tampabypth, bellshlpth)
+#
+# nps_gaged <- anlz_nps_gaged(yrrng = c('2021-01-01', '2023-12-31'), mancopth = mancopth,
+#                           pincopth = pincopth, lakemanpth = lakemanpth, tampabypth = tampabypth,
+#                           bellshlpth = bellshlpth, verbose = TRUE)
+#
 # # gaged
 # obsloads <- readRDS("./data/nps_gaged_loads_2021-2023.rds") %>% #Saved from nps_load_Q+WQ_calc.R script
 #               mutate(oh2oload = h2oload,
