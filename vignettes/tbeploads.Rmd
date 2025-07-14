@@ -119,7 +119,7 @@ vernafl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
 vernafl
 ```
 
-During load calculation, the Verna data are converted to total nitrogen and total phosphorus from ammonium and nitrate concentration data using the `util_ad_prepverna()` function. Total nitrogen and phosphorus concentrations are estimated from ammonium and nitrate concentrations (mg/L) using the following relationships:
+During load calculation, the Verna data are converted to total nitrogen and total phosphorus from ammonium and nitrate concentration data using the `util_prepverna()` function. Total nitrogen and phosphorus concentrations are estimated from ammonium and nitrate concentrations (mg/L) using the following relationships:
 
 $$
 TN = NH_4^+ * 0.78 + NO_3^- * 0.23

@@ -1,6 +1,6 @@
-#' Prep Verna Wellfield data for use in AD calculations
+#' Prep Verna Wellfield data for use in AD and NPS calculations
 #'
-#' Prep Verna Wellfield data for use in AD calculations
+#' Prep Verna Wellfield data for use in AD and NPS calculations
 #'
 #' @param fl text string for the file path to the Verna Wellfield data
 #' @param fillmis logical indicating whether to fill missing data with monthly means
@@ -19,8 +19,8 @@
 #'
 #' @examples
 #' fl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
-#' util_ad_prepverna(fl)
-util_ad_prepverna <- function(fl, fillmis = T){
+#' util_prepverna(fl)
+util_prepverna <- function(fl, fillmis = T){
 
   # import raw, subset relevant, fill -9 as NA
   dat <- read.csv(fl, header = T, stringsAsFactors = F) |>

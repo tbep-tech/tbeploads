@@ -10,25 +10,25 @@ test_data <- data.frame(
 temp_csv <- tempfile(fileext = ".csv")
 write.csv(test_data, temp_csv, row.names = FALSE)
 
-test_that("util_ad_prepverna returns a data frame", {
-  result <- util_ad_prepverna(vernafl, fillmis = TRUE)
+test_that("util_prepverna returns a data frame", {
+  result <- util_prepverna(vernafl, fillmis = TRUE)
   expect_s3_class(result, "data.frame")
 })
 
-test_that("util_ad_prepverna fills missing values when fillmis is TRUE", {
-  result <- util_ad_prepverna(vernafl, fillmis = TRUE)
+test_that("util_prepverna fills missing values when fillmis is TRUE", {
+  result <- util_prepverna(vernafl, fillmis = TRUE)
   expect_false(any(is.na(result$TNConc)))
   expect_false(any(is.na(result$TPConc)))
 })
 
-test_that("util_ad_prepverna does not fill missing values when fillmis is FALSE", {
-  result <- util_ad_prepverna(vernafl, fillmis = FALSE)
+test_that("util_prepverna does not fill missing values when fillmis is FALSE", {
+  result <- util_prepverna(vernafl, fillmis = FALSE)
   expect_true(any(is.na(result$TNConc)))
   expect_true(any(is.na(result$TPConc)))
 })
 
-test_that("util_ad_prepverna calculates TNConc and TPConc correctly", {
-  result <- util_ad_prepverna(temp_csv, fillmis = TRUE)
+test_that("util_prepverna calculates TNConc and TPConc correctly", {
+  result <- util_prepverna(temp_csv, fillmis = TRUE)
 
   # Manually calculate the expected values for the first row
   expected_TNConc <- (test_data$NH4[1] * 0.78) + (test_data$NO3[1] * 0.23)

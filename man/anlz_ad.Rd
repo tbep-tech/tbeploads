@@ -27,7 +27,7 @@ A data frame with nitrogen and phosphorus loads in tons/month, hydrologic load i
 Calculate AD loads and summarize
 }
 \details{
-Loading from atmospheric deposition (AD) for bay segments in the Tampa Bay watershed are calculated using rainfall data and atmospheric concentration data from the Verna Wellfield site.  Rainfall data must be obtained using the \code{\link{util_getrain}} function before calculating loads.  For convenience, daily rainfall data from 2017 to 2023 at sites in the watershed are included with the package in the \code{\link{rain}} object.  The Verna Wellfield data must also be obtained from \url{https://nadp.slh.wisc.edu/sites/ntn-FL41/} as monthly observations. This file is also included with the package and can be found using \code{\link{system.file}} as in the examples below. Internally, the Verna data are converted to total nitrogen and total phosphorus from ammonium and nitrate concentration data (see \code{\link{util_ad_prepverna}} for additional information).
+Loading from atmospheric deposition (AD) for bay segments in the Tampa Bay watershed are calculated using rainfall data and atmospheric concentration data from the Verna Wellfield site.  Rainfall data must be obtained using the \code{\link{util_getrain}} function before calculating loads.  For convenience, daily rainfall data from 2017 to 2023 at sites in the watershed are included with the package in the \code{\link{rain}} object.  The Verna Wellfield data must also be obtained from \url{https://nadp.slh.wisc.edu/sites/ntn-FL41/} as monthly observations. This file is also included with the package and can be found using \code{\link{system.file}} as in the examples below. Internally, the Verna data are converted to total nitrogen and total phosphorus from ammonium and nitrate concentration data (see \code{\link{util_prepverna}} for additional information).
 
 The function first estimates the total hydrologic load for each bay segment using daily estimates of rainfall at NWIS NCDC sites in the watershed.  This is done as a weighted mean of rainfall at the measured sites relative to grid locations in each sub-watershed for the bay segments.  The weights are based on distance of the grid cells from the closest site as inverse distance squared. Total hydrologic load for a bay segment is then estimated by converting inches/month  to m3/month using the segment area. The distance data and bay segment areas are contained in the \code{\link{ad_distance}} file included with the package.
 
@@ -39,5 +39,5 @@ data(rain)
 anlz_ad(rain, vernafl)
 }
 \seealso{
-\code{\link{util_getrain}}, \code{\link{util_ad_prepverna}}
+\code{\link{util_getrain}}, \code{\link{util_prepverna}}
 }
