@@ -66,7 +66,7 @@
 #' Requires the following inputs:
 #'
 #' \itemize{
-#'  \item \code{tbbase}: A data frame containing polygon areas for the combined data layer of bay segment, basin, jurisdiction, land use data, and soils, Stored as \code{\link{tbbase}} or created (takes an hour or so) with \code{\link{util_nps_gettbbase}}.
+#'  \item \code{tbbase}: A data frame containing polygon areas for the combined data layer of bay segment, basin, jurisdiction, land use data, and soils, Stored as \code{\link{tbbase}} or created (takes an hour or so) with \code{\link{util_nps_tbbase}}.
 #'  \item \code{rain}: A data frame of rainfall data. See \code{\link{rain}}.
 #'  \item \code{lakemanpth}: character, path to the file containing the Lake Manatee flow data. See \code{\link{util_nps_getextflow}}.
 #'  \item \code{tampabypth}: character, path to the file containing the Tampa Bypass flow data. See \code{\link{util_nps_getextflow}}.
@@ -102,7 +102,8 @@
 #' tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
 #' bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 #'
-#' anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, lakemanpth, tampabypth, bellshlpth)
+#' anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase,
+#'    rain, lakemanpth, tampabypth, bellshlpth)
 anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, lakemanpth, tampabypth, bellshlpth, verbose = TRUE) {
 
   yrrng <- lubridate::ymd(yrrng)

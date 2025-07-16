@@ -1,8 +1,3 @@
-library(testthat)
-library(sf)
-library(mockery)
-library(dplyr)
-
 # Mock sf object creation function
 create_mock_sf <- function(coords = NULL, crs = 4326, id = 1) {
   # Handle vector of IDs - create multiple polygons

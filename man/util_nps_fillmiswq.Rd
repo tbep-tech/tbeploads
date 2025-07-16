@@ -22,7 +22,8 @@ Missing end date monthly values are filled with prior 5 year averages. Then, mis
 \dontrun{
 manopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
 pincopth <- system.file('extdata/nps_wq_pinco.txt', package = 'tbeploads')
-wq <- util_nps_getwq(c('2021-01-01', '2023-12-31'), mancopth = manopth, pincopth = pincopth, verbose = F)
+wq <- util_nps_getwq(c('2021-01-01', '2023-12-31'), mancopth = manopth,
+  pincopth = pincopth, verbose = F)
 wq <- util_nps_fillmiswq(wq)
 }
 }

@@ -2,6 +2,7 @@
 #'
 #' @param pth Path to the external Excel file
 #' @param loc Location of the external flow data. Options are 'LMANATEE', 'TBYPASS', or '02301500'.
+#' @param yrrng Numeric vector of length 2 indicating the year range to filter the data. Default is c(2021, 2023).
 #'
 #' @returns A data frame of flow data for the location in `loc`
 #'

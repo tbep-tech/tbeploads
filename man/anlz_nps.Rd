@@ -32,8 +32,9 @@ anlz_nps(
 
 \item{tampabypth}{character, path to the file containing the Tampa Bypass flow data, see details}
 
-\item{bellshlpth}{character, path to the file containing the Bell shoals data, see details
-#' @param vernafl character vector of file path to Verna Wellfield atmospheric concentration data}
+\item{bellshlpth}{character, path to the file containing the Bell shoals data, see details}
+
+\item{vernafl}{character vector of file path to Verna Wellfield atmospheric concentration data}
 
 \item{verbose}{logical indicating whether to print verbose output}
 }
@@ -53,10 +54,10 @@ The following functions are used internally and are provided here for reference 
 \item \code{\link{anlz_nps_gaged}}: Estimates gaged NPS loads.
 \item \code{\link{util_prepverna}}: Prepares and fills missing data with five-year means for the Verna Wellfield site data.
 \item \code{\link{util_nps_getflow}}: Gets flow estimates for NPS gaged and ungaged calculations.
-\item \code{\link{util_nps_getusgsflow}}: Gets USGS flow data for NPS calculations, used in \code{\link{anlz_nps_getflow}}.
-\item \code{\link{util_nps_getextflow}}: Gets external flow data and contacts (Lake Manatee, Tampa Bypass, and Bell Shoals), used in \code{\link{anlz_nps_getflow}}.
+\item \code{\link{util_nps_getusgsflow}}: Gets USGS flow data for NPS calculations, used in \code{\link{util_nps_getflow}}.
+\item \code{\link{util_nps_getextflow}}: Gets external flow data and contacts (Lake Manatee, Tampa Bypass, and Bell Shoals), used in \code{\link{util_nps_getflow}}.
 \item \code{\link{util_nps_getwq}}: Gets water quality data for NPS gaged calculations (for \code{mancopth}, \code{pincopth}, and Hillsborough County data).
-\item \code{\link{util_nps_getrain}}: Gets rainfall data for NPS ungaged calculations, as provided in \code{\link{rain}}.
+\item \code{\link{util_getrain}}: Gets rainfall data for NPS ungaged calculations, as provided in \code{\link{rain}}.
 \item \code{\link{util_nps_tbbase}}: Gets the combined spatial data layer for NPS ungaged calculations, as provided in \code{\link{tbbase}}.
 }
 }

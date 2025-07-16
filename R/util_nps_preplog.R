@@ -52,7 +52,7 @@ util_nps_preplog <- function(tbbase){
       dplyr:: filter(tbland, basin == "02307359") |> dplyr::mutate(basin = "LTARPON")
     ) |>
     dplyr::summarise(
-      across(.cols = where(is.numeric), .fns = sum),
+      dplyr::across(.cols = dplyr::where(is.numeric), .fns = sum),
       .by = c("bay_seg", "basin")
     )
 

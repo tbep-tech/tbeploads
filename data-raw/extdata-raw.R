@@ -44,8 +44,8 @@ dat <- tibble::tibble(
 
       x |>
         dplyr::mutate(
-          across(
-            !any_of(nmsexc), rn_fun
+          dplyr::across(
+            !dplyr::any_of(nmsexc), rn_fun
           )
         )
 
