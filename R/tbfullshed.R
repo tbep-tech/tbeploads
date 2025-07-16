@@ -16,7 +16,7 @@
 #' \dontrun{
 #' prj <- 6443
 #'
-#' tbfullshed <- sf::st_read("./data-raw/TBEP/gis/TBEP_Watershed_Correct_Projection.shp") |>
+#' tbfullshed <- sf::st_read("./data-raw/gis/TBEP_Watershed_Correct_Projection.shp") |>
 #'   st_transform(prj) |>
 #'   st_union(by_feature = T) |>
 #'   st_buffer(dist = 0) |>

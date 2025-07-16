@@ -27,7 +27,7 @@ Projection is NAD83(2011) / Florida West (ftUS), CRS 6443.
 \dontrun{
 prj <- 6443
 
-tbjuris <- sf::st_read("./data-raw/TBEP/gis/TB_Juris.shp") |>
+tbjuris <- sf::st_read("./data-raw/gis/TB_Juris.shp") |>
   sf::st_transform(prj) |>
   sf::st_buffer(dist = 0) |>
   dplyr::rename(entity = NAME_FINAL) |>

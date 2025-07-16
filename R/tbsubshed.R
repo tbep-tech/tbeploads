@@ -21,7 +21,7 @@
 #' \dontrun{
 #' prj <- 6443
 #'
-#' tbsubshed <- sf::st_read("./data-raw/TBEP/gis/TBEP_Major_Basins_NAD1983_SP_FIPS0902_FT.shp") |>
+#' tbsubshed <- sf::st_read("./data-raw/gis/TBEP_Major_Basins_NAD1983_SP_FIPS0902_FT.shp") |>
 #'   sf::st_transform(prj) |>
 #'   sf::st_buffer(dist = 0) |>
 #'   dplyr::mutate(

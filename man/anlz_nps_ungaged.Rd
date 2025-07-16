@@ -117,7 +117,7 @@ Requires the following inputs:
 \item \code{bellshlpth}: character, path to the file containing the Bell shoals data. See \code{\link{util_nps_getextflow}}.
 }
 
-USGS gaged flows are also used, as returned by \code{\link{util_nps_getusgsflow}}.
+USGS gaged flows are also used, as returned by \code{\link{util_nps_getusgsflow}} and combined with the external flow data using \code{\link{util_nps_getextflow}} and \code{\link{util_nps_getflow}}.
 }
 \examples{
 # external flow sources
@@ -125,5 +125,5 @@ lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbe
 tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
 bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 
-anlz_nps_ungaged(tbbase, rain, lakemanpth, tampabypth, bellshlpth)
+anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, lakemanpth, tampabypth, bellshlpth)
 }

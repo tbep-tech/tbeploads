@@ -16,7 +16,7 @@
 #' \dontrun{
 #' prj <- 6443
 #'
-#' tbdbasin <- sf::st_read("./data-raw/TBEP/gis/TBEP_dBasins_FIPS0902_Projection.shp") |>
+#' tbdbasin <- sf::st_read("./data-raw/gis/TBEP_dBasins_FIPS0902_Projection.shp") |>
 #'   sf::st_transform(prj) |>
 #'   sf::st_buffer(dist = 0) |>
 #'   dplyr::group_by(NEWGAGE, DRNFEATURE) |>

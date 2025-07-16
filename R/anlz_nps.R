@@ -23,7 +23,7 @@
 #' \itemize{
 #'  \item \code{\link{anlz_nps_ungaged}}: Estimates ungaged NPS loads.
 #'  \item \code{\link{anlz_nps_gaged}}: Estimates gaged NPS loads.
-#'  \item \code{\link[tbeploads]{util_prepverna}}: Prepares and fills missing data with five-year means for the Verna Wellfield site data.
+#'  \item \code{\link{util_prepverna}}: Prepares and fills missing data with five-year means for the Verna Wellfield site data.
 #'  \item \code{\link{util_nps_getflow}}: Gets flow estimates for NPS gaged and ungaged calculations.
 #'  \item \code{\link{util_nps_getusgsflow}}: Gets USGS flow data for NPS calculations, used in \code{\link{anlz_nps_getflow}}.
 #'  \item \code{\link{util_nps_getextflow}}: Gets external flow data and contacts (Lake Manatee, Tampa Bypass, and Bell Shoals), used in \code{\link{anlz_nps_getflow}}.
