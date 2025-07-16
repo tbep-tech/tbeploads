@@ -50,7 +50,7 @@ util_nps_unionchunk <- function(sf1, sf2, chunk_size, verbose = TRUE) {
     all_cols <- c(sf1_cols, sf2_cols)
 
     final_result |>
-      dplyr::group_by(dplyr::across(dplyr::all_of(all_cols))) %>%
+      dplyr::group_by(dplyr::across(dplyr::all_of(all_cols))) |>
       dplyr::summarise(.groups = 'drop')
   } else {
     # Return empty sf object with correct structure

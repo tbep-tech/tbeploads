@@ -22,7 +22,7 @@ util_nps_getusgsflow <- function(site = NULL, yrrng = c('2021-01-01', '2023-12-3
 
   for(sid in usgsid) {
 
-    dat <- suppressMessages(dataRetrieval::readNWISdv(sid, "00060", yrrng[1], yrrng[2])) %>%
+    dat <- suppressMessages(dataRetrieval::readNWISdv(sid, "00060", yrrng[1], yrrng[2])) |>
       dataRetrieval::renameNWISColumns()
 
     fl_results[[sid]] <- dat

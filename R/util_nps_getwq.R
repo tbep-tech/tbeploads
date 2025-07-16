@@ -111,11 +111,11 @@ util_nps_getwq <- function(yrrng = c('2021-01-01', '2023-12-31'), mancopth = NUL
     ) |>
     dplyr::filter(as.Date(SampleTime) >= as.Date(yrrng[1]) &
                   as.Date(SampleTime) <= as.Date(yrrng[2])) |>
-    dplyr::filter(station %in% c('105', '113', '114', '132', '141', '138', '142', '147')) %>%
+    dplyr::filter(station %in% c('105', '113', '114', '132', '141', '138', '142', '147')) |>
     dplyr::select(station, date, tn_mgl, tp_mgl, tss_mgl, bod_mgl)
 
   # combine all wq
-  out <- dplyr::bind_rows(hilco, codat) %>%
+  out <- dplyr::bind_rows(hilco, codat) |>
     dplyr::mutate(
       basin = dplyr::case_when(
         station == "06-06" ~ "LTARPON",

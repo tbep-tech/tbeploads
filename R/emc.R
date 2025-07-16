@@ -2,7 +2,7 @@
 #'
 #' @format A \code{data.frame}
 #'
-#' @details Used for non-point source (NPS) ungaged estimates summaries, bay segments are as follows:
+#' @details Used for non-point source (NPS) ungaged estimates summaries.
 #'
 #' Values are grouped by CLUCSID and include mean TN, TP, TSS, and BOD.
 #'

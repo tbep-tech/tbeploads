@@ -48,7 +48,7 @@ anlz_nps_gaged <- function(yrrng = c('2021-01-01', '2023-12-31'), mancopth = NUL
   # combine flow and wq
   alldat <- allwq |>
     dplyr::full_join(allflo, by = c("basin", "yr", "mo")) |>
-    dplyr::arrange(basin, yr, mo) %>%
+    dplyr::arrange(basin, yr, mo) |>
     dplyr::filter(basin %in% c("02300500", "02300700", "02301500", "02301750",
                          "02304500", "02306647", "02307000", "EVERSRES",
                          "LMANATEE", "LTARPON", "TBYPASS"))

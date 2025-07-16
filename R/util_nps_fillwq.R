@@ -43,8 +43,8 @@ util_nps_fillmiswq <- function(wq){
       bod_mgl = dplyr::case_when(
         (basin == "LTARPON" & yr == 2023 & mo == 12) ~ mean(c(1, 2.6, 2.9, 3.2, 2.3)),
         TRUE ~ bod_mgl)
-      ) %>%
-    dplyr::mutate(tn_mgl = zoo::na.approx(tn_mgl), .by = basin) %>%    # Linear interpolate missing monthly WQ concentration values
+      ) |>
+    dplyr::mutate(tn_mgl = zoo::na.approx(tn_mgl), .by = basin) |>    # Linear interpolate missing monthly WQ concentration values
     dplyr::mutate(tp_mgl = zoo::na.approx(tp_mgl), .by = basin)
 
   return(out)

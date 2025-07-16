@@ -42,8 +42,8 @@ util_nps_landsoilrc <- function(tbbase, yrexp = c(2021:2023)){
       .by = c('basin', 'bay_seg', 'mo')
     )
 
-  out <- landsoil %>%
-     dplyr::left_join(tot_rca, by = c("bay_seg", "basin", "mo")) %>%
+  out <- landsoil |>
+     dplyr::left_join(tot_rca, by = c("bay_seg", "basin", "mo")) |>
      tidyr::expand_grid(yr = yrexp)
 
   return(out)
