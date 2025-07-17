@@ -345,12 +345,12 @@ combined with IPS loads for reporting.</p>
 Tampa Bay watershed are calculated using rainfall data from weather
 stations in the watershed and atmospheric concentration data from the
 Verna Wellfield site. Rainfall data must be obtained using the
-<code><a href="../reference/util_ad_getrain.html">util_ad_getrain()</a></code> function before calculating loads. For
+<code><a href="../reference/util_getrain.html">util_getrain()</a></code> function before calculating loads. For
 convenience, daily rainfall data from 2017 to 2023 at sites in the
-watershed are included with the package in the <code>ad_rain</code>
+watershed are included with the package in the <code>rain</code>
 object.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ad_rain</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">rain</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 6</span></span></span>
 <span><span class="co">#&gt;   station date        Year Month   Day rainfall</span></span>
 <span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -369,7 +369,7 @@ found using <code><a href="https://rdrr.io/r/base/system.file.html" class="exter
 <span><span class="co">#&gt; [1] "/home/runner/work/_temp/Library/tbeploads/extdata/verna-raw.csv"</span></span></code></pre></div>
 <p>During load calculation, the Verna data are converted to total
 nitrogen and total phosphorus from ammonium and nitrate concentration
-data using the <code><a href="../reference/util_ad_prepverna.html">util_ad_prepverna()</a></code> function. Total nitrogen
+data using the <code><a href="../reference/util_prepverna.html">util_prepverna()</a></code> function. Total nitrogen
 and phosphorus concentrations are estimated from ammonium and nitrate
 concentrations (mg/L) using the following relationships:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>N</mi><mo>=</mo><mi>N</mi><msubsup><mi>H</mi><mn>4</mn><mo>+</mo></msubsup><mo>*</mo><mn>0.78</mn><mo>+</mo><mi>N</mi><msubsup><mi>O</mi><mn>3</mn><mo>−</mo></msubsup><mo>*</mo><mn>0.23</mn></mrow><annotation encoding="application/x-tex">
@@ -409,29 +409,284 @@ nitrogen and phosphorus concentrations in the Verna data. The loading
 calculations also include a wet/dry deposition conversion factor to
 account for differences in loading during the rainy and dry seasons.</p>
 <p>Using <code><a href="../reference/anlz_ad.html">anlz_ad()</a></code> to estimate AD load is done as follows,
-where <code>ad_rain</code> is the rain data and <code>vernafl</code> is
-the path to the Verna Wellfield data.</p>
+where <code>rain</code> is the rain data and <code>vernafl</code> is the
+path to the Verna Wellfield data.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/anlz_ad.html">anlz_ad</a></span><span class="op">(</span><span class="va">ad_rain</span>, <span class="va">vernafl</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/anlz_ad.html">anlz_ad</a></span><span class="op">(</span><span class="va">rain</span>, <span class="va">vernafl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 672 × 7</span></span></span>
 <span><span class="co">#&gt;     Year Month source segment        tn_load tp_load hy_load</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">2</span>017     1 AD     Boca Ciega Bay   1.13   0.019<span style="text-decoration: underline;">2</span>    1.98</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">2</span>017     1 AD     Boca Ciega Bay   0.934  0.016<span style="text-decoration: underline;">7</span>    1.98</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">2</span>017     2 AD     Boca Ciega Bay   0.945  0.016<span style="text-decoration: underline;">8</span>    1.95</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">2</span>017     3 AD     Boca Ciega Bay   0.950  0.018<span style="text-decoration: underline;">1</span>    2.48</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  <span style="text-decoration: underline;">2</span>017     4 AD     Boca Ciega Bay   3.23   0.050<span style="text-decoration: underline;">4</span>    3.90</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  <span style="text-decoration: underline;">2</span>017     4 AD     Boca Ciega Bay   3.03   0.047<span style="text-decoration: underline;">9</span>    3.90</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  <span style="text-decoration: underline;">2</span>017     5 AD     Boca Ciega Bay   9.06   0.131     6.89</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  <span style="text-decoration: underline;">2</span>017     6 AD     Boca Ciega Bay   9.67   0.178    22.5 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  <span style="text-decoration: underline;">2</span>017     7 AD     Boca Ciega Bay  10.8    0.189    26.2 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  <span style="text-decoration: underline;">2</span>017     8 AD     Boca Ciega Bay   5.58   0.120    24.6 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">2</span>017     9 AD     Boca Ciega Bay   2.14   0.055<span style="text-decoration: underline;">3</span>   14.1 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>017    10 AD     Boca Ciega Bay   0.493  0.017<span style="text-decoration: underline;">4</span>    5.56</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>017    10 AD     Boca Ciega Bay   1.54   0.030<span style="text-decoration: underline;">6</span>    5.56</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 662 more rows</span></span></span></code></pre></div>
 <p>Results can be summarized by segment, baywide, monthly, or annually
 using the <code>summ</code> and <code>summtime</code> arguments. By
 default, loads are returned monthly for each segment. Note that Boca
 Ciega Bay and Boca Ciega Bay South results are returned separately. Only
 Boca Ciega Bay South is used when estimating total bay loads.</p>
+</div>
+<div class="section level3">
+<h3 id="nps">NPS<a class="anchor" aria-label="anchor" href="#nps"></a>
+</h3>
+<p>Non-point source (NPS) estimates are obtained for gaged and ungaged
+locations in the watershed, then combined for the final result. Skip to
+the final sub-section to understand how to obtain all estimates
+together. Separate approaches for gaged and ungaged estimates are
+described first for documentation purposes.</p>
+<div class="section level4">
+<h4 id="gaged-locations">Gaged locations<a class="anchor" aria-label="anchor" href="#gaged-locations"></a>
+</h4>
+<p>Gaged estimates are obtained using the <code><a href="../reference/anlz_nps_gaged.html">anlz_nps_gaged()</a></code>
+function that retrieves flow and water quality data, then combines them
+to calculate TN, TP, TSS, BOD, and hydrologic loads.</p>
+<p>Required external data inputs are Lake Manatee, Tampa Bypass, and
+Alafia River Bell Shoals flow data. These are not available from the
+USGS API and must be obtained from the contacts listed in
+<code><a href="../reference/util_nps_getextflow.html">util_nps_getextflow()</a></code>. USGS flow data are obtained from an
+API for stations 02299950, 02300042, 02300500, 02300700, 02301000,
+02301300, 02301500, 02301750, 02303000, 02303330, 02304500, 02306647,
+02307000, 02307359, and 02307498.</p>
+<p>Water Quality data are obtained from the FDEP WIN database API,
+tbeptools, or local files as described in <code><a href="../reference/util_nps_getwq.html">util_nps_getwq()</a></code>.
+Chosen stations are ER2 and UM2 for Manatee County and station 06-06 for
+Pinellas County. Environmental Protection Commission (EPC) of
+Hillsborough County stations retained are 105, 113, 114, 132, 141, 138,
+142, and 147. Manatee or Pinellas County data can be imported from local
+files using the <code>mancopth</code> and <code>pincopth</code>
+arguments, respectively. If these are not provided, the function will
+attempt to retrieve data from the FDEP WIN database using
+<code>read_importwqwin()</code> from tbeptools. The EPC data are
+retrieved using <code>read_importepc()</code> from tbeptools.</p>
+<p>The function assumes that the water quality data are in mg/L and flow
+data are in cfs. Missing water quality data are filled with previous
+five year averages for the end months, then linearly interpolated using
+. This function will need to be updated for future load
+calculations.</p>
+<p>A data frame is returned with columns for basin, year, month, TN in
+mg/L, TP in mg/L, TSS in mg/L, BOD in mg/L, flow in liters/month,
+hydrologic load in million m3/month, TN load in kg/month, TP load in
+kg/month, TSS load in kg/month, and BOD load in kg/month.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># external files included with the package</span></span>
+<span><span class="va">mancopth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_wq_manco.txt'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span><span class="va">pincopth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_wq_pinco.txt'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span><span class="va">lakemanpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_lakemanatee.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span><span class="va">tampabypth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_tampabypass.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span><span class="va">bellshlpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_bellshoals.xls'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># get gaged NPS loads</span></span>
+<span><span class="va">nps_gaged</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps_gaged.html">anlz_nps_gaged</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, mancopth <span class="op">=</span> <span class="va">mancopth</span>,</span>
+<span>                           pincopth <span class="op">=</span> <span class="va">pincopth</span>, lakemanpth <span class="op">=</span> <span class="va">lakemanpth</span>, tampabypth <span class="op">=</span> <span class="va">tampabypth</span>,</span>
+<span>                           bellshlpth <span class="op">=</span> <span class="va">bellshlpth</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Retrieving flow data...</span></span>
+<span><span class="co">#&gt; Retrieving water quality data...</span></span>
+<span><span class="co">#&gt; Retrieving Manatee County data...</span></span>
+<span><span class="co">#&gt; Retreiving Pinellas County data...</span></span>
+<span><span class="co">#&gt; Retrieving Hillsborough County data...</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">nps_gaged</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 13</span></span></span>
+<span><span class="co">#&gt;   basin      yr    mo tn_mgl tp_mgl tss_mgl bod_mgl   flow h2oload tnload tpload</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 023005…  <span style="text-decoration: underline;">2</span>021     1  0.862  0.222      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span> 4.71<span style="color: #949494;">e</span>9  4.71<span style="color: #949494;">e</span>6  <span style="text-decoration: underline;">4</span>063.  <span style="text-decoration: underline;">1</span>046.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 023005…  <span style="text-decoration: underline;">2</span>021     2  1.13   0.358      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span> 9.10<span style="color: #949494;">e</span>9  9.10<span style="color: #949494;">e</span>6 <span style="text-decoration: underline;">10</span>280.  <span style="text-decoration: underline;">3</span>257.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 023005…  <span style="text-decoration: underline;">2</span>021     3  0.941  0.327      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span> 4.62<span style="color: #949494;">e</span>9  4.62<span style="color: #949494;">e</span>6  <span style="text-decoration: underline;">4</span>351.  <span style="text-decoration: underline;">1</span>512.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 023005…  <span style="text-decoration: underline;">2</span>021     4  0.964  0.44       <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span> 8.04<span style="color: #949494;">e</span>9  8.04<span style="color: #949494;">e</span>6  <span style="text-decoration: underline;">7</span>755.  <span style="text-decoration: underline;">3</span>540.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 023005…  <span style="text-decoration: underline;">2</span>021     5  0.334  0.286      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span> 2.07<span style="color: #949494;">e</span>9  2.07<span style="color: #949494;">e</span>6   692.   593.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 023005…  <span style="text-decoration: underline;">2</span>021     6  0.871  0.341      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span> 4.12<span style="color: #949494;">e</span>9  4.12<span style="color: #949494;">e</span>6  <span style="text-decoration: underline;">3</span>585.  <span style="text-decoration: underline;">1</span>403.</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: tssload &lt;dbl&gt;, bodload &lt;dbl&gt;</span></span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="ungaged-locations">Ungaged locations<a class="anchor" aria-label="anchor" href="#ungaged-locations"></a>
+</h4>
+<p>Ungaged (unmonitored basins) estimates are obtained using
+<code><a href="../reference/anlz_nps_ungaged.html">anlz_nps_ungaged()</a></code>. The approach combines spatial land use
+data, rainfall patterns, hydrologic modeling, and empirical
+relationships to estimate monthly nutrient and sediment loads. The
+function requires combined spatial data for bay segment, basin, entity
+jurisdiction, land use data, and soils (using <code>tbbase</code>),
+rainfall data (using <code>rain</code>), and flow data (obtained with
+<code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>).</p>
+<p>The first step is updating the combined spatial data if any of the
+input datasets have changed. The required inputs are land use
+(<code>tblu2020</code> or <code>tblu2023</code>), soil data
+(<code>tbsoil</code>), jurisdiction (<code>tbjuris</code>), and
+sub-basin data (<code>tbsubshed</code>). The function
+<code><a href="../reference/util_nps_tbbase.html">util_nps_tbbase()</a></code> combines these datasets into a single
+spatial object that is used for ungaged load estimation using
+<code><a href="../reference/util_nps_union.html">util_nps_union()</a></code>. The function requires GDAL to be
+installed and accessible in the system PATH, or the path to GDAL
+binaries can be provided using the <code>gdal_path</code> argument.</p>
+<p>Land use and soil data can be updated using the
+<code><a href="../reference/util_nps_getswfwmd.html">util_nps_getswfwmd()</a></code> function. These data are also stored
+internally with the package for easy retrieval, as are the remaining
+datasets.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">tblu2023</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_nps_getswfwmd.html">util_nps_getswfwmd</a></span><span class="op">(</span><span class="st">'lulc2023'</span><span class="op">)</span></span>
+<span><span class="va">tbsoil</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_nps_getswfwmd.html">util_nps_getswfwmd</a></span><span class="op">(</span><span class="st">'soil'</span><span class="op">)</span></span></code></pre></div>
+<p>Then, the combined layer, <code>tbbase</code>, can be created (takes
+an hour or two).</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbsubshed</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbjuris</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tblu2023</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbsoil</span><span class="op">)</span></span>
+<span><span class="va">tbbase</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_nps_tbbase.html">util_nps_tbbase</a></span><span class="op">(</span><span class="va">tbsubshed</span>, <span class="va">tbjuris</span>, <span class="va">tblu2023</span>, <span class="va">tbsoil</span>, gdal_path <span class="op">=</span> <span class="st">"C:/OSGeo4W/bin"</span>, chunk_size <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
+<p>The <code>tbbase</code> data object is also included with the package
+for convenience.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">tbbase</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 9</span></span></span>
+<span><span class="co">#&gt;   bay_seg basin    drnfeat entity     FLUCCSCODE CLUCSID IMPROVED hydgrp area_ha</span></span>
+<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>       1 02304500 LAKE    HILLSBORO…       <span style="text-decoration: underline;">1</span>100       1        1 B/D    0.006<span style="text-decoration: underline;">51</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>       1 02304500 LAKE    HILLSBORO…       <span style="text-decoration: underline;">1</span>100       1        1 C      0.002<span style="text-decoration: underline;">54</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>       1 02304500 LAKE    HILLSBORO…       <span style="text-decoration: underline;">1</span>200       2        1 A      0.001<span style="text-decoration: underline;">08</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>       1 02304500 LAKE    HILLSBORO…       <span style="text-decoration: underline;">1</span>200       2        1 B/D    0.004<span style="text-decoration: underline;">40</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>       1 02304500 LAKE    HILLSBORO…       <span style="text-decoration: underline;">1</span>200       2        1 C      0.033<span style="text-decoration: underline;">5</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>       1 02304500 LAKE    HILLSBORO…       <span style="text-decoration: underline;">1</span>200       2        1 D      0.005<span style="text-decoration: underline;">74</span></span></span></code></pre></div>
+<p>Once the required data are prepared, ungaged loads can be estimated
+using <code><a href="../reference/anlz_nps_ungaged.html">anlz_nps_ungaged()</a></code>. The following describes the
+general methods for how the ungaged loads are estimated in four
+steps.</p>
+<div class="section level5">
+<h5 id="data-preparation">1. Data Preparation<a class="anchor" aria-label="anchor" href="#data-preparation"></a>
+</h5>
+<p>The first step processes land use data for logistic regression
+modeling and calculates inverse distance-weighted rainfall data for each
+sub-basin. This ensures that each basin receives rainfall estimates that
+account for spatial variability across the watershed based on the
+proximity and influence of nearby rain gauges.</p>
+</div>
+<div class="section level5">
+<h5 id="flow-estimation">2. Flow Estimation<a class="anchor" aria-label="anchor" href="#flow-estimation"></a>
+</h5>
+<p>A logistic regression model predicts monthly streamflow in ungaged
+basins using several key variables:</p>
+<ul>
+<li>
+<strong>Rainfall variables</strong>: Current month rainfall plus
+2-month lagged rainfall to capture antecedent moisture conditions</li>
+<li>
+<strong>Land use percentages</strong>: Proportions of urban,
+agriculture, wetlands, and forest cover within each basin</li>
+<li>
+<strong>Seasonal patterns</strong>: Separate treatment for wet
+season (July-October) and dry season (November-June)</li>
+<li>
+<strong>Urban development intensity</strong>: Basins are classified
+into Group A (&lt;19% urban) or Group B (≥19% urban)</li>
+<li>
+<strong>Hydrologic soil characteristics</strong>: Soil group
+properties that influence infiltration and runoff</li>
+</ul>
+</div>
+<div class="section level5">
+<h5 id="runoff-coefficient-application">3. Runoff Coefficient Application<a class="anchor" aria-label="anchor" href="#runoff-coefficient-application"></a>
+</h5>
+<p>Land use and soil-specific runoff coefficients are applied to
+distribute the predicted basin flows across different landscape types
+within each basin.</p>
+</div>
+<div class="section level5">
+<h5 id="load-calculation">4. Load Calculation<a class="anchor" aria-label="anchor" href="#load-calculation"></a>
+</h5>
+<p>Pollutant loads are estimated using Event Mean Concentrations (EMCs)
+for different land use categories, calculating:</p>
+<ul>
+<li>Total Nitrogen (TN) loads</li>
+<li>Total Phosphorus (TP) loads<br>
+</li>
+<li>Total Suspended Solids (TSS) loads</li>
+<li>Biochemical Oxygen Demand (BOD) loads</li>
+<li>Stormwater-specific loads (with different EMCs for certain
+categories)</li>
+</ul>
+<p>The fundamental equation for pollutant load estimation is:</p>
+<p><strong>Load = Flow × EMC × Unit Conversions</strong></p>
+<p>Where EMCs (Event Mean Concentrations) represent the average
+pollutant concentrations in stormwater runoff for different land use
+types. EMCs vary by land use category (CLUCSID) based on empirical
+studies of stormwater quality. Special handling is applied for water
+bodies and certain wetland types (CLUCSIDs 18, 20), which are assigned
+zero stormwater loads since these areas do not generate surface runoff
+in the same manner as terrestrial land uses.</p>
+<p>All together, the above can be implemented as follows:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># required inputs</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbbase</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">rain</span><span class="op">)</span></span>
+<span><span class="va">lakemanpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_lakemanatee.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span><span class="va">tampabypth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_tampabypass.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span><span class="va">bellshlpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_bellshoals.xls'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/anlz_nps_ungaged.html">anlz_nps_ungaged</a></span><span class="op">(</span><span class="va">tbbase</span>, <span class="va">rain</span>, <span class="va">lakemanpth</span>, <span class="va">tampabypth</span>, <span class="va">bellshlpth</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level4">
+<h4 id="combined-gaged-and-ungaged-loads">Combined gaged and ungaged loads<a class="anchor" aria-label="anchor" href="#combined-gaged-and-ungaged-loads"></a>
+</h4>
+<p>Refer to the prior sections for details on how the separate loads for
+gaged and ungaged portions of the wateshed are calculated. The
+<code><a href="../reference/anlz_nps.html">anlz_nps()</a></code> function described below can be used to combined
+all steps. The function estimates non-point source (NPS) loads for Tampa
+Bay by combining ungaged and gaged NPS loads. Ungaged loads are
+estimated using rainfall, flow, event mean concentration, land use, and
+soils data, while gaged loads are estimated using water quality data and
+flow data. The function also incorporates atmospheric concentration data
+from the Verna Wellfield site.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbbase</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">rain</span><span class="op">)</span></span>
+<span><span class="va">mancopth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_wq_manco.txt'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span><span class="va">pincopth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_wq_pinco.txt'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span><span class="va">lakemanpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_lakemanatee.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span><span class="va">tampabypth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_tampabypass.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span><span class="va">bellshlpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_bellshoals.xls'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span><span class="va">vernafl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/verna-raw.csv'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/anlz_nps.html">anlz_nps</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, <span class="va">tbbase</span>, <span class="va">rain</span>, <span class="va">mancopth</span>, <span class="va">pincopth</span>,</span>
+<span>         <span class="va">lakemanpth</span>, <span class="va">tampabypth</span>, <span class="va">bellshlpth</span>, <span class="va">vernafl</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>The following functions are used internally and are provided here for
+reference on the components used in the calculations:</p>
+<ul>
+<li>
+<code><a href="../reference/anlz_nps_ungaged.html">anlz_nps_ungaged()</a></code>: Estimates ungaged NPS loads.</li>
+<li>
+<code><a href="../reference/anlz_nps_gaged.html">anlz_nps_gaged()</a></code>: Estimates gaged NPS loads.</li>
+<li>
+<code><a href="../reference/util_prepverna.html">util_prepverna()</a></code>: Prepares and fills missing data with
+five-year means for the Verna Wellfield site data.</li>
+<li>
+<code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>: Gets flow estimates for NPS gaged
+and ungaged calculations.</li>
+<li>
+<code><a href="../reference/util_nps_getusgsflow.html">util_nps_getusgsflow()</a></code>: Gets USGS flow data for NPS
+calculations, used in <code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>.</li>
+<li>
+<code><a href="../reference/util_nps_getextflow.html">util_nps_getextflow()</a></code>: Gets external flow data and
+contacts (Lake Manatee, Tampa Bypass, and Bell Shoals), used in
+<code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>.</li>
+<li>
+<code><a href="../reference/util_nps_getwq.html">util_nps_getwq()</a></code>: Gets water quality data for NPS gaged
+calculations (for <code>mancopth</code>, <code>pincopth</code>, and
+Hillsborough County data).</li>
+<li>
+<code><a href="../reference/util_getrain.html">util_getrain()</a></code>: Gets rainfall data for NPS ungaged
+calculations, as provided in <code>rain</code>.</li>
+<li>
+<code><a href="../reference/util_nps_tbbase.html">util_nps_tbbase()</a></code>: Gets the combined spatial data layer
+for NPS ungaged calculations, as provided in <code>tbbase</code>.</li>
+</ul>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -445,7 +700,7 @@ Boca Ciega Bay South is used when estimating total bay loads.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

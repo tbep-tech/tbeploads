@@ -84,6 +84,24 @@
 
         </dt>
         <dd>Calculate material loss (ML) loads from raw facility data</dd>
+      </dl><dl><dt>
+
+          <code><a href="anlz_nps.html">anlz_nps()</a></code>
+
+        </dt>
+        <dd>Calculate non-point source (NPS) loads for Tampa Bay</dd>
+      </dl><dl><dt>
+
+          <code><a href="anlz_nps_gaged.html">anlz_nps_gaged()</a></code>
+
+        </dt>
+        <dd>Calculate non-point source (NPS) loads for gaged basins</dd>
+      </dl><dl><dt>
+
+          <code><a href="anlz_nps_ungaged.html">anlz_nps_ungaged()</a></code>
+
+        </dt>
+        <dd>Estimated non-point source (NPS) ungaged loads</dd>
       </dl></div><div class="section level2">
       <h2 id="internal-datasets">Internal datasets<a class="anchor" aria-label="anchor" href="#internal-datasets"></a></h2>
 
@@ -103,10 +121,10 @@
         <dd>Data frame of distances of segment locations to National Weather Service (NWS) sites</dd>
       </dl><dl><dt>
 
-          <code><a href="ad_rain.html">ad_rain</a></code>
+          <code><a href="clucsid.html">clucsid</a></code>
 
         </dt>
-        <dd>Data frame of daily rainfall data from NOAA NCDC National Weather Service (NWS) sites from 2017 to 2023</dd>
+        <dd>Lookup table for FLUCCSCODE conversion to CLUCSID and IMPROVED</dd>
       </dl><dl><dt>
 
           <code><a href="dbasing.html">dbasing</a></code>
@@ -115,10 +133,88 @@
         <dd>Basin information for coastal subbasin codes</dd>
       </dl><dl><dt>
 
+          <code><a href="emc.html">emc</a></code>
+
+        </dt>
+        <dd>Event Mean Concentration (EMC) data for CLUCSID in Tampa Bay</dd>
+      </dl><dl><dt>
+
           <code><a href="facilities.html">facilities</a></code>
 
         </dt>
         <dd>Domestic and industrial point source facilities, including industrial with material losses</dd>
+      </dl><dl><dt>
+
+          <code><a href="nps_distance.html">nps_distance</a></code>
+
+        </dt>
+        <dd>Data frame of distances of drainage basin locations to National Weather Service (NWS) sites</dd>
+      </dl><dl><dt>
+
+          <code><a href="rain.html">rain</a></code>
+
+        </dt>
+        <dd>Data frame of daily rainfall data from NOAA NCDC National Weather Service (NWS) sites from 2017 to 2023</dd>
+      </dl><dl><dt>
+
+          <code><a href="rain_historic.html">rain_historic</a></code>
+
+        </dt>
+        <dd>Data frame of historical daily rainfall datas</dd>
+      </dl><dl><dt>
+
+          <code><a href="rcclucsid.html">rcclucsid</a></code>
+
+        </dt>
+        <dd>Lookup table for CLUCSID runoff coefficients</dd>
+      </dl><dl><dt>
+
+          <code><a href="tbbase.html">tbbase</a></code>
+
+        </dt>
+        <dd>Combined spatial data required for non-point source (NPS) ungaged estimate</dd>
+      </dl><dl><dt>
+
+          <code><a href="tbdbasin.html">tbdbasin</a></code>
+
+        </dt>
+        <dd>Simple feature polygons major drainage basins in the Tampa Bay Estuary Program boundary</dd>
+      </dl><dl><dt>
+
+          <code><a href="tbfullshed.html">tbfullshed</a></code>
+
+        </dt>
+        <dd>Simple features polygon for the Tampa Bay Estuary Program boundary</dd>
+      </dl><dl><dt>
+
+          <code><a href="tbjuris.html">tbjuris</a></code>
+
+        </dt>
+        <dd>Simple feature polygons of jurisdictional boundaries in the Tampa Bay Estuary Program boundary</dd>
+      </dl><dl><dt>
+
+          <code><a href="tblu2020.html">tblu2020</a></code>
+
+        </dt>
+        <dd>Simple feature polygons of 2020 land use in the Tampa Bay Estuary Program boundary</dd>
+      </dl><dl><dt>
+
+          <code><a href="tblu2023.html">tblu2023</a></code>
+
+        </dt>
+        <dd>Simple feature polygons of 2023 land use in the Tampa Bay Estuary Program boundary</dd>
+      </dl><dl><dt>
+
+          <code><a href="tbsoil.html">tbsoil</a></code>
+
+        </dt>
+        <dd>Simple feature polygons of soil data in the Tampa Bay Estuary Program boundary</dd>
+      </dl><dl><dt>
+
+          <code><a href="tbsubshed.html">tbsubshed</a></code>
+
+        </dt>
+        <dd>Simple feature polygons of sub-watersheds in the Tampa Bay Estuary Program boundary</dd>
       </dl></div><div class="section level2">
       <h2 id="utility-functions">Utility functions<a class="anchor" aria-label="anchor" href="#utility-functions"></a></h2>
 
@@ -132,16 +228,100 @@
 
       <dl><dt>
 
-          <code><a href="util_ad_getrain.html">util_ad_getrain()</a></code>
+          <code><a href="util_getrain.html">util_getrain()</a></code>
 
         </dt>
-        <dd>Get rainfall data at NOAA NCDC sites</dd>
+        <dd>Get rainfall data at NOAA NCDC sites for atmospheric deposition and non-point source ungaged calculations</dd>
       </dl><dl><dt>
 
-          <code><a href="util_ad_prepverna.html">util_ad_prepverna()</a></code>
+          <code><a href="util_nps_fillmiswq.html">util_nps_fillmiswq()</a></code>
 
         </dt>
-        <dd>Prep Verna Wellfield data for use in AD calculations</dd>
+        <dd>Fill in missing water quality values for non-point source (NPS) data</dd>
+      </dl><dl><dt>
+
+          <code><a href="util_nps_getextflow.html">util_nps_getextflow()</a></code>
+
+        </dt>
+        <dd>Get external flow data not from USGS for NPS calculations</dd>
+      </dl><dl><dt>
+
+          <code><a href="util_nps_getflow.html">util_nps_getflow()</a></code>
+
+        </dt>
+        <dd>Get flow data from for NPS calculations at gaged sites</dd>
+      </dl><dl><dt>
+
+          <code><a href="util_nps_getswfwmd.html">util_nps_getswfwmd()</a></code>
+
+        </dt>
+        <dd>Retrieve non-point source (NPS) supporting data from SWFWMD web services</dd>
+      </dl><dl><dt>
+
+          <code><a href="util_nps_getusgsflow.html">util_nps_getusgsflow()</a></code>
+
+        </dt>
+        <dd>Get flow data from USGS for NPS calculations</dd>
+      </dl><dl><dt>
+
+          <code><a href="util_nps_getwq.html">util_nps_getwq()</a></code>
+
+        </dt>
+        <dd>Get water quality data for NPS gaged flows</dd>
+      </dl><dl><dt>
+
+          <code><a href="util_nps_landsoil.html">util_nps_landsoil()</a></code>
+
+        </dt>
+        <dd>Utility function for non-point source (NPS) ungaged workflow to create land use and soil data</dd>
+      </dl><dl><dt>
+
+          <code><a href="util_nps_landsoilrc.html">util_nps_landsoilrc()</a></code>
+
+        </dt>
+        <dd>Utility function to create non-point source (NPS) ungaged land use and soil runoff coefficients</dd>
+      </dl><dl><dt>
+
+          <code><a href="util_nps_preplog.html">util_nps_preplog()</a></code>
+
+        </dt>
+        <dd>Utility function for non-point source (NPS) ungaged workflow to prepare land use and soil data for logistic regression</dd>
+      </dl><dl><dt>
+
+          <code><a href="util_nps_preprain.html">util_nps_preprain()</a></code>
+
+        </dt>
+        <dd>Prep rain data for non-point source (NPS) ungaged load estimates</dd>
+      </dl><dl><dt>
+
+          <code><a href="util_nps_tbbase.html">util_nps_tbbase()</a></code>
+
+        </dt>
+        <dd>Create unioned base layer for non-point source (NPS) ungaged load estimation in the Tampa Bay watershed</dd>
+      </dl><dl><dt>
+
+          <code><a href="util_nps_union.html">util_nps_union()</a></code>
+
+        </dt>
+        <dd>Fast Spatial Intersection and Union Using GDAL</dd>
+      </dl><dl><dt>
+
+          <code><a href="util_nps_unionchunk.html">util_nps_unionchunk()</a></code>
+
+        </dt>
+        <dd>Helper function for union operation</dd>
+      </dl><dl><dt>
+
+          <code><a href="util_nps_unionnochunk.html">util_nps_unionnochunk()</a></code>
+
+        </dt>
+        <dd>Helper function for union operation</dd>
+      </dl><dl><dt>
+
+          <code><a href="util_prepverna.html">util_prepverna()</a></code>
+
+        </dt>
+        <dd>Prep Verna Wellfield data for use in AD and NPS calculations</dd>
       </dl><dl><dt>
 
           <code><a href="util_ps_addcol.html">util_ps_addcol()</a></code>
@@ -194,7 +374,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>
