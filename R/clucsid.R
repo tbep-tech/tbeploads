@@ -1,0 +1,20 @@
+#' Lookup table for FLUCCSCODE conversion to CLUCSID and IMPROVED
+#'
+#' @format A data frame
+#'
+#' @details Used to create the \code{\link{tbbase}} combined layer with jurisdictions, land use, soils, and sub-basins, used in \code{\link{util_nps_tbbase}}.
+#'
+#' \itemize{
+#'  \item \code{FLUCCSCODE}: Numeric value for the Florida Land Use, Cover and Forms Classification System (FLUCCS) code
+#'  \item \code{CLUCSID}: Numeric value for the coastal land use code, from JEI
+#'  \item \code{IMPROVED}: Numeric value for whether the code is improved (1) or not (0)
+#'}
+#'
+#' @examples
+#' \dontrun{
+#' clucsid <- read.csv('data-raw/clucsid.csv', stringsAsFactors = F, header = T)
+#'
+#' save(clucsid, file = 'data/clucsid.RData', compress = 'xz')
+#' }
+#' clucsid
+"clucsid"

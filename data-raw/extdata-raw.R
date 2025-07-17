@@ -42,10 +42,10 @@ dat <- tibble::tibble(
     dat = purrr::map(fls, read.table, skip = 0, sep = '\t', header = T),
     dat = purrr::map(dat, function(x){
 
-      x %>%
+      x |>
         dplyr::mutate(
-          across(
-            !any_of(nmsexc), rn_fun
+          dplyr::across(
+            !dplyr::any_of(nmsexc), rn_fun
           )
         )
 

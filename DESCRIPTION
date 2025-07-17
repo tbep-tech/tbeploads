@@ -26,16 +26,22 @@ Description: Loading data from major sources to Tampa Bay are calculated on a mo
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Depends: 
   R (>= 4.1)
 Imports:
+  dataRetrieval,
   dplyr,
+  httr,
   lubridate,
   purrr,
+  readxl,
   rnoaa,
+  sf,
+  tbeptools,
   tibble,
-  tidyr
+  tidyr, 
+  zoo
 LazyData: true
 LazyDataCompression: xz
 VignetteBuilder: knitr
@@ -47,6 +53,8 @@ Suggests:
     mockery,
     rmarkdown,
     testthat (>= 3.0.0)
+SystemRequirements: GDAL (>= 2.0.0)
 Remotes:
-  ropensci/rnoaa
+  ropensci/rnoaa,
+  tbep-tech/tbeptools
 Config/testthat/edition: 3

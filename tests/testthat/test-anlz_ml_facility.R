@@ -2,8 +2,8 @@
 test_that("Check load calculations", {
 
   result <- ml |>
-    filter(Year == 2021 & Month == 1 & facility == 'Riverview') |>
-    mutate_if(is.numeric, round, 3)
+    dplyr::filter(Year == 2021 & Month == 1 & facility == 'Riverview') |>
+    dplyr::mutate_if(is.numeric, round, 3)
 
   expect_equal(result$tn_load[[1]], 0.082)
   expect_equal(result$tp_load[[1]], NA)

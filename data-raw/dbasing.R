@@ -26,13 +26,13 @@ dbasing <- dbasing |>
       bayseg == 2 ~ "Hillsborough Bay",
       bayseg == 3 ~ "Middle Tampa Bay",
       bayseg == 4 ~ "Lower Tampa Bay",
-      bayseg == 5 ~ "Boca Ciega Bay",
+      bayseg == 5 ~ "Upper Boca Ciega Bay",
       bayseg == 6 ~ "Terra Ceia Bay",
       bayseg == 7 ~ "Manatee River",
-      bayseg == 55 ~ "Boca Ciega Bay South",
+      bayseg == 55 ~ "Lower Boca Ciega Bay",
       TRUE ~ NA_character_
     )
   ) |>
-  dplyr::select(coastco, basin = newgage, bayseg, name, hectare)
+  dplyr::select(coastco, coastco, gagetype, basin = newgage, bayseg, name, hectare)
 
 usethis::use_data(dbasing, overwrite = TRUE)

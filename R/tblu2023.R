@@ -1,0 +1,33 @@
+#' Simple feature polygons of 2023 land use in the Tampa Bay Estuary Program boundary
+#'
+#' @format A \code{\link[sf]{sf}} object
+#'
+#' @details Used for estimating ungaged non-point source (NPS) loads. The data includes the following columns.
+#'
+#' \itemize{
+#'  \item \code{FLUCCSCODE}: Numeric value for the Florida Land Use, Cover and Forms Classification System (FLUCCS) code
+#'  \item \code{FLUCCSDESC}: Character describing the FLUCCS description
+#'  \item \code{geometry}: The geometry column
+#'}
+#'
+#' Projection is NAD83(2011) / Florida West (ftUS), CRS 6443.
+#'
+#' @examples
+#' \dontrun{
+#' # import from local source
+#' prj <- 6443
+#'
+#' tblu2023 <- sf::st_read("T:/05_GIS/SWFWMD/LULC_2023/LANDUSELANDCOVER2023.shp") |>
+#'   sf::st_transform(prj) |>
+#'   sf::st_intersection(tbfullshed) |>
+#'   sf::st_buffer(dist = 0) |>
+#'   dplyr::group_by(FLUCCSCODE, FLUCSDESC) |>
+#'   dplyr::summarise() |>
+#'   dplyr::ungroup()
+#'
+#' # or use SWFWMD API
+#' tblu2023 <- util_nps_getswfwmd('lulc2023')
+#'
+#' save(tblu2023, file = 'data/tblu2023.RData', compress = 'xz')
+#' }
+"tblu2023"
