@@ -19,5 +19,4 @@
 #'
 #' save(tbsoil, file = 'data/tbsoil.RData', compress = 'xz')
 #' }
-#' tbsoil
 "tbsoil"

@@ -25,9 +25,9 @@ globalVariables(c(".", "Facility.Name", "Month", "Outfall.ID", "Permit.Number", 
                   "stnload", "stpload", "stssload", "target", "tbdbasin", "tbfullshed", "tbjuris",
                   "tbsubshed", "tkn_mgl", "tn_mgl", "tnload", "tnload_a", "tnload_b", "tot_area",
                   "tp_mgl", "tpcp", "tpload", "tpload_a", "tpload_b", "tss_mgl", "tssload", "urb",
-                  "wd_cfs", "wet", "wet_rc"))
+                  "wd_cfs", "wet", "wet_rc", "DAILY AVG", "RECORDED DATE"))
 
-#' @importFrom utils capture.output data read.csv read.table
+#' @importFrom utils capture.output read.csv read.table
 NULL
 
 #' @importFrom stats na.omit weighted.mean

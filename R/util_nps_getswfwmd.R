@@ -26,8 +26,6 @@ util_nps_getswfwmd <- function(dat, max_records = 1000, verbose = TRUE) {
 
   dat <- match.arg(dat, c('soil', 'lulc2020', 'lulc2023'))
 
-  data(tbfullshed)
-
   url <- switch(dat,
                 soil = "https://www25.swfwmd.state.fl.us/arcgis12/rest/services/BaseVector/Soils/MapServer/0/query",
                 lulc2020 = "https://www25.swfwmd.state.fl.us/arcgis12/rest/services/OpenData/LandUseLandCoverPost2014/MapServer/2/query",

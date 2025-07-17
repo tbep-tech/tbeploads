@@ -14,7 +14,6 @@
 #'
 #' @examples
 #' \dontrun{
-#'
 #' # import from local source
 #' prj <- 6443
 #'
@@ -31,5 +30,4 @@
 #'
 #' save(tblu2020, file = 'data/tblu2020.RData', compress = 'xz')
 #' }
-#' tblu2020
 "tblu2020"

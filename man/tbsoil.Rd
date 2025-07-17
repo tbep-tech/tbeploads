@@ -31,6 +31,5 @@ tbsoil <- util_nps_getswfwmd('soil')
 
 save(tbsoil, file = 'data/tbsoil.RData', compress = 'xz')
 }
-tbsoil
 }
 \keyword{datasets}

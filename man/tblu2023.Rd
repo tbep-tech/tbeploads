@@ -26,7 +26,6 @@ Projection is NAD83(2011) / Florida West (ftUS), CRS 6443.
 }
 \examples{
 \dontrun{
-
 # import from local source
 prj <- 6443
 
@@ -43,6 +42,5 @@ tblu2023 <- util_nps_getswfwmd('lulc2023')
 
 save(tblu2023, file = 'data/tblu2023.RData', compress = 'xz')
 }
-tblu2023
 }
 \keyword{datasets}
