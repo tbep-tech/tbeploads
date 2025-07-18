@@ -102,9 +102,7 @@
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This function estimates pollutant loads from non-point sources in ungaged (unmonitored) basins within the Tampa Bay watershed. The approach combines spatial land use data, rainfall patterns, hydrologic modeling, and empirical relationships to estimate monthly nutrient and sediment loads.</p>
-<p><strong>Methodology Overview:</strong></p>
-<p>The function implements a multi-step process:</p>
+    <p>This function estimates pollutant loads from non-point sources in ungaged (unmonitored) basins within the Tampa Bay watershed. The approach combines spatial land use data, rainfall patterns, hydrologic modeling, and empirical relationships to estimate monthly nutrient and sediment loads.  Several steps are followed:</p>
 <ol><li><p><strong>Data Preparation</strong>: Processes land use data for logistic regression modeling and calculates inverse distance-weighted rainfall data for each sub-basin.</p></li>
 <li><p><strong>Flow Estimation</strong>: Uses a logistic regression model to predict monthly streamflow in ungaged basins based on:</p><ul><li><p>Current month rainfall and 2-month lagged rainfall</p></li>
 <li><p>Land use percentages (urban, agriculture, wetlands, forest)</p></li>
@@ -120,7 +118,7 @@
 <li><p>Stormwater-specific loads (with different EMCs for certain categories)</p></li>
 </ul></li>
 </ol><p><strong>Spatial Framework:</strong></p>
-<p>The analysis operates on a nested spatial hierarchy:</p><ul><li><p><strong>Bay Segments</strong>: Major subdivisions of Tampa Bay (1-7, with 55 as a special case)</p></li>
+<p>The analysis uses a nested spatial hierarchy:</p><ul><li><p><strong>Bay Segments</strong>: Major subdivisions of Tampa Bay (1-7, with 55 for Lower Boca Ciega Bay)</p></li>
 <li><p><strong>Basins</strong>: Hydrologic sub-basins, including both USGS gaged and ungaged areas</p></li>
 <li><p><strong>Land Use Polygons</strong>: Detailed spatial units combining jurisdiction, land use (FLUCCS codes), and soil characteristics</p></li>
 </ul><p><strong>Flow Prediction Models:</strong></p>
@@ -129,7 +127,7 @@
 <li><p>Models account for antecedent moisture conditions through lagged rainfall terms</p></li>
 </ul><p><strong>Load Estimation:</strong></p>
 <p>Pollutant loads are calculated as: <code>Load = Flow × EMC × Unit Conversions</code></p>
-<p>Where EMCs vary by land use category (CLUCSID) and special handling is applied for water bodies and certain wetland types (CLUCSIDs 18, 20) which are assigned zero stormwater loads.</p>
+<p>Where EMCs vary by land use category (CLUCSID).  Special handling is applied for water bodies and certain wetland types (CLUCSIDs 18, 20), which are assigned zero stormwater loads.</p>
 <p>Requires the following inputs:</p>
 <ul><li><p><code>tbbase</code>: A data frame containing polygon areas for the combined data layer of bay segment, basin, jurisdiction, land use data, and soils, Stored as <code><a href="tbbase.html">tbbase</a></code> or created (takes an hour or so) with <code><a href="util_nps_tbbase.html">util_nps_tbbase</a></code>.</p></li>
 <li><p><code>rain</code>: A data frame of rainfall data. See <code><a href="rain.html">rain</a></code>.</p></li>
@@ -147,7 +145,7 @@
 <span class="r-in"><span><span class="va">tampabypth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_tampabypass.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">bellshlpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_bellshoals.xls'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">anlz_nps_ungaged</span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, <span class="va">tbbase</span>,</span></span>
+<span class="r-in"><span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu">anlz_nps_ungaged</span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, <span class="va">tbbase</span>,</span></span>
 <span class="r-in"><span>   <span class="va">rain</span>, <span class="va">lakemanpth</span>, <span class="va">tampabypth</span>, <span class="va">bellshlpth</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
