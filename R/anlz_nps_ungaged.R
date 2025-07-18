@@ -9,11 +9,7 @@
 #' @param verbose logical indicating whether to print verbose output
 #'
 #' @details
-#' This function estimates pollutant loads from non-point sources in ungaged (unmonitored) basins within the Tampa Bay watershed. The approach combines spatial land use data, rainfall patterns, hydrologic modeling, and empirical relationships to estimate monthly nutrient and sediment loads.
-#'
-#' \strong{Methodology Overview:}
-#'
-#' The function implements a multi-step process:
+#' This function estimates pollutant loads from non-point sources in ungaged (unmonitored) basins within the Tampa Bay watershed. The approach combines spatial land use data, rainfall patterns, hydrologic modeling, and empirical relationships to estimate monthly nutrient and sediment loads.  Several steps are followed:
 #'
 #' \enumerate{
 #'   \item \strong{Data Preparation}: Processes land use data for logistic regression modeling and calculates inverse distance-weighted rainfall data for each sub-basin.
@@ -41,9 +37,9 @@
 #'
 #' \strong{Spatial Framework:}
 #'
-#' The analysis operates on a nested spatial hierarchy:
+#' The analysis uses a nested spatial hierarchy:
 #' \itemize{
-#'   \item \strong{Bay Segments}: Major subdivisions of Tampa Bay (1-7, with 55 as a special case)
+#'   \item \strong{Bay Segments}: Major subdivisions of Tampa Bay (1-7, with 55 for Lower Boca Ciega Bay)
 #'   \item \strong{Basins}: Hydrologic sub-basins, including both USGS gaged and ungaged areas
 #'   \item \strong{Land Use Polygons}: Detailed spatial units combining jurisdiction, land use (FLUCCS codes), and soil characteristics
 #' }
@@ -61,7 +57,7 @@
 #'
 #' Pollutant loads are calculated as: \code{Load = Flow × EMC × Unit Conversions}
 #'
-#' Where EMCs vary by land use category (CLUCSID) and special handling is applied for water bodies and certain wetland types (CLUCSIDs 18, 20) which are assigned zero stormwater loads.
+#' Where EMCs vary by land use category (CLUCSID).  Special handling is applied for water bodies and certain wetland types (CLUCSIDs 18, 20), which are assigned zero stormwater loads.
 #'
 #' Requires the following inputs:
 #'
@@ -103,7 +99,7 @@
 #' tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
 #' bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 #'
-#' anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase,
+#' tmp <- anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase,
 #'    rain, lakemanpth, tampabypth, bellshlpth)
 #' }
 anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, lakemanpth, tampabypth, bellshlpth, verbose = TRUE) {

@@ -38,6 +38,7 @@
 #'   sf1 = tbsubshed,
 #'   sf2 = tbjuris,
 #'   "C:/OSGeo4W/bin"
+#'   )
 #' }
 util_nps_union <- function(sf1, sf2, gdal_path = NULL, chunk_size = NULL, cast = FALSE, verbose = TRUE) {
 

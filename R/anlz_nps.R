@@ -225,7 +225,8 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
       bas_area = sum(bas_area, na.rm=TRUE),
       segment = dplyr::first(segment),
       majbasin = dplyr::first(majbasin),
-      source = dplyr::first(source)
+      source = dplyr::first(source),
+      .groups = 'drop'
     ) |>
     dplyr::arrange(segment, basin, yr)
 

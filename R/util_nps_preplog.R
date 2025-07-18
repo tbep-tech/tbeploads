@@ -38,23 +38,22 @@ util_nps_preplog <- function(tbbase){
       )
 
   #Nests and combines certain basins for logistic model
-  tbland <- dplyr::left_join(tbland1, tbland2, by = c("bay_seg", "basin")) |>
-    dplyr::mutate(original_basin = basin)
+  tbland <- dplyr::left_join(tbland1, tbland2, by = c("bay_seg", "basin"))
 
-  out <- dplyr::bind_rows(
-      dplyr::filter(tbland, basin == "02301000") |> dplyr::mutate(basin = "02301500"),
-      dplyr::filter(tbland, basin == "02301300") |> dplyr::mutate(basin = "02301500"),
-      dplyr::filter(tbland, basin == "02303330") |> dplyr::mutate(basin = "02304500"),
-      dplyr::filter(tbland, basin == "02303000") |>
-        dplyr::bind_rows(
-          dplyr::mutate(tbland |> dplyr::filter(basin == "02303000"), basin = "02304500"),
-          dplyr::mutate(tbland |> dplyr::filter(basin == "02303000"), basin = "02303330")),
-      dplyr:: filter(tbland, basin == "02307359") |> dplyr::mutate(basin = "LTARPON")
+  out <- tbland |>
+    mutate(original_basin = basin) |>
+    bind_rows(
+      filter(tbland, basin == "02301000") |> mutate(basin = "02301500"),
+      filter(tbland, basin == "02301300") |> mutate(basin = "02301500"),
+      filter(tbland, basin == "02303330") |> mutate(basin = "02304500"),
+      filter(tbland, basin == "02303000") |>
+        bind_rows(
+          mutate(tbland |> filter(basin == "02303000"), basin = "02304500"),
+          mutate(tbland |> filter(basin == "02303000"), basin = "02303330")),
+      filter(tbland, basin == "02307359") |> mutate(basin = "LTARPON")
     ) |>
-    dplyr::summarise(
-      dplyr::across(.cols = dplyr::where(is.numeric), .fns = sum),
-      .by = c("bay_seg", "basin")
-    )
+    group_by(bay_seg, basin) |>
+    summarise(across(.cols = where(is.numeric), .fns = sum))
 
   return(out)
 

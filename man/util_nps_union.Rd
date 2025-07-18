@@ -57,5 +57,6 @@ result <- util_nps_union(
   sf1 = tbsubshed,
   sf2 = tbjuris,
   "C:/OSGeo4W/bin"
+  )
 }
 }
