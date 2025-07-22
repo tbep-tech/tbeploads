@@ -122,7 +122,7 @@ lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbe
 tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
 bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 
-tmp <- anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase,
+anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase,
    rain, lakemanpth, tampabypth, bellshlpth)
 }
 }

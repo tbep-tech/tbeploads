@@ -99,7 +99,7 @@
 #' tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
 #' bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 #'
-#' tmp <- anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase,
+#' anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase,
 #'    rain, lakemanpth, tampabypth, bellshlpth)
 #' }
 anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, lakemanpth, tampabypth, bellshlpth, verbose = TRUE) {
@@ -150,25 +150,27 @@ anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain
 
   npsmod1 <- dplyr::left_join(tbnestland, rainflow1, by = c("bay_seg", "basin"))
 
-  tbshydro <- dplyr::full_join(dbasing, npsmod1, by = c("bayseg" = "bay_seg", "basin"), relationship = "many-to-many") |>
-    dplyr::rename(
+  dbasingjn <- dbasing |>
+    dplyr::select(
+      basin,
+      gagetype,
       bay_seg = bayseg
-    )
+    ) |>
+    dplyr::distinct(bay_seg, basin, gagetype) |>
+    dplyr::arrange(bay_seg, basin)
+
+  tbshydro <- dplyr::full_join(dbasingjn, npsmod1, by = c("bay_seg", "basin"))
 
   # Remove 'Non-connected' basins, saltwater features and wetland CLUCs from basins' total area calculation
   # CLUC-Soil category areas and the Total area calculated under this effort deviate from JEI's prior efforts
   # This needs to be researched/QC'd a bit more based on total available land area in each basin, for now proceeding with model calculations
 
   explan <- tbshydro |>
+    # First, remove non-connected basins
+    dplyr::mutate(bas_area = tot_area - rowSums(dplyr::select(tbshydro, dplyr::starts_with("NC_C")), na.rm = TRUE)) |>
+    # Then remove saltwater and wetlands from the updated data
+    dplyr::mutate(bas_area = tot_area - rowSums(dplyr::across(dplyr::starts_with(c("C_C17", "C_C21", "C_C22"))), na.rm = TRUE)) |>
     dplyr::mutate(
-
-      # Remove non-connected basins
-      bas_area = tot_area - rowSums(dplyr::select(tbshydro, dplyr::starts_with("NC_C")), na.rm = TRUE),
-
-      # Remove saltwater and wetlands
-      bas_area = tot_area - rowSums(dplyr::select(tbshydro, dplyr::starts_with("C_C17"),
-                                                  dplyr::starts_with("C_C21"), dplyr::starts_with("C_C22")), na.rm = TRUE),
-
       # Calculate CLUCs percentages
       lu01 = (rowSums(dplyr::select(tbshydro, dplyr::starts_with("C_C01")), na.rm = TRUE)) / bas_area,
       lu02 = (rowSums(dplyr::select(tbshydro, dplyr::starts_with("C_C02")), na.rm = TRUE)) / bas_area,
