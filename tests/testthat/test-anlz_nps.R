@@ -77,7 +77,6 @@ test_that("anlz_nps returns expected output format", {
 
 test_that("anlz_nps handles verbose output correctly", {
 
-
   # Mock the analysis functions
   local_mocked_bindings(
     anlz_nps_ungaged = function(...) mock_ungaged,

@@ -140,6 +140,14 @@ test_that("util_nps_tbbase processes successfully with valid inputs", {
   expect_true("area_ha" %in% names(result))
   expect_equal(union_call_count, 4)
 
+  union_call_count <- 0
+
+  # verify verbose
+  expect_output(
+    util_nps_tbbase(tblu, tbsoil, verbose = T),
+    "Combining drainage basins with sub-watersheds...\\nCombining results with TBNMC jurisdictions...\\nCombining results with land use...\\nCombining results with soils...\\nSummarizing...\\n"
+  )
+
   # Clean up
   rm(clucsid, envir = .GlobalEnv)
 })

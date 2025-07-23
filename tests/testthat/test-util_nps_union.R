@@ -169,7 +169,7 @@ test_that("util_nps_union processes chunks when chunk_size specified", {
   stub(util_nps_union, 'system', 0)
   stub(util_nps_union, 'util_nps_unionchunk', "chunked_result")
 
-  result <- util_nps_union(mock_sf1, mock_sf2, chunk_size = 50, verbose = FALSE)
+  result <- expect_output(util_nps_union(mock_sf1, mock_sf2, chunk_size = 50, verbose = TRUE), "Processing in chunks of 50 features")
 
   expect_equal(result, "chunked_result")
 })
