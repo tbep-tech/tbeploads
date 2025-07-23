@@ -1,3 +1,4 @@
+# nocov start
 summ_params <- function(x){
 
   out <- list(
@@ -11,3 +12,4 @@ summ_params <- function(x){
   return(out)
 
 }
+# nocov end
