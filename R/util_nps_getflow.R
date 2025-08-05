@@ -57,7 +57,8 @@ util_nps_getflow <- function(lakemanpth, tampabypth, bellshlpth, yrrng = c(2021,
     dplyr::summarise(
       flow_cfs = mean(flow_cfs),
       .by = c(basin, yr, mo)
-    )
+    ) |>
+    dplyr::arrange(basin, yr, mo)
 
   return(out)
 
