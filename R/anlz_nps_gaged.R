@@ -43,15 +43,13 @@ anlz_nps_gaged <- function(yrrng = c('2021-01-01', '2023-12-31'), mancopth = NUL
   if(verbose)
     cat('Retrieving water quality data...\n')
   allwq <- util_nps_getwq(yrrng = yrrng, mancopth = mancopth, pincopth = pincopth, verbose = verbose)
-  allwq <- util_nps_fillmiswq(allwq)
 
-  # combine flow and wq
-  alldat <- allwq |>
+  # fill missing, combine with flow, fill miss
+  alldat <- util_nps_fillmiswq(allwq) |>
     dplyr::full_join(allflo, by = c("basin", "yr", "mo")) |>
-    dplyr::arrange(basin, yr, mo) |>
     dplyr::filter(basin %in% c("02300500", "02300700", "02301500", "02301750",
-                         "02304500", "02306647", "02307000", "EVERSRES",
-                         "LMANATEE", "LTARPON", "TBYPASS"))
+                               "02304500", "02306647", "02307000", "EVERSRES",
+                               "LMANATEE", "LTARPON", "TBYPASS"))
 
   # get gaged loads
   out <- alldat |>

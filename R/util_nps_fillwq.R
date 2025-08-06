@@ -19,6 +19,12 @@
 util_nps_fillmiswq <- function(wq){
 
   out <- wq |>
+    dplyr::arrange(basin, yr, mo) |>
+    tidyr::complete(
+      basin,
+      yr = tidyr::full_seq(yr, 1),
+      mo = 1:12
+    ) |>
     dplyr::mutate(
       tn_mgl = dplyr::case_when(
         (basin == "LTARPON" & yr == 2023 & mo == 12) ~ mean(c(0.62, 0.83, 0.9, 0.87, 0.9)),   # Fill in missing end date monthly values with prior 5 year averages
