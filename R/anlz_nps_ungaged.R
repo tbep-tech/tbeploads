@@ -252,7 +252,7 @@ anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain
     dplyr::select(bay_seg, basin, bas_area, yr, mo, flow, flowhat)
 
   # apply runoff coefficients to tbbase
-  landsoil <- util_nps_landsoilrc(tbbase)
+  landsoil <- util_nps_landsoilrc(tbbase, yrexp = yrs[1]:yrs[2])
 
   pflow1 <- flowhat |>
     dplyr::left_join(landsoil, by = c("yr", "mo", "bay_seg", "basin")) |>
