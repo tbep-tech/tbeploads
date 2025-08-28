@@ -41,7 +41,8 @@ util_nps_preprain <- function(rain, yrrng = NULL){
       .by = c(target, yr, mo)
     ) |>
     dplyr::rename(basin = target)
-
+  
+  # db <- rain
   npsrain <- db |>
     dplyr::mutate(
       lag1rain = dplyr::lag(tpcp, n = 1, order_by = basin),

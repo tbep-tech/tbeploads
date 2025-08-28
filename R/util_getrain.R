@@ -51,8 +51,6 @@
 #'
 #' @export
 #'
-#' @importFrom rnoaa ncdc
-#'
 #' @seealso \code{\link{rain}}
 #'
 #' @examples
@@ -68,14 +66,26 @@ util_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE)
                  3153, 3986, 4707, 5973, 6065,
                  6880, 7205, 7851, 7886, 8788,
                  8824, 9176, 9401)
+  
   stationid <- dplyr::case_when(
     station == 2806 ~ 'GHCND:USW00092806',
     station == 8788 ~ 'GHCND:USW00012842',
-    T ~ paste0('GHCND:USC0008', sprintf('%04d', station))
+    TRUE ~ paste0('GHCND:USC0008', sprintf('%04d', station))
   )
 
+  # empty data frame
+  empt <- data.frame(
+          station = numeric(0),
+          date = as.Date(character(0)),
+          Year = numeric(0),
+          Month = numeric(0),
+          Day = numeric(0),
+          rainfall = numeric(0)
+        )
+  
   stayr <- tidyr::crossing(yrs, stationid) |>
     dplyr::mutate(data = NA)
+  
   for(i in 1:nrow(stayr)){
 
     sta <- stayr$stationid[i]
@@ -86,10 +96,44 @@ util_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE)
 
     startdate <- paste0(yr, '-01-01')
     enddate <- paste0(yr, '-12-31')
-    dat <- try(ncdc(datasetid = 'GHCND', stationid = sta,
-                           datatypeid = 'PRCP', startdate = startdate,
-                           enddate = enddate, limit = 400, add_units = TRUE,
-                           token = noaa_key)$data, silent = TRUE)
+    
+    # Build the API request URL
+    base_url <- "https://www.ncei.noaa.gov/cdo-web/api/v2/data"
+    query_params <- list(
+      datasetid = 'GHCND',
+      stationid = sta,
+      datatypeid = 'PRCP',
+      startdate = startdate,
+      enddate = enddate,
+      limit = 1000,  # Increased from 400 to get more data per request
+      units = 'metric'
+    )
+    
+    # Make the API request
+    dat <- try({
+      response <- httr::GET(
+        url = base_url,
+        query = query_params,
+        httr::add_headers(token = noaa_key)
+      )
+      
+      # Check if request was successful
+      if(httr::status_code(response) != 200) {
+        stop("API request failed with status code: ", httr::status_code(response))
+      }
+      
+      # Parse the JSON response
+      content <- httr::content(response, as = "text", encoding = "UTF-8")
+      parsed_data <- jsonlite::fromJSON(content)
+      
+      # Return the results data frame
+      if(!is.null(parsed_data$results)) {
+        parsed_data$results
+      } else {
+        empt
+      }
+      
+    }, silent = TRUE)
 
     tryi <- 0
     while(inherits(dat, 'try-error') & tryi < ntry) {
@@ -97,12 +141,29 @@ util_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE)
       if(!quiet)
         cat('Retrying...\n')
 
-      dat <- try(ncdc(datasetid = 'GHCND', stationid = sta,
-                             datatypeid = 'PRCP', startdate = startdate,
-                             enddate = enddate, limit = 400, add_units = TRUE,
-                             token = noaa_key)$data, silent = TRUE)
+      dat <- try({
+        response <- httr::GET(
+          url = base_url,
+          query = query_params,
+          httr::add_headers(token = noaa_key)
+        )
+        
+        if(httr::status_code(response) != 200) {
+          stop("API request failed with status code: ", httr::status_code(response))
+        }
+        
+        content <- httr::content(response, as = "text", encoding = "UTF-8")
+        parsed_data <- jsonlite::fromJSON(content)
+        
+        if(!is.null(parsed_data$results)) {
+          parsed_data$results
+        } else {
+          empt
+        }
+        
+      }, silent = TRUE)
+      
       tryi <- tryi + 1
-
     }
 
     if(tryi == ntry){
@@ -110,16 +171,18 @@ util_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE)
       next()
     }
 
+    if(length(dat) == 0)
+      dat <- empt
+    
     stayr$data[[i]] <- list(dat)
-
   }
 
   out <- stayr |>
     tidyr::unnest('data')
 
-  # NULL if no data
-  if(all(is.na(out$data)))
-    return(NULL)
+  # Return empty data frame with expected structure if no data
+  if(all(unlist(lapply(out$data, nrow)) == 0))
+    return(empt)
 
   # station and stationid crosswalk
   stations <- tibble::tibble(
@@ -135,12 +198,11 @@ util_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE)
       Year = yrs,
       Month = lubridate::month(date),
       Day = lubridate::day(date),
-      rainfall = round(value / 254, 2)
-      ) |>
+      rainfall = round(value / 254, 2)  # Convert from mm*10 to inches
+    ) |>
     dplyr::left_join(stations, by = 'stationid') |>
     dplyr::select(station, date, Year, Month, Day, rainfall) |>
     dplyr::arrange(station, date)
 
   return(out)
-
 }

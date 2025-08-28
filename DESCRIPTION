@@ -36,7 +36,6 @@ Imports:
   lubridate,
   purrr,
   readxl,
-  rnoaa,
   sf,
   tbeptools,
   tibble,
@@ -55,6 +54,5 @@ Suggests:
     testthat (>= 3.0.0)
 SystemRequirements: GDAL (>= 2.0.0)
 Remotes:
-  ropensci/rnoaa,
   tbep-tech/tbeptools
 Config/testthat/edition: 3
