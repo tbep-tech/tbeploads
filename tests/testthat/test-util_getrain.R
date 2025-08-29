@@ -222,7 +222,7 @@ test_that("util_getrain handles missing results field", {
   noaa_key <- "test_key"
   result <- util_getrain(2021, 228, noaa_key, ntry = 1)
   
-  expect_equal(nrow(result), 0)
+  expect_true(nrow(result) == 0)
 })
 
 test_that("util_getrain handles empty results in retry loop", {
@@ -280,4 +280,53 @@ test_that("util_getrain handles zero-length data objects", {
   expect_s3_class(result, "data.frame")
   expect_equal(nrow(result), 0)
   expect_true(all(c("station", "date", "Year", "Month", "Day", "rainfall") %in% colnames(result)))
+})
+
+test_that("util_getrain handles zero-length data in retry loop", {
+  # Mock that succeeds first, then fails, then returns zero-length data on retry
+  call_count <- 0
+  mock_mixed_response <- function(url, query, ...) {
+    call_count <<- call_count + 1
+    
+    if (call_count == 1) {
+      # First call succeeds with normal data
+      mock_data <- data.frame(
+        date = c("2021-01-15", "2021-02-15"),
+        datatype = "PRCP",
+        station = query$stationid,
+        value = c(100, 200),
+        stringsAsFactors = FALSE
+      )
+      response <- list(
+        status_code = 200,
+        content = jsonlite::toJSON(list(results = mock_data))
+      )
+    } else if (call_count == 2) {
+      # Second call fails (triggers retry)
+      response <- list(status_code = 500)
+    } else {
+      # Third call (retry) succeeds but returns zero-length data
+      response <- list(
+        status_code = 200,
+        content = jsonlite::toJSON(list(results = data.frame()))
+      )
+    }
+    
+    class(response) <- "response"
+    return(response)
+  }
+  
+  stub(util_getrain, "httr::GET", mock_mixed_response)
+  stub(util_getrain, "httr::status_code", mock_status_code)
+  stub(util_getrain, "httr::content", mock_content)
+  stub(util_getrain, "httr::add_headers", mock_add_headers)
+
+  noaa_key <- "test_key"
+  # Use two stations to trigger multiple API calls
+  result <- util_getrain(2021, c(228, 478), noaa_key, ntry = 2)
+  
+  expect_s3_class(result, "data.frame")
+  expect_true(all(c("station", "date", "Year", "Month", "Day", "rainfall") %in% colnames(result)))
+  # Should have data from the first successful call
+  expect_true(nrow(result) > 0)
 })

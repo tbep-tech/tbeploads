@@ -75,8 +75,8 @@ util_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE)
 
   # empty data frame
   empt <- data.frame(
-          station = numeric(0),
-          date = as.Date(character(0)),
+          station = character(0),
+          date = character(0),
           Year = numeric(0),
           Month = numeric(0),
           Day = numeric(0),
@@ -127,7 +127,7 @@ util_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE)
       parsed_data <- jsonlite::fromJSON(content)
       
       # Return the results data frame
-      if(!is.null(parsed_data$results)) {
+      if(!length(parsed_data$results) == 0) {
         parsed_data$results
       } else {
         empt
@@ -154,8 +154,8 @@ util_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE)
         
         content <- httr::content(response, as = "text", encoding = "UTF-8")
         parsed_data <- jsonlite::fromJSON(content)
-        
-        if(!is.null(parsed_data$results)) {
+
+        if(!length(parsed_data$results) == 0) {
           parsed_data$results
         } else {
           empt
@@ -170,9 +170,6 @@ util_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE)
       if(!quiet) cat('Failed...\n')
       next()
     }
-
-    if(length(dat) == 0)
-      dat <- empt
     
     stayr$data[[i]] <- list(dat)
   }
