@@ -33,6 +33,7 @@ Imports:
   dataRetrieval,
   dplyr,
   httr,
+  jsonlite,
   lubridate,
   purrr,
   readxl,
