@@ -22,9 +22,18 @@ util_nps_getusgsflow <- function(site = NULL, yrrng = c('2021-01-01', '2023-12-3
 
   for(sid in usgsid) {
 
-    dat <- suppressMessages(dataRetrieval::readNWISdv(sid, "00060", yrrng[1], yrrng[2])) |>
-      dataRetrieval::renameNWISColumns()
-
+    dat <- suppressMessages(dataRetrieval::read_waterdata_daily(monitoring_location_id = paste0('USGS-', sid), 
+        parameter_code = '00060', time = yrrng, skipGeometry = TRUE
+      )) |>
+      tidyr::separate(monitoring_location_id, c('agency_cd', 'site_no'), sep = '-') |> 
+      dplyr::select(
+        agency_cd, 
+        site_no, 
+        Date = time, 
+        Flow = value, 
+        Flow_cd = qualifier
+      )
+    
     fl_results[[sid]] <- dat
 
   }
