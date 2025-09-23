@@ -119,7 +119,7 @@ test_that("util_nps_tbbase processes successfully with valid inputs", {
   )
 
   # Mock the clucsid lookup table
-  assign("clucsid", data.frame(FLUCCSCODE = 1100, CLUCSID = 1, IMPROVED = 0), envir = .GlobalEnv)
+  assign("clucsid", data.frame(FLUCCSCODE = 1100, CLUCSID = 1, IMPROVED = 0, DESCRIPTION = 'Low Density Residential'), envir = .GlobalEnv)
 
   # Counter to track util_nps_union calls
   union_call_count <- 0
@@ -171,7 +171,7 @@ test_that("util_nps_tbbase handles missing drnfeat values", {
   )
 
   # Mock the clucsid lookup table
-  assign("clucsid", data.frame(FLUCCSCODE = 1100, CLUCSID = 1, IMPROVED = 0), envir = .GlobalEnv)
+  assign("clucsid", data.frame(FLUCCSCODE = 1100, CLUCSID = 1, IMPROVED = 0, DESCRIPTION = 'Low Density Residential'), envir = .GlobalEnv)
 
   # Stub util_nps_union
   stub(util_nps_tbbase, "util_nps_union", function(...) tbbase4_mock)
