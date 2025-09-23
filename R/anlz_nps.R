@@ -9,6 +9,8 @@
 #' @param tampabypth character, path to the file containing the Tampa Bypass flow data, see details
 #' @param bellshlpth character, path to the file containing the Bell shoals data, see details
 #' @param vernafl character vector of file path to Verna Wellfield atmospheric concentration data
+#' @param summ character indicating how to summarrize results, by land use (\code{'lu'}, ungaged basins only), by bay segment (\code{'segment'}, default), or all segments combined (\code{'all'})
+#' @param summtime `r summ_params('summtime')`
 #' @param verbose logical indicating whether to print verbose output
 #'
 #' @returns A data frame of non-point source loads for Tampa Bay, including columns for year, month, basin, bay segment, basin area (hectares), and loads for water, total nitrogen (TN), total phosphorus (TP), total suspended solids (TSS), and biochemical oxygen demand (BOD).
@@ -18,6 +20,8 @@
 #' @details
 #' The function estimates non-point source (NPS) loads for Tampa Bay by combining ungaged and gaged NPS loads. Ungaged loads are estimated using rainfall, flow, event mean concentration, land use, and soils data, while gaged loads are estimated using water quality data and flow data. The function also incorporates atmospheric concentration data from the Verna Wellfield site.
 #'
+#' `r summ_params('descrip')` Using `summ = 'lu'` will return only ungaged loads summarized by land use.
+#' 
 #' The following functions are used internally and are provided here for reference on the components used in the calculations:
 #'
 #' \itemize{
@@ -47,7 +51,11 @@
 #'          lakemanpth, tampabypth, bellshlpth, vernafl, verbose = TRUE)
 #' }
 anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancopth,
-                     pincopth, lakemanpth, tampabypth, bellshlpth, vernafl, verbose = T){
+                     pincopth, lakemanpth, tampabypth, bellshlpth, vernafl, 
+                     summ = c('segment', 'all', 'lu'), summtime = c('month', 'year'), verbose = T){
+
+  summ <- match.arg(summ)
+  summtime <- match.arg(summtime)
 
   if(verbose)
     cat('Retrieving flow data...\n')
