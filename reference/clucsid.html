@@ -52,6 +52,7 @@
 <ul><li><p><code>FLUCCSCODE</code>: Numeric value for the Florida Land Use, Cover and Forms Classification System (FLUCCS) code</p></li>
 <li><p><code>CLUCSID</code>: Numeric value for the coastal land use code, from JEI</p></li>
 <li><p><code>IMPROVED</code>: Numeric value for whether the code is improved (1) or not (0)</p></li>
+<li><p><code>DESCRIPTION</code>: Character description of the CLUCSID code</p></li>
 </ul></div>
 
     <div class="section level2">
@@ -62,65 +63,65 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">clucsid</span>, file <span class="op">=</span> <span class="st">'data/clucsid.RData'</span>, compress <span class="op">=</span> <span class="st">'xz'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span><span class="va">clucsid</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    FLUCCSCODE CLUCSID IMPROVED</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1        1100       1        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2        1200       2        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3        1300       3        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4        1400       4        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5        1700       7        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6        1800       8        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7        1820       8        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8        1900       8        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9        2100      10        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10       2600       8        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11       3300       8        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12       4340      15        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13       4400      15        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14       5200      16        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15       5300      16        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16       6150      18        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17       6210      18        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18       6300      18        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19       6400      20        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20       6410      20        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21       6430      20        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22       6440      16        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23       6520      21        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24       6530      20        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25       8100       7        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26       8300       7        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27       1500       5        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28       3200       8        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29       4100      15        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30       5100      16        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 31       6200      18        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 32       7400       9        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 33       2200      11        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 34       2400      13        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 35       2500      16        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 36       3100       8        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37       4110      15        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38       4300      15        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 39       6100      18        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 40       8200       7        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 41       4200      15        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 42       4120      15        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 43       6110      18        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 44       6500      21        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 45       1600       6        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 46       5400      17        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 47       6120      19        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 48       6420      19        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 49       6600      17        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 50       7100       9        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 51       2140      14        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 52       1650       6        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 53       2300      12        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 54       6460      16        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 55       7200       9        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 56       3000       8        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 57       5720      17        0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 58       5700      17        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    FLUCCSCODE CLUCSID IMPROVED                              DESCRIPTION</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        1100       1        1                  Low Density Residential</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2        1200       2        1               Medium Density Residential</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3        1300       3        1                 High Density Residential</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4        1400       4        1                               Commercial</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        1700       7        1 Institutional, Transportation, Utilities</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6        1800       8        0                              Range Lands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7        1820       8        1                              Range Lands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8        1900       8        0                              Range Lands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9        2100      10        1                                  Pasture</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10       2600       8        0                              Range Lands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11       3300       8        0                              Range Lands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12       4340      15        0                           Upland Forests</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13       4400      15        0                           Upland Forests</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14       5200      16        0                               Freshwater</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15       5300      16        0                               Freshwater</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16       6150      18        0             Forested Freshwater Wetlands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17       6210      18        0             Forested Freshwater Wetlands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18       6300      18        0             Forested Freshwater Wetlands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19       6400      20        0         Non-forested Freshwater Wetlands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20       6410      20        0         Non-forested Freshwater Wetlands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21       6430      20        0         Non-forested Freshwater Wetlands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22       6440      16        0                               Freshwater</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23       6520      21        0                              Tidal Flats</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24       6530      20        0         Non-forested Freshwater Wetlands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25       8100       7        1 Institutional, Transportation, Utilities</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26       8300       7        1 Institutional, Transportation, Utilities</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27       1500       5        1                               Industrial</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28       3200       8        0                              Range Lands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 29       4100      15        0                           Upland Forests</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 30       5100      16        0                               Freshwater</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 31       6200      18        0             Forested Freshwater Wetlands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 32       7400       9        0                             Barren Lands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 33       2200      11        1                                   Groves</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 34       2400      13        1                                  Nursery</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 35       2500      16        1                               Freshwater</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 36       3100       8        0                              Range Lands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37       4110      15        0                           Upland Forests</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 38       4300      15        0                           Upland Forests</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 39       6100      18        0             Forested Freshwater Wetlands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 40       8200       7        1 Institutional, Transportation, Utilities</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 41       4200      15        0                           Upland Forests</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 42       4120      15        0                           Upland Forests</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 43       6110      18        0             Forested Freshwater Wetlands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 44       6500      21        0                              Tidal Flats</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 45       1600       6        1                                   Mining</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 46       5400      17        0                                Saltwater</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 47       6120      19        0                       Saltwater Wetlands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 48       6420      19        0                       Saltwater Wetlands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 49       6600      17        0                                Saltwater</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50       7100       9        0                             Barren Lands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 51       2140      14        1                      Row and Field Crops</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 52       1650       6        1                                   Mining</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 53       2300      12        1                                 Feedlots</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 54       6460      16        0                               Freshwater</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 55       7200       9        0                             Barren Lands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 56       3000       8        0                              Range Lands</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 57       5720      17        0                                Saltwater</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 58       5700      17        0                                Saltwater</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
