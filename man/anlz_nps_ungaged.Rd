@@ -11,6 +11,7 @@ anlz_nps_ungaged(
   lakemanpth,
   tampabypth,
   bellshlpth,
+  allflo = NULL,
   verbose = TRUE
 )
 }
@@ -26,6 +27,8 @@ anlz_nps_ungaged(
 \item{tampabypth}{character, path to the file containing the Tampa Bypass flow data, see details}
 
 \item{bellshlpth}{character, path to the file containing the Bell shoals data, see details}
+
+\item{allflo}{data frame of flow data, if already available from \code{\link{util_nps_getflow}}, otherwise NULL and the function will retrieve the data}
 
 \item{verbose}{logical indicating whether to print verbose output}
 }

@@ -4,7 +4,13 @@
 \alias{util_nps_getflow}
 \title{Get flow data from for NPS calculations at gaged sites}
 \usage{
-util_nps_getflow(lakemanpth, tampabypth, bellshlpth, yrrng = c(2021, 2023))
+util_nps_getflow(
+  lakemanpth,
+  tampabypth,
+  bellshlpth,
+  yrrng = c(2021, 2023),
+  verbose = TRUE
+)
 }
 \arguments{
 \item{lakemanpth}{character, path to the file containing the Lake Manatee flow data}
@@ -14,6 +20,8 @@ util_nps_getflow(lakemanpth, tampabypth, bellshlpth, yrrng = c(2021, 2023))
 \item{bellshlpth}{character, path to the file containing the Bell shoals data}
 
 \item{yrrng}{vector of two integers, the year range for which to retrieve flow data. Default is c(2021, 2023).}
+
+\item{verbose}{logical indicating whether to print verbose output}
 }
 \value{
 A data frame of monthly mean flow or fifteen USGS stations and three external flow sites

@@ -2,6 +2,7 @@
 #'
 #' @param site A character vector of USGS site numbers. If NULL, defaults to a predefined set of sites. Default is NULL, see details.
 #' @param yrrng A vector of two dates in 'YYYY-MM-DD' format, specifying the date range to retrieve flow data. Default is from '2021-01-01' to '2023-12-31'.
+#' @param verbose logical indicating whether to print verbose output
 #'
 #' @returns A data frame of daily flow values in cfs for fifteen stations
 #' @export
@@ -10,7 +11,7 @@
 #'
 #' @examples
 #' usgsflo <- util_nps_getusgsflow()
-util_nps_getusgsflow <- function(site = NULL, yrrng = c('2021-01-01', '2023-12-31')){
+util_nps_getusgsflow <- function(site = NULL, yrrng = c('2021-01-01', '2023-12-31'), verbose = TRUE){
 
   if(is.null(site))
     usgsid <- c("02299950", "02300042", "02300500", "02300700", "02301000",
@@ -21,7 +22,10 @@ util_nps_getusgsflow <- function(site = NULL, yrrng = c('2021-01-01', '2023-12-3
   names(fl_results) <- usgsid
 
   for(sid in usgsid) {
-
+    
+    if(verbose)
+      cat('\t', sid, '\n')
+    
     dat <- suppressMessages(dataRetrieval::read_waterdata_daily(monitoring_location_id = paste0('USGS-', sid), 
         parameter_code = '00060', time = yrrng, skipGeometry = TRUE
       )) |>

@@ -4,6 +4,7 @@
 #' @param tampabypth character, path to the file containing the Tampa Bypass flow data
 #' @param bellshlpth character, path to the file containing the Bell shoals data
 #' @param yrrng vector of two integers, the year range for which to retrieve flow data. Default is c(2021, 2023).
+#' @param verbose logical indicating whether to print verbose output
 #'
 #' @returns A data frame of monthly mean flow or fifteen USGS stations and three external flow sites
 #' @export
@@ -17,7 +18,7 @@
 #' tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
 #' bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 #' allflo <- util_nps_getflow(lakemanpth, tampabypth, bellshlpth)
-util_nps_getflow <- function(lakemanpth, tampabypth, bellshlpth, yrrng = c(2021, 2023)){
+util_nps_getflow <- function(lakemanpth, tampabypth, bellshlpth, yrrng = c(2021, 2023), verbose = TRUE){
 
   # external files
   lman <- util_nps_getextflow(lakemanpth, 'LMANATEE', yrrng = yrrng)
@@ -26,7 +27,7 @@ util_nps_getflow <- function(lakemanpth, tampabypth, bellshlpth, yrrng = c(2021,
 
   # usgs api flow data
   yrrng <- as.Date(c(paste0(yrrng[1], '-01-01'), paste0(yrrng[2], '-12-31')))
-  intflo <- util_nps_getusgsflow(yrrng = yrrng)
+  intflo <- util_nps_getusgsflow(yrrng = yrrng, verbose = verbose)
 
   # combine all
   new_flow <- intflo |>

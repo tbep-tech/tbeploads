@@ -4,12 +4,18 @@
 \alias{util_nps_getusgsflow}
 \title{Get flow data from USGS for NPS calculations}
 \usage{
-util_nps_getusgsflow(site = NULL, yrrng = c("2021-01-01", "2023-12-31"))
+util_nps_getusgsflow(
+  site = NULL,
+  yrrng = c("2021-01-01", "2023-12-31"),
+  verbose = TRUE
+)
 }
 \arguments{
 \item{site}{A character vector of USGS site numbers. If NULL, defaults to a predefined set of sites. Default is NULL, see details.}
 
 \item{yrrng}{A vector of two dates in 'YYYY-MM-DD' format, specifying the date range to retrieve flow data. Default is from '2021-01-01' to '2023-12-31'.}
+
+\item{verbose}{logical indicating whether to print verbose output}
 }
 \value{
 A data frame of daily flow values in cfs for fifteen stations

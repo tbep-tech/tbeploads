@@ -11,6 +11,7 @@ anlz_nps_gaged(
   lakemanpth,
   tampabypth,
   bellshlpth,
+  allflo = NULL,
   verbose = TRUE
 )
 }
@@ -27,6 +28,8 @@ anlz_nps_gaged(
 
 \item{bellshlpth}{character, path to the file containing the Bell shoals data}
 
+\item{allflo}{data frame of flow data, if already available from \code{\link{util_nps_getflow}}, otherwise NULL and the function will retrieve the data}
+
 \item{verbose}{logical indicating whether to print verbose output}
 }
 \value{
@@ -38,7 +41,7 @@ Calculate non-point source (NPS) loads for gaged basins
 \details{
 The function uses \code{\link{util_nps_getflow}} to retrieve flow data and \code{\link{util_nps_getwq}} to retrieve water quality data. It then combines these datasets and calculates loads for TN, TP, TSS, BOD, and hydrologic load.  See the help files for each function for more details.
 
-Required external data inputs are Lake Manatee, Tampa Bypass, and Alafia River Bell Shoals flow data.  These are not available from the USGS API and must be obtained from the contacts listed in \code{\link{util_nps_getextflow}}.  USGS flow data are for stations 02299950, 02300042, 02300500, 02300700, 02301000, 02301300, 02301500, 02301750, 02303000, 02303330, 02304500, 02306647, 02307000, 02307359, and 02307498.  The USGS flow data are from the NWIS database as returned by \code{\link[dataRetrieval]{readNWISdv}}.
+Required external data inputs are Lake Manatee, Tampa Bypass, and Alafia River Bell Shoals flow data.  These are not available from the USGS API and must be obtained from the contacts listed in \code{\link{util_nps_getextflow}}.  USGS flow data are for stations 02299950, 02300042, 02300500, 02300700, 02301000, 02301300, 02301500, 02301750, 02303000, 02303330, 02304500, 02306647, 02307000, 02307359, and 02307498.  The USGS flow data are from the NWIS database as returned by \code{\link[dataRetrieval]{read_waterdata_daily}}.
 
 Water Quality data are obtained from the FDEP WIN database API, tbeptools, or local files as described in \code{\link{util_nps_getwq}}. Chosen stations are ER2 and UM2 for Manatee County and station 06-06 for Pinellas County. Environmental Protection Commission (EPC) of Hillsborough County stations retained are 105, 113, 114, 132, 141, 138, 142, and 147. Manatee or Pinellas County data can be imported from local files using the \code{mancopth} and \code{pincopth} arguments, respectively.  If these are not provided, the function will attempt to retrieve data from the FDEP WIN database using \code{read_importwqwin} from tbeptools.  The EPC data are retrieved using \code{read_importepc} from tbeptools.
 

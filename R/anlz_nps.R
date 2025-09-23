@@ -50,15 +50,20 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
                      pincopth, lakemanpth, tampabypth, bellshlpth, vernafl, verbose = T){
 
   if(verbose)
+    cat('Retrieving flow data...\n')
+  allflo <- util_nps_getflow(lakemanpth, tampabypth, bellshlpth, yrrng = lubridate::year(as.Date(yrrng)), verbose = verbose)
+
+  if(verbose)
     cat('Estimating ungaged NPS loads...\n')
   nps_ungaged <- anlz_nps_ungaged(yrrng = yrrng,
                                   tbbase, rain, lakemanpth, tampabypth, bellshlpth,
+                                  allflo = allflo,
                                   verbose = verbose)
 
   if(verbose)
     cat('Estimating gaged NPS loads...\n')
   nps_gaged <- anlz_nps_gaged(yrrng, mancopth, pincopth, lakemanpth, tampabypth,
-                              bellshlpth, verbose = verbose) |>
+                              bellshlpth, allflo = allflo, verbose = verbose) |>
     dplyr::select(
       basin,
       yr,

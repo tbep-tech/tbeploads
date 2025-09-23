@@ -6,6 +6,7 @@
 #' @param lakemanpth character, path to the file containing the Lake Manatee flow data, see details
 #' @param tampabypth character, path to the file containing the Tampa Bypass flow data, see details
 #' @param bellshlpth character, path to the file containing the Bell shoals data, see details
+#' @param allflo data frame of flow data, if already available from \code{\link{util_nps_getflow}}, otherwise NULL and the function will retrieve the data
 #' @param verbose logical indicating whether to print verbose output
 #'
 #' @details
@@ -102,7 +103,7 @@
 #' anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase,
 #'    rain, lakemanpth, tampabypth, bellshlpth)
 #' }
-anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, lakemanpth, tampabypth, bellshlpth, verbose = TRUE) {
+anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, lakemanpth, tampabypth, bellshlpth, allflo = NULL, verbose = TRUE) {
 
   yrrng <- lubridate::ymd(yrrng)
   yrs <- lubridate::year(yrrng)
@@ -117,9 +118,11 @@ anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain
   npsrain <- util_nps_preprain(rain, yrrng = yrs)
 
   # flow_monthly_means
-  if(verbose)
-    cat('Retrieving flow data...\n')
-  allflo <- util_nps_getflow(lakemanpth, tampabypth, bellshlpth, yrrng = yrs)
+  if(is.null(allflo)){
+    if(verbose)
+      cat('Retrieving flow data...\n')
+    allflo <- util_nps_getflow(lakemanpth, tampabypth, bellshlpth, yrrng = yrs, verbose = verbose)
+  }
 
   # start assembling NPS model parameters
   if(verbose)
