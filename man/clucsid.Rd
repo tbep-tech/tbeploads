@@ -20,6 +20,7 @@ Used to create the \code{\link{tbbase}} combined layer with jurisdictions, land 
 \item \code{FLUCCSCODE}: Numeric value for the Florida Land Use, Cover and Forms Classification System (FLUCCS) code
 \item \code{CLUCSID}: Numeric value for the coastal land use code, from JEI
 \item \code{IMPROVED}: Numeric value for whether the code is improved (1) or not (0)
+\item \code{DESCRIPTION}: Character description of the CLUCSID code
 }
 }
 \examples{

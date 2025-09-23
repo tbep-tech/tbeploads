@@ -23,7 +23,7 @@ create_mock_wq_data <- function() {
   )
 }
 
-mock_util_nps_getflow <- function(lakemanpth, tampabypth, bellshlpth, yrrng) {
+mock_util_nps_getflow <- function(lakemanpth, tampabypth, bellshlpth, yrrng, verbose = TRUE) {
   return(create_mock_flow_data())
 }
 

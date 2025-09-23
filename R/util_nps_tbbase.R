@@ -71,7 +71,8 @@ util_nps_tbbase <- function(tblu, tbsoil, gdal_path = NULL,
     cat('Summarizing...\n')
 
   # Join with CLUCSID lookup table
-  tbbase <- dplyr::left_join(tbbase4, clucsid, by = "FLUCCSCODE", relationship = 'many-to-one')
+  tbbase <- dplyr::left_join(tbbase4, clucsid, by = "FLUCCSCODE", relationship = 'many-to-one') |> 
+    dplyr::select(-DESCRIPTION)
 
   # summarize
   out <- tbbase |>

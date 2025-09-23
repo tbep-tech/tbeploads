@@ -28,7 +28,7 @@ pth3 <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 test_that("util_nps_getflow basic functionality", {
 
   # Create mock functions that return the expected data structures
-  mock_usgs_flow_func <- function(yrrng) {
+  mock_usgs_flow_func <- function(yrrng, verbose = TRUE) {
     create_mock_usgs_flow(yrrng[1], yrrng[2])
   }
 
