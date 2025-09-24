@@ -21,6 +21,9 @@
 #' anlz_ml(fls)
 anlz_ml <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summtime = c('month', 'year')){
 
+  summ <- match.arg(summ)
+  summtime <- match.arg(summtime)
+
   # get facility and outfall level data
   mlbyfac <- anlz_ml_facility(fls)
 

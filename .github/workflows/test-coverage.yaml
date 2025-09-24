@@ -16,6 +16,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN}}
+      API_USGS_PAT: ${{ secrets.API_USGS_PAT}}
 
     steps:
       - uses: actions/checkout@v4
