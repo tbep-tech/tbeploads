@@ -172,9 +172,9 @@ tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbe
 bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 
 # get gaged NPS loads
-nps_gaged <- anlz_nps_gaged(yrrng = c('2021-01-01', '2023-12-31'), mancopth = mancopth,
+nps_gaged <- anlz_nps_gaged(yrrng = c('2023-01-01', '2023-12-31'), mancopth = mancopth,
                            pincopth = pincopth, lakemanpth = lakemanpth, tampabypth = tampabypth,
-                           bellshlpth = bellshlpth, verbose = TRUE)
+                           bellshlpth = bellshlpth)
 
 head(nps_gaged)
 ```
@@ -246,7 +246,7 @@ Where EMCs (Event Mean Concentrations) represent the average pollutant concentra
 
 All together, the above can be implemented as follows:
 
-```{r eval= F}
+```{r eval= T}
 # required inputs
 data(tbbase)
 data(rain)
@@ -254,14 +254,20 @@ lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbe
 tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
 bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 
-anlz_nps_ungaged(tbbase, rain, lakemanpth, tampabypth, bellshlpth)
+nps_ungaged <- anlz_nps_ungaged(yrrng = c('2023-01-01', '2023-12-31'), tbbase = tbbase, rain = rain, 
+                                lakemanpth = lakemanpth, tampabypth = tampabypth, 
+                                bellshlpth = bellshlpth)
+
+head(nps_ungaged)
 ```
 
 #### Combined gaged and ungaged loads
 
 Refer to the prior sections for details on how the separate loads for gaged and ungaged portions of the wateshed are calculated.  The `anlz_nps()` function described below can be used to combined all steps. The function estimates non-point source (NPS) loads for Tampa Bay by combining ungaged and gaged NPS loads. Ungaged loads are estimated using rainfall, flow, event mean concentration, land use, and soils data, while gaged loads are estimated using water quality data and flow data. The function also incorporates atmospheric concentration data from the Verna Wellfield site.
 
-```{r eval = F}
+Unlike the individual gaged and ungaged functions, `anlz_nps()` returns loading results in tons per month or year depending on the summary arguments. Hydrologic load is returned as million cubic meters per month or year.
+
+```{r eval = T}
 data(tbbase)
 data(rain)
 mancopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
@@ -271,8 +277,11 @@ tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbe
 bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 vernafl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
 
-anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancopth, pincopth,
-         lakemanpth, tampabypth, bellshlpth, vernafl, verbose = TRUE)
+nps <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain = rain, 
+                mancopth = mancopth, pincopth = pincopth, lakemanpth = lakemanpth, 
+                tampabypth = tampabypth, bellshlpth = bellshlpth, vernafl = vernafl)
+
+head(nps)
 ```
 
 The following functions are used internally and are provided here for reference on the components used in the calculations:
@@ -286,3 +295,15 @@ The following functions are used internally and are provided here for reference 
 * `util_nps_getwq()`: Gets water quality data for NPS gaged calculations (for `mancopth`, `pincopth`, and Hillsborough County data).
 * `util_getrain()`: Gets rainfall data for NPS ungaged calculations, as provided in `rain`.
 * `util_nps_tbbase()`: Gets the combined spatial data layer for NPS ungaged calculations, as provided in `tbbase`.
+
+Results can be summarized by basin, segment, baywide, monthly, or annually using the `summ` and `summtime` arguments. By default, loads are returned monthly for each basin. Note that Boca Ciega Bay and Boca Ciega Bay South results are returned separately. Only Boca Ciega Bay South is used when estimating total bay loads.  
+
+Loads by land use type (using CLUCSID) can also be returned if `summ = 'lu'`.  These results only apply to ungaged loading estimates. 
+
+```{r}
+npslu <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain = rain, 
+                mancopth = mancopth, pincopth = pincopth, lakemanpth = lakemanpth, 
+                tampabypth = tampabypth, bellshlpth = bellshlpth, vernafl = vernafl,
+                summ = 'lu')
+head(npslu)
+```
