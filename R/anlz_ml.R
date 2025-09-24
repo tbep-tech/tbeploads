@@ -7,7 +7,7 @@
 #' @param summtime `r summ_params('summtime')`
 #'
 #' @details
-#' Input data files in \code{fls} are first processed by \code{\link{anlz_ml_facility}} to calculate ML loads for each facility.  `r summ_params('descrip')`
+#' Input data files in \code{fls} are first processed by \code{\link{anlz_ml_facility}} to calculate ML loads for each facility.  `r summ_params('descrip')` Options for \code{summ} are 'entity' to summarize by entity only, 'facility' to summarize by facility only, 'segment' to summarize by bay segment, and 'all' to summarize total load.  Options for \code{summtime} are 'month' to summarize by month and 'year' to summarize by year.  The default is to summarize by entity and month.
 #'
 #' @return data frame with loading data for TN as tons per month/year.  Columns for TP, TSS, BOD, and hydrologic load are also returned with zero load for consistency with other point source load calculation functions.
 #'

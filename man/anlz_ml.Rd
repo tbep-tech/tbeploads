@@ -24,7 +24,7 @@ data frame with loading data for TN as tons per month/year.  Columns for TP, TSS
 Calculate material loss (ML) loads and summarize
 }
 \details{
-Input data files in \code{fls} are first processed by \code{\link{anlz_ml_facility}} to calculate ML loads for each facility.  The data are summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed based on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}).
+Input data files in \code{fls} are first processed by \code{\link{anlz_ml_facility}} to calculate ML loads for each facility.  The data are summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed based on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}). Options for \code{summ} are 'entity' to summarize by entity only, 'facility' to summarize by facility only, 'segment' to summarize by bay segment, and 'all' to summarize total load.  Options for \code{summtime} are 'month' to summarize by month and 'year' to summarize by year.  The default is to summarize by entity and month.
 }
 \examples{
 fls <- list.files(system.file('extdata/', package = 'tbeploads'),

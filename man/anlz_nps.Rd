@@ -14,7 +14,7 @@ anlz_nps(
   tampabypth,
   bellshlpth,
   vernafl,
-  summ = c("segment", "all", "lu"),
+  summ = c("basin", "segment", "all", "lu"),
   summtime = c("month", "year"),
   verbose = T
 )
@@ -38,14 +38,14 @@ anlz_nps(
 
 \item{vernafl}{character vector of file path to Verna Wellfield atmospheric concentration data}
 
-\item{summ}{character indicating how to summarrize results, by land use (\code{'lu'}, ungaged basins only), by bay segment (\code{'segment'}, default), or all segments combined (\code{'all'})}
+\item{summ}{chr string indicating how the returned data are summarized, see details}
 
 \item{summtime}{chr string indicating how the returned data are summarized temporally (month or year), see details}
 
 \item{verbose}{logical indicating whether to print verbose output}
 }
 \value{
-A data frame of non-point source loads for Tampa Bay, including columns for year, month, basin, bay segment, basin area (hectares), and loads for water, total nitrogen (TN), total phosphorus (TP), total suspended solids (TSS), and biochemical oxygen demand (BOD).
+A data frame of non-point source loads for Tampa Bay, including columns for year, month, bay segment, basin, and loads for total nitrogen (TN), total phosphorus (TP), total suspended solids (TSS), biochemical oxygen demand (BOD), and hydrology using default values for the \code{summ} and \code{summtime} arguments. TN, TP, TSS, and BOD Loads are tons per month or year depending on the \code{summtime} argument. Hydrologic loads are cubic meters per month or year depending on the \code{summtime} argument.
 }
 \description{
 Calculate non-point source (NPS) loads for Tampa Bay
@@ -53,7 +53,7 @@ Calculate non-point source (NPS) loads for Tampa Bay
 \details{
 The function estimates non-point source (NPS) loads for Tampa Bay by combining ungaged and gaged NPS loads. Ungaged loads are estimated using rainfall, flow, event mean concentration, land use, and soils data, while gaged loads are estimated using water quality data and flow data. The function also incorporates atmospheric concentration data from the Verna Wellfield site.
 
-The data are summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed based on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}). Using \code{summ = 'lu'} will return only ungaged loads summarized by land use.
+The data are summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed based on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}). Options for \code{summ} are 'basin' to summarize across sub-basins within bay segments, 'segment' to summarize by bay segment, 'all' to summarize total load, and 'lu' to summarize by land use type (ungaged loads only).  Options for \code{summtime} are 'month' to summarize by month and 'year' to summarize by year.  The default is to summarize by basin and month.
 
 The following functions are used internally and are provided here for reference on the components used in the calculations:
 

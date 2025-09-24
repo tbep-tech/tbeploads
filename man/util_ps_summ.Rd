@@ -6,7 +6,7 @@
 \usage{
 util_ps_summ(
   dat,
-  summ = c("entity", "facility", "segment", "all"),
+  summ = c("entity", "facility", "basin", "segment", "all"),
   summtime = c("month", "year")
 )
 }
@@ -32,7 +32,7 @@ fls <- list.files(system.file('extdata/', package = 'tbeploads'),
 
 ipsbyfac <- anlz_ips_facility(fls)
 
-# add bay segment and source, there should only be loads to hills, middle, and lower tampa bay
+# add bay segment and source, there should only be loads to Hillsborough, Middle, and Lower Tampa Bay
 ipsld <- ipsbyfac  |>
   dplyr::arrange(coastco) |>
   dplyr::left_join(dbasing, by = "coastco") |>

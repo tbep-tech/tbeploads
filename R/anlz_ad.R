@@ -117,37 +117,7 @@ anlz_ad <- function(rain, vernafl, summ = c('segment', 'all'), summtime = c('mon
   ##
   # output based on summ and summtime
 
-  if(summ == 'segment' & summtime == 'month')
-    out <- lddat
-
-  if(summ == 'segment' & summtime == 'year')
-    out <- lddat |>
-      dplyr::summarise(
-        tn_load = sum(tn_load),
-        tp_load = sum(tp_load),
-        hy_load = sum(hy_load),
-        .by = c(Year, source, segment)
-      )
-
-  if(summ == 'all' & summtime == 'month')
-    out <- lddat |>
-      dplyr::filter(segment != "Boca Ciega Bay") |>
-      dplyr::summarise(
-        tn_load = sum(tn_load),
-        tp_load = sum(tp_load),
-        hy_load = sum(hy_load),
-        .by = c(Year, Month, source)
-      )
-
-  if(summ == 'all' & summtime == 'year')
-    out <- lddat |>
-      dplyr::filter(segment != "Boca Ciega Bay") |>
-      dplyr::summarise(
-        tn_load = sum(tn_load),
-        tp_load = sum(tp_load),
-        hy_load = sum(hy_load),
-        .by = c(Year, source)
-      )
+  out <- util_ps_summ(lddat, summ = summ, summtime = summtime)
 
   return(out)
 

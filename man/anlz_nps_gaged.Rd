@@ -33,7 +33,7 @@ anlz_nps_gaged(
 \item{verbose}{logical indicating whether to print verbose output}
 }
 \value{
-A data frame with columns for basin, year, month, TN in mg/L, TP in mg/L, TSS in mg/L, BOD in mg/L, flow in liters/month, hydrologic load in million m3/month, TN load in kg/month, TP load in kg/month, TSS load in kg/month, and BOD load in kg/month.
+A data frame with columns for basin, year, month, TN in mg/L, TP in mg/L, TSS in mg/L, BOD in mg/L, flow in liters/month, hydrologic load in m3/month, TN load in kg/month, TP load in kg/month, TSS load in kg/month, and BOD load in kg/month.
 }
 \description{
 Calculate non-point source (NPS) loads for gaged basins

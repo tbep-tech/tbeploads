@@ -9,18 +9,18 @@
 #' @param tampabypth character, path to the file containing the Tampa Bypass flow data, see details
 #' @param bellshlpth character, path to the file containing the Bell shoals data, see details
 #' @param vernafl character vector of file path to Verna Wellfield atmospheric concentration data
-#' @param summ character indicating how to summarrize results, by land use (\code{'lu'}, ungaged basins only), by bay segment (\code{'segment'}, default), or all segments combined (\code{'all'})
+#' @param summ `r summ_params('summ')`
 #' @param summtime `r summ_params('summtime')`
 #' @param verbose logical indicating whether to print verbose output
 #'
-#' @returns A data frame of non-point source loads for Tampa Bay, including columns for year, month, basin, bay segment, basin area (hectares), and loads for water, total nitrogen (TN), total phosphorus (TP), total suspended solids (TSS), and biochemical oxygen demand (BOD).
+#' @returns A data frame of non-point source loads for Tampa Bay, including columns for year, month, bay segment, basin, and loads for total nitrogen (TN), total phosphorus (TP), total suspended solids (TSS), biochemical oxygen demand (BOD), and hydrology using default values for the \code{summ} and \code{summtime} arguments. TN, TP, TSS, and BOD Loads are tons per month or year depending on the \code{summtime} argument. Hydrologic loads are cubic meters per month or year depending on the \code{summtime} argument.
 #'
 #' @export
 #'
 #' @details
 #' The function estimates non-point source (NPS) loads for Tampa Bay by combining ungaged and gaged NPS loads. Ungaged loads are estimated using rainfall, flow, event mean concentration, land use, and soils data, while gaged loads are estimated using water quality data and flow data. The function also incorporates atmospheric concentration data from the Verna Wellfield site.
 #'
-#' `r summ_params('descrip')` Using `summ = 'lu'` will return only ungaged loads summarized by land use.
+#' `r summ_params('descrip')` Options for \code{summ} are 'basin' to summarize across sub-basins within bay segments, 'segment' to summarize by bay segment, 'all' to summarize total load, and 'lu' to summarize by land use type (ungaged loads only).  Options for \code{summtime} are 'month' to summarize by month and 'year' to summarize by year.  The default is to summarize by basin and month.
 #' 
 #' The following functions are used internally and are provided here for reference on the components used in the calculations:
 #'
@@ -52,7 +52,7 @@
 #' }
 anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancopth,
                      pincopth, lakemanpth, tampabypth, bellshlpth, vernafl, 
-                     summ = c('segment', 'all', 'lu'), summtime = c('month', 'year'), verbose = T){
+                     summ = c('basin', 'segment', 'all', 'lu'), summtime = c('month', 'year'), verbose = T){
 
   summ <- match.arg(summ)
   summtime <- match.arg(summtime)
@@ -102,7 +102,7 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
       tnload_b = tnload,
       tpload_a = tpload,
       tpload_b = tpload,
-      h2oload2 = h2oload * 1000
+      h2oload2 = h2oload * 1000 # m3 to liters
     ) |>
     dplyr::mutate(
       tnload_a = dplyr::case_when(
@@ -227,21 +227,43 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
       tnload_a, tpload_a, tnload_b, tpload_b
     )
 
-  out <- npsfinal |>
+  npsld <- npsfinal |>
     dplyr::group_by(yr, mo, bay_seg, basin) |>
     dplyr::summarise(
-      h2oload = sum(h2oload, na.rm=TRUE),
-      tnload = sum(tnload, na.rm=TRUE),
-      tpload = sum(tpload, na.rm=TRUE),
-      tssload = sum(tssload, na.rm=TRUE),
-      bodload = sum(bodload, na.rm=TRUE),
-      bas_area = sum(bas_area, na.rm=TRUE),
+      tn_load = sum(tnload, na.rm=TRUE) / 907.2, # kg to tons per month
+      tp_load = sum(tpload, na.rm=TRUE) / 907.2, # kg to tons per month
+      tss_load = sum(tssload, na.rm=TRUE) / 907.2, # kg to tons per month
+      bod_load = sum(bodload, na.rm=TRUE) / 907.2, # kg to tons per month
+      hy_load = sum(h2oload, na.rm=TRUE), # m3 per month
+      bas_area = sum(bas_area, na.rm=TRUE), # hectares
       segment = dplyr::first(segment),
       majbasin = dplyr::first(majbasin),
       source = dplyr::first(source),
       .groups = 'drop'
     ) |>
-    dplyr::arrange(segment, basin, yr)
+    dplyr::mutate(
+      segment = dplyr::case_when(
+        segment == 1 ~ "Old Tampa Bay",
+        segment == 2 ~ "Hillsborough Bay",
+        segment == 3 ~ "Middle Tampa Bay",
+        segment == 4 ~ "Lower Tampa Bay",
+        segment == 5 ~ "Boca Ciega Bay",
+        segment == 6 ~ "Terra Ceia Bay",
+        segment == 7 ~ "Manatee River", 
+        segment == 55 ~ "Boca Ciega Bay South"
+      )
+    ) |> 
+    dplyr::select(Year = yr, Month = mo, source, segment, basin, tn_load, tp_load, 
+      tss_load, bod_load, hy_load) |>     
+    dplyr::arrange(segment, basin, Year, Month)
+
+  ##
+  # output based on summ and summtime
+  
+  ##
+  # summarize by selection
+
+  out <- util_ps_summ(npsld, summ = summ, summtime = summtime)
 
   return(out)
 
