@@ -172,7 +172,7 @@ tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbe
 bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 
 # get gaged NPS loads
-nps_gaged <- anlz_nps_gaged(yrrng = c('2023-01-01', '2023-12-31'), mancopth = mancopth,
+nps_gaged <- anlz_nps_gaged(yrrng = c('2021-01-01', '2023-12-31'), mancopth = mancopth,
                            pincopth = pincopth, lakemanpth = lakemanpth, tampabypth = tampabypth,
                            bellshlpth = bellshlpth)
 
@@ -254,7 +254,7 @@ lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbe
 tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
 bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 
-nps_ungaged <- anlz_nps_ungaged(yrrng = c('2023-01-01', '2023-12-31'), tbbase = tbbase, rain = rain, 
+nps_ungaged <- anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain = rain, 
                                 lakemanpth = lakemanpth, tampabypth = tampabypth, 
                                 bellshlpth = bellshlpth)
 
