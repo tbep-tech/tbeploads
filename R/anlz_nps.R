@@ -121,7 +121,18 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
         clucsid %in% c(18, 20) ~ h2oload2 * tp_ppt * 3.04 * 0.001 * 0.001,
         TRUE ~ tpload_b
       )
-    ) |>
+    ) 
+   
+  # ungaged lu summary
+  if(summ == 'lu'){
+
+    out <- util_nps_lusumm(nps2, summ = summ, summtime = summtime)
+
+    return(out)
+
+  }
+      
+  nps2 <- nps2 |>
     dplyr::group_by(yr, mo, bay_seg, basin) |>
     dplyr::summarise(
       h2oload = sum(h2oload, na.rm=TRUE),
@@ -189,22 +200,8 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
       tpload_b = ifelse(is.na(otpload), etploadb, otpload),
       source = "NPS"
     ) |>
+    util_nps_segment() |> 
     dplyr::mutate(
-      segment = dplyr::case_when(
-        basin %in% c("LTARPON", "02306647", "02307000", "02307359", "206-1") ~ 1,
-        basin %in% c("TBYPASS", "02301750", "206-2", "02300700") ~ 2,
-        basin %in% c("02301000", "02301300", "02303000", "02303330") ~ 2,
-        basin %in% c("02301500", "02301695", "204-2") ~ 2,
-        basin %in% c("02304500", "205-2") ~ 2,
-        basin %in% c("02300500", "02300530", "203-3") ~ 3,
-        basin %in% c("206-3C", "206-3E", "206-3W") ~ 3,
-        basin == "206-4" ~ 4,
-        basin == "206-5" | basin == "207-5" & bay_seg == 55 ~ 55,
-        basin == "207-5" & bay_seg == 5 ~ 5,
-        basin == "206-6" ~ 6,
-        basin %in% c("EVERSRES", "LMANATEE", "202-7", "02299950") ~ 7,
-        TRUE ~ NA
-      ),
       majbasin = dplyr::case_when(
         basin %in% c("LTARPON", "02306647", "02307000", "02307359", "206-1") ~ "Coastal Old Tampa Bay",
         basin %in% c("TBYPASS", "02301750", "206-2", "02300700") ~ "Coastal Hillsborough Bay",
@@ -241,18 +238,6 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
       source = dplyr::first(source),
       .groups = 'drop'
     ) |>
-    dplyr::mutate(
-      segment = dplyr::case_when(
-        segment == 1 ~ "Old Tampa Bay",
-        segment == 2 ~ "Hillsborough Bay",
-        segment == 3 ~ "Middle Tampa Bay",
-        segment == 4 ~ "Lower Tampa Bay",
-        segment == 5 ~ "Boca Ciega Bay",
-        segment == 6 ~ "Terra Ceia Bay",
-        segment == 7 ~ "Manatee River", 
-        segment == 55 ~ "Boca Ciega Bay South"
-      )
-    ) |> 
     dplyr::select(Year = yr, Month = mo, source, segment, basin, tn_load, tp_load, 
       tss_load, bod_load, hy_load) |>     
     dplyr::arrange(segment, basin, Year, Month)
