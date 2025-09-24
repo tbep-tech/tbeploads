@@ -1,8 +1,8 @@
-#' Summarize point source load estimates
+#' Summarize load estimates
 #'
-#' Summarize point source load estimates
+#' Summarize load estimates
 #'
-#' @param dat Pre-processed data frame of point source load estimates, see examples
+#' @param dat Pre-processed data frame of load estimates, see examples
 #' @param summ `r summ_params('summ')`
 #' @param summtime `r summ_params('summtime')`
 #'
@@ -34,8 +34,8 @@
 #'   ) |>
 #'   dplyr::select(-basin, -hectare, -coastco, -name, -bayseg)
 #'
-#' util_ps_summ(ipsld, summ = 'entity', summtime = 'year')
-util_ps_summ <- function(dat, summ = c('entity', 'facility', 'basin', 'segment', 'all'), summtime = c('month', 'year')){
+#' util_summ(ipsld, summ = 'entity', summtime = 'year')
+util_summ <- function(dat, summ = c('entity', 'facility', 'basin', 'segment', 'all'), summtime = c('month', 'year')){
 
   summ <- match.arg(summ)
   summtime <- match.arg(summtime)

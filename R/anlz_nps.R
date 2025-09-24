@@ -259,11 +259,11 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
 
   ##
   # output based on summ and summtime
-  
+
   ##
   # summarize by selection
 
-  out <- util_ps_summ(npsld, summ = summ, summtime = summtime)
+  out <- util_summ(npsld, summ = summ, summtime = summtime)
 
   return(out)
 

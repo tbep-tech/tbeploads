@@ -20,72 +20,72 @@ ipsld <- ipsbyfac  |>
   dplyr::select(-basin, -hectare, -coastco, -name, -bayseg)
 
 # Test cases
-test_that("util_ps_summ returns correct results for facility, month", {
+test_that("util_summ returns correct results for facility, month", {
   # summarize by facility and year
-  result <- util_ps_summ(ipsld, summ = 'facility', summtime = 'month')
+  result <- util_summ(ipsld, summ = 'facility', summtime = 'month')
   result <- names(result)
   expected <- c("Year", "Month", "source", "entity", "facility", "segment", "tn_load",
                 "tp_load", "tss_load", "bod_load", "hy_load")
   expect_identical(result, expected)
 })
 
-test_that("util_ps_summ returns correct results for entity, month", {
+test_that("util_summ returns correct results for entity, month", {
   # summarize by facility and year
-  result <- util_ps_summ(ipsld, summ = 'entity', summtime = 'month')
+  result <- util_summ(ipsld, summ = 'entity', summtime = 'month')
   result <- names(result)
   expected <- c("Year", "Month", "source", "entity", "segment", "tn_load",
                 "tp_load", "tss_load", "bod_load", "hy_load")
   expect_identical(result, expected)
 })
 
-test_that("util_ps_summ returns correct results for segment, month", {
+test_that("util_summ returns correct results for segment, month", {
   # summarize by facility and year
-  result <- util_ps_summ(ipsld, summ = 'segment', summtime = 'month')
+  result <- util_summ(ipsld, summ = 'segment', summtime = 'month')
   result <- names(result)
   expected <- c("Year", "Month", "source", "segment", "tn_load",
                 "tp_load", "tss_load", "bod_load", "hy_load")
   expect_identical(result, expected)
 })
 
-test_that("util_ps_summ returns correct results for all, month", {
+test_that("util_summ returns correct results for all, month", {
   # summarize by facility and year
-  result <- util_ps_summ(ipsld, summ = 'all', summtime = 'month')
+  result <- util_summ(ipsld, summ = 'all', summtime = 'month')
   result <- names(result)
   expected <- c("Year", "Month", "source", "tn_load",
                 "tp_load", "tss_load", "bod_load", "hy_load")
   expect_identical(result, expected)
 })
 
-test_that("util_ps_summ returns correct results for facility, year", {
+test_that("util_summ returns correct results for facility, year", {
   # summarize by facility and year
-  result <- util_ps_summ(ipsld, summ = 'facility', summtime = 'year')
+  result <- util_summ(ipsld, summ = 'facility', summtime = 'year')
   result <- names(result)
   expected <- c("Year", "source", "entity", "facility", "segment", "tn_load",
                 "tp_load", "tss_load", "bod_load", "hy_load")
   expect_identical(result, expected)
 })
 
-test_that("util_ps_summ returns correct results for entity, year", {
+test_that("util_summ returns correct results for entity, year", {
   # summarize by facility and year
-  result <- util_ps_summ(ipsld, summ = 'entity', summtime = 'year')
+  result <- util_summ(ipsld, summ = 'entity', summtime = 'year')
   result <- names(result)
   expected <- c("Year", "source", "entity", "segment", "tn_load",
                 "tp_load", "tss_load", "bod_load", "hy_load")
   expect_identical(result, expected)
 })
 
-test_that("util_ps_summ returns correct results for segment, year", {
+test_that("util_summ returns correct results for segment, year", {
   # summarize by facility and year
-  result <- util_ps_summ(ipsld, summ = 'segment', summtime = 'year')
+  result <- util_summ(ipsld, summ = 'segment', summtime = 'year')
   result <- names(result)
   expected <- c("Year", "source", "segment", "tn_load",
                 "tp_load", "tss_load", "bod_load", "hy_load")
   expect_identical(result, expected)
 })
 
-test_that("util_ps_summ returns correct results for all, year", {
+test_that("util_summ returns correct results for all, year", {
   # summarize by facility and year
-  result <- util_ps_summ(ipsld, summ = 'all', summtime = 'year')
+  result <- util_summ(ipsld, summ = 'all', summtime = 'year')
   result <- names(result)
   expected <- c("Year", "source", "tn_load",
                 "tp_load", "tss_load", "bod_load", "hy_load")

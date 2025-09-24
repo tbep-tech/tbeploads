@@ -22,7 +22,7 @@ anlz_ips <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summ
 
   summ <- match.arg(summ)
   summtime <- match.arg(summtime)
-  
+
   # get facility and outfall level data
   ipsbyfac <- anlz_ips_facility(fls)
 
@@ -45,7 +45,7 @@ anlz_ips <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summ
   ##
   # summarize by selection
 
-  out <- util_ps_summ(ipsld, summ = summ, summtime = summtime)
+  out <- util_summ(ipsld, summ = summ, summtime = summtime)
 
   return(out)
 

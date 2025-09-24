@@ -111,7 +111,7 @@ anlz_dps <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summ
   ##
   # summarize by selection
 
-  out <- util_ps_summ(dpsld, summ = summ, summtime = summtime)
+  out <- util_summ(dpsld, summ = summ, summtime = summtime)
 
   return(out)
 

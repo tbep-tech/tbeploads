@@ -117,7 +117,7 @@ anlz_ad <- function(rain, vernafl, summ = c('segment', 'all'), summtime = c('mon
   ##
   # output based on summ and summtime
 
-  out <- util_ps_summ(lddat, summ = summ, summtime = summtime)
+  out <- util_summ(lddat, summ = summ, summtime = summtime)
 
   return(out)
 

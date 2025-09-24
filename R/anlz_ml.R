@@ -45,7 +45,7 @@ anlz_ml <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summt
   ##
   # summarize by selection
 
-  out <- util_ps_summ(mlld, summ = summ, summtime = summtime)
+  out <- util_summ(mlld, summ = summ, summtime = summtime)
 
   return(out)
 
