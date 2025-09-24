@@ -55,24 +55,23 @@ test_that("anlz_nps returns expected output format", {
   expect_s3_class(result, "data.frame")
 
   # Check expected columns are present
-  expected_cols <- c("yr", "mo", "bay_seg", "basin", "h2oload", "tnload", "tpload",
-                     "tssload", "bodload", "bas_area", "segment", "majbasin", "source")
+  expected_cols <- c("Year", "Month", "source", "segment", "basin", "tn_load", "tp_load",
+                     "tss_load", "bod_load", "hy_load")
   expect_true(all(expected_cols %in% names(result)))
 
   # Check data types
-  expect_type(result$yr, "double")
-  expect_type(result$mo, "double")
-  expect_type(result$bay_seg, "double")
-  expect_type(result$h2oload, "double")
-  expect_type(result$tnload, "double")
-  expect_type(result$tpload, "double")
-  expect_type(result$tssload, "double")
-  expect_type(result$bodload, "double")
-  expect_type(result$bas_area, "double")
+  expect_type(result$Year, "double")
+  expect_type(result$Month, "double")
+  expect_type(result$tn_load, "double")
+  expect_type(result$tp_load, "double")
+  expect_type(result$tss_load, "double")
+  expect_type(result$bod_load, "double")
+  expect_type(result$hy_load, "double")
   expect_type(result$source, "character")
 
   # Check that source column contains expected value
   expect_true(all(result$source == "NPS"))
+
 })
 
 test_that("anlz_nps handles verbose output correctly", {
