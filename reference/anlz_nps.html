@@ -49,7 +49,7 @@
 <span>  <span class="va">tampabypth</span>,</span>
 <span>  <span class="va">bellshlpth</span>,</span>
 <span>  <span class="va">vernafl</span>,</span>
-<span>  summ <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"segment"</span>, <span class="st">"all"</span>, <span class="st">"lu"</span><span class="op">)</span>,</span>
+<span>  summ <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basin"</span>, <span class="st">"segment"</span>, <span class="st">"all"</span>, <span class="st">"lu"</span><span class="op">)</span>,</span>
 <span>  summtime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"month"</span>, <span class="st">"year"</span><span class="op">)</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">T</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -96,7 +96,7 @@
 
 
 <dt id="arg-summ">summ<a class="anchor" aria-label="anchor" href="#arg-summ"></a></dt>
-<dd><p>character indicating how to summarrize results, by land use (<code>'lu'</code>, ungaged basins only), by bay segment (<code>'segment'</code>, default), or all segments combined (<code>'all'</code>)</p></dd>
+<dd><p>chr string indicating how the returned data are summarized, see details</p></dd>
 
 
 <dt id="arg-summtime">summtime<a class="anchor" aria-label="anchor" href="#arg-summtime"></a></dt>
@@ -109,12 +109,12 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame of non-point source loads for Tampa Bay, including columns for year, month, basin, bay segment, basin area (hectares), and loads for water, total nitrogen (TN), total phosphorus (TP), total suspended solids (TSS), and biochemical oxygen demand (BOD).</p>
+    <p>A data frame of non-point source loads for Tampa Bay, including columns for year, month, bay segment, basin, and loads for total nitrogen (TN), total phosphorus (TP), total suspended solids (TSS), biochemical oxygen demand (BOD), and hydrology using default values for the <code>summ</code> and <code>summtime</code> arguments. TN, TP, TSS, and BOD Loads are tons per month or year depending on the <code>summtime</code> argument. Hydrologic loads are cubic meters per month or year depending on the <code>summtime</code> argument.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The function estimates non-point source (NPS) loads for Tampa Bay by combining ungaged and gaged NPS loads. Ungaged loads are estimated using rainfall, flow, event mean concentration, land use, and soils data, while gaged loads are estimated using water quality data and flow data. The function also incorporates atmospheric concentration data from the Verna Wellfield site.</p>
-<p>The data are summarized differently based on the <code>summ</code> and <code>summtime</code> arguments.  All loading data are summed based on these arguments, e.g., by bay segment (<code>summ = 'segment'</code>) and year (<code>summtime = 'year'</code>). Using <code>summ = 'lu'</code> will return only ungaged loads summarized by land use.</p>
+<p>The data are summarized differently based on the <code>summ</code> and <code>summtime</code> arguments.  All loading data are summed based on these arguments, e.g., by bay segment (<code>summ = 'segment'</code>) and year (<code>summtime = 'year'</code>). Options for <code>summ</code> are 'basin' to summarize across sub-basins within bay segments, 'segment' to summarize by bay segment, 'all' to summarize total load, and 'lu' to summarize by land use type (ungaged loads only).  Options for <code>summtime</code> are 'month' to summarize by month and 'year' to summarize by year.  The default is to summarize by basin and month.</p>
 <p>The following functions are used internally and are provided here for reference on the components used in the calculations:</p>
 <ul><li><p><code><a href="anlz_nps_ungaged.html">anlz_nps_ungaged</a></code>: Estimates ungaged NPS loads.</p></li>
 <li><p><code><a href="anlz_nps_gaged.html">anlz_nps_gaged</a></code>: Estimates gaged NPS loads.</p></li>
