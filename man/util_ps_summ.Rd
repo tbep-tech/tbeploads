@@ -32,7 +32,8 @@ fls <- list.files(system.file('extdata/', package = 'tbeploads'),
 
 ipsbyfac <- anlz_ips_facility(fls)
 
-# add bay segment and source, there should only be loads to Hillsborough, Middle, and Lower Tampa Bay
+# add bay segment and source
+# there should only be loads to Hillsborough, Middle, and Lower Tampa Bay
 ipsld <- ipsbyfac  |>
   dplyr::arrange(coastco) |>
   dplyr::left_join(dbasing, by = "coastco") |>

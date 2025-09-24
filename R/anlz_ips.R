@@ -20,6 +20,9 @@
 #' anlz_ips(fls)
 anlz_ips <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summtime = c('month', 'year')){
 
+  summ <- match.arg(summ)
+  summtime <- match.arg(summtime)
+  
   # get facility and outfall level data
   ipsbyfac <- anlz_ips_facility(fls)
 
