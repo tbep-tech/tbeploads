@@ -78,6 +78,7 @@ The following functions are used internally and are provided here for reference 
 \examples{
 data(tbbase)
 data(rain)
+data(usgsflow)
 mancopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
 pincopth <- system.file('extdata/nps_wq_pinco.txt', package = 'tbeploads')
 lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
@@ -85,6 +86,18 @@ tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbe
 bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 vernafl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
 
-anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancopth, pincopth,
-         lakemanpth, tampabypth, bellshlpth, vernafl, usgsflow, verbose = TRUE)
+nps <- anlz_nps(
+  yrrng = c('2021-01-01', '2023-12-31'), 
+  tbbase = tbbase, 
+  rain = rain, 
+  mancopth = mancopth, 
+  pincopth = pincopth,
+  lakemanpth = lakemanpth, 
+  tampabypth = tampabypth, 
+  bellshlpth = bellshlpth, 
+  vernafl = vernafl, 
+  usgsflow = usgsflow
+)
+
+head(nps)
 }

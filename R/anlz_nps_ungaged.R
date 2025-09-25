@@ -95,15 +95,25 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
 #' # external flow sources
+#' data(tbbase)
+#' data(rain)
+#' data(usgsflow)
 #' lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
 #' tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
 #' bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 #'
-#' anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase,
-#'    rain, lakemanpth, tampabypth, bellshlpth)
-#' }
+#' nps_ungaged <- anlz_nps_ungaged(
+#'   yrrng = c('2021-01-01', '2023-12-31'), 
+#'   tbbase = tbbase,
+#'   rain = rain, 
+#'   lakemanpth = lakemanpth, 
+#'   tampabypth = tampabypth, 
+#'   bellshlth = bellshlpth,
+#'   usgsflow = usgsflow
+#' )
+#' 
+#' head(nps_ungaged)
 anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, lakemanpth, tampabypth, bellshlpth, allflo = NULL, usgsflow = NULL, verbose = TRUE) {
 
   yrrng <- lubridate::ymd(yrrng)

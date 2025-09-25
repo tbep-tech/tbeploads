@@ -20,19 +20,24 @@
 #' @return A data frame with columns for basin, year, month, TN in mg/L, TP in mg/L, TSS in mg/L, BOD in mg/L, flow in liters/month, hydrologic load in m3/month, TN load in kg/month, TP load in kg/month, TSS load in kg/month, and BOD load in kg/month.
 #'
 #' @examples
-#' \dontrun{
+#' data(usgsflow)
 #' mancopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
 #' pincopth <- system.file('extdata/nps_wq_pinco.txt', package = 'tbeploads')
 #' lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
 #' tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
 #' bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 #'
-#' nps_gaged <- anlz_nps_gaged(yrrng = c('2021-01-01', '2023-12-31'), mancopth = mancopth,
-#'                           pincopth = pincopth, lakemanpth = lakemanpth, tampabypth = tampabypth,
-#'                           bellshlpth = bellshlpth, verbose = TRUE)
+#' nps_gaged <- anlz_nps_gaged(
+#'   yrrng = c('2021-01-01', '2023-12-31'), 
+#'   mancopth = mancopth,
+#'   pincopth = pincopth, 
+#'   lakemanpth = lakemanpth, 
+#'   tampabypth = tampabypth,
+#'   bellshlpth = bellshlpth, 
+#'   usgsflow = usgsflow
+#' )
 #'
 #' head(nps_gaged)
-#' }
 anlz_nps_gaged <- function(yrrng = c('2021-01-01', '2023-12-31'), mancopth = NULL, pincopth = NULL, lakemanpth, tampabypth, bellshlpth, allflo = NULL, usgsflow = NULL, verbose = TRUE){
 
   # get flow data

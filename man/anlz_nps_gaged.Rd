@@ -51,17 +51,22 @@ Water Quality data are obtained from the FDEP WIN database API, tbeptools, or lo
 The function assumes that the water quality data are in mg/L and flow data are in cfs.  Missing water quality data are filled with previous five year averages for the end months, then linearly interpolated using \code{\link{util_nps_fillmiswq}}.  This function will need to be updated for future load calculations.
 }
 \examples{
-\dontrun{
+data(usgsflow)
 mancopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
 pincopth <- system.file('extdata/nps_wq_pinco.txt', package = 'tbeploads')
 lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
 tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
 bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
 
-nps_gaged <- anlz_nps_gaged(yrrng = c('2021-01-01', '2023-12-31'), mancopth = mancopth,
-                          pincopth = pincopth, lakemanpth = lakemanpth, tampabypth = tampabypth,
-                          bellshlpth = bellshlpth, verbose = TRUE)
+nps_gaged <- anlz_nps_gaged(
+  yrrng = c('2021-01-01', '2023-12-31'), 
+  mancopth = mancopth,
+  pincopth = pincopth, 
+  lakemanpth = lakemanpth, 
+  tampabypth = tampabypth,
+  bellshlpth = bellshlpth, 
+  usgsflow = usgsflow
+)
 
 head(nps_gaged)
-}
 }
