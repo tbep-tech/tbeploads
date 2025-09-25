@@ -72,6 +72,22 @@ test_that("anlz_nps returns expected output format", {
   # Check that source column contains expected value
   expect_true(all(result$source == "NPS"))
 
+  result <- anlz_nps(
+    yrrng = c('2021-01-01', '2021-12-31'),
+    tbbase, rain, mancopth, pincopth, lakemanpth, tampabypth, bellshlpth, vernafl,
+    usgsflow = usgsflow, aslu = TRUE, verbose = FALSE
+  )
+
+  expect_true('lu' %in% names(result))
+
+  result <- anlz_nps(
+    yrrng = c('2021-01-01', '2021-12-31'),
+    tbbase, rain, mancopth, pincopth, lakemanpth, tampabypth, bellshlpth, vernafl,
+    usgsflow = usgsflow, aslu = TRUE, verbose = FALSE, summtime = 'year'
+  )
+
+  expect_false('Month' %in% names(result))
+  
 })
 
 test_that("anlz_nps handles verbose output correctly", {
