@@ -11,6 +11,7 @@
 #' @param vernafl character vector of file path to Verna Wellfield atmospheric concentration data
 #' @param summ `r summ_params('summ')`
 #' @param summtime `r summ_params('summtime')`
+#' @param aslu logical indicating whether to summarize by land use type (ungaged loads only), default is FALSE
 #' @param verbose logical indicating whether to print verbose output
 #'
 #' @returns A data frame of non-point source loads for Tampa Bay, including columns for year, month, bay segment, basin, and loads for total nitrogen (TN), total phosphorus (TP), total suspended solids (TSS), biochemical oxygen demand (BOD), and hydrology using default values for the \code{summ} and \code{summtime} arguments. TN, TP, TSS, and BOD Loads are tons per month or year depending on the \code{summtime} argument. Hydrologic loads are cubic meters per month or year depending on the \code{summtime} argument.
@@ -20,7 +21,7 @@
 #' @details
 #' The function estimates non-point source (NPS) loads for Tampa Bay by combining ungaged and gaged NPS loads. Ungaged loads are estimated using rainfall, flow, event mean concentration, land use, and soils data, while gaged loads are estimated using water quality data and flow data. The function also incorporates atmospheric concentration data from the Verna Wellfield site.
 #'
-#' `r summ_params('descrip')` Options for \code{summ} are 'basin' to summarize across sub-basins within bay segments, 'segment' to summarize by bay segment, 'all' to summarize total load, and 'lu' to summarize by land use type (ungaged loads only).  Options for \code{summtime} are 'month' to summarize by month and 'year' to summarize by year.  The default is to summarize by basin and month.
+#' `r summ_params('descrip')` Options for \code{summ} are 'basin' to summarize across sub-basins within bay segments, 'segment' to summarize by bay segment, and 'all' to summarize total load. Loads can also be summarized by land use type with the `summ` and `summtime` argumets by setting `aslu = TRUE`.  Land use type summaries only apply to ungaged load estimates.  Options for \code{summtime} are 'month' to summarize by month and 'year' to summarize by year.  The default is to summarize by basin and month.
 #' 
 #' The following functions are used internally and are provided here for reference on the components used in the calculations:
 #'
@@ -52,7 +53,8 @@
 #' }
 anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancopth,
                      pincopth, lakemanpth, tampabypth, bellshlpth, vernafl, 
-                     summ = c('basin', 'segment', 'all', 'lu'), summtime = c('month', 'year'), verbose = T){
+                     summ = c('basin', 'segment', 'all'), summtime = c('month', 'year'),
+                     aslu = FALSE, verbose = TRUE){
 
   summ <- match.arg(summ)
   summtime <- match.arg(summtime)
@@ -68,24 +70,28 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
                                   allflo = allflo,
                                   verbose = verbose)
 
-  if(verbose)
-    cat('Estimating gaged NPS loads...\n')
-  nps_gaged <- anlz_nps_gaged(yrrng, mancopth, pincopth, lakemanpth, tampabypth,
-                              bellshlpth, allflo = allflo, verbose = verbose) |>
-    dplyr::select(
-      basin,
-      yr,
-      mo,
-      oh2oload = h2oload,
-      otnload = tnload,
-      otpload = tpload,
-      otssload = tssload,
-      obodload = bodload
-    )
+  if(!aslu){
+
+    if(verbose)
+      cat('Estimating gaged NPS loads...\n')
+
+    nps_gaged <- anlz_nps_gaged(yrrng, mancopth, pincopth, lakemanpth, tampabypth,
+                                bellshlpth, allflo = allflo, verbose = verbose) |>
+      dplyr::select(
+        basin,
+        yr,
+        mo,
+        oh2oload = h2oload,
+        otnload = tnload,
+        otpload = tpload,
+        otssload = tssload,
+        obodload = bodload
+      )
+  }
 
   if(verbose)
-    cat('Combining ungaged and gaged NPS loads, estimating final...\n')
-
+    cat('Combining Verna data with NPS ungaged...\n')
+  
   # get verna data, fill missing w/ five-year avg
   verna <- util_prepverna(vernafl) |>
     dplyr::rename(
@@ -124,7 +130,7 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
     ) 
    
   # ungaged lu summary
-  if(summ == 'lu'){
+  if(aslu){
 
     out <- util_nps_lusumm(nps2, summ = summ, summtime = summtime)
 
@@ -185,7 +191,10 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
       eh2oload, etnload, etpload, etssload, ebodload,
       etnloada, etploada, etnloadb, etploadb
     )
-
+  
+  if(verbose)
+    cat('Combining ungaged and gaged NPS loads, estimating final...\n')
+  
   npsfinal <- estloads |>
     dplyr::full_join(nps_gaged, by = c("yr", "mo", "basin")) |>
     dplyr::mutate(

@@ -298,12 +298,13 @@ The following functions are used internally and are provided here for reference 
 
 Results can be summarized by basin, segment, baywide, monthly, or annually using the `summ` and `summtime` arguments. By default, loads are returned monthly for each basin. Note that Boca Ciega Bay and Boca Ciega Bay South results are returned separately. Only Boca Ciega Bay South is used when estimating total bay loads.  
 
-Loads by land use type (using CLUCSID) can also be returned if `summ = 'lu'`.  These results only apply to ungaged loading estimates. 
+Loads by land use type (using CLUCSID) can also be returned if `aslu = TRUE`.  These results only apply to ungaged loading estimates. 
 
 ```{r}
 npslu <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain = rain, 
                 mancopth = mancopth, pincopth = pincopth, lakemanpth = lakemanpth, 
                 tampabypth = tampabypth, bellshlpth = bellshlpth, vernafl = vernafl,
-                summ = 'lu')
+                aslu = TRUE)
+                
 head(npslu)
 ```

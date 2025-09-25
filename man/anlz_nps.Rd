@@ -14,9 +14,10 @@ anlz_nps(
   tampabypth,
   bellshlpth,
   vernafl,
-  summ = c("basin", "segment", "all", "lu"),
+  summ = c("basin", "segment", "all"),
   summtime = c("month", "year"),
-  verbose = T
+  aslu = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -42,6 +43,8 @@ anlz_nps(
 
 \item{summtime}{chr string indicating how the returned data are summarized temporally (month or year), see details}
 
+\item{aslu}{logical indicating whether to summarize by land use type (ungaged loads only), default is FALSE}
+
 \item{verbose}{logical indicating whether to print verbose output}
 }
 \value{
@@ -53,7 +56,7 @@ Calculate non-point source (NPS) loads for Tampa Bay
 \details{
 The function estimates non-point source (NPS) loads for Tampa Bay by combining ungaged and gaged NPS loads. Ungaged loads are estimated using rainfall, flow, event mean concentration, land use, and soils data, while gaged loads are estimated using water quality data and flow data. The function also incorporates atmospheric concentration data from the Verna Wellfield site.
 
-The data are summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed based on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}). Options for \code{summ} are 'basin' to summarize across sub-basins within bay segments, 'segment' to summarize by bay segment, 'all' to summarize total load, and 'lu' to summarize by land use type (ungaged loads only).  Options for \code{summtime} are 'month' to summarize by month and 'year' to summarize by year.  The default is to summarize by basin and month.
+The data are summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed based on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}). Options for \code{summ} are 'basin' to summarize across sub-basins within bay segments, 'segment' to summarize by bay segment, and 'all' to summarize total load. Loads can also be summarized by land use type with the \code{summ} and \code{summtime} argumets by setting \code{aslu = TRUE}.  Land use type summaries only apply to ungaged load estimates.  Options for \code{summtime} are 'month' to summarize by month and 'year' to summarize by year.  The default is to summarize by basin and month.
 
 The following functions are used internally and are provided here for reference on the components used in the calculations:
 
