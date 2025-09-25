@@ -90,7 +90,7 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
   }
 
   if(verbose)
-    cat('Combining Verna data with NPS ungaged...\n')
+    cat('Combining atmospheric data with ungaged NPS loads...\n')
   
   # get verna data, fill missing w/ five-year avg
   verna <- util_prepverna(vernafl) |>

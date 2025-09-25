@@ -47,7 +47,7 @@ anlz_nps_gaged <- function(yrrng = c('2021-01-01', '2023-12-31'), mancopth = NUL
   # get wq data
   if(verbose)
     cat('Retrieving water quality data...\n')
-  allwq <- util_nps_getwq(yrrng = yrrng, mancopth = mancopth, pincopth = pincopth, verbose = verbose)
+  allwq <- util_nps_getwq(yrrng = yrrng, mancopth = mancopth, pincopth = pincopth, verbose = FALSE)
 
   # fill missing, combine with flow, fill miss
   alldat <- util_nps_fillmiswq(allwq) |>

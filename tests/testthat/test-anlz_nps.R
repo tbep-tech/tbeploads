@@ -75,7 +75,7 @@ test_that("anlz_nps returns expected output format", {
   result <- anlz_nps(
     yrrng = c('2021-01-01', '2021-12-31'),
     tbbase, rain, mancopth, pincopth, lakemanpth, tampabypth, bellshlpth, vernafl,
-    usgsflow = usgsflow, aslu = TRUE, verbose = FALSE
+    usgsflow = usgsflow, aslu = TRUE, verbose = TRUE
   )
 
   expect_true('lu' %in% names(result))
