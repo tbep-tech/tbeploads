@@ -83,11 +83,11 @@ test_that("anlz_nps returns expected output format", {
   result <- anlz_nps(
     yrrng = c('2021-01-01', '2021-12-31'),
     tbbase, rain, mancopth, pincopth, lakemanpth, tampabypth, bellshlpth, vernafl,
-    usgsflow = usgsflow, aslu = TRUE, verbose = FALSE, summtime = 'year'
+    usgsflow = usgsflow, verbose = FALSE, summtime = 'year'
   )
 
   expect_false('Month' %in% names(result))
-  
+
 })
 
 test_that("anlz_nps handles verbose output correctly", {

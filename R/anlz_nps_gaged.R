@@ -56,6 +56,9 @@ anlz_nps_gaged <- function(yrrng = c('2021-01-01', '2023-12-31'), mancopth = NUL
                                "02304500", "02306647", "02307000", "EVERSRES",
                                "LMANATEE", "LTARPON", "TBYPASS"))
 
+  if(verbose)
+    cat('Estimating gaged NPS loads...\n')
+  
   # get gaged loads
   out <- alldat |>
     dplyr::mutate(

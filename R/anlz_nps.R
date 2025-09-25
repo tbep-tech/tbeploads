@@ -68,7 +68,7 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
   nps_ungaged <- anlz_nps_ungaged(yrrng = yrrng,
                                   tbbase, rain, lakemanpth, tampabypth, bellshlpth,
                                   allflo = allflo,
-                                  verbose = verbose)
+                                  verbose = FALSE)
 
   if(!aslu){
 
@@ -131,6 +131,9 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
    
   # ungaged lu summary
   if(aslu){
+
+    if(verbose)
+      cat('Summarizing ungaged NPS loads by land use...\n')
 
     out <- util_nps_lusumm(nps2, summ = summ, summtime = summtime)
 

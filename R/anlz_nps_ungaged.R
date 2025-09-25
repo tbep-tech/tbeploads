@@ -128,7 +128,7 @@ anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain
 
   # start assembling NPS model parameters
   if(verbose)
-    cat('Estimating NPS ungaged...\n')
+    cat('Estimating ungaged NPS loads...\n')
   rainflow <- dplyr::full_join(npsrain, allflo, by = c("basin", "yr", "mo"))
 
   rainflow <- rainflow |>
