@@ -49,9 +49,10 @@
 <span>  <span class="va">tampabypth</span>,</span>
 <span>  <span class="va">bellshlpth</span>,</span>
 <span>  <span class="va">vernafl</span>,</span>
-<span>  summ <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basin"</span>, <span class="st">"segment"</span>, <span class="st">"all"</span>, <span class="st">"lu"</span><span class="op">)</span>,</span>
+<span>  summ <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basin"</span>, <span class="st">"segment"</span>, <span class="st">"all"</span><span class="op">)</span>,</span>
 <span>  summtime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"month"</span>, <span class="st">"year"</span><span class="op">)</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">T</span></span>
+<span>  aslu <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -103,6 +104,10 @@
 <dd><p>chr string indicating how the returned data are summarized temporally (month or year), see details</p></dd>
 
 
+<dt id="arg-aslu">aslu<a class="anchor" aria-label="anchor" href="#arg-aslu"></a></dt>
+<dd><p>logical indicating whether to summarize by land use type (ungaged loads only), default is FALSE</p></dd>
+
+
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>logical indicating whether to print verbose output</p></dd>
 
@@ -114,7 +119,7 @@
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The function estimates non-point source (NPS) loads for Tampa Bay by combining ungaged and gaged NPS loads. Ungaged loads are estimated using rainfall, flow, event mean concentration, land use, and soils data, while gaged loads are estimated using water quality data and flow data. The function also incorporates atmospheric concentration data from the Verna Wellfield site.</p>
-<p>The data are summarized differently based on the <code>summ</code> and <code>summtime</code> arguments.  All loading data are summed based on these arguments, e.g., by bay segment (<code>summ = 'segment'</code>) and year (<code>summtime = 'year'</code>). Options for <code>summ</code> are 'basin' to summarize across sub-basins within bay segments, 'segment' to summarize by bay segment, 'all' to summarize total load, and 'lu' to summarize by land use type (ungaged loads only).  Options for <code>summtime</code> are 'month' to summarize by month and 'year' to summarize by year.  The default is to summarize by basin and month.</p>
+<p>The data are summarized differently based on the <code>summ</code> and <code>summtime</code> arguments.  All loading data are summed based on these arguments, e.g., by bay segment (<code>summ = 'segment'</code>) and year (<code>summtime = 'year'</code>). Options for <code>summ</code> are 'basin' to summarize across sub-basins within bay segments, 'segment' to summarize by bay segment, and 'all' to summarize total load. Loads can also be summarized by land use type with the <code>summ</code> and <code>summtime</code> argumets by setting <code>aslu = TRUE</code>.  Land use type summaries only apply to ungaged load estimates.  Options for <code>summtime</code> are 'month' to summarize by month and 'year' to summarize by year.  The default is to summarize by basin and month.</p>
 <p>The following functions are used internally and are provided here for reference on the components used in the calculations:</p>
 <ul><li><p><code><a href="anlz_nps_ungaged.html">anlz_nps_ungaged</a></code>: Estimates ungaged NPS loads.</p></li>
 <li><p><code><a href="anlz_nps_gaged.html">anlz_nps_gaged</a></code>: Estimates gaged NPS loads.</p></li>

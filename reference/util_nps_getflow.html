@@ -44,6 +44,7 @@
 <span>  <span class="va">tampabypth</span>,</span>
 <span>  <span class="va">bellshlpth</span>,</span>
 <span>  yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2021</span>, <span class="fl">2023</span><span class="op">)</span>,</span>
+<span>  usgsflow <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -68,13 +69,17 @@
 <dd><p>vector of two integers, the year range for which to retrieve flow data. Default is c(2021, 2023).</p></dd>
 
 
+<dt id="arg-usgsflow">usgsflow<a class="anchor" aria-label="anchor" href="#arg-usgsflow"></a></dt>
+<dd><p>data frame of USGS flow data, if already available from <code><a href="util_nps_getusgsflow.html">util_nps_getusgsflow</a></code>, otherwise NULL and the function will retrieve the data. Default is NULL.</p></dd>
+
+
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>logical indicating whether to print verbose output</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame of monthly mean flow or fifteen USGS stations and three external flow sites</p>
+    <p>A data frame of monthly mean flow for fifteen USGS stations and three external flow sites</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -90,22 +95,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">lakemanpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_lakemanatee.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">tampabypth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_tampabypass.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">bellshlpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_bellshoals.xls'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">allflo</span> <span class="op">&lt;-</span> <span class="fu">util_nps_getflow</span><span class="op">(</span><span class="va">lakemanpth</span>, <span class="va">tampabypth</span>, <span class="va">bellshlpth</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 02299950 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 02300042 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 02300500 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 02300700 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 02301000 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 02301300 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 02301500 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 02301750 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 02303000 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 02303330 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 02304500 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 02306647 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 02307000 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 02307359 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 02307498 </span>
+<span class="r-in"><span><span class="va">allflo</span> <span class="op">&lt;-</span> <span class="fu">util_nps_getflow</span><span class="op">(</span><span class="va">lakemanpth</span>, <span class="va">tampabypth</span>, <span class="va">bellshlpth</span>, usgsflow <span class="op">=</span> <span class="va">usgsflow</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
