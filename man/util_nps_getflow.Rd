@@ -9,6 +9,7 @@ util_nps_getflow(
   tampabypth,
   bellshlpth,
   yrrng = c(2021, 2023),
+  usgsflow = NULL,
   verbose = TRUE
 )
 }
@@ -21,10 +22,12 @@ util_nps_getflow(
 
 \item{yrrng}{vector of two integers, the year range for which to retrieve flow data. Default is c(2021, 2023).}
 
+\item{usgsflow}{data frame of USGS flow data, if already available from \code{\link{util_nps_getusgsflow}}, otherwise NULL and the function will retrieve the data. Default is NULL.}
+
 \item{verbose}{logical indicating whether to print verbose output}
 }
 \value{
-A data frame of monthly mean flow or fifteen USGS stations and three external flow sites
+A data frame of monthly mean flow for fifteen USGS stations and three external flow sites
 }
 \description{
 Get flow data from for NPS calculations at gaged sites
@@ -36,7 +39,7 @@ Missing flow values are linearly interpolated using \code{\link[zoo]{na.approx}}
 lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
 tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
 bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
-allflo <- util_nps_getflow(lakemanpth, tampabypth, bellshlpth)
+allflo <- util_nps_getflow(lakemanpth, tampabypth, bellshlpth, usgsflow = usgsflow)
 }
 \seealso{
 \code{\link{util_nps_getextflow}}, \code{\link{util_nps_getusgsflow}}

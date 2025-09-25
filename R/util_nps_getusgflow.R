@@ -7,10 +7,12 @@
 #' @returns A data frame of daily flow values in cfs for fifteen stations
 #' @export
 #'
-#' @details Stations are from the USGS NWIS database and include 02299950, 02300042, 02300500, 02300700, 02301000, 02301300, 02301500, 02301750, 02303000, 02303330, 02304500, 02306647, 02307000, 02307359, and 02307498.
+#' @details Stations are from the USGS NWIS database and include 02299950, 02300042, 02300500, 02300700, 02301000, 02301300, 02301500, 02301750, 02303000, 02303330, 02304500, 02306647, 02307000, 02307359, and 02307498.  Uses the \code{\link[dataRetrieval]{read_waterdata_daily}} function from the \code{dataRetrieval} package.
 #'
 #' @examples
-#' usgsflo <- util_nps_getusgsflow()
+#' \dontrun{
+#' usgsflow <- util_nps_getusgsflow()
+#' }
 util_nps_getusgsflow <- function(site = NULL, yrrng = c('2021-01-01', '2023-12-31'), verbose = TRUE){
 
   if(is.null(site))

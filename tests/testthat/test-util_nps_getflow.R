@@ -61,3 +61,22 @@ test_that("util_nps_getflow basic functionality", {
   expect_true("LMANATEE" %in% unique_basins)
   expect_true("TBYPASS" %in% unique_basins)
 })
+
+test_that("util_nps_getflow works with pre-processed usgsflow", {
+
+  # Test with custom date range
+  result <- util_nps_getflow(pth1, pth2, pth3, yrrng = c(2021, 2023), usgsflow = usgsflow)
+
+  # Check that result is a data frame
+  expect_s3_class(result, "data.frame")
+
+  # Check required columns exist
+  expect_true(all(c("basin", "yr", "mo", "flow_cfs") %in% names(result)))
+
+  # Check that data is aggregated to monthly means
+  expect_true(all(result$yr %in% c(2021:2023)))
+  expect_true(all(result$mo %in% 1:12))
+
+  # Check that flow_cfs is numeric
+  expect_true(is.numeric(result$flow_cfs))
+})
