@@ -47,6 +47,7 @@
 <span>  <span class="va">tampabypth</span>,</span>
 <span>  <span class="va">bellshlpth</span>,</span>
 <span>  allflo <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  usgsflow <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -81,6 +82,10 @@
 
 <dt id="arg-allflo">allflo<a class="anchor" aria-label="anchor" href="#arg-allflo"></a></dt>
 <dd><p>data frame of flow data, if already available from <code><a href="util_nps_getflow.html">util_nps_getflow</a></code>, otherwise NULL and the function will retrieve the data</p></dd>
+
+
+<dt id="arg-usgsflow">usgsflow<a class="anchor" aria-label="anchor" href="#arg-usgsflow"></a></dt>
+<dd><p>data frame of USGS flow data, if already available from <code><a href="util_nps_getusgsflow.html">util_nps_getusgsflow</a></code>, otherwise NULL and the function will retrieve the data. Default is NULL. Does not apply if <code>allflo</code> is provided.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>

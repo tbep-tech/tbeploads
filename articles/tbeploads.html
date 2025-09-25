@@ -453,7 +453,9 @@ USGS API and must be obtained from the contacts listed in
 <code><a href="../reference/util_nps_getextflow.html">util_nps_getextflow()</a></code>. USGS flow data are obtained from an
 API for stations 02299950, 02300042, 02300500, 02300700, 02301000,
 02301300, 02301500, 02301750, 02303000, 02303330, 02304500, 02306647,
-02307000, 02307359, and 02307498.</p>
+02307000, 02307359, and 02307498. A preprocessed USGS flow data frame
+can be provided using the <code>usgsflow</code> argument to avoid
+re-downloading the data.</p>
 <p>Water Quality data are obtained from the FDEP WIN database API,
 tbeptools, or local files as described in <code><a href="../reference/util_nps_getwq.html">util_nps_getwq()</a></code>.
 Chosen stations are ER2 and UM2 for Manatee County and station 06-06 for
@@ -485,23 +487,8 @@ TSS load in kg/month, and BOD load in kg/month.</p>
 <span><span class="co"># get gaged NPS loads</span></span>
 <span><span class="va">nps_gaged</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps_gaged.html">anlz_nps_gaged</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, mancopth <span class="op">=</span> <span class="va">mancopth</span>,</span>
 <span>                           pincopth <span class="op">=</span> <span class="va">pincopth</span>, lakemanpth <span class="op">=</span> <span class="va">lakemanpth</span>, tampabypth <span class="op">=</span> <span class="va">tampabypth</span>,</span>
-<span>                           bellshlpth <span class="op">=</span> <span class="va">bellshlpth</span><span class="op">)</span></span>
+<span>                           bellshlpth <span class="op">=</span> <span class="va">bellshlpth</span>, usgsflow <span class="op">=</span> <span class="va">usgsflow</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Retrieving flow data...</span></span>
-<span><span class="co">#&gt;   02299950 </span></span>
-<span><span class="co">#&gt;   02300042 </span></span>
-<span><span class="co">#&gt;   02300500 </span></span>
-<span><span class="co">#&gt;   02300700 </span></span>
-<span><span class="co">#&gt;   02301000 </span></span>
-<span><span class="co">#&gt;   02301300 </span></span>
-<span><span class="co">#&gt;   02301500 </span></span>
-<span><span class="co">#&gt;   02301750 </span></span>
-<span><span class="co">#&gt;   02303000 </span></span>
-<span><span class="co">#&gt;   02303330 </span></span>
-<span><span class="co">#&gt;   02304500 </span></span>
-<span><span class="co">#&gt;   02306647 </span></span>
-<span><span class="co">#&gt;   02307000 </span></span>
-<span><span class="co">#&gt;   02307359 </span></span>
-<span><span class="co">#&gt;   02307498 </span></span>
 <span><span class="co">#&gt; Retrieving water quality data...</span></span>
 <span><span class="co">#&gt; Retrieving Manatee County data...</span></span>
 <span><span class="co">#&gt; Retreiving Pinellas County data...</span></span>
@@ -529,7 +516,9 @@ relationships to estimate monthly nutrient and sediment loads. The
 function requires combined spatial data for bay segment, basin, entity
 jurisdiction, land use data, and soils (using <code>tbbase</code>),
 rainfall data (using <code>rain</code>), and flow data (obtained with
-<code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>).</p>
+<code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>). A preprocessed USGS flow data frame
+can be provided using the <code>usgsflow</code> argument to avoid
+re-downloading the data.</p>
 <p>The first step is updating the combined spatial data if any of the
 input datasets have changed. The required inputs are land use
 (<code>tblu2020</code> or <code>tblu2023</code>), soil data
@@ -645,24 +634,9 @@ in the same manner as terrestrial land uses.</p>
 <span></span>
 <span><span class="va">nps_ungaged</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps_ungaged.html">anlz_nps_ungaged</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, tbbase <span class="op">=</span> <span class="va">tbbase</span>, rain <span class="op">=</span> <span class="va">rain</span>, </span>
 <span>                                lakemanpth <span class="op">=</span> <span class="va">lakemanpth</span>, tampabypth <span class="op">=</span> <span class="va">tampabypth</span>, </span>
-<span>                                bellshlpth <span class="op">=</span> <span class="va">bellshlpth</span><span class="op">)</span></span>
+<span>                                bellshlpth <span class="op">=</span> <span class="va">bellshlpth</span>, usgsflow <span class="op">=</span> <span class="va">usgsflow</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Prepping rain data...</span></span>
 <span><span class="co">#&gt; Retrieving flow data...</span></span>
-<span><span class="co">#&gt;   02299950 </span></span>
-<span><span class="co">#&gt;   02300042 </span></span>
-<span><span class="co">#&gt;   02300500 </span></span>
-<span><span class="co">#&gt;   02300700 </span></span>
-<span><span class="co">#&gt;   02301000 </span></span>
-<span><span class="co">#&gt;   02301300 </span></span>
-<span><span class="co">#&gt;   02301500 </span></span>
-<span><span class="co">#&gt;   02301750 </span></span>
-<span><span class="co">#&gt;   02303000 </span></span>
-<span><span class="co">#&gt;   02303330 </span></span>
-<span><span class="co">#&gt;   02304500 </span></span>
-<span><span class="co">#&gt;   02306647 </span></span>
-<span><span class="co">#&gt;   02307000 </span></span>
-<span><span class="co">#&gt;   02307359 </span></span>
-<span><span class="co">#&gt;   02307498 </span></span>
 <span><span class="co">#&gt; Estimating NPS ungaged...</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">nps_ungaged</span><span class="op">)</span></span>
@@ -707,31 +681,13 @@ million cubic meters per month or year.</p>
 <span></span>
 <span><span class="va">nps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps.html">anlz_nps</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, tbbase <span class="op">=</span> <span class="va">tbbase</span>, rain <span class="op">=</span> <span class="va">rain</span>, </span>
 <span>                mancopth <span class="op">=</span> <span class="va">mancopth</span>, pincopth <span class="op">=</span> <span class="va">pincopth</span>, lakemanpth <span class="op">=</span> <span class="va">lakemanpth</span>, </span>
-<span>                tampabypth <span class="op">=</span> <span class="va">tampabypth</span>, bellshlpth <span class="op">=</span> <span class="va">bellshlpth</span>, vernafl <span class="op">=</span> <span class="va">vernafl</span><span class="op">)</span></span>
+<span>                tampabypth <span class="op">=</span> <span class="va">tampabypth</span>, bellshlpth <span class="op">=</span> <span class="va">bellshlpth</span>, vernafl <span class="op">=</span> <span class="va">vernafl</span>, </span>
+<span>                usgsflow <span class="op">=</span> <span class="va">usgsflow</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Retrieving flow data...</span></span>
-<span><span class="co">#&gt;   02299950 </span></span>
-<span><span class="co">#&gt;   02300042 </span></span>
-<span><span class="co">#&gt;   02300500 </span></span>
-<span><span class="co">#&gt;   02300700 </span></span>
-<span><span class="co">#&gt;   02301000 </span></span>
-<span><span class="co">#&gt;   02301300 </span></span>
-<span><span class="co">#&gt;   02301500 </span></span>
-<span><span class="co">#&gt;   02301750 </span></span>
-<span><span class="co">#&gt;   02303000 </span></span>
-<span><span class="co">#&gt;   02303330 </span></span>
-<span><span class="co">#&gt;   02304500 </span></span>
-<span><span class="co">#&gt;   02306647 </span></span>
-<span><span class="co">#&gt;   02307000 </span></span>
-<span><span class="co">#&gt;   02307359 </span></span>
-<span><span class="co">#&gt;   02307498 </span></span>
 <span><span class="co">#&gt; Estimating ungaged NPS loads...</span></span>
 <span><span class="co">#&gt; Prepping rain data...</span></span>
 <span><span class="co">#&gt; Estimating NPS ungaged...</span></span>
 <span><span class="co">#&gt; Estimating gaged NPS loads...</span></span>
-<span><span class="co">#&gt; Retrieving water quality data...</span></span>
-<span><span class="co">#&gt; Retrieving Manatee County data...</span></span>
-<span><span class="co">#&gt; Retreiving Pinellas County data...</span></span>
-<span><span class="co">#&gt; Retrieving Hillsborough County data...</span></span>
 <span><span class="co">#&gt; Combining Verna data with NPS ungaged...</span></span>
 <span><span class="co">#&gt; Combining ungaged and gaged NPS loads, estimating final...</span></span>
 <span></span>
@@ -760,7 +716,9 @@ five-year means for the Verna Wellfield site data.</li>
 and ungaged calculations.</li>
 <li>
 <code><a href="../reference/util_nps_getusgsflow.html">util_nps_getusgsflow()</a></code>: Gets USGS flow data for NPS
-calculations, used in <code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>.</li>
+calculations, used in <code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>. A preprocessed
+USGS flow data frame can be provided using the <code>usgsflow</code>
+argument to avoid re-downloading the data.</li>
 <li>
 <code><a href="../reference/util_nps_getextflow.html">util_nps_getextflow()</a></code>: Gets external flow data and
 contacts (Lake Manatee, Tampa Bypass, and Bell Shoals), used in
@@ -789,23 +747,8 @@ estimates.</p>
 <code class="sourceCode R"><span><span class="va">npslu</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps.html">anlz_nps</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, tbbase <span class="op">=</span> <span class="va">tbbase</span>, rain <span class="op">=</span> <span class="va">rain</span>, </span>
 <span>                mancopth <span class="op">=</span> <span class="va">mancopth</span>, pincopth <span class="op">=</span> <span class="va">pincopth</span>, lakemanpth <span class="op">=</span> <span class="va">lakemanpth</span>, </span>
 <span>                tampabypth <span class="op">=</span> <span class="va">tampabypth</span>, bellshlpth <span class="op">=</span> <span class="va">bellshlpth</span>, vernafl <span class="op">=</span> <span class="va">vernafl</span>,</span>
-<span>                aslu <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>                usgsflow <span class="op">=</span> <span class="va">usgsflow</span>, aslu <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Retrieving flow data...</span></span>
-<span><span class="co">#&gt;   02299950 </span></span>
-<span><span class="co">#&gt;   02300042 </span></span>
-<span><span class="co">#&gt;   02300500 </span></span>
-<span><span class="co">#&gt;   02300700 </span></span>
-<span><span class="co">#&gt;   02301000 </span></span>
-<span><span class="co">#&gt;   02301300 </span></span>
-<span><span class="co">#&gt;   02301500 </span></span>
-<span><span class="co">#&gt;   02301750 </span></span>
-<span><span class="co">#&gt;   02303000 </span></span>
-<span><span class="co">#&gt;   02303330 </span></span>
-<span><span class="co">#&gt;   02304500 </span></span>
-<span><span class="co">#&gt;   02306647 </span></span>
-<span><span class="co">#&gt;   02307000 </span></span>
-<span><span class="co">#&gt;   02307359 </span></span>
-<span><span class="co">#&gt;   02307498 </span></span>
 <span><span class="co">#&gt; Estimating ungaged NPS loads...</span></span>
 <span><span class="co">#&gt; Prepping rain data...</span></span>
 <span><span class="co">#&gt; Estimating NPS ungaged...</span></span>
