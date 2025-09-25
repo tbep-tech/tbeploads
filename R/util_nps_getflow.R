@@ -11,6 +11,8 @@
 #' @export
 #'
 #' @details Missing flow values are linearly interpolated using \code{\link[zoo]{na.approx}}.  The function combines external and USGS API flow data using the `util_nps_getextflow` and `util_nps_getusgsflow` functions.
+#' 
+#' A preprocessed USGS flow data frame can be provided using the `usgsflow` argument to avoid re-downloading the data.
 #'
 #' @seealso \code{\link{util_nps_getextflow}}, \code{\link{util_nps_getusgsflow}}
 #'
@@ -28,11 +30,19 @@ util_nps_getflow <- function(lakemanpth, tampabypth, bellshlpth, yrrng = c(2021,
 
   # usgs api flow data
   if(!is.null(usgsflow)){
+
+    # stop if usgsflow does not cover years in yrrng
+    if(min(lubridate::year(usgsflow$date)) > yrrng[1] | max(lubridate::year(usgsflow$date)) < yrrng[2])
+      stop('Provided usgsflow data frame does not cover the requested year range in yrrng')
+
     intflo <- usgsflow |>
       dplyr::filter(lubridate::year(date) >= yrrng[1] & lubridate::year(date) <= yrrng[2])
+
   } else {
+    
     yrrng <- as.Date(c(paste0(yrrng[1], '-01-01'), paste0(yrrng[2], '-12-31')))
     intflo <- util_nps_getusgsflow(yrrng = yrrng, verbose = verbose)
+
   }
 
   # combine all

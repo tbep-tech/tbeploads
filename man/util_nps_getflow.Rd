@@ -34,6 +34,8 @@ Get flow data from for NPS calculations at gaged sites
 }
 \details{
 Missing flow values are linearly interpolated using \code{\link[zoo]{na.approx}}.  The function combines external and USGS API flow data using the \code{util_nps_getextflow} and \code{util_nps_getusgsflow} functions.
+
+A preprocessed USGS flow data frame can be provided using the \code{usgsflow} argument to avoid re-downloading the data.
 }
 \examples{
 lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')

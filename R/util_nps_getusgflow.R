@@ -15,6 +15,7 @@
 #' }
 util_nps_getusgsflow <- function(site = NULL, yrrng = c('2021-01-01', '2023-12-31'), verbose = TRUE){
 
+  usgsid <- site
   if(is.null(site))
     usgsid <- c("02299950", "02300042", "02300500", "02300700", "02301000",
                     "02301300", "02301500", "02301750", "02303000", "02303330",

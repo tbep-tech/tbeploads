@@ -14,6 +14,7 @@ anlz_nps(
   tampabypth,
   bellshlpth,
   vernafl,
+  usgsflow = NULL,
   summ = c("basin", "segment", "all"),
   summtime = c("month", "year"),
   aslu = FALSE,
@@ -38,6 +39,8 @@ anlz_nps(
 \item{bellshlpth}{character, path to the file containing the Bell shoals data, see details}
 
 \item{vernafl}{character vector of file path to Verna Wellfield atmospheric concentration data}
+
+\item{usgsflow}{data frame of USGS flow data, if already available from \code{\link{util_nps_getusgsflow}}, otherwise NULL and the function will retrieve the data. Default is NULL.}
 
 \item{summ}{chr string indicating how the returned data are summarized, see details}
 
@@ -73,7 +76,6 @@ The following functions are used internally and are provided here for reference 
 }
 }
 \examples{
-\dontrun{
 data(tbbase)
 data(rain)
 mancopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
@@ -84,6 +86,5 @@ bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbepl
 vernafl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
 
 anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancopth, pincopth,
-         lakemanpth, tampabypth, bellshlpth, vernafl, verbose = TRUE)
-}
+         lakemanpth, tampabypth, bellshlpth, vernafl, usgsflow, verbose = TRUE)
 }

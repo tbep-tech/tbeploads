@@ -9,6 +9,7 @@
 #' @param tampabypth character, path to the file containing the Tampa Bypass flow data, see details
 #' @param bellshlpth character, path to the file containing the Bell shoals data, see details
 #' @param vernafl character vector of file path to Verna Wellfield atmospheric concentration data
+#' @param usgsflow data frame of USGS flow data, if already available from \code{\link{util_nps_getusgsflow}}, otherwise NULL and the function will retrieve the data. Default is NULL.
 #' @param summ `r summ_params('summ')`
 #' @param summtime `r summ_params('summtime')`
 #' @param aslu logical indicating whether to summarize by land use type (ungaged loads only), default is FALSE
@@ -38,7 +39,6 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
 #' data(tbbase)
 #' data(rain)
 #' mancopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
@@ -49,10 +49,9 @@
 #' vernafl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
 #'
 #' anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancopth, pincopth,
-#'          lakemanpth, tampabypth, bellshlpth, vernafl, verbose = TRUE)
-#' }
+#'          lakemanpth, tampabypth, bellshlpth, vernafl, usgsflow, verbose = TRUE)
 anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancopth,
-                     pincopth, lakemanpth, tampabypth, bellshlpth, vernafl, 
+                     pincopth, lakemanpth, tampabypth, bellshlpth, vernafl, usgsflow = NULL,
                      summ = c('basin', 'segment', 'all'), summtime = c('month', 'year'),
                      aslu = FALSE, verbose = TRUE){
 
@@ -61,7 +60,8 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
 
   if(verbose)
     cat('Retrieving flow data...\n')
-  allflo <- util_nps_getflow(lakemanpth, tampabypth, bellshlpth, yrrng = lubridate::year(as.Date(yrrng)), verbose = verbose)
+  allflo <- util_nps_getflow(lakemanpth, tampabypth, bellshlpth, 
+    yrrng = lubridate::year(as.Date(yrrng)), usgsflow = usgsflow, verbose = verbose)
 
   if(verbose)
     cat('Estimating ungaged NPS loads...\n')
@@ -76,7 +76,7 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
       cat('Estimating gaged NPS loads...\n')
 
     nps_gaged <- anlz_nps_gaged(yrrng, mancopth, pincopth, lakemanpth, tampabypth,
-                                bellshlpth, allflo = allflo, verbose = verbose) |>
+                                bellshlpth, allflo = allflo, verbose = FALSE) |>
       dplyr::select(
         basin,
         yr,

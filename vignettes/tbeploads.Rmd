@@ -155,7 +155,7 @@ Non-point source (NPS) estimates are obtained for gaged and ungaged locations in
 
 Gaged estimates are obtained using the `anlz_nps_gaged()` function that retrieves flow and water quality data, then combines them to calculate TN, TP, TSS, BOD, and hydrologic loads.
 
-Required external data inputs are Lake Manatee, Tampa Bypass, and Alafia River Bell Shoals flow data.  These are not available from the USGS API and must be obtained from the contacts listed in `util_nps_getextflow()`.  USGS flow data are obtained from an API for stations 02299950, 02300042, 02300500, 02300700, 02301000, 02301300, 02301500, 02301750, 02303000, 02303330, 02304500, 02306647, 02307000, 02307359, and 02307498.
+Required external data inputs are Lake Manatee, Tampa Bypass, and Alafia River Bell Shoals flow data.  These are not available from the USGS API and must be obtained from the contacts listed in `util_nps_getextflow()`.  USGS flow data are obtained from an API for stations 02299950, 02300042, 02300500, 02300700, 02301000, 02301300, 02301500, 02301750, 02303000, 02303330, 02304500, 02306647, 02307000, 02307359, and 02307498.  A preprocessed USGS flow data frame can be provided using the `usgsflow` argument to avoid re-downloading the data.
 
 Water Quality data are obtained from the FDEP WIN database API, tbeptools, or local files as described in `util_nps_getwq()`. Chosen stations are ER2 and UM2 for Manatee County and station 06-06 for Pinellas County. Environmental Protection Commission (EPC) of Hillsborough County stations retained are 105, 113, 114, 132, 141, 138, 142, and 147. Manatee or Pinellas County data can be imported from local files using the `mancopth` and `pincopth` arguments, respectively.  If these are not provided, the function will attempt to retrieve data from the FDEP WIN database using `read_importwqwin()` from tbeptools.  The EPC data are retrieved using `read_importepc()` from tbeptools.
 
@@ -174,14 +174,14 @@ bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbepl
 # get gaged NPS loads
 nps_gaged <- anlz_nps_gaged(yrrng = c('2021-01-01', '2023-12-31'), mancopth = mancopth,
                            pincopth = pincopth, lakemanpth = lakemanpth, tampabypth = tampabypth,
-                           bellshlpth = bellshlpth)
+                           bellshlpth = bellshlpth, usgsflow = usgsflow)
 
 head(nps_gaged)
 ```
 
 #### Ungaged locations
 
-Ungaged (unmonitored basins) estimates are obtained using `anlz_nps_ungaged()`. The approach combines spatial land use data, rainfall patterns, hydrologic modeling, and empirical relationships to estimate monthly nutrient and sediment loads. The function requires combined spatial data for bay segment, basin, entity jurisdiction, land use data, and soils (using `tbbase`), rainfall data (using `rain`), and flow data (obtained with `util_nps_getflow()`). 
+Ungaged (unmonitored basins) estimates are obtained using `anlz_nps_ungaged()`. The approach combines spatial land use data, rainfall patterns, hydrologic modeling, and empirical relationships to estimate monthly nutrient and sediment loads. The function requires combined spatial data for bay segment, basin, entity jurisdiction, land use data, and soils (using `tbbase`), rainfall data (using `rain`), and flow data (obtained with `util_nps_getflow()`). A preprocessed USGS flow data frame can be provided using the `usgsflow` argument to avoid re-downloading the data. 
 
 The first step is updating the combined spatial data if any of the input datasets have changed.  The required inputs are land use (`tblu2020` or `tblu2023`), soil data (`tbsoil`), jurisdiction (`tbjuris`), and sub-basin data (`tbsubshed`).  The function `util_nps_tbbase()` combines these datasets into a single spatial object that is used for ungaged load estimation using `util_nps_union()`.  The function requires GDAL to be installed and accessible in the system PATH, or the path to GDAL binaries can be provided using the `gdal_path` argument.
 
@@ -256,7 +256,7 @@ bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbepl
 
 nps_ungaged <- anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain = rain, 
                                 lakemanpth = lakemanpth, tampabypth = tampabypth, 
-                                bellshlpth = bellshlpth)
+                                bellshlpth = bellshlpth, usgsflow = usgsflow)
 
 head(nps_ungaged)
 ```
@@ -279,7 +279,8 @@ vernafl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
 
 nps <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain = rain, 
                 mancopth = mancopth, pincopth = pincopth, lakemanpth = lakemanpth, 
-                tampabypth = tampabypth, bellshlpth = bellshlpth, vernafl = vernafl)
+                tampabypth = tampabypth, bellshlpth = bellshlpth, vernafl = vernafl, 
+                usgsflow = usgsflow)
 
 head(nps)
 ```
@@ -290,7 +291,7 @@ The following functions are used internally and are provided here for reference 
 * `anlz_nps_gaged()`: Estimates gaged NPS loads.
 * `util_prepverna()`: Prepares and fills missing data with five-year means for the Verna Wellfield site data.
 * `util_nps_getflow()`: Gets flow estimates for NPS gaged and ungaged calculations.
-* `util_nps_getusgsflow()`: Gets USGS flow data for NPS calculations, used in `util_nps_getflow()`.
+* `util_nps_getusgsflow()`: Gets USGS flow data for NPS calculations, used in `util_nps_getflow()`. A preprocessed USGS flow data frame can be provided using the `usgsflow` argument to avoid re-downloading the data.
 * `util_nps_getextflow()`: Gets external flow data and contacts (Lake Manatee, Tampa Bypass, and Bell Shoals), used in `util_nps_getflow()`.
 * `util_nps_getwq()`: Gets water quality data for NPS gaged calculations (for `mancopth`, `pincopth`, and Hillsborough County data).
 * `util_getrain()`: Gets rainfall data for NPS ungaged calculations, as provided in `rain`.
@@ -304,7 +305,7 @@ Loads by land use type (using CLUCSID) can also be returned if `aslu = TRUE`.  T
 npslu <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain = rain, 
                 mancopth = mancopth, pincopth = pincopth, lakemanpth = lakemanpth, 
                 tampabypth = tampabypth, bellshlpth = bellshlpth, vernafl = vernafl,
-                aslu = TRUE)
+                usgsflow = usgsflow, aslu = TRUE)
                 
 head(npslu)
 ```

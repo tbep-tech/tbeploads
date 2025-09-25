@@ -4,7 +4,7 @@
 #'
 #' @format A \code{data.frame}
 #'
-#' @details Dadily flow data at select stations used for estimating non-point source gaged and ungaged loads.  Created using the \code{\link{util_getusgsflow}} function. The file is provided to reduce calls to the USGS API. The data frame contains the following columns:
+#' @details Dadily flow data at select stations used for estimating non-point source gaged and ungaged loads.  Created using the \code{\link{util_nps_getusgsflow}} function. The file is provided to reduce calls to the USGS API. The data frame contains the following columns:
 #'
 #' \itemize{
 #'    \item \code{site_no}: Character string for the site number
@@ -12,7 +12,7 @@
 #'    \item \code{flow_cfs}: Numeric value for the daily flow in cubic feet per second (cfs)
 #'}
 #'
-#' @seealso \code{\link{util_getusgsflow}}
+#' @seealso \code{\link{util_nps_getusgsflow}}
 #'
 #' @examples
 #' usgsflow

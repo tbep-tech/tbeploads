@@ -79,4 +79,11 @@ test_that("util_nps_getflow works with pre-processed usgsflow", {
 
   # Check that flow_cfs is numeric
   expect_true(is.numeric(result$flow_cfs))
+
+  # Check that it stops when usgsflow does not cover yrrng
+  expect_error(
+    util_nps_getflow(pth1, pth2, pth3, yrrng = c(2020, 2023), usgsflow = usgsflow),
+    "Provided usgsflow data frame does not cover the requested year range in yrrng"
+  )
+
 })
