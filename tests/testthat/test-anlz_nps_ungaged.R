@@ -43,7 +43,7 @@ test_that("anlz_nps_ungaged returns verbose output", {
   expect_output(
     anlz_nps_ungaged(yrrng = c("2021-01-01", "2023-12-31"),
                      tbbase, rain, lakemanpth, tampabypth, bellshlpth, verbose = T),
-    "Prepping rain data...\\nRetrieving flow data...\\nEstimating NPS ungaged..."
+    "Prepping rain data...\\nRetrieving flow data...\\nEstimating ungaged NPS loads..."
   )
 
 })
