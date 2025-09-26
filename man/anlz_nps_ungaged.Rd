@@ -136,7 +136,7 @@ nps_ungaged <- anlz_nps_ungaged(
   rain = rain, 
   lakemanpth = lakemanpth, 
   tampabypth = tampabypth, 
-  bellshlth = bellshlpth,
+  bellshlpth = bellshlpth,
   usgsflow = usgsflow
 )
 

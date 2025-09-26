@@ -109,7 +109,7 @@
 #'   rain = rain, 
 #'   lakemanpth = lakemanpth, 
 #'   tampabypth = tampabypth, 
-#'   bellshlth = bellshlpth,
+#'   bellshlpth = bellshlpth,
 #'   usgsflow = usgsflow
 #' )
 #' 
