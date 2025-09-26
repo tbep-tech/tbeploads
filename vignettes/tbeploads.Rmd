@@ -38,7 +38,7 @@ Load estimates are broadly defined as domestic point source (DPS), industrial po
 
 ### DPS
 
-The domestic point source (DPS) functions are designed to work with raw entity data provided by partners.  The core function is `anlz_dps_facility()` that requires only a vector of file paths as input, where each path points to a file with monthly parameter concentration (mg/L) and flow data (million gallons per day).  The data also describe whether the observations are end of pipe (direct inflow to the bay) or reuse (applied to the land), with each defined by outfall Ids typically noted as D-001, D-002, etc. and R-001, R-002, etc, respectively. Both are estimated as concentration times flow, whereas reuse includes an attenuation factor for land application depending on location.  The file names must follow a specific convention, where metadata for each entity is found in the `facilities()` data object using information in the file name. 
+The domestic point source (DPS) functions are designed to work with raw entity data provided by partners.  The core function is `anlz_dps_facility()` that requires only a vector of file paths as input, where each path points to a file with monthly parameter concentration (mg/L) and flow data (million gallons per day).  The data also describe whether the observations are end of pipe (direct inflow to the bay) or reuse (applied to the land), with each defined by outfall Ids typically noted as D-001, D-002, etc. and R-001, R-002, etc, respectively. Both are estimated as concentration times flow, whereas reuse includes an attenuation factor for land application depending on location.  The file names must follow a specific convention, where metadata for each entity is found in the [facilities] data object using information in the file name. 
 
 For convenience, four example files are included with the package. These files represent actual entities and facilities, but the data have been randomized. The paths to these files are used as input to the function. Non-trivial data pre-processing and quality control is needed for each file and those included in the package are the correct format. The output is returned as tons per month for TN, TP, TSS, and BOD and million cubic meters per month for flow (hy).
 
@@ -149,7 +149,7 @@ Results can be summarized by segment, baywide, monthly, or annually using the `s
 
 ### NPS
 
-Non-point source (NPS) estimates are obtained for gaged and ungaged locations in the watershed, then combined for the final result.  Skip to the final sub-section to understand how to obtain all estimates together. Separate approaches for gaged and ungaged estimates are described first for documentation purposes.
+Non-point source (NPS) estimates are obtained for gaged and ungaged locations in the watershed, then combined for the final result.  Skip to the [final sub-section](#nps-final) to understand how to obtain all estimates together. Separate approaches for gaged and ungaged estimates are described first for documentation purposes.
 
 #### Gaged locations
 
@@ -263,9 +263,9 @@ nps_ungaged <- anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase = 
 head(nps_ungaged)
 ```
 
-#### Combined gaged and ungaged loads
+#### Combined gaged and ungaged loads {#nps-final}
 
-Refer to the prior sections for details on how the separate loads for gaged and ungaged portions of the wateshed are calculated.  The `anlz_nps()` function described below can be used to combined all steps. The function estimates non-point source (NPS) loads for Tampa Bay by combining ungaged and gaged NPS loads. Ungaged loads are estimated using rainfall, flow, event mean concentration, land use, and soils data, while gaged loads are estimated using water quality data and flow data. The function also incorporates atmospheric concentration data from the Verna Wellfield site.
+Refer to the prior sections for details on how the separate loads for gaged and ungaged portions of the wateshed are calculated.  The `anlz_nps()` function described below can be used to combine all steps. The function estimates non-point source (NPS) loads for Tampa Bay by combining ungaged and gaged NPS loads. Ungaged loads are estimated using rainfall, flow, event mean concentration, land use, and soils data, while gaged loads are estimated using water quality data and flow data. The function also incorporates atmospheric concentration data from the Verna Wellfield site.
 
 Unlike the individual gaged and ungaged functions, `anlz_nps()` returns loading results in tons per month or year depending on the summary arguments. Hydrologic load is returned as million cubic meters per month or year.
 
