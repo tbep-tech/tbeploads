@@ -93,8 +93,8 @@ Ids typically noted as D-001, D-002, etc. and R-001, R-002, etc,
 respectively. Both are estimated as concentration times flow, whereas
 reuse includes an attenuation factor for land application depending on
 location. The file names must follow a specific convention, where
-metadata for each entity is found in the <code><a href="../reference/facilities.html">facilities()</a></code> data
-object using information in the file name.</p>
+metadata for each entity is found in the [facilities] data object using
+information in the file name.</p>
 <p>For convenience, four example files are included with the package.
 These files represent actual entities and facilities, but the data have
 been randomized. The paths to these files are used as input to the
@@ -438,9 +438,9 @@ Boca Ciega Bay South is used when estimating total bay loads.</p>
 </h3>
 <p>Non-point source (NPS) estimates are obtained for gaged and ungaged
 locations in the watershed, then combined for the final result. Skip to
-the final sub-section to understand how to obtain all estimates
-together. Separate approaches for gaged and ungaged estimates are
-described first for documentation purposes.</p>
+the <a href="#nps-final">final sub-section</a> to understand how to
+obtain all estimates together. Separate approaches for gaged and ungaged
+estimates are described first for documentation purposes.</p>
 <div class="section level4">
 <h4 id="gaged-locations">Gaged locations<a class="anchor" aria-label="anchor" href="#gaged-locations"></a>
 </h4>
@@ -654,11 +654,11 @@ in the same manner as terrestrial land uses.</p>
 </div>
 </div>
 <div class="section level4">
-<h4 id="combined-gaged-and-ungaged-loads">Combined gaged and ungaged loads<a class="anchor" aria-label="anchor" href="#combined-gaged-and-ungaged-loads"></a>
+<h4 id="nps-final">Combined gaged and ungaged loads<a class="anchor" aria-label="anchor" href="#nps-final"></a>
 </h4>
 <p>Refer to the prior sections for details on how the separate loads for
 gaged and ungaged portions of the wateshed are calculated. The
-<code><a href="../reference/anlz_nps.html">anlz_nps()</a></code> function described below can be used to combined
+<code><a href="../reference/anlz_nps.html">anlz_nps()</a></code> function described below can be used to combine
 all steps. The function estimates non-point source (NPS) loads for Tampa
 Bay by combining ungaged and gaged NPS loads. Ungaged loads are
 estimated using rainfall, flow, event mean concentration, land use, and
