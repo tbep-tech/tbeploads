@@ -94,8 +94,8 @@ respectively. Both are estimated as concentration times flow, whereas
 reuse includes an attenuation factor for land application depending on
 location. The file names must follow a specific convention, where
 metadata for each entity is found in the
-<code>[facilities](../reference/facilities.html)</code> data object
-using information in the file name.</p>
+<code><a href="../reference/facilities.html">facilities</a></code> data
+object using information in the file name.</p>
 <p>For convenience, four example files are included with the package.
 These files represent actual entities and facilities, but the data have
 been randomized. The paths to these files are used as input to the
@@ -269,8 +269,8 @@ only a vector of file paths as input, where each file should be one row
 per year per facility, where the row shows the total tons per year of
 total nitrogen loss. The file names must follow a specific convention,
 where metadata for each entity is found in the
-<code>[facilities](../reference/facilities.html)</code> data object
-using information in the file name.</p>
+<code><a href="../reference/facilities.html">facilities</a></code> data
+object using information in the file name.</p>
 <p>For convenience, four example files are included with the package.
 These files represent actual entities and facilities, but the data have
 been randomized. The paths to these files are used as input to the
@@ -351,7 +351,7 @@ Verna Wellfield site. Rainfall data must be obtained using the
 <code><a href="../reference/util_getrain.html">util_getrain()</a></code> function before calculating loads. For
 convenience, daily rainfall data from 2017 to 2023 at sites in the
 watershed are included with the package in the
-<code>[rain](../reference/rain.html)</code> object.</p>
+<code><a href="../reference/rain.html">rain</a></code> object.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">rain</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 6</span></span></span>
@@ -412,8 +412,9 @@ nitrogen and phosphorus concentrations in the Verna data. The loading
 calculations also include a wet/dry deposition conversion factor to
 account for differences in loading during the rainy and dry seasons.</p>
 <p>Using <code><a href="../reference/anlz_ad.html">anlz_ad()</a></code> to estimate AD load is done as follows,
-where <code>[rain](../reference/rain.html)</code> is the rain data and
-<code>vernafl</code> is the path to the Verna Wellfield data.</p>
+where <code><a href="../reference/rain.html">rain</a></code> is the rain
+data and <code>vernafl</code> is the path to the Verna Wellfield
+data.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/anlz_ad.html">anlz_ad</a></span><span class="op">(</span><span class="va">rain</span>, <span class="va">vernafl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 672 × 7</span></span></span>
@@ -458,8 +459,8 @@ API for stations 02299950, 02300042, 02300500, 02300700, 02301000,
 02301300, 02301500, 02301750, 02303000, 02303330, 02304500, 02306647,
 02307000, 02307359, and 02307498. A preprocessed USGS flow data frame
 can be provided using the
-<code>[usgsflow](../reference/usgsflow.html)</code> argument to avoid
-re-downloading the data.</p>
+<code><a href="../reference/usgsflow.html">usgsflow</a></code> argument
+to avoid re-downloading the data.</p>
 <p>Water Quality data are obtained from the FDEP WIN database API,
 tbeptools, or local files as described in <code><a href="../reference/util_nps_getwq.html">util_nps_getwq()</a></code>.
 Chosen stations are ER2 and UM2 for Manatee County and station 06-06 for
@@ -518,21 +519,23 @@ data, rainfall patterns, hydrologic modeling, and empirical
 relationships to estimate monthly nutrient and sediment loads. The
 function requires combined spatial data for bay segment, basin, entity
 jurisdiction, land use data, and soils (using
-<code>[tbbase](../reference/tbbase.html)</code>), rainfall data (using
-<code>[rain](../reference/rain.html)</code>), and flow data (obtained
-with <code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>). A preprocessed USGS flow data
-frame can be provided using the
-<code>[usgsflow](../reference/usgsflow.html)</code> argument to avoid
-re-downloading the data.</p>
+<code><a href="../reference/tbbase.html">tbbase</a></code>), rainfall
+data (using <code><a href="../reference/rain.html">rain</a></code>), and
+flow data (obtained with <code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>). A
+preprocessed USGS flow data frame can be provided using the
+<code><a href="../reference/usgsflow.html">usgsflow</a></code> argument
+to avoid re-downloading the data.</p>
 <p>The first step is updating the combined spatial data if any of the
 input datasets have changed. The required inputs are land use
-(<code>[tblu2020](../reference/tblu2020.html)</code> or
-<code>[tblu2023](../reference/tblu2023.html)</code>), soil data
-(<code>[tbsoil](../reference/tbsoil.html)</code>), jurisdiction
-(<code>[tbjuris](../reference/tbjuris.html)</code>), and sub-basin data
-(<code>[tbsubshed](../reference/tbsubshed.html)</code>). The function
-<code><a href="../reference/util_nps_tbbase.html">util_nps_tbbase()</a></code> combines these datasets into a single
-spatial object that is used for ungaged load estimation using
+(<code><a href="../reference/tblu2020.html">tblu2020</a></code> or
+<code><a href="../reference/tblu2023.html">tblu2023</a></code>), soil
+data (<code><a href="../reference/tbsoil.html">tbsoil</a></code>),
+jurisdiction
+(<code><a href="../reference/tbjuris.html">tbjuris</a></code>), and
+sub-basin data
+(<code><a href="../reference/tbsubshed.html">tbsubshed</a></code>). The
+function <code><a href="../reference/util_nps_tbbase.html">util_nps_tbbase()</a></code> combines these datasets into a
+single spatial object that is used for ungaged load estimation using
 <code><a href="../reference/util_nps_union.html">util_nps_union()</a></code>. The function requires GDAL to be
 installed and accessible in the system PATH, or the path to GDAL
 binaries can be provided using the <code>gdal_path</code> argument.</p>
@@ -544,16 +547,16 @@ datasets.</p>
 <code class="sourceCode R"><span><span class="va">tblu2023</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_nps_getswfwmd.html">util_nps_getswfwmd</a></span><span class="op">(</span><span class="st">'lulc2023'</span><span class="op">)</span></span>
 <span><span class="va">tbsoil</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_nps_getswfwmd.html">util_nps_getswfwmd</a></span><span class="op">(</span><span class="st">'soil'</span><span class="op">)</span></span></code></pre></div>
 <p>Then, the combined layer,
-<code>[tbbase](../reference/tbbase.html)</code>, can be created (takes
-an hour or two).</p>
+<code><a href="../reference/tbbase.html">tbbase</a></code>, can be
+created (takes an hour or two).</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbsubshed</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbjuris</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tblu2023</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbsoil</span><span class="op">)</span></span>
 <span><span class="va">tbbase</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_nps_tbbase.html">util_nps_tbbase</a></span><span class="op">(</span><span class="va">tbsubshed</span>, <span class="va">tbjuris</span>, <span class="va">tblu2023</span>, <span class="va">tbsoil</span>, gdal_path <span class="op">=</span> <span class="st">"C:/OSGeo4W/bin"</span>, chunk_size <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
-<p>The <code>[tbbase](../reference/tbbase.html)</code> data object is
-also included with the package for convenience.</p>
+<p>The <code><a href="../reference/tbbase.html">tbbase</a></code> data
+object is also included with the package for convenience.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">tbbase</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 9</span></span></span>
@@ -726,8 +729,8 @@ and ungaged calculations.</li>
 <code><a href="../reference/util_nps_getusgsflow.html">util_nps_getusgsflow()</a></code>: Gets USGS flow data for NPS
 calculations, used in <code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>. A preprocessed
 USGS flow data frame can be provided using the
-<code>[usgsflow](../reference/usgsflow.html)</code> argument to avoid
-re-downloading the data.</li>
+<code><a href="../reference/usgsflow.html">usgsflow</a></code> argument
+to avoid re-downloading the data.</li>
 <li>
 <code><a href="../reference/util_nps_getextflow.html">util_nps_getextflow()</a></code>: Gets external flow data and
 contacts (Lake Manatee, Tampa Bypass, and Bell Shoals), used in
@@ -739,11 +742,11 @@ Hillsborough County data).</li>
 <li>
 <code><a href="../reference/util_getrain.html">util_getrain()</a></code>: Gets rainfall data for NPS ungaged
 calculations, as provided in
-<code>[rain](../reference/rain.html)</code>.</li>
+<code><a href="../reference/rain.html">rain</a></code>.</li>
 <li>
 <code><a href="../reference/util_nps_tbbase.html">util_nps_tbbase()</a></code>: Gets the combined spatial data layer
 for NPS ungaged calculations, as provided in
-<code>[tbbase](../reference/tbbase.html)</code>.</li>
+<code><a href="../reference/tbbase.html">tbbase</a></code>.</li>
 </ul>
 <p>Results can be summarized by basin, segment, baywide, monthly, or
 annually using the <code>summ</code> and <code>summtime</code>
