@@ -49,6 +49,7 @@
 <span>  <span class="va">tampabypth</span>,</span>
 <span>  <span class="va">bellshlpth</span>,</span>
 <span>  <span class="va">vernafl</span>,</span>
+<span>  allwq <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  usgsflow <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  summ <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basin"</span>, <span class="st">"segment"</span>, <span class="st">"all"</span><span class="op">)</span>,</span>
 <span>  summtime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"month"</span>, <span class="st">"year"</span><span class="op">)</span>,</span>
@@ -95,6 +96,10 @@
 
 <dt id="arg-vernafl">vernafl<a class="anchor" aria-label="anchor" href="#arg-vernafl"></a></dt>
 <dd><p>character vector of file path to Verna Wellfield atmospheric concentration data</p></dd>
+
+
+<dt id="arg-allwq">allwq<a class="anchor" aria-label="anchor" href="#arg-allwq"></a></dt>
+<dd><p>data frame of water quality data, if already available from <code><a href="util_nps_getwq.html">util_nps_getwq</a></code>, otherwise NULL and the function will retrieve the data.</p></dd>
 
 
 <dt id="arg-usgsflow">usgsflow<a class="anchor" aria-label="anchor" href="#arg-usgsflow"></a></dt>
