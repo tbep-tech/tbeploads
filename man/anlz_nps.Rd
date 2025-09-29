@@ -14,6 +14,7 @@ anlz_nps(
   tampabypth,
   bellshlpth,
   vernafl,
+  allwq = NULL,
   usgsflow = NULL,
   summ = c("basin", "segment", "all"),
   summtime = c("month", "year"),
@@ -39,6 +40,8 @@ anlz_nps(
 \item{bellshlpth}{character, path to the file containing the Bell shoals data, see details}
 
 \item{vernafl}{character vector of file path to Verna Wellfield atmospheric concentration data}
+
+\item{allwq}{data frame of water quality data, if already available from \code{\link{util_nps_getwq}}, otherwise NULL and the function will retrieve the data.}
 
 \item{usgsflow}{data frame of USGS flow data, if already available from \code{\link{util_nps_getusgsflow}}, otherwise NULL and the function will retrieve the data. Default is NULL.}
 

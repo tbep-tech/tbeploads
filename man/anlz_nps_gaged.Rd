@@ -12,6 +12,7 @@ anlz_nps_gaged(
   tampabypth,
   bellshlpth,
   allflo = NULL,
+  allwq = NULL,
   usgsflow = NULL,
   verbose = TRUE
 )
@@ -30,6 +31,8 @@ anlz_nps_gaged(
 \item{bellshlpth}{character, path to the file containing the Bell shoals data}
 
 \item{allflo}{data frame of flow data, if already available from \code{\link{util_nps_getflow}}, otherwise NULL and the function will retrieve the data}
+
+\item{allwq}{data frame of water quality data, if already available from \code{\link{util_nps_getwq}}, otherwise NULL and the function will retrieve the data.}
 
 \item{usgsflow}{data frame of USGS flow data, if already available from \code{\link{util_nps_getusgsflow}}, otherwise NULL and the function will retrieve the data. Default is NULL. Does not apply if \code{allflo} is provided.}
 

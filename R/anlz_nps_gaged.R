@@ -5,6 +5,7 @@
 #' @param tampabypth character, path to the file containing the Tampa Bypass flow data
 #' @param bellshlpth character, path to the file containing the Bell shoals data
 #' @param allflo data frame of flow data, if already available from \code{\link{util_nps_getflow}}, otherwise NULL and the function will retrieve the data
+#' @param allwq data frame of water quality data, if already available from \code{\link{util_nps_getwq}}, otherwise NULL and the function will retrieve the data.
 #' @param usgsflow data frame of USGS flow data, if already available from \code{\link{util_nps_getusgsflow}}, otherwise NULL and the function will retrieve the data. Default is NULL. Does not apply if \code{allflo} is provided.
 #'
 #' @export
@@ -38,7 +39,7 @@
 #' )
 #'
 #' head(nps_gaged)
-anlz_nps_gaged <- function(yrrng = c('2021-01-01', '2023-12-31'), mancopth = NULL, pincopth = NULL, lakemanpth, tampabypth, bellshlpth, allflo = NULL, usgsflow = NULL, verbose = TRUE){
+anlz_nps_gaged <- function(yrrng = c('2021-01-01', '2023-12-31'), mancopth = NULL, pincopth = NULL, lakemanpth, tampabypth, bellshlpth, allflo = NULL, allwq = NULL, usgsflow = NULL, verbose = TRUE){
 
   # get flow data
   if(is.null(allflo)){
@@ -50,9 +51,11 @@ anlz_nps_gaged <- function(yrrng = c('2021-01-01', '2023-12-31'), mancopth = NUL
   }
 
   # get wq data
-  if(verbose)
-    cat('Retrieving water quality data...\n')
-  allwq <- util_nps_getwq(yrrng = yrrng, mancopth = mancopth, pincopth = pincopth, verbose = FALSE)
+  if(is.null(allwq)){
+    if(verbose)
+      cat('Retrieving water quality data...\n')
+    allwq <- util_nps_getwq(yrrng = yrrng, mancopth = mancopth, pincopth = pincopth, verbose = FALSE)
+  }
 
   # fill missing, combine with flow, fill miss
   alldat <- util_nps_fillmiswq(allwq) |>
