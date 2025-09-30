@@ -10,9 +10,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' manopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
+#' mancopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
 #' pincopth <- system.file('extdata/nps_wq_pinco.txt', package = 'tbeploads')
-#' wq <- util_nps_getwq(c('2021-01-01', '2023-12-31'), mancopth = manopth,
+#' wq <- util_nps_getwq(c('2021-01-01', '2023-12-31'), mancopth = mancopth,
 #'   pincopth = pincopth, verbose = F)
 #' wq <- util_nps_fillmiswq(wq)
 #' }

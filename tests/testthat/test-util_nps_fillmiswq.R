@@ -17,7 +17,7 @@ mock_read_importepc <- function(tmpfl, download_latest = TRUE) {
   return(create_mock_epc_data())
 }
 
-test_that("util_nps_fillwq returns correct data", {
+test_that("util_nps_fillmiswq returns correct data", {
 
   mancopth <- system.file("extdata", "nps_wq_manco.txt", package = "tbeploads")
   pincopth <- system.file("extdata", "nps_wq_pinco.txt", package = "tbeploads")
