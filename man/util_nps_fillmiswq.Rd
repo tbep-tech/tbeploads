@@ -4,10 +4,12 @@
 \alias{util_nps_fillmiswq}
 \title{Fill in missing water quality values for non-point source (NPS) data}
 \usage{
-util_nps_fillmiswq(wq)
+util_nps_fillmiswq(wq, yrrng = c("2021-01-01", "2023-12-31"))
 }
 \arguments{
 \item{wq}{A data frame of water quality data returned by \code{util_nps_getwq}}
+
+\item{yrrng}{A vector of two dates in 'YYYY-MM-DD' format, specifying the date range to retrieve flow data. Default is from '2021-01-01' to '2023-12-31'.}
 }
 \value{
 Input data frame with missing data filled as described above.
@@ -16,14 +18,11 @@ Input data frame with missing data filled as described above.
 Fill in missing water quality values for non-point source (NPS) data
 }
 \details{
-Missing end date monthly values are filled with prior 5 year averages. Then, missing monthly values are linearly interpolated using \code{\link[zoo]{na.approx}}.  This function will need to be updated each RA period with correct averages.
+Missing end date monthly values are filled with prior 5 year averages. Then, missing monthly values are linearly interpolated using \code{\link[zoo]{na.approx}}.
 }
 \examples{
 \dontrun{
-mancopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
-pincopth <- system.file('extdata/nps_wq_pinco.txt', package = 'tbeploads')
-wq <- util_nps_getwq(c('2021-01-01', '2023-12-31'), mancopth = mancopth,
-  pincopth = pincopth, verbose = F)
-wq <- util_nps_fillmiswq(wq)
+data(allwq)
+wq <- util_nps_fillmiswq(allwq)
 }
 }
