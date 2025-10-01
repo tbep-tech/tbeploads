@@ -9,6 +9,7 @@
 #' @param tampabypth character, path to the file containing the Tampa Bypass flow data, see details
 #' @param bellshlpth character, path to the file containing the Bell shoals data, see details
 #' @param vernafl character vector of file path to Verna Wellfield atmospheric concentration data
+#' @param allflo data frame of flow data, if already available from \code{\link{util_nps_getflow}}, otherwise NULL and the function will retrieve the data
 #' @param allwq data frame of water quality data, if already available from \code{\link{util_nps_getwq}}, otherwise NULL and the function will retrieve the data.
 #' @param usgsflow data frame of USGS flow data, if already available from \code{\link{util_nps_getusgsflow}}, otherwise NULL and the function will retrieve the data. Default is NULL.
 #' @param summ `r summ_params('summ')`
@@ -42,40 +43,37 @@
 #' @examples
 #' data(tbbase)
 #' data(rain)
-#' data(usgsflow)
-#' mancopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
-#' pincopth <- system.file('extdata/nps_wq_pinco.txt', package = 'tbeploads')
-#' lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
-#' tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
-#' bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
+#' data(allwq)
+#' data(allflo)
 #' vernafl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
 #'
 #' nps <- anlz_nps(
 #'   yrrng = c('2021-01-01', '2023-12-31'), 
 #'   tbbase = tbbase, 
 #'   rain = rain, 
-#'   mancopth = mancopth, 
-#'   pincopth = pincopth,
-#'   lakemanpth = lakemanpth, 
-#'   tampabypth = tampabypth, 
-#'   bellshlpth = bellshlpth, 
+#'   allwq = allwq,
+#'   allflo = allflo,  
 #'   vernafl = vernafl, 
-#'   usgsflow = usgsflow
 #' )
 #' 
 #' head(nps)
-anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancopth,
-                     pincopth, lakemanpth, tampabypth, bellshlpth, vernafl, allwq = NULL,
-                     usgsflow = NULL, summ = c('basin', 'segment', 'all'), 
-                     summtime = c('month', 'year'), aslu = FALSE, verbose = TRUE){
+anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancopth = NULL,
+                     pincopth = NULL, lakemanpth = NULL, tampabypth = NULL, bellshlpth = NULL, 
+                     vernafl, allflo = NULL, allwq = NULL, usgsflow = NULL, 
+                     summ = c('basin', 'segment', 'all'), summtime = c('month', 'year'), 
+                     aslu = FALSE, verbose = TRUE){
 
   summ <- match.arg(summ)
   summtime <- match.arg(summtime)
 
-  if(verbose)
-    cat('Retrieving flow data...\n')
-  allflo <- util_nps_getflow(lakemanpth, tampabypth, bellshlpth, 
-    yrrng = lubridate::year(as.Date(yrrng)), usgsflow = usgsflow, verbose = verbose)
+  if(is.null(allflo)){
+  
+    if(verbose)
+      cat('Retrieving flow data...\n')
+    allflo <- util_nps_getflow(lakemanpth, tampabypth, bellshlpth, 
+      yrrng = lubridate::year(as.Date(yrrng)), usgsflow = usgsflow, verbose = verbose)
+    
+  }
 
   if(verbose)
     cat('Estimating ungaged NPS loads...\n')

@@ -8,12 +8,13 @@ anlz_nps(
   yrrng = c("2021-01-01", "2023-12-31"),
   tbbase,
   rain,
-  mancopth,
-  pincopth,
-  lakemanpth,
-  tampabypth,
-  bellshlpth,
+  mancopth = NULL,
+  pincopth = NULL,
+  lakemanpth = NULL,
+  tampabypth = NULL,
+  bellshlpth = NULL,
   vernafl,
+  allflo = NULL,
   allwq = NULL,
   usgsflow = NULL,
   summ = c("basin", "segment", "all"),
@@ -40,6 +41,8 @@ anlz_nps(
 \item{bellshlpth}{character, path to the file containing the Bell shoals data, see details}
 
 \item{vernafl}{character vector of file path to Verna Wellfield atmospheric concentration data}
+
+\item{allflo}{data frame of flow data, if already available from \code{\link{util_nps_getflow}}, otherwise NULL and the function will retrieve the data}
 
 \item{allwq}{data frame of water quality data, if already available from \code{\link{util_nps_getwq}}, otherwise NULL and the function will retrieve the data.}
 
@@ -81,25 +84,17 @@ The following functions are used internally and are provided here for reference 
 \examples{
 data(tbbase)
 data(rain)
-data(usgsflow)
-mancopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
-pincopth <- system.file('extdata/nps_wq_pinco.txt', package = 'tbeploads')
-lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
-tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
-bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
+data(allwq)
+data(allflo)
 vernafl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
 
 nps <- anlz_nps(
   yrrng = c('2021-01-01', '2023-12-31'), 
   tbbase = tbbase, 
   rain = rain, 
-  mancopth = mancopth, 
-  pincopth = pincopth,
-  lakemanpth = lakemanpth, 
-  tampabypth = tampabypth, 
-  bellshlpth = bellshlpth, 
+  allwq = allwq,
+  allflo = allflo,  
   vernafl = vernafl, 
-  usgsflow = usgsflow
 )
 
 head(nps)

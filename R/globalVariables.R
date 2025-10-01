@@ -26,7 +26,8 @@ globalVariables(c(".", "Facility.Name", "Month", "Outfall.ID", "Permit.Number", 
                   "tbsubshed", "tkn_mgl", "tn_mgl", "tnload", "tnload_a", "tnload_b", "tot_area",
                   "tp_mgl", "tpcp", "tpload", "tpload_a", "tpload_b", "tss_mgl", "tssload", "urb",
                   "wd_cfs", "wet", "wet_rc", "DAILY AVG", "RECORDED DATE", "monitoring_location_id",
-                  "agency_cd", "qualifier", "time", "DESCRIPTION", "lu"))
+                  "agency_cd", "qualifier", "time", "DESCRIPTION", "lu", "bod_mgl_avg5", "max_yr", 
+                "min_yr", "tss_mgl_avg5", "tp_mgl_avg5", "tn_mgl_avg5"))
 
 #' @importFrom utils capture.output read.csv read.table
 NULL

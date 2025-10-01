@@ -5,9 +5,9 @@
 \title{Get flow data from for NPS calculations at gaged sites}
 \usage{
 util_nps_getflow(
-  lakemanpth,
-  tampabypth,
-  bellshlpth,
+  lakemanpth = NULL,
+  tampabypth = NULL,
+  bellshlpth = NULL,
   yrrng = c(2021, 2023),
   usgsflow = NULL,
   verbose = TRUE
@@ -38,6 +38,9 @@ Missing flow values are linearly interpolated using \code{\link[zoo]{na.approx}}
 A preprocessed USGS flow data frame can be provided using the \code{usgsflow} argument to avoid re-downloading the data.
 }
 \examples{
+\dontrun{
+usgsflow <- util_nps_getusgsflow(yrrng = as.Date(c('2021-01-01', '2023-12-31')))
+}
 lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
 tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
 bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')

@@ -14,7 +14,7 @@ usgsflow
 Data frame of USGS stream flow data from the USGS NWIS database for 2021 to 2023
 }
 \details{
-Dadily flow data at select stations used for estimating non-point source gaged and ungaged loads.  Created using the \code{\link{util_nps_getusgsflow}} function. The file is provided to reduce calls to the USGS API. The data frame contains the following columns:
+Daily flow data at select stations used for estimating non-point source gaged and ungaged loads.  Created using the \code{\link{util_nps_getusgsflow}} function. The file is provided to reduce calls to the USGS API. The data frame contains the following columns:
 
 \itemize{
 \item \code{site_no}: Character string for the site number

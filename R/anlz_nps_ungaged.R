@@ -66,9 +66,9 @@
 #' \itemize{
 #'  \item \code{tbbase}: A data frame containing polygon areas for the combined data layer of bay segment, basin, jurisdiction, land use data, and soils, Stored as \code{\link{tbbase}} or created (takes an hour or so) with \code{\link{util_nps_tbbase}}.
 #'  \item \code{rain}: A data frame of rainfall data. See \code{\link{rain}}.
-#'  \item \code{lakemanpth}: character, path to the file containing the Lake Manatee flow data. See \code{\link{util_nps_getextflow}}.
-#'  \item \code{tampabypth}: character, path to the file containing the Tampa Bypass flow data. See \code{\link{util_nps_getextflow}}.
-#'  \item \code{bellshlpth}: character, path to the file containing the Bell shoals data. See \code{\link{util_nps_getextflow}}.
+#'  \item \code{lakemanpth}: character, path to the file containing the Lake Manatee flow data. See \code{\link{util_nps_getextflow}}. Only applies if \code{allflo} is not provided.
+#'  \item \code{tampabypth}: character, path to the file containing the Tampa Bypass flow data. See \code{\link{util_nps_getextflow}}. Only applies if \code{allflo} is not provided.
+#'  \item \code{bellshlpth}: character, path to the file containing the Bell shoals data. See \code{\link{util_nps_getextflow}}. Only applies if \code{allflo} is not provided.
 #' }
 #'
 #' USGS gaged flows are also used, as returned by \code{\link{util_nps_getusgsflow}} and combined with the external flow data using \code{\link{util_nps_getextflow}} and \code{\link{util_nps_getflow}}.
@@ -98,23 +98,18 @@
 #' # external flow sources
 #' data(tbbase)
 #' data(rain)
-#' data(usgsflow)
-#' lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
-#' tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
-#' bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
+#' data(allflo)
 #'
 #' nps_ungaged <- anlz_nps_ungaged(
 #'   yrrng = c('2021-01-01', '2023-12-31'), 
 #'   tbbase = tbbase,
 #'   rain = rain, 
-#'   lakemanpth = lakemanpth, 
-#'   tampabypth = tampabypth, 
-#'   bellshlpth = bellshlpth,
-#'   usgsflow = usgsflow
+#'   allflo = allflo
 #' )
 #' 
 #' head(nps_ungaged)
-anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, lakemanpth, tampabypth, bellshlpth, allflo = NULL, usgsflow = NULL, verbose = TRUE) {
+anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, lakemanpth = NULL, 
+  tampabypth = NULL, bellshlpth = NULL, allflo = NULL, usgsflow = NULL, verbose = TRUE) {
 
   yrrng <- lubridate::ymd(yrrng)
   yrs <- lubridate::year(yrrng)
@@ -130,6 +125,7 @@ anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain
 
   # flow_monthly_means
   if(is.null(allflo)){
+
     if(verbose)
       cat('Retrieving flow data...\n')
     allflo <- util_nps_getflow(lakemanpth, tampabypth, bellshlpth, yrrng = yrs, 
