@@ -451,16 +451,20 @@ estimates are described first for documentation purposes.</p>
 <p>Gaged estimates are obtained using the <code><a href="../reference/anlz_nps_gaged.html">anlz_nps_gaged()</a></code>
 function that retrieves flow and water quality data, then combines them
 to calculate TN, TP, TSS, BOD, and hydrologic loads.</p>
-<p>Required external data inputs are Lake Manatee, Tampa Bypass, and
-Alafia River Bell Shoals flow data. These are not available from the
-USGS API and must be obtained from the contacts listed in
+<p>Required external flow data are Lake Manatee, Tampa Bypass, and
+Alafia River Bell Shoals. These are not available from the USGS API and
+must be obtained from the contacts listed in
 <code><a href="../reference/util_nps_getextflow.html">util_nps_getextflow()</a></code>. USGS flow data are obtained from an
 API for stations 02299950, 02300042, 02300500, 02300700, 02301000,
 02301300, 02301500, 02301750, 02303000, 02303330, 02304500, 02306647,
 02307000, 02307359, and 02307498. A preprocessed USGS flow data frame
-can be provided using the
-<code><a href="../reference/usgsflow.html">usgsflow</a></code> argument
-to avoid re-downloading the data.</p>
+can be provided to the <code>usgsflow</code> argument. The
+<code><a href="../reference/usgsflow.html">usgsflow</a></code> data
+object is provided with the package to avoid re-downloading the data.
+Similarly, all flow data can be provided to the <code>allflo</code>
+argument. The <code><a href="../reference/allflo.html">allflo</a></code>
+data object included with the package has both external and USGS flow
+data.</p>
 <p>Water Quality data are obtained from the FDEP WIN database API,
 tbeptools, or local files as described in <code><a href="../reference/util_nps_getwq.html">util_nps_getwq()</a></code>.
 Chosen stations are ER2 and UM2 for Manatee County and station 06-06 for
@@ -471,31 +475,47 @@ files using the <code>mancopth</code> and <code>pincopth</code>
 arguments, respectively. If these are not provided, the function will
 attempt to retrieve data from the FDEP WIN database using
 <code>read_importwqwin()</code> from tbeptools. The EPC data are
-retrieved using <code>read_importepc()</code> from tbeptools.</p>
+retrieved using <code>read_importepc()</code> from tbeptools. The
+<code><a href="../reference/allwq.html">allwq</a></code> data object
+included with the package has external data and USGS flow data and can
+used with the <code>allwq</code> argument.</p>
 <p>The function assumes that the water quality data are in mg/L and flow
 data are in cfs. Missing water quality data are filled with previous
 five year averages for the end months, then linearly interpolated using
-. This function will need to be updated for future load
-calculations.</p>
-<p>A data frame is returned with columns for basin, year, month, TN in
-mg/L, TP in mg/L, TSS in mg/L, BOD in mg/L, flow in liters/month,
-hydrologic load in m3/month, TN load in kg/month, TP load in kg/month,
-TSS load in kg/month, and BOD load in kg/month.</p>
+<code><a href="../reference/util_nps_fillmiswq.html">util_nps_fillmiswq()</a></code>.</p>
+<p>Water quality and flow inputs to <code><a href="../reference/anlz_nps_gaged.html">anlz_nps_gaged()</a></code> can be
+provided numerous ways:</p>
+<ol style="list-style-type: decimal">
+<li>Manatee and Pinellas County water quality data provided as local
+files and EPC data automatically retrieved from the API</li>
+<li>All water quality data provided locally using a single object with
+the <code>allwq</code> argument (see the
+<code><a href="../reference/allwq.html">allwq</a></code> dataset for the
+format, created using <code><a href="../reference/util_nps_getwq.html">util_nps_getwq()</a></code>)</li>
+<li>Flow data provided using local files for Lake Manatee, Bell Shoals,
+and Tampa Bypass, USGS data retrieved automatically from the API</li>
+<li>Flow data provided using local files for Lake Manatee, Bell Shoals,
+and Tampa Bypass, USGS data provided locally using the
+<code>usgsflow</code> argument (see the
+<code><a href="../reference/usgsflow.html">usgsflow</a></code> dataset
+for the format, created using <code><a href="../reference/util_nps_getusgsflow.html">util_nps_getusgsflow()</a></code>)</li>
+<li>All flow data provided locally using the <code>allflo</code>
+argument (see the
+<code><a href="../reference/allflo.html">allflo</a></code> dataset for
+the format, created using <code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>).</li>
+</ol>
+<p>In all cases, input data can retrieved from APIs with the exception
+of flow data for Lake Manatee, Bell Shoals, and Tampa Bypass (see the
+help file for <code><a href="../reference/util_nps_getextflow.html">util_nps_getextflow()</a></code> for how to get these
+data). The following example uses combined water quality and flow data
+included with the package for convenience.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># external files included with the package</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">usgsflow</span><span class="op">)</span></span>
-<span><span class="va">mancopth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_wq_manco.txt'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
-<span><span class="va">pincopth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_wq_pinco.txt'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
-<span><span class="va">lakemanpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_lakemanatee.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
-<span><span class="va">tampabypth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_tampabypass.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
-<span><span class="va">bellshlpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_bellshoals.xls'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">allwq</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">allflo</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># get gaged NPS loads</span></span>
-<span><span class="va">nps_gaged</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps_gaged.html">anlz_nps_gaged</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, mancopth <span class="op">=</span> <span class="va">mancopth</span>,</span>
-<span>                           pincopth <span class="op">=</span> <span class="va">pincopth</span>, lakemanpth <span class="op">=</span> <span class="va">lakemanpth</span>, tampabypth <span class="op">=</span> <span class="va">tampabypth</span>,</span>
-<span>                           bellshlpth <span class="op">=</span> <span class="va">bellshlpth</span>, usgsflow <span class="op">=</span> <span class="va">usgsflow</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Retrieving flow data...</span></span>
-<span><span class="co">#&gt; Retrieving water quality data...</span></span>
+<span><span class="va">nps_gaged</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps_gaged.html">anlz_nps_gaged</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, allwq <span class="op">=</span> <span class="va">allwq</span>, allflo <span class="op">=</span> <span class="va">allflo</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Estimating gaged NPS loads...</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">nps_gaged</span><span class="op">)</span></span>
@@ -509,6 +529,11 @@ TSS load in kg/month, and BOD load in kg/month.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 023005…  <span style="text-decoration: underline;">2</span>021     5  0.334  0.286      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span> 2.07<span style="color: #949494;">e</span>9  2.07<span style="color: #949494;">e</span>6   692.   593.</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 023005…  <span style="text-decoration: underline;">2</span>021     6  0.871  0.341      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span> 4.12<span style="color: #949494;">e</span>9  4.12<span style="color: #949494;">e</span>6  <span style="text-decoration: underline;">3</span>585.  <span style="text-decoration: underline;">1</span>403.</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: tssload &lt;dbl&gt;, bodload &lt;dbl&gt;</span></span></span></code></pre></div>
+<p>In all use cases for the function, a data frame is returned with
+columns for basin, year, month, TN in mg/L, TP in mg/L, TSS in mg/L, BOD
+in mg/L, flow in liters/month, hydrologic load in m3/month, TN load in
+kg/month, TP load in kg/month, TSS load in kg/month, and BOD load in
+kg/month.</p>
 </div>
 <div class="section level4">
 <h4 id="ungaged-locations">Ungaged locations<a class="anchor" aria-label="anchor" href="#ungaged-locations"></a>
@@ -518,13 +543,10 @@ TSS load in kg/month, and BOD load in kg/month.</p>
 data, rainfall patterns, hydrologic modeling, and empirical
 relationships to estimate monthly nutrient and sediment loads. The
 function requires combined spatial data for bay segment, basin, entity
-jurisdiction, land use data, and soils (using
-<code><a href="../reference/tbbase.html">tbbase</a></code>), rainfall
-data (using <code><a href="../reference/rain.html">rain</a></code>), and
-flow data (obtained with <code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>). A
-preprocessed USGS flow data frame can be provided using the
-<code><a href="../reference/usgsflow.html">usgsflow</a></code> argument
-to avoid re-downloading the data.</p>
+jurisdiction, land use data, and soils (obtained with
+<code><a href="../reference/util_nps_tbbase.html">util_nps_tbbase()</a></code>), rainfall data (obtained with
+<code><a href="../reference/util_getrain.html">util_getrain()</a></code>), and flow data (obtained with
+<code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>).</p>
 <p>The first step is updating the combined spatial data if any of the
 input datasets have changed. The required inputs are land use
 (<code><a href="../reference/tblu2020.html">tblu2020</a></code> or
@@ -568,6 +590,29 @@ object is also included with the package for convenience.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>       1 02304500 LAKE    HILLSBORO…       <span style="text-decoration: underline;">1</span>200       2        1 A/D    0.012<span style="text-decoration: underline;">6</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>       1 02304500 LAKE    HILLSBORO…       <span style="text-decoration: underline;">1</span>400       4        1 A      0.009<span style="text-decoration: underline;">69</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>       1 02304500 LAKE    HILLSBORO…       <span style="text-decoration: underline;">1</span>400       4        1 A/D    0.007<span style="text-decoration: underline;">79</span></span></span></code></pre></div>
+<p>Next, rainfall data must be obtained for the watershed. These data
+can be obtained using the <code><a href="../reference/util_getrain.html">util_getrain()</a></code> function. The
+function retrieves daily rainfall data from NWIS NCDC stations in the
+watershed and returns a data frame with daily rainfall totals for each
+station. These data are always provided to the
+<code><a href="../reference/anlz_nps_ungaged.html">anlz_nps_ungaged()</a></code> using the <code>rain</code> argument and
+not downloaded automatically to reduce execution time. The
+<code><a href="../reference/rain.html">rain</a></code> data object
+included with the package is provided for convenience.</p>
+<p>Flow data are also required to estimate ungaged loads. This is the
+same dataset used to estimate gaged loads. These data can be obtained
+using the <code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code> function. The function
+retrieves flow data from USGS stations in the watershed and also uses
+external flow data for Lake Manatee, Tampa Bypass, and Bell Shoals (see
+the help file for <code><a href="../reference/util_nps_getextflow.html">util_nps_getextflow()</a></code> for how to retrieve
+these data). A preprocessed USGS flow data frame can be provided to the
+<code>usgsflow</code> argument. The
+<code><a href="../reference/usgsflow.html">usgsflow</a></code> data
+object is provided with the package to avoid re-downloading the data.
+Similarly, all flow data can be provided to the <code>allflo</code>
+argument. The <code><a href="../reference/allflo.html">allflo</a></code>
+data object included with the package has both external and USGS flow
+data.</p>
 <p>Once the required data are prepared, ungaged loads can be estimated
 using <code><a href="../reference/anlz_nps_ungaged.html">anlz_nps_ungaged()</a></code>. The following describes the
 general methods for how the ungaged loads are estimated in four
@@ -575,11 +620,12 @@ steps.</p>
 <div class="section level5">
 <h5 id="data-preparation">1. Data Preparation<a class="anchor" aria-label="anchor" href="#data-preparation"></a>
 </h5>
-<p>The first step processes land use data for logistic regression
-modeling and calculates inverse distance-weighted rainfall data for each
-sub-basin. This ensures that each basin receives rainfall estimates that
-account for spatial variability across the watershed based on the
-proximity and influence of nearby rain gauges.</p>
+<p>Using the inptus described above, the first step processes land use
+data for logistic regression modeling and calculates inverse
+distance-weighted rainfall data for each sub-basin. This ensures that
+each basin receives rainfall estimates that account for spatial
+variability across the watershed based on the proximity and influence of
+nearby rain gauges.</p>
 </div>
 <div class="section level5">
 <h5 id="flow-estimation">2. Flow Estimation<a class="anchor" aria-label="anchor" href="#flow-estimation"></a>
@@ -634,21 +680,39 @@ studies of stormwater quality. Special handling is applied for water
 bodies and certain wetland types (CLUCSIDs 18, 20), which are assigned
 zero stormwater loads since these areas do not generate surface runoff
 in the same manner as terrestrial land uses.</p>
-<p>All together, the above can be implemented as follows:</p>
+<p>All together, the above can be implemented as follows. Flow inputs
+(as cubic feet per second) to <code><a href="../reference/anlz_nps_ungaged.html">anlz_nps_ungaged()</a></code> can be
+provided numerous ways:</p>
+<ol style="list-style-type: decimal">
+<li>Flow data provided using local files for Lake Manatee, Bell Shoals,
+and Tampa Bypass, USGS data retrieved automatically from the API</li>
+<li>Flow data provided using local files for Lake Manatee, Bell Shoals,
+and Tampa Bypass, USGS data provided locally using the
+<code>usgsflow</code> argument (see the
+<code><a href="../reference/usgsflow.html">usgsflow</a></code> dataset
+for the format, created using <code><a href="../reference/util_nps_getusgsflow.html">util_nps_getusgsflow()</a></code>)</li>
+<li>All flow data provided locally using the <code>allflo</code>
+argument (see the
+<code><a href="../reference/allflo.html">allflo</a></code> dataset for
+the format, created using <code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>).</li>
+</ol>
+<p>In all cases, input data can retrieved from APIs with the exception
+of flow data for Lake Manatee, Bell Shoals, and Tampa Bypass (see the
+help file for <code><a href="../reference/util_nps_getextflow.html">util_nps_getextflow()</a></code> for how to get these
+data). The following example uses combined flow data included with the
+package for convenience. See above for how to create the
+<code><a href="../reference/tbbase.html">tbbase</a></code> and
+<code><a href="../reference/rain.html">rain</a></code> data objects if
+updated data are needed.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># required inputs</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbbase</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">rain</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">usgsflow</span><span class="op">)</span></span>
-<span><span class="va">lakemanpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_lakemanatee.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
-<span><span class="va">tampabypth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_tampabypass.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
-<span><span class="va">bellshlpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_bellshoals.xls'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">allflo</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nps_ungaged</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps_ungaged.html">anlz_nps_ungaged</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, tbbase <span class="op">=</span> <span class="va">tbbase</span>, rain <span class="op">=</span> <span class="va">rain</span>, </span>
-<span>                                lakemanpth <span class="op">=</span> <span class="va">lakemanpth</span>, tampabypth <span class="op">=</span> <span class="va">tampabypth</span>, </span>
-<span>                                bellshlpth <span class="op">=</span> <span class="va">bellshlpth</span>, usgsflow <span class="op">=</span> <span class="va">usgsflow</span><span class="op">)</span></span>
+<span>                                allflo <span class="op">=</span> <span class="va">allflo</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Prepping rain data...</span></span>
-<span><span class="co">#&gt; Retrieving flow data...</span></span>
 <span><span class="co">#&gt; Estimating ungaged NPS loads...</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">nps_ungaged</span><span class="op">)</span></span>
@@ -672,31 +736,28 @@ in the same manner as terrestrial land uses.</p>
 gaged and ungaged portions of the wateshed are calculated. The
 <code><a href="../reference/anlz_nps.html">anlz_nps()</a></code> function described below can be used to combine
 all steps. The function estimates non-point source (NPS) loads for Tampa
-Bay by combining ungaged and gaged NPS loads. Ungaged loads are
-estimated using rainfall, flow, event mean concentration, land use, and
-soils data, while gaged loads are estimated using water quality data and
-flow data. The function also incorporates atmospheric concentration data
-from the Verna Wellfield site.</p>
-<p>Unlike the individual gaged and ungaged functions,
-<code><a href="../reference/anlz_nps.html">anlz_nps()</a></code> returns loading results in tons per month or
-year depending on the summary arguments. Hydrologic load is returned as
-million cubic meters per month or year.</p>
+Bay by combining gaged and ungaged NPS loads. Gaged loads are estimated
+using flow and water quality data. Ungaged loads are estimated using
+rainfall, flow, event mean concentration, land use, and soils data. The
+function also incorporates atmospheric concentration data from the Verna
+Wellfield site.</p>
+<p>Pre-processed inputs for
+<code><a href="../reference/tbbase.html">tbbase</a></code>,
+<code><a href="../reference/rain.html">rain</a></code>,
+<code><a href="../reference/allwq.html">allwq</a></code>, and
+<code><a href="../reference/allflo.html">allflo</a></code> are used. See
+the help file for <code><a href="../reference/util_prepverna.html">util_prepverna()</a></code> for how to obtain the
+file for atmosopheric concentration data. See above for how to recreate
+these files if updated data are needed.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbbase</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">rain</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">usgsflow</span><span class="op">)</span></span>
-<span><span class="va">mancopth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_wq_manco.txt'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
-<span><span class="va">pincopth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_wq_pinco.txt'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
-<span><span class="va">lakemanpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_lakemanatee.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
-<span><span class="va">tampabypth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_tampabypass.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
-<span><span class="va">bellshlpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_bellshoals.xls'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">allwq</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">allflo</span><span class="op">)</span></span>
 <span><span class="va">vernafl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/verna-raw.csv'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps.html">anlz_nps</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, tbbase <span class="op">=</span> <span class="va">tbbase</span>, rain <span class="op">=</span> <span class="va">rain</span>, </span>
-<span>                mancopth <span class="op">=</span> <span class="va">mancopth</span>, pincopth <span class="op">=</span> <span class="va">pincopth</span>, lakemanpth <span class="op">=</span> <span class="va">lakemanpth</span>, </span>
-<span>                tampabypth <span class="op">=</span> <span class="va">tampabypth</span>, bellshlpth <span class="op">=</span> <span class="va">bellshlpth</span>, vernafl <span class="op">=</span> <span class="va">vernafl</span>, </span>
-<span>                usgsflow <span class="op">=</span> <span class="va">usgsflow</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Retrieving flow data...</span></span>
+<span>                vernafl <span class="op">=</span> <span class="va">vernafl</span>, allwq <span class="op">=</span> <span class="va">allwq</span>, allflo <span class="op">=</span> <span class="va">allflo</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Estimating ungaged NPS loads...</span></span>
 <span><span class="co">#&gt; Estimating gaged NPS loads...</span></span>
 <span><span class="co">#&gt; Combining atmospheric data with ungaged NPS loads...</span></span>
@@ -712,41 +773,46 @@ million cubic meters per month or year.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">2</span>021     4 NPS    Boca Ciega… 207-5    1.58   0.258     52.5     9.43  7.91<span style="color: #949494;">e</span>5</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>021     5 NPS    Boca Ciega… 207-5    1.21   0.198     40.2     7.23  6.06<span style="color: #949494;">e</span>5</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">2</span>021     6 NPS    Boca Ciega… 207-5    2.68   0.440     89.4    16.1   1.35<span style="color: #949494;">e</span>6</span></span></code></pre></div>
+<p>Unlike the individual gaged and ungaged functions,
+<code><a href="../reference/anlz_nps.html">anlz_nps()</a></code> returns loading results in tons per month or
+year depending on the summary arguments. Hydrologic load is returned as
+million cubic meters per month or year.</p>
 <p>The following functions are used internally and are provided here for
-reference on the components used in the calculations:</p>
+reference on the components used in the calculations. Not all are used
+depending on the inputs provided.</p>
 <ul>
 <li>
 <code><a href="../reference/anlz_nps_ungaged.html">anlz_nps_ungaged()</a></code>: Estimates ungaged NPS loads.</li>
 <li>
 <code><a href="../reference/anlz_nps_gaged.html">anlz_nps_gaged()</a></code>: Estimates gaged NPS loads.</li>
 <li>
-<code><a href="../reference/util_prepverna.html">util_prepverna()</a></code>: Prepares and fills missing data with
-five-year means for the Verna Wellfield site data.</li>
+<code><a href="../reference/util_nps_fillmiswq.html">util_nps_fillmiswq()</a></code>: Fills missing water quality data
+with linear interpolation.</li>
 <li>
 <code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>: Gets flow estimates for NPS gaged
 and ungaged calculations.</li>
 <li>
 <code><a href="../reference/util_nps_getusgsflow.html">util_nps_getusgsflow()</a></code>: Gets USGS flow data for NPS
-calculations, used in <code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>. A preprocessed
-USGS flow data frame can be provided using the
-<code><a href="../reference/usgsflow.html">usgsflow</a></code> argument
-to avoid re-downloading the data.</li>
+calculations, used in <code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>.</li>
 <li>
-<code><a href="../reference/util_nps_getextflow.html">util_nps_getextflow()</a></code>: Gets external flow data and
-contacts (Lake Manatee, Tampa Bypass, and Bell Shoals), used in
+<code><a href="../reference/util_nps_getextflow.html">util_nps_getextflow()</a></code>: Gets external flow data (Lake
+Manatee, Tampa Bypass, and Bell Shoals), used in
 <code><a href="../reference/util_nps_getflow.html">util_nps_getflow()</a></code>.</li>
 <li>
 <code><a href="../reference/util_nps_getwq.html">util_nps_getwq()</a></code>: Gets water quality data for NPS gaged
-calculations (for <code>mancopth</code>, <code>pincopth</code>, and
-Hillsborough County data).</li>
+calculations.</li>
 <li>
-<code><a href="../reference/util_getrain.html">util_getrain()</a></code>: Gets rainfall data for NPS ungaged
-calculations, as provided in
-<code><a href="../reference/rain.html">rain</a></code>.</li>
+<code><a href="../reference/util_nps_preprain.html">util_nps_preprain()</a></code>: Prepares and formats rainfall
+data.</li>
 <li>
-<code><a href="../reference/util_nps_tbbase.html">util_nps_tbbase()</a></code>: Gets the combined spatial data layer
-for NPS ungaged calculations, as provided in
-<code><a href="../reference/tbbase.html">tbbase</a></code>.</li>
+<code><a href="../reference/util_nps_preplog.html">util_nps_preplog()</a></code>: Prepares land use data for logistic
+regression modeling.</li>
+<li>
+<code><a href="../reference/util_nps_segment.html">util_nps_segment()</a></code>: Assigns basins to bay
+segments.</li>
+<li>
+<code><a href="../reference/util_prepverna.html">util_prepverna()</a></code>: Prepares and fills missing data with
+five-year means for the Verna Wellfield site data.</li>
 </ul>
 <p>Results can be summarized by basin, segment, baywide, monthly, or
 annually using the <code>summ</code> and <code>summtime</code>
@@ -759,10 +825,7 @@ loads.</p>
 estimates.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">npslu</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps.html">anlz_nps</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, tbbase <span class="op">=</span> <span class="va">tbbase</span>, rain <span class="op">=</span> <span class="va">rain</span>, </span>
-<span>                mancopth <span class="op">=</span> <span class="va">mancopth</span>, pincopth <span class="op">=</span> <span class="va">pincopth</span>, lakemanpth <span class="op">=</span> <span class="va">lakemanpth</span>, </span>
-<span>                tampabypth <span class="op">=</span> <span class="va">tampabypth</span>, bellshlpth <span class="op">=</span> <span class="va">bellshlpth</span>, vernafl <span class="op">=</span> <span class="va">vernafl</span>,</span>
-<span>                usgsflow <span class="op">=</span> <span class="va">usgsflow</span>, aslu <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Retrieving flow data...</span></span>
+<span>                allwq <span class="op">=</span> <span class="va">allwq</span>, allflo <span class="op">=</span> <span class="va">allflo</span>, vernafl <span class="op">=</span> <span class="va">vernafl</span>, aslu <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Estimating ungaged NPS loads...</span></span>
 <span><span class="co">#&gt; Combining atmospheric data with ungaged NPS loads...</span></span>
 <span><span class="co">#&gt; Summarizing ungaged NPS loads by land use...</span></span>

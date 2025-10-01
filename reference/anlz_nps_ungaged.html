@@ -43,9 +43,9 @@
 <span>  yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2021-01-01"</span>, <span class="st">"2023-12-31"</span><span class="op">)</span>,</span>
 <span>  <span class="va">tbbase</span>,</span>
 <span>  <span class="va">rain</span>,</span>
-<span>  <span class="va">lakemanpth</span>,</span>
-<span>  <span class="va">tampabypth</span>,</span>
-<span>  <span class="va">bellshlpth</span>,</span>
+<span>  lakemanpth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tampabypth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  bellshlpth <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  allflo <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  usgsflow <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -141,9 +141,9 @@
 <p>Requires the following inputs:</p>
 <ul><li><p><code>tbbase</code>: A data frame containing polygon areas for the combined data layer of bay segment, basin, jurisdiction, land use data, and soils, Stored as <code><a href="tbbase.html">tbbase</a></code> or created (takes an hour or so) with <code><a href="util_nps_tbbase.html">util_nps_tbbase</a></code>.</p></li>
 <li><p><code>rain</code>: A data frame of rainfall data. See <code><a href="rain.html">rain</a></code>.</p></li>
-<li><p><code>lakemanpth</code>: character, path to the file containing the Lake Manatee flow data. See <code><a href="util_nps_getextflow.html">util_nps_getextflow</a></code>.</p></li>
-<li><p><code>tampabypth</code>: character, path to the file containing the Tampa Bypass flow data. See <code><a href="util_nps_getextflow.html">util_nps_getextflow</a></code>.</p></li>
-<li><p><code>bellshlpth</code>: character, path to the file containing the Bell shoals data. See <code><a href="util_nps_getextflow.html">util_nps_getextflow</a></code>.</p></li>
+<li><p><code>lakemanpth</code>: character, path to the file containing the Lake Manatee flow data. See <code><a href="util_nps_getextflow.html">util_nps_getextflow</a></code>. Only applies if <code>allflo</code> is not provided.</p></li>
+<li><p><code>tampabypth</code>: character, path to the file containing the Tampa Bypass flow data. See <code><a href="util_nps_getextflow.html">util_nps_getextflow</a></code>. Only applies if <code>allflo</code> is not provided.</p></li>
+<li><p><code>bellshlpth</code>: character, path to the file containing the Bell shoals data. See <code><a href="util_nps_getextflow.html">util_nps_getextflow</a></code>. Only applies if <code>allflo</code> is not provided.</p></li>
 </ul><p>USGS gaged flows are also used, as returned by <code><a href="util_nps_getusgsflow.html">util_nps_getusgsflow</a></code> and combined with the external flow data using <code><a href="util_nps_getextflow.html">util_nps_getextflow</a></code> and <code><a href="util_nps_getflow.html">util_nps_getflow</a></code>.</p>
     </div>
 
@@ -152,22 +152,15 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># external flow sources</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbbase</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">rain</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">usgsflow</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">lakemanpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_lakemanatee.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">tampabypth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_tampabypass.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">bellshlpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_bellshoals.xls'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">allflo</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">nps_ungaged</span> <span class="op">&lt;-</span> <span class="fu">anlz_nps_ungaged</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>  tbbase <span class="op">=</span> <span class="va">tbbase</span>,</span></span>
 <span class="r-in"><span>  rain <span class="op">=</span> <span class="va">rain</span>, </span></span>
-<span class="r-in"><span>  lakemanpth <span class="op">=</span> <span class="va">lakemanpth</span>, </span></span>
-<span class="r-in"><span>  tampabypth <span class="op">=</span> <span class="va">tampabypth</span>, </span></span>
-<span class="r-in"><span>  bellshlpth <span class="op">=</span> <span class="va">bellshlpth</span>,</span></span>
-<span class="r-in"><span>  usgsflow <span class="op">=</span> <span class="va">usgsflow</span></span></span>
+<span class="r-in"><span>  allflo <span class="op">=</span> <span class="va">allflo</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Prepping rain data...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Retrieving flow data...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Estimating ungaged NPS loads...</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">nps_ungaged</span><span class="op">)</span></span></span>

@@ -40,9 +40,9 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_nps_getflow</span><span class="op">(</span></span>
-<span>  <span class="va">lakemanpth</span>,</span>
-<span>  <span class="va">tampabypth</span>,</span>
-<span>  <span class="va">bellshlpth</span>,</span>
+<span>  lakemanpth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tampabypth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  bellshlpth <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2021</span>, <span class="fl">2023</span><span class="op">)</span>,</span>
 <span>  usgsflow <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -93,7 +93,10 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">lakemanpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_lakemanatee.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="va">usgsflow</span> <span class="op">&lt;-</span> <span class="fu"><a href="util_nps_getusgsflow.html">util_nps_getusgsflow</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span><span class="va">lakemanpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_lakemanatee.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">tampabypth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_tampabypass.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">bellshlpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_bellshoals.xls'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">allflo</span> <span class="op">&lt;-</span> <span class="fu">util_nps_getflow</span><span class="op">(</span><span class="va">lakemanpth</span>, <span class="va">tampabypth</span>, <span class="va">bellshlpth</span>, usgsflow <span class="op">=</span> <span class="va">usgsflow</span><span class="op">)</span></span></span>

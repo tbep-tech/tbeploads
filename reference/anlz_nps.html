@@ -43,12 +43,13 @@
 <span>  yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2021-01-01"</span>, <span class="st">"2023-12-31"</span><span class="op">)</span>,</span>
 <span>  <span class="va">tbbase</span>,</span>
 <span>  <span class="va">rain</span>,</span>
-<span>  <span class="va">mancopth</span>,</span>
-<span>  <span class="va">pincopth</span>,</span>
-<span>  <span class="va">lakemanpth</span>,</span>
-<span>  <span class="va">tampabypth</span>,</span>
-<span>  <span class="va">bellshlpth</span>,</span>
+<span>  mancopth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pincopth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lakemanpth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tampabypth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  bellshlpth <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">vernafl</span>,</span>
+<span>  allflo <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  allwq <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  usgsflow <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  summ <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basin"</span>, <span class="st">"segment"</span>, <span class="st">"all"</span><span class="op">)</span>,</span>
@@ -96,6 +97,10 @@
 
 <dt id="arg-vernafl">vernafl<a class="anchor" aria-label="anchor" href="#arg-vernafl"></a></dt>
 <dd><p>character vector of file path to Verna Wellfield atmospheric concentration data</p></dd>
+
+
+<dt id="arg-allflo">allflo<a class="anchor" aria-label="anchor" href="#arg-allflo"></a></dt>
+<dd><p>data frame of flow data, if already available from <code><a href="util_nps_getflow.html">util_nps_getflow</a></code>, otherwise NULL and the function will retrieve the data</p></dd>
 
 
 <dt id="arg-allwq">allwq<a class="anchor" aria-label="anchor" href="#arg-allwq"></a></dt>
@@ -146,27 +151,18 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbbase</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">rain</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">usgsflow</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mancopth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_wq_manco.txt'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">pincopth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_wq_pinco.txt'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">lakemanpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_lakemanatee.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">tampabypth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_tampabypass.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">bellshlpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/nps_extflow_bellshoals.xls'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">allwq</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">allflo</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">vernafl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/verna-raw.csv'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">nps</span> <span class="op">&lt;-</span> <span class="fu">anlz_nps</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>  tbbase <span class="op">=</span> <span class="va">tbbase</span>, </span></span>
 <span class="r-in"><span>  rain <span class="op">=</span> <span class="va">rain</span>, </span></span>
-<span class="r-in"><span>  mancopth <span class="op">=</span> <span class="va">mancopth</span>, </span></span>
-<span class="r-in"><span>  pincopth <span class="op">=</span> <span class="va">pincopth</span>,</span></span>
-<span class="r-in"><span>  lakemanpth <span class="op">=</span> <span class="va">lakemanpth</span>, </span></span>
-<span class="r-in"><span>  tampabypth <span class="op">=</span> <span class="va">tampabypth</span>, </span></span>
-<span class="r-in"><span>  bellshlpth <span class="op">=</span> <span class="va">bellshlpth</span>, </span></span>
+<span class="r-in"><span>  allwq <span class="op">=</span> <span class="va">allwq</span>,</span></span>
+<span class="r-in"><span>  allflo <span class="op">=</span> <span class="va">allflo</span>,  </span></span>
 <span class="r-in"><span>  vernafl <span class="op">=</span> <span class="va">vernafl</span>, </span></span>
-<span class="r-in"><span>  usgsflow <span class="op">=</span> <span class="va">usgsflow</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Retrieving flow data...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Estimating ungaged NPS loads...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Estimating gaged NPS loads...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Combining atmospheric data with ungaged NPS loads...</span>
