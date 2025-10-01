@@ -155,34 +155,38 @@ Non-point source (NPS) estimates are obtained for gaged and ungaged locations in
 
 Gaged estimates are obtained using the `anlz_nps_gaged()` function that retrieves flow and water quality data, then combines them to calculate TN, TP, TSS, BOD, and hydrologic loads.
 
-Required external data inputs are Lake Manatee, Tampa Bypass, and Alafia River Bell Shoals flow data.  These are not available from the USGS API and must be obtained from the contacts listed in `util_nps_getextflow()`.  USGS flow data are obtained from an API for stations 02299950, 02300042, 02300500, 02300700, 02301000, 02301300, 02301500, 02301750, 02303000, 02303330, 02304500, 02306647, 02307000, 02307359, and 02307498.  A preprocessed USGS flow data frame can be provided using the <code><a href="../reference/usgsflow.html">usgsflow</a></code> argument to avoid re-downloading the data.
+Required external flow data are Lake Manatee, Tampa Bypass, and Alafia River Bell Shoals.  These are not available from the USGS API and must be obtained from the contacts listed in `util_nps_getextflow()`.  USGS flow data are obtained from an API for stations 02299950, 02300042, 02300500, 02300700, 02301000, 02301300, 02301500, 02301750, 02303000, 02303330, 02304500, 02306647, 02307000, 02307359, and 02307498.  A preprocessed USGS flow data frame can be provided to the `usgsflow` argument.  The <code><a href="../reference/usgsflow.html">usgsflow</a></code> data object is provided with the package to avoid re-downloading the data.  Similarly, all flow data can be provided to the `allflo` argument.  The <code><a href="../reference/allflo.html">allflo</a></code> data object included with the package has both external and USGS flow data. 
 
-Water Quality data are obtained from the FDEP WIN database API, tbeptools, or local files as described in `util_nps_getwq()`. Chosen stations are ER2 and UM2 for Manatee County and station 06-06 for Pinellas County. Environmental Protection Commission (EPC) of Hillsborough County stations retained are 105, 113, 114, 132, 141, 138, 142, and 147. Manatee or Pinellas County data can be imported from local files using the `mancopth` and `pincopth` arguments, respectively.  If these are not provided, the function will attempt to retrieve data from the FDEP WIN database using `read_importwqwin()` from tbeptools.  The EPC data are retrieved using `read_importepc()` from tbeptools.
+Water Quality data are obtained from the FDEP WIN database API, tbeptools, or local files as described in `util_nps_getwq()`. Chosen stations are ER2 and UM2 for Manatee County and station 06-06 for Pinellas County. Environmental Protection Commission (EPC) of Hillsborough County stations retained are 105, 113, 114, 132, 141, 138, 142, and 147. Manatee or Pinellas County data can be imported from local files using the `mancopth` and `pincopth` arguments, respectively.  If these are not provided, the function will attempt to retrieve data from the FDEP WIN database using `read_importwqwin()` from tbeptools.  The EPC data are retrieved using `read_importepc()` from tbeptools.  The <code><a href="../reference/allwq.html">allwq</a></code> data object included with the package has external data and USGS flow data and can used with the `allwq` argument. 
 
-The function assumes that the water quality data are in mg/L and flow data are in cfs.  Missing water quality data are filled with previous five year averages for the end months, then linearly interpolated using \code{\link{util_nps_fillmiswq}}.  This function will need to be updated for future load calculations.
+The function assumes that the water quality data are in mg/L and flow data are in cfs.  Missing water quality data are filled with previous five year averages for the end months, then linearly interpolated using `util_nps_fillmiswq()`.  
 
-A data frame is returned with columns for basin, year, month, TN in mg/L, TP in mg/L, TSS in mg/L, BOD in mg/L, flow in liters/month, hydrologic load in m3/month, TN load in kg/month, TP load in kg/month, TSS load in kg/month, and BOD load in kg/month.
+Water quality and flow inputs to `anlz_nps_gaged()` can be provided numerous ways: 
+
+1. Manatee and Pinellas County water quality data provided as local files and EPC data automatically retrieved from the API
+1. All water quality data provided locally using a single object with the `allwq` argument (see the <code><a href="../reference/allwq.html">allwq</a></code> dataset for the format, created using `util_nps_getwq()`)
+1. Flow data provided using local files for Lake Manatee, Bell Shoals, and Tampa Bypass, USGS data retrieved automatically from the API
+1. Flow data provided using local files for Lake Manatee, Bell Shoals, and Tampa Bypass, USGS data provided locally using the `usgsflow` argument (see the <code><a href="../reference/usgsflow.html">usgsflow</a></code> dataset for the format, created using `util_nps_getusgsflow()`)
+1. All flow data provided locally using the `allflo` argument (see the <code><a href="../reference/allflo.html">allflo</a></code> dataset for the format, created using `util_nps_getflow()`).  
+
+In all cases, input data can retrieved from APIs with the exception of flow data for Lake Manatee, Bell Shoals, and Tampa Bypass (see the help file for `util_nps_getextflow()` for how to get these data). The following example uses combined water quality and flow data included with the package for convenience.
 
 ```{r}
 # external files included with the package
-data(usgsflow)
-mancopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
-pincopth <- system.file('extdata/nps_wq_pinco.txt', package = 'tbeploads')
-lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
-tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
-bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
+data(allwq)
+data(allflo)
 
 # get gaged NPS loads
-nps_gaged <- anlz_nps_gaged(yrrng = c('2021-01-01', '2023-12-31'), mancopth = mancopth,
-                           pincopth = pincopth, lakemanpth = lakemanpth, tampabypth = tampabypth,
-                           bellshlpth = bellshlpth, usgsflow = usgsflow)
+nps_gaged <- anlz_nps_gaged(yrrng = c('2021-01-01', '2023-12-31'), allwq = allwq, allflo = allflo)
 
 head(nps_gaged)
 ```
 
+In all use cases for the function, a data frame is returned with columns for basin, year, month, TN in mg/L, TP in mg/L, TSS in mg/L, BOD in mg/L, flow in liters/month, hydrologic load in m3/month, TN load in kg/month, TP load in kg/month, TSS load in kg/month, and BOD load in kg/month.
+
 #### Ungaged locations
 
-Ungaged (unmonitored basins) estimates are obtained using `anlz_nps_ungaged()`. The approach combines spatial land use data, rainfall patterns, hydrologic modeling, and empirical relationships to estimate monthly nutrient and sediment loads. The function requires combined spatial data for bay segment, basin, entity jurisdiction, land use data, and soils (using <code><a href="../reference/tbbase.html">tbbase</a></code>), rainfall data (using <code><a href="../reference/rain.html">rain</a></code>), and flow data (obtained with `util_nps_getflow()`). A preprocessed USGS flow data frame can be provided using the <code><a href="../reference/usgsflow.html">usgsflow</a></code> argument to avoid re-downloading the data. 
+Ungaged (unmonitored basins) estimates are obtained using `anlz_nps_ungaged()`. The approach combines spatial land use data, rainfall patterns, hydrologic modeling, and empirical relationships to estimate monthly nutrient and sediment loads. The function requires combined spatial data for bay segment, basin, entity jurisdiction, land use data, and soils (obtained with `util_nps_tbbase()`), rainfall data (obtained with `util_getrain()`), and flow data (obtained with `util_nps_getflow()`).
 
 The first step is updating the combined spatial data if any of the input datasets have changed.  The required inputs are land use (<code><a href="../reference/tblu2020.html">tblu2020</a></code> or <code><a href="../reference/tblu2023.html">tblu2023</a></code>), soil data (<code><a href="../reference/tbsoil.html">tbsoil</a></code>), jurisdiction (<code><a href="../reference/tbjuris.html">tbjuris</a></code>), and sub-basin data (<code><a href="../reference/tbsubshed.html">tbsubshed</a></code>).  The function `util_nps_tbbase()` combines these datasets into a single spatial object that is used for ungaged load estimation using `util_nps_union()`.  The function requires GDAL to be installed and accessible in the system PATH, or the path to GDAL binaries can be provided using the `gdal_path` argument.
 
@@ -209,11 +213,15 @@ The <code><a href="../reference/tbbase.html">tbbase</a></code> data object is al
 head(tbbase)
 ```
 
+Next, rainfall data must be obtained for the watershed.  These data can be obtained using the `util_getrain()` function.  The function retrieves daily rainfall data from NWIS NCDC stations in the watershed and returns a data frame with daily rainfall totals for each station. These data are always provided to the `anlz_nps_ungaged()` using the `rain` argument and not downloaded automatically to reduce execution time. The <code><a href="../reference/rain.html">rain</a></code> data object included with the package is provided for convenience.
+
+Flow data are also required to estimate ungaged loads. This is the same dataset used to estimate gaged loads. These data can be obtained using the `util_nps_getflow()` function.  The function retrieves flow data from USGS stations in the watershed and also uses external flow data for Lake Manatee, Tampa Bypass, and Bell Shoals (see the help file for `util_nps_getextflow()` for how to retrieve these data).  A preprocessed USGS flow data frame can be provided to the `usgsflow` argument.  The <code><a href="../reference/usgsflow.html">usgsflow</a></code> data object is provided with the package to avoid re-downloading the data.  Similarly, all flow data can be provided to the `allflo` argument.  The <code><a href="../reference/allflo.html">allflo</a></code> data object included with the package has both external and USGS flow data. 
+
 Once the required data are prepared, ungaged loads can be estimated using `anlz_nps_ungaged()`.  The following describes the general methods for how the ungaged loads are estimated in four steps.
 
 ##### 1. Data Preparation
 
-The first step processes land use data for logistic regression modeling and calculates inverse distance-weighted rainfall data for each sub-basin. This ensures that each basin receives rainfall estimates that account for spatial variability across the watershed based on the proximity and influence of nearby rain gauges.
+Using the inptus described above, the first step processes land use data for logistic regression modeling and calculates inverse distance-weighted rainfall data for each sub-basin. This ensures that each basin receives rainfall estimates that account for spatial variability across the watershed based on the proximity and influence of nearby rain gauges.
 
 ##### 2. Flow Estimation
 
@@ -245,60 +253,60 @@ The fundamental equation for pollutant load estimation is:
 
 Where EMCs (Event Mean Concentrations) represent the average pollutant concentrations in stormwater runoff for different land use types. EMCs vary by land use category (CLUCSID) based on empirical studies of stormwater quality. Special handling is applied for water bodies and certain wetland types (CLUCSIDs 18, 20), which are assigned zero stormwater loads since these areas do not generate surface runoff in the same manner as terrestrial land uses. 
 
-All together, the above can be implemented as follows:
+All together, the above can be implemented as follows. Flow inputs (as cubic feet per second) to `anlz_nps_ungaged()` can be provided numerous ways: 
+
+1. Flow data provided using local files for Lake Manatee, Bell Shoals, and Tampa Bypass, USGS data retrieved automatically from the API
+1. Flow data provided using local files for Lake Manatee, Bell Shoals, and Tampa Bypass, USGS data provided locally using the `usgsflow` argument (see the <code><a href="../reference/usgsflow.html">usgsflow</a></code> dataset for the format, created using `util_nps_getusgsflow()`)
+1. All flow data provided locally using the `allflo` argument (see the <code><a href="../reference/allflo.html">allflo</a></code> dataset for the format, created using `util_nps_getflow()`).  
+
+In all cases, input data can retrieved from APIs with the exception of flow data for Lake Manatee, Bell Shoals, and Tampa Bypass (see the help file for `util_nps_getextflow()` for how to get these data). The following example uses combined flow data included with the package for convenience. See above for how to create the <code><a href="../reference/tbbase.html">tbbase</a></code> and <code><a href="../reference/rain.html">rain</a></code> data objects if updated data are needed.
 
 ```{r eval= T}
 # required inputs
 data(tbbase)
 data(rain)
-data(usgsflow)
-lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
-tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
-bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
+data(allflo)
 
 nps_ungaged <- anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain = rain, 
-                                lakemanpth = lakemanpth, tampabypth = tampabypth, 
-                                bellshlpth = bellshlpth, usgsflow = usgsflow)
+                                allflo = allflo)
 
 head(nps_ungaged)
 ```
 
 #### Combined gaged and ungaged loads {#nps-final}
 
-Refer to the prior sections for details on how the separate loads for gaged and ungaged portions of the wateshed are calculated.  The `anlz_nps()` function described below can be used to combine all steps. The function estimates non-point source (NPS) loads for Tampa Bay by combining ungaged and gaged NPS loads. Ungaged loads are estimated using rainfall, flow, event mean concentration, land use, and soils data, while gaged loads are estimated using water quality data and flow data. The function also incorporates atmospheric concentration data from the Verna Wellfield site.
+Refer to the prior sections for details on how the separate loads for gaged and ungaged portions of the wateshed are calculated.  The `anlz_nps()` function described below can be used to combine all steps. The function estimates non-point source (NPS) loads for Tampa Bay by combining gaged and ungaged NPS loads. Gaged loads are estimated using flow and water quality data. Ungaged loads are estimated using rainfall, flow, event mean concentration, land use, and soils data. The function also incorporates atmospheric concentration data from the Verna Wellfield site.
 
-Unlike the individual gaged and ungaged functions, `anlz_nps()` returns loading results in tons per month or year depending on the summary arguments. Hydrologic load is returned as million cubic meters per month or year.
+Pre-processed inputs for <code><a href="../reference/tbbase.html">tbbase</a></code>, <code><a href="../reference/rain.html">rain</a></code>, <code><a href="../reference/allwq.html">allwq</a></code>, and <code><a href="../reference/allflo.html">allflo</a></code> are used.  See the help file for `util_prepverna()` for how to obtain the file for atmosopheric concentration data. See above for how to recreate these files if updated data are needed.
 
 ```{r eval = T}
 data(tbbase)
 data(rain)
-data(usgsflow)
-mancopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
-pincopth <- system.file('extdata/nps_wq_pinco.txt', package = 'tbeploads')
-lakemanpth <- system.file('extdata/nps_extflow_lakemanatee.xlsx', package = 'tbeploads')
-tampabypth <- system.file('extdata/nps_extflow_tampabypass.xlsx', package = 'tbeploads')
-bellshlpth <- system.file('extdata/nps_extflow_bellshoals.xls', package = 'tbeploads')
+data(allwq)
+data(allflo)
 vernafl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
 
 nps <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain = rain, 
-                mancopth = mancopth, pincopth = pincopth, lakemanpth = lakemanpth, 
-                tampabypth = tampabypth, bellshlpth = bellshlpth, vernafl = vernafl, 
-                usgsflow = usgsflow)
+                vernafl = vernafl, allwq = allwq, allflo = allflo)
 
 head(nps)
 ```
 
-The following functions are used internally and are provided here for reference on the components used in the calculations:
+Unlike the individual gaged and ungaged functions, `anlz_nps()` returns loading results in tons per month or year depending on the summary arguments. Hydrologic load is returned as million cubic meters per month or year.  
+
+The following functions are used internally and are provided here for reference on the components used in the calculations.  Not all are used depending on the inputs provided.
 
 * `anlz_nps_ungaged()`: Estimates ungaged NPS loads.
 * `anlz_nps_gaged()`: Estimates gaged NPS loads.
-* `util_prepverna()`: Prepares and fills missing data with five-year means for the Verna Wellfield site data.
+* `util_nps_fillmiswq()`: Fills missing water quality data with linear interpolation.
 * `util_nps_getflow()`: Gets flow estimates for NPS gaged and ungaged calculations.
-* `util_nps_getusgsflow()`: Gets USGS flow data for NPS calculations, used in `util_nps_getflow()`. A preprocessed USGS flow data frame can be provided using the <code><a href="../reference/usgsflow.html">usgsflow</a></code> argument to avoid re-downloading the data.
-* `util_nps_getextflow()`: Gets external flow data and contacts (Lake Manatee, Tampa Bypass, and Bell Shoals), used in `util_nps_getflow()`.
-* `util_nps_getwq()`: Gets water quality data for NPS gaged calculations (for `mancopth`, `pincopth`, and Hillsborough County data).
-* `util_getrain()`: Gets rainfall data for NPS ungaged calculations, as provided in <code><a href="../reference/rain.html">rain</a></code>.
-* `util_nps_tbbase()`: Gets the combined spatial data layer for NPS ungaged calculations, as provided in <code><a href="../reference/tbbase.html">tbbase</a></code>.
+* `util_nps_getusgsflow()`: Gets USGS flow data for NPS calculations, used in `util_nps_getflow()`.
+* `util_nps_getextflow()`: Gets external flow data (Lake Manatee, Tampa Bypass, and Bell Shoals), used in `util_nps_getflow()`.
+* `util_nps_getwq()`: Gets water quality data for NPS gaged calculations.
+* `util_nps_preprain()`: Prepares and formats rainfall data.
+* `util_nps_preplog()`: Prepares land use data for logistic regression modeling.
+* `util_nps_segment()`: Assigns basins to bay segments.
+* `util_prepverna()`: Prepares and fills missing data with five-year means for the Verna Wellfield site data.
 
 Results can be summarized by basin, segment, baywide, monthly, or annually using the `summ` and `summtime` arguments. By default, loads are returned monthly for each basin. Note that Boca Ciega Bay and Boca Ciega Bay South results are returned separately. Only Boca Ciega Bay South is used when estimating total bay loads.  
 
@@ -306,9 +314,7 @@ Loads by land use type (using CLUCSID) can also be returned if `aslu = TRUE`.  T
 
 ```{r}
 npslu <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain = rain, 
-                mancopth = mancopth, pincopth = pincopth, lakemanpth = lakemanpth, 
-                tampabypth = tampabypth, bellshlpth = bellshlpth, vernafl = vernafl,
-                usgsflow = usgsflow, aslu = TRUE)
+                allwq = allwq, allflo = allflo, vernafl = vernafl, aslu = TRUE)
                 
 head(npslu)
 ```
