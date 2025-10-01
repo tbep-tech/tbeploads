@@ -87,3 +87,18 @@ test_that("util_nps_getflow works with pre-processed usgsflow", {
   )
 
 })
+
+test_that("util_nps_getflow handles missing files", {
+  expect_error(
+    util_nps_getflow(NULL, pth2, pth3),
+    "lakemanpth, tampabypth, and bellshlpth must be provided"
+  )
+  expect_error(
+    util_nps_getflow(pth1, NULL, pth3),
+    "lakemanpth, tampabypth, and bellshlpth must be provided"
+  )
+  expect_error(
+    util_nps_getflow(pth1, pth2, NULL),
+    "lakemanpth, tampabypth, and bellshlpth must be provided"
+  )
+})
