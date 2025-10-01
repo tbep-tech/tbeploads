@@ -1,0 +1,23 @@
+#' Data frame of all water quality data used in \code{\link{anlz_nps_gaged}}
+#'
+#' Data frame of all water quality data used in \code{\link{anlz_nps_gaged}}
+#'
+#' @format A \code{data.frame} of monthly mean water quality data for select stations
+#'
+#' @details Monthly water quality data for select stations used for estimating non-point source gaged loads.  Created using the \code{\link{util_nps_getwq}} function. Includes data from Manatee, Pinellas, and Hillsborough (EPCHC) counties. The data frame contains the following columns:
+#'
+#' \itemize{
+#'    \item \code{basin}: Character string for the basin or station location
+#'    \item \code{yr}: Year of the observation
+#'    \item \code{mo}: Month of the observation
+#'    \item \code{tn_mgl}: Numeric value for Total Nitrogen in mg/L
+#'    \item \code{tp_mgl}: Numeric value for Total Phosphorus in mg/L
+#'    \item \code{tss_mgl}: Numeric value for Total Suspended Solids in mg/L
+#'    \item \code{bod_mgl}: Numeric value for Biochemical Oxygen Demand in mg/L
+#' }
+#' 
+#' @seealso \code{\link{util_nps_getwq}}
+#'
+#' @examples
+#' allwq
+"allwq"
