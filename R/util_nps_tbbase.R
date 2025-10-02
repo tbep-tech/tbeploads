@@ -1,6 +1,6 @@
 #' Create unioned base layer for non-point source (NPS) ungaged load estimation in the Tampa Bay watershed
 #'
-#' @param tblu sf object of land use/land cover in the Tampa Bay watershed, currently either \code{link{tblu2020}} or \code{link{tblu2023}}
+#' @param tblu sf object of land use/land cover in the Tampa Bay watershed, currently \code{link{tblu2023}}
 #' @param tbsoil sf object \code{link{tbsoil}} of soil data in the Tampa Bay watershed
 #' @param gdal_path Character string specifying the path to GDAL binaries (e.g., "C:/OSGeo4W/bin"). If NULL (default), assumes GDAL is in system PATH.
 #' @param chunk_size Integer. For large datasets, process in chunks of this many features. Set to NULL (default) to process all at once.  This applies only to the final union with the soils data.
@@ -17,9 +17,9 @@
 #' @examples
 #' \dontrun{
 #' # Load required data
-#' data(tblu2020)
+#' data(tblu2023)
 #' data(tbsoil)
-#' result <- util_nps_tbbase(tblu2020, tbsoil, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
+#' result <- util_nps_tbbase(tblu2023, tbsoil, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
 #' }
 util_nps_tbbase <- function(tblu, tbsoil, gdal_path = NULL,
                             chunk_size = NULL, cast = FALSE, verbose = TRUE) {
