@@ -159,7 +159,7 @@ anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain
 
   rainflow1 <- dplyr::bind_rows(rainflow, rainflowextra)
 
-  npsmod1 <- dplyr::left_join(tbnestland, rainflow1, by = c("bay_seg", "basin"))
+  npsmod1 <- dplyr::inner_join(tbnestland, rainflow1, by = c("bay_seg", "basin"))
 
   dbasingjn <- dbasing |>
     dplyr::select(
