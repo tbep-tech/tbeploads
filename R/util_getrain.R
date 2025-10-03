@@ -195,7 +195,7 @@ util_getrain <- function(yrs, station = NULL, noaa_key, ntry = 5, quiet = FALSE)
       Year = yrs,
       Month = lubridate::month(date),
       Day = lubridate::day(date),
-      rainfall = round(value / 254, 2)  # Convert from mm*10 to inches
+      rainfall = round(value / 25.4, 2)  # Convert from mm to inches
     ) |>
     dplyr::left_join(stations, by = 'stationid') |>
     dplyr::select(station, date, Year, Month, Day, rainfall) |>
