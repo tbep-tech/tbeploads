@@ -44,7 +44,10 @@ anlz_dps <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summ
            bayseg = 55)
 
   bcb <- dplyr::bind_rows(bcbnorth, bcbsouth) |>
-    dplyr::left_join(dbasing, by = c("coastco", "bayseg"))
+    dplyr::left_join(dbasing, by = c("coastco", "bayseg")) |> 
+    dplyr::mutate(
+      basin = ifelse(is.na(basin), "207-5", basin)
+    )
 
   # combine orig with refactored bcb data, redo segment
   dpsld <- dplyr::bind_rows(dpsld, bcb) |>
