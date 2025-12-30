@@ -1,0 +1,82 @@
+# Get water quality data for NPS gaged flows
+
+Get water quality data for NPS gaged flows
+
+## Usage
+
+``` r
+util_nps_getwq(
+  yrrng = c("2021-01-01", "2023-12-31"),
+  mancopth = NULL,
+  pincopth = NULL,
+  verbose = TRUE
+)
+```
+
+## Arguments
+
+- yrrng:
+
+  A vector of two dates in 'YYYY-MM-DD' format, specifying the date
+  range to retrieve flow data. Default is from '2021-01-01' to
+  '2023-12-31'.
+
+- mancopth:
+
+  character, path to the Manatee County water quality data file, see
+  details
+
+- pincopth:
+
+  character, path to the Pinellas County water quality data file, see
+  details
+
+- verbose:
+
+  logical indicating whether to print verbose output
+
+## Value
+
+A data frame of water quality data for Manatee, Pinellas, and
+Hillsborough County
+
+## Details
+
+If `mancopth` or `pincopth` are `NULL`, Manatee and Pinellas County data
+are retrieved from the FDEP WIN database using
+[`read_importwqwin`](https://rdrr.io/pkg/tbeptools/man/read_importwqwin.html).
+Hillsborough County data is retrieved using
+[`read_importwq`](https://rdrr.io/pkg/tbeptools/man/read_importwq.html).
+If `mancopth` or `pincopth` are not `NULL`, then data are imported from
+disk using the path specified. Data from the Environmental Protection
+Commission (EPC) of Hillsborough County are imported using
+`read_importepc` from the tbeptools R package.
+
+Local data files can be downloaded from the FDEP WIN database at
+<https://prodenv.dep.state.fl.us/DearWin/public/wavesSearchFilter?calledBy=menu>,
+using filters for 21FLMANA and 21FLPDEM for Manatee and Pinellas County,
+respectively. Activity start and end dates are bounded by the values in
+`yrrng`. Chosen analytes are Nitrate-Nitrite (N), Nitrogen- Total
+Kjeldahl, Phosphorus- Total, and Residues- Nonfilterable (TSS). Chosen
+stations are ER2 and UM2 for Manatee County and station 06-06 for
+Pinellas County. EPC stations retained are 105, 113, 114, 132, 141, 138,
+142, and 147.
+
+The data are filtered to include only the following analytes:
+"Nitrate-Nitrite (N)", "Nitrogen- Total Kjeldahl", "Phosphorus- Total",
+and "Residues- Nonfilterable (TSS)". The units for all analytes are
+assumed to be mg/L.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+# import from WIN
+wqdat <- util_nps_getwq(c('2021-01-01', '2023-12-31'))
+
+# use system files
+mancopth <- system.file('extdata/nps_wq_manco.txt', package = 'tbeploads')
+pincopth <- system.file('extdata/nps_wq_pinco.txt', package = 'tbeploads')
+wqdat <- util_nps_getwq(c('2021-01-01', '2023-12-31'), mancopth = mancopth, pincopth = pincopth)
+} # }
+```
