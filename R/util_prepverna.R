@@ -3,7 +3,7 @@
 #' Prep Verna Wellfield data for use in AD and NPS calculations
 #'
 #' @param fl text string for the file path to the Verna Wellfield data
-#' @param fillmis logical indicating whether to fill missing data with monthly means
+#' @param fillmis logical indicating whether to fill missing data with monthly means, see details
 #'
 #' @return A data frame with total nitrogen and phosphorus estimates as mg/l for each year and month of the input data
 #'
@@ -15,6 +15,8 @@
 #'
 #' The first equation corrects for the % of ions in ammonium and nitrate that is N, and the second is a regression relationship between TBADS TN and TP, applied to Verna.
 #'
+#' Missing data (-9 values) can be filled using monthly means from the previous five years where data exist for that month.  If there are less than five previous years of data for that month, the missing value is not filled.
+#' 
 #' @export
 #'
 #' @examples
@@ -35,29 +37,56 @@ util_prepverna <- function(fl, fillmis = T){
       no3 = ifelse(no3 == -9, NA, no3)
     )
 
-  # fill missing annual data by monthly means from other years
+  # fill missing annual data by monthly means from previous five years
+  # use years where data exist for that month
   if(fillmis){
 
     # get monthly ave
     datave <- dat |>
-      dplyr::summarise(
-        nh4ave = mean(nh4, na.rm = T),
-        no3ave = mean(no3, na.rm = T),
-        .by = Month
+      dplyr::arrange(Year, Month) |> 
+      tidyr::pivot_longer(
+        cols = c(nh4, no3),
+        names_to = "var",
+        values_to = "val"
+      ) |>
+      dplyr::group_nest(Month, var) |>
+      dplyr::mutate(
+        data = purrr::map(data, ~{
+          
+          out <- .x
+          
+          for (i in 1:nrow(out)) {
+            # check if NA
+            if (is.na(out[i, 'val'])) {
+              # get all previous non-na values
+              pastvals <- .x[1:(i-1), 'val']
+              pastvals <- pastvals[!is.na(pastvals)]
+              
+              # take the last five non-na values
+              if (length(pastvals) >= 5) {
+                last_5 <- tail(pastvals, 5)
+                out[i, 'val'] <- mean(last_5)
+              } else if (length(pastvals) > 0) {
+                # if less than five, do not fill
+                out[i, 'val'] <- NA
+              }
+            }
+          }
+
+          return(out)
+
+        })
       )
 
-    # fill missing with ave
-    dat <- tidyr::crossing(
-        Year = unique(dat$Year),
-        Month = 1:12
-      ) |>
-      dplyr::left_join(dat, by = c('Year', 'Month')) |>
-      dplyr::left_join(datave, by = 'Month') |>
-      dplyr::mutate(
-        nh4 = ifelse(is.na(nh4), nh4ave, nh4),
-        no3 = ifelse(is.na(no3), no3ave, no3)
-      ) |>
-      dplyr::select(-nh4ave, -no3ave)
+    # reformat with averages
+    dat <- datave |> 
+      tidyr::unnest('data') |> 
+      tidyr::pivot_wider(
+        names_from = var,
+        values_from = val
+      ) |> 
+      dplyr::select(Year, Month, nh4, no3) |> 
+      dplyr::arrange(Year, Month)
 
   }
 

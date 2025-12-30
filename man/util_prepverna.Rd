@@ -9,7 +9,7 @@ util_prepverna(fl, fillmis = T)
 \arguments{
 \item{fl}{text string for the file path to the Verna Wellfield data}
 
-\item{fillmis}{logical indicating whether to fill missing data with monthly means}
+\item{fillmis}{logical indicating whether to fill missing data with monthly means, see details}
 }
 \value{
 A data frame with total nitrogen and phosphorus estimates as mg/l for each year and month of the input data
@@ -24,6 +24,8 @@ Raw data can be obtained from \url{https://nadp.slh.wisc.edu/sites/ntn-FL41/} as
 \deqn{TP = 0.01262 * TN + 0.00110}
 
 The first equation corrects for the \% of ions in ammonium and nitrate that is N, and the second is a regression relationship between TBADS TN and TP, applied to Verna.
+
+Missing data (-9 values) can be filled using monthly means from the previous five years where data exist for that month.  If there are less than five previous years of data for that month, the missing value is not filled.
 }
 \examples{
 fl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
