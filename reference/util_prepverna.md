@@ -43,23 +43,26 @@ previous five years where data exist for that month. If there are less
 than five previous years of data for that month, the missing value is
 not filled.
 
+Years with incomplete seasonal data will be filled with NA values if
+`fillmis = FALSE` or filled with monthly means if `fillmis = TRUE`.
+
 ## Examples
 
 ``` r
 fl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
 util_prepverna(fl)
-#> # A tibble: 497 × 4
+#> # A tibble: 504 × 4
 #>     Year Month  TNConc   TPConc
 #>    <int> <int>   <dbl>    <dbl>
-#>  1  1983     8 NA      NA      
-#>  2  1983     9  0.0101  0.00123
-#>  3  1983    10 NA      NA      
-#>  4  1983    11  0.180   0.00337
-#>  5  1983    12  0.150   0.00299
-#>  6  1984     1  0.265   0.00445
-#>  7  1984     2  0.174   0.00330
-#>  8  1984     3  0.137   0.00283
-#>  9  1984     4  0.324   0.00518
-#> 10  1984     5  0.257   0.00434
-#> # ℹ 487 more rows
+#>  1  1983     1 NA      NA      
+#>  2  1983     2 NA      NA      
+#>  3  1983     3 NA      NA      
+#>  4  1983     4 NA      NA      
+#>  5  1983     5 NA      NA      
+#>  6  1983     6 NA      NA      
+#>  7  1983     7 NA      NA      
+#>  8  1983     8 NA      NA      
+#>  9  1983     9  0.0101  0.00123
+#> 10  1983    10 NA      NA      
+#> # ℹ 494 more rows
 ```
