@@ -103,12 +103,12 @@ anlz_ad(rain, vernafl)
 #>  1  2017     1 AD     Boca Ciega Bay   0.721  0.0140    1.98
 #>  2  2017     2 AD     Boca Ciega Bay   0.945  0.0168    1.95
 #>  3  2017     3 AD     Boca Ciega Bay   0.950  0.0181    2.48
-#>  4  2017     4 AD     Boca Ciega Bay   0      0         3.90
+#>  4  2017     4 AD     Boca Ciega Bay   3.05   0.0482    3.90
 #>  5  2017     5 AD     Boca Ciega Bay   9.06   0.131     6.89
 #>  6  2017     6 AD     Boca Ciega Bay   9.67   0.178    22.5 
 #>  7  2017     7 AD     Boca Ciega Bay  10.8    0.189    26.2 
 #>  8  2017     8 AD     Boca Ciega Bay   5.58   0.120    24.6 
 #>  9  2017     9 AD     Boca Ciega Bay   2.14   0.0553   14.1 
-#> 10  2017    10 AD     Boca Ciega Bay   0      0         5.56
+#> 10  2017    10 AD     Boca Ciega Bay   2.03   0.0368    5.56
 #> # ℹ 662 more rows
 ```
