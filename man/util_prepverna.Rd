@@ -26,6 +26,8 @@ Raw data can be obtained from \url{https://nadp.slh.wisc.edu/sites/ntn-FL41/} as
 The first equation corrects for the \% of ions in ammonium and nitrate that is N, and the second is a regression relationship between TBADS TN and TP, applied to Verna.
 
 Missing data (-9 values) can be filled using monthly means from the previous five years where data exist for that month.  If there are less than five previous years of data for that month, the missing value is not filled.
+
+Years with incomplete seasonal data will be filled with NA values if \code{fillmis = FALSE} or filled with monthly means if \code{fillmis = TRUE}.
 }
 \examples{
 fl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')

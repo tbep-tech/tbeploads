@@ -17,6 +17,8 @@
 #'
 #' Missing data (-9 values) can be filled using monthly means from the previous five years where data exist for that month.  If there are less than five previous years of data for that month, the missing value is not filled.
 #' 
+#' Years with incomplete seasonal data will be filled with NA values if `fillmis = FALSE` or filled with monthly means if `fillmis = TRUE`.
+#' 
 #' @export
 #'
 #' @examples
@@ -35,7 +37,16 @@ util_prepverna <- function(fl, fillmis = T){
     dplyr::mutate(
       nh4 = ifelse(nh4 == -9, NA, nh4),
       no3 = ifelse(no3 == -9, NA, no3)
-    )
+    ) |> 
+    dplyr::arrange(Year, Month)
+
+  # make complete year, month sequence
+  allmonths <- expand.grid(
+      Year = unique(dat$Year),
+      Month = 1:12
+    ) |> 
+    dplyr::arrange(Year, Month)
+  dat <- dplyr::left_join(allmonths, dat, by = c("Year", "Month"))
 
   # fill missing annual data by monthly means from previous five years
   # use years where data exist for that month
@@ -43,7 +54,6 @@ util_prepverna <- function(fl, fillmis = T){
 
     # get monthly ave
     datave <- dat |>
-      dplyr::arrange(Year, Month) |> 
       tidyr::pivot_longer(
         cols = c(nh4, no3),
         names_to = "var",
