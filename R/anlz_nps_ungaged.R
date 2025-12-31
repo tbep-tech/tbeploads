@@ -180,7 +180,7 @@ anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain
     # First, remove non-connected basins
     dplyr::mutate(bas_area = tot_area - rowSums(dplyr::select(tbshydro, dplyr::starts_with("NC_C")), na.rm = TRUE)) |>
     # Then remove saltwater and wetlands from the updated data
-    dplyr::mutate(bas_area = tot_area - rowSums(dplyr::across(dplyr::starts_with(c("C_C17", "C_C21", "C_C22"))), na.rm = TRUE)) |>
+    dplyr::mutate(bas_area = bas_area - rowSums(dplyr::across(dplyr::starts_with(c("C_C17", "C_C21", "C_C22"))), na.rm = TRUE)) |>
     dplyr::mutate(
       # Calculate CLUCs percentages
       lu01 = (rowSums(dplyr::select(tbshydro, dplyr::starts_with("C_C01")), na.rm = TRUE)) / bas_area,
