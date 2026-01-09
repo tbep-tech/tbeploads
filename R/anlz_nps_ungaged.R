@@ -213,8 +213,8 @@ anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain
       frs = lu08 + lu09 + lu10 + lu15,
 
       # Calculate forest land cover (%) by HSG, C_C10A + C_C10B excluded/missing -- need to QC CLUCs-FLUCCs crosswalk for 'Pasture Lands'
-      for_ab = (rowSums(dplyr::select(tbshydro, dplyr::any_of(c("C_C08A", "C_C08B", "C_C09A", "C_C09B", "C_C15A", "C_C15B"))), na.rm = TRUE)) / bas_area,
-      for_cd = (rowSums(dplyr::select(tbshydro, dplyr::any_of(c("C_C08C", "C_C08D", "C_C09C", "C_C09D", "C_C15C", "C_C15D"))), na.rm = TRUE)) / bas_area,  # C_C10C + C_C10D excluded/missing -- need to QC CLUCs-FLUCCs crosswalk for 'Pasture Lands'
+      for_ab = (rowSums(dplyr::select(tbshydro, dplyr::any_of(c("C_C08A", "C_C08B", "C_C09A", "C_C09B", "C_C10A", "C_C10B", "C_C15A", "C_C15B"))), na.rm = TRUE)) / bas_area,
+      for_cd = (rowSums(dplyr::select(tbshydro, dplyr::any_of(c("C_C08C", "C_C08D", "C_C09C", "C_C09D", "C_C10C", "C_C10D", "C_C15C", "C_C15D"))), na.rm = TRUE)) / bas_area,  # C_C10C + C_C10D excluded/missing -- need to QC CLUCs-FLUCCs crosswalk for 'Pasture Lands'
       flow = ((flow_cfs * 0.0283) / (bas_area *10000)) * 60 * 60 * 24 * (365/12),  # Convert from cfs to meters per month
       rain = rain * 0.0254,  # Convert from inches to meters per month
       lag1rain = lag1rain * 0.0254,  # Convert from inches to meters per month

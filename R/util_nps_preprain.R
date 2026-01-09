@@ -98,6 +98,10 @@ util_nps_preprain <- function(rain, yrrng = NULL){
       dplyr::filter(yr >= yrrng[1] & yr <= yrrng[2])
   }
 
+  out$rain <- round(out$rain, 1)
+  out$lag1rain <- round(out$lag1rain, 1)
+  out$lag2rain <- round(out$lag2rain, 1)
+
   return(out)
 
 }
