@@ -285,22 +285,23 @@ anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain
     ) |>
     dplyr::select(yr, mo, bay_seg, basin, clucsid, pflow, area, bas_area)
 
+  # the sm values are a throwback to an older routine no longer used, see RP code
   npspol <- emc |>
-    dplyr::mutate(
-      sm_tn = dplyr::case_when(
-        clucsid %in% c(18, 20) ~ 0,
-        TRUE ~ mean_tn
-      ),
-      sm_tp = dplyr::case_when(
-        clucsid %in% c(18, 20) ~ 0,
-        TRUE ~ mean_tp
-      ),
-      sm_tss = dplyr::case_when(
-        clucsid %in% c(18, 20) ~ 0,
-        TRUE ~ mean_tss)
-      ) |>
-    dplyr::select(clucsid, mean_tn, mean_tp, mean_tss, mean_bod, sm_tn, sm_tp, sm_tss)
-
+    # dplyr::mutate(
+    #   sm_tn = dplyr::case_when(
+    #     clucsid %in% c(18, 20) ~ 0,
+    #     TRUE ~ mean_tn
+    #   ),
+    #   sm_tp = dplyr::case_when(
+    #     clucsid %in% c(18, 20) ~ 0,
+    #     TRUE ~ mean_tp
+    #   ),
+    #   sm_tss = dplyr::case_when(
+    #     clucsid %in% c(18, 20) ~ 0,
+    #     TRUE ~ mean_tss)
+    #   ) |>
+    dplyr::select(clucsid, mean_tn, mean_tp, mean_tss, mean_bod)#, sm_tn, sm_tp, sm_tss)
+browser()
   out <- pflow |>
     dplyr::left_join(npspol, by = "clucsid") |>
     dplyr::mutate(
@@ -309,9 +310,9 @@ anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain
       tpload = mean_tp * 1000 * h2oload * 0.001 * 0.001,
       tssload = mean_tss * 1000 * h2oload * 0.001 * 0.001,
       bodload = mean_bod * 1000 * h2oload * 0.001 * 0.001,
-      stnload = sm_tn * 1000 * h2oload * 0.001 * 0.001,
-      stpload = sm_tp * 1000 * h2oload * 0.001 * 0.001,
-      stssload = sm_tss * 1000 * h2oload * 0.001 * 0.001
+      # stnload = sm_tn * 1000 * h2oload * 0.001 * 0.001,
+      # stpload = sm_tp * 1000 * h2oload * 0.001 * 0.001,
+      # stssload = sm_tss * 1000 * h2oload * 0.001 * 0.001
     ) |>
     dplyr::group_by(bay_seg, basin, yr, mo, clucsid) |>
     dplyr::summarise(
@@ -319,9 +320,9 @@ anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain
       tnload = sum(tnload, na.rm=TRUE),
       tpload = sum(tpload, na.rm=TRUE),
       tssload = sum(tssload, na.rm=TRUE),
-      stnload = sum(stnload, na.rm=TRUE),
-      stpload = sum(stpload, na.rm=TRUE),
-      stssload = sum(stssload, na.rm=TRUE),
+      # stnload = sum(stnload, na.rm=TRUE),
+      # stpload = sum(stpload, na.rm=TRUE),
+      # stssload = sum(stssload, na.rm=TRUE),
       bodload = sum(bodload, na.rm=TRUE),
       area = sum(area, na.rm=TRUE),
       bas_area = dplyr::first(bas_area),
