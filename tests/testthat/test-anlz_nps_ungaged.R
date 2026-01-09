@@ -26,8 +26,7 @@ test_that("anlz_nps_ungaged returns expected output format", {
 
   # Check expected columns are present
   expected_cols <- c("bay_seg", "basin", "yr", "mo", "clucsid", "h2oload",
-                     "tnload", "tpload", "tssload", "stnload", "stpload",
-                     "stssload", "bodload", "area", "bas_area")
+                     "tnload", "tpload", "tssload", "bodload", "area", "bas_area")
   expect_true(all(expected_cols %in% names(result)))
 
 })

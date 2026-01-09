@@ -301,7 +301,7 @@ anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain
     #     TRUE ~ mean_tss)
     #   ) |>
     dplyr::select(clucsid, mean_tn, mean_tp, mean_tss, mean_bod)#, sm_tn, sm_tp, sm_tss)
-browser()
+
   out <- pflow |>
     dplyr::left_join(npspol, by = "clucsid") |>
     dplyr::mutate(
