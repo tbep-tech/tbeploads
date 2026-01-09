@@ -801,11 +801,11 @@ head(nps)
 #>    Year Month source segment     basin tn_load tp_load tss_load bod_load hy_load
 #>   <dbl> <dbl> <chr>  <chr>       <chr>   <dbl>   <dbl>    <dbl>    <dbl>   <dbl>
 #> 1  2021     1 NPS    Boca Ciega… 207-5    2.43   0.398     80.8    14.5   1.22e6
-#> 2  2021     2 NPS    Boca Ciega… 207-5    1.65   0.270     54.8     9.85  8.26e5
-#> 3  2021     3 NPS    Boca Ciega… 207-5    1.37   0.224     45.5     8.18  6.86e5
-#> 4  2021     4 NPS    Boca Ciega… 207-5    1.58   0.258     52.5     9.43  7.91e5
-#> 5  2021     5 NPS    Boca Ciega… 207-5    1.21   0.198     40.2     7.23  6.06e5
-#> 6  2021     6 NPS    Boca Ciega… 207-5    2.68   0.440     89.4    16.1   1.35e6
+#> 2  2021     2 NPS    Boca Ciega… 207-5    1.66   0.272     55.3     9.94  8.34e5
+#> 3  2021     3 NPS    Boca Ciega… 207-5    1.37   0.225     45.6     8.21  6.89e5
+#> 4  2021     4 NPS    Boca Ciega… 207-5    1.58   0.259     52.6     9.46  7.94e5
+#> 5  2021     5 NPS    Boca Ciega… 207-5    1.20   0.197     40.1     7.20  6.04e5
+#> 6  2021     6 NPS    Boca Ciega… 207-5    2.66   0.435     88.4    15.9   1.33e6
 ```
 
 Unlike the individual gaged and ungaged functions,
@@ -865,11 +865,11 @@ head(npslu)
 #> # A tibble: 6 × 11
 #>    Year Month source segment       basin lu    tn_load tp_load tss_load bod_load
 #>   <dbl> <dbl> <chr>  <chr>         <chr> <chr>   <dbl>   <dbl>    <dbl>    <dbl>
-#> 1  2021     1 NPS    Boca Ciega B… 207-5 Barr… 7.11e-5 5.73e-7 0.000631  8.32e-5
-#> 2  2021     2 NPS    Boca Ciega B… 207-5 Barr… 4.82e-5 3.89e-7 0.000428  5.64e-5
-#> 3  2021     3 NPS    Boca Ciega B… 207-5 Barr… 4.00e-5 3.23e-7 0.000355  4.68e-5
-#> 4  2021     4 NPS    Boca Ciega B… 207-5 Barr… 4.62e-5 3.72e-7 0.000409  5.40e-5
-#> 5  2021     5 NPS    Boca Ciega B… 207-5 Barr… 3.54e-5 2.85e-7 0.000314  4.14e-5
-#> 6  2021     6 NPS    Boca Ciega B… 207-5 Barr… 7.86e-5 6.34e-7 0.000698  9.20e-5
+#> 1  2021     1 NPS    Boca Ciega B… 207-5 Barr… 7.11e-5 5.74e-7 0.000631  8.32e-5
+#> 2  2021     2 NPS    Boca Ciega B… 207-5 Barr… 4.86e-5 3.92e-7 0.000431  5.69e-5
+#> 3  2021     3 NPS    Boca Ciega B… 207-5 Barr… 4.02e-5 3.24e-7 0.000356  4.70e-5
+#> 4  2021     4 NPS    Boca Ciega B… 207-5 Barr… 4.63e-5 3.73e-7 0.000411  5.41e-5
+#> 5  2021     5 NPS    Boca Ciega B… 207-5 Barr… 3.52e-5 2.84e-7 0.000313  4.12e-5
+#> 6  2021     6 NPS    Boca Ciega B… 207-5 Barr… 7.78e-5 6.27e-7 0.000690  9.10e-5
 #> # ℹ 1 more variable: hy_load <dbl>
 ```
