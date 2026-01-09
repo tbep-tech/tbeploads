@@ -166,6 +166,20 @@
 <span class="r-in"><span>  vernafl <span class="op">=</span> <span class="va">vernafl</span>, </span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Estimating ungaged NPS loads...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Called from: anlz_nps_ungaged(yrrng = yrrng, tbbase, rain, lakemanpth, tampabypth, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     bellshlpth, allflo = allflo, verbose = FALSE)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> debug: out &lt;- dplyr::summarise(dplyr::group_by(dplyr::mutate(dplyr::left_join(pflow, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     npspol, by = "clucsid"), h2oload = pflow * bas_area * 10000, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     tnload = mean_tn * 1000 * h2oload * 0.001 * 0.001, tpload = mean_tp * </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         1000 * h2oload * 0.001 * 0.001, tssload = mean_tss * </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         1000 * h2oload * 0.001 * 0.001, bodload = mean_bod * </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         1000 * h2oload * 0.001 * 0.001, ), bay_seg, basin, yr, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mo, clucsid), h2oload = sum(h2oload, na.rm = TRUE), tnload = sum(tnload, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     na.rm = TRUE), tpload = sum(tpload, na.rm = TRUE), tssload = sum(tssload, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     na.rm = TRUE), bodload = sum(bodload, na.rm = TRUE), area = sum(area, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     na.rm = TRUE), bas_area = dplyr::first(bas_area), .groups = "drop")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> debug: out &lt;- dplyr::filter(out, (yr &gt;= yrs[1] &amp; yr &lt;= yrs[2]) | is.na(yr))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> debug: return(out)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Estimating gaged NPS loads...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Combining atmospheric data with ungaged NPS loads...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Combining ungaged and gaged NPS loads, estimating final...</span>

@@ -234,17 +234,30 @@ nps_ungaged <- anlz_nps_ungaged(
 )
 #> Prepping rain data...
 #> Estimating ungaged NPS loads...
+#> Called from: anlz_nps_ungaged(yrrng = c("2021-01-01", "2023-12-31"), tbbase = tbbase, 
+#>     rain = rain, allflo = allflo)
+#> debug: out <- dplyr::summarise(dplyr::group_by(dplyr::mutate(dplyr::left_join(pflow, 
+#>     npspol, by = "clucsid"), h2oload = pflow * bas_area * 10000, 
+#>     tnload = mean_tn * 1000 * h2oload * 0.001 * 0.001, tpload = mean_tp * 
+#>         1000 * h2oload * 0.001 * 0.001, tssload = mean_tss * 
+#>         1000 * h2oload * 0.001 * 0.001, bodload = mean_bod * 
+#>         1000 * h2oload * 0.001 * 0.001, ), bay_seg, basin, yr, 
+#>     mo, clucsid), h2oload = sum(h2oload, na.rm = TRUE), tnload = sum(tnload, 
+#>     na.rm = TRUE), tpload = sum(tpload, na.rm = TRUE), tssload = sum(tssload, 
+#>     na.rm = TRUE), bodload = sum(bodload, na.rm = TRUE), area = sum(area, 
+#>     na.rm = TRUE), bas_area = dplyr::first(bas_area), .groups = "drop")
+#> debug: out <- dplyr::filter(out, (yr >= yrs[1] & yr <= yrs[2]) | is.na(yr))
+#> debug: return(out)
 
 head(nps_ungaged)
-#> # A tibble: 6 × 15
-#>   bay_seg basin       yr    mo clucsid h2oload tnload tpload tssload stnload
-#>     <dbl> <chr>    <dbl> <dbl>   <dbl>   <dbl>  <dbl>  <dbl>   <dbl>   <dbl>
-#> 1       1 02306647  2021     1       1   7661.   14.6   2.40    137.    14.6
-#> 2       1 02306647  2021     1       2  59344.  133.   20.2    2156.   133. 
-#> 3       1 02306647  2021     1       3 108271.  225.   39.9    6912.   225. 
-#> 4       1 02306647  2021     1       4  81852.  159.   22.9    6766.   159. 
-#> 5       1 02306647  2021     1       5  58995.   96.6  15.8    5542.    96.6
-#> 6       1 02306647  2021     1       7  27446.   32.4   4.12    549.    32.4
-#> # ℹ 5 more variables: stpload <dbl>, stssload <dbl>, bodload <dbl>, area <dbl>,
-#> #   bas_area <dbl>
+#> # A tibble: 6 × 12
+#>   bay_seg basin     yr    mo clucsid h2oload tnload tpload tssload bodload  area
+#>     <dbl> <chr>  <dbl> <dbl>   <dbl>   <dbl>  <dbl>  <dbl>   <dbl>   <dbl> <dbl>
+#> 1       1 02306…  2021     1       1   7661.   14.6   2.40    137.    33.7  210.
+#> 2       1 02306…  2021     1       2  59344.  133.   20.2    2156.   439.   971.
+#> 3       1 02306…  2021     1       3 108271.  225.   39.9    6912.  1191.  1267.
+#> 4       1 02306…  2021     1       4  81852.  159.   22.9    6766.  1408.   481.
+#> 5       1 02306…  2021     1       5  58995.   96.6  15.8    5542.   566.   371.
+#> 6       1 02306…  2021     1       7  27446.   32.4   4.12    549.   225.   281.
+#> # ℹ 1 more variable: bas_area <dbl>
 ```

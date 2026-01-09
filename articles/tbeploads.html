@@ -713,19 +713,32 @@ updated data are needed.</p>
 <span>                                allflo <span class="op">=</span> <span class="va">allflo</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Prepping rain data...</span></span>
 <span><span class="co">#&gt; Estimating ungaged NPS loads...</span></span>
+<span><span class="co">#&gt; Called from: anlz_nps_ungaged(yrrng = c("2021-01-01", "2023-12-31"), tbbase = tbbase, </span></span>
+<span><span class="co">#&gt;     rain = rain, allflo = allflo)</span></span>
+<span><span class="co">#&gt; debug: out &lt;- dplyr::summarise(dplyr::group_by(dplyr::mutate(dplyr::left_join(pflow, </span></span>
+<span><span class="co">#&gt;     npspol, by = "clucsid"), h2oload = pflow * bas_area * 10000, </span></span>
+<span><span class="co">#&gt;     tnload = mean_tn * 1000 * h2oload * 0.001 * 0.001, tpload = mean_tp * </span></span>
+<span><span class="co">#&gt;         1000 * h2oload * 0.001 * 0.001, tssload = mean_tss * </span></span>
+<span><span class="co">#&gt;         1000 * h2oload * 0.001 * 0.001, bodload = mean_bod * </span></span>
+<span><span class="co">#&gt;         1000 * h2oload * 0.001 * 0.001, ), bay_seg, basin, yr, </span></span>
+<span><span class="co">#&gt;     mo, clucsid), h2oload = sum(h2oload, na.rm = TRUE), tnload = sum(tnload, </span></span>
+<span><span class="co">#&gt;     na.rm = TRUE), tpload = sum(tpload, na.rm = TRUE), tssload = sum(tssload, </span></span>
+<span><span class="co">#&gt;     na.rm = TRUE), bodload = sum(bodload, na.rm = TRUE), area = sum(area, </span></span>
+<span><span class="co">#&gt;     na.rm = TRUE), bas_area = dplyr::first(bas_area), .groups = "drop")</span></span>
+<span><span class="co">#&gt; debug: out &lt;- dplyr::filter(out, (yr &gt;= yrs[1] &amp; yr &lt;= yrs[2]) | is.na(yr))</span></span>
+<span><span class="co">#&gt; debug: return(out)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">nps_ungaged</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 15</span></span></span>
-<span><span class="co">#&gt;   bay_seg basin       yr    mo clucsid h2oload tnload tpload tssload stnload</span></span>
-<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>       1 02306647  <span style="text-decoration: underline;">2</span>021     1       1   <span style="text-decoration: underline;">7</span>661.   14.6   2.40    137.    14.6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>       1 02306647  <span style="text-decoration: underline;">2</span>021     1       2  <span style="text-decoration: underline;">59</span>344.  133.   20.2    <span style="text-decoration: underline;">2</span>156.   133. </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>       1 02306647  <span style="text-decoration: underline;">2</span>021     1       3 <span style="text-decoration: underline;">108</span>271.  225.   39.9    <span style="text-decoration: underline;">6</span>912.   225. </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>       1 02306647  <span style="text-decoration: underline;">2</span>021     1       4  <span style="text-decoration: underline;">81</span>852.  159.   22.9    <span style="text-decoration: underline;">6</span>766.   159. </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>       1 02306647  <span style="text-decoration: underline;">2</span>021     1       5  <span style="text-decoration: underline;">58</span>995.   96.6  15.8    <span style="text-decoration: underline;">5</span>542.    96.6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>       1 02306647  <span style="text-decoration: underline;">2</span>021     1       7  <span style="text-decoration: underline;">27</span>446.   32.4   4.12    549.    32.4</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more variables: stpload &lt;dbl&gt;, stssload &lt;dbl&gt;, bodload &lt;dbl&gt;, area &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   bas_area &lt;dbl&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 12</span></span></span>
+<span><span class="co">#&gt;   bay_seg basin     yr    mo clucsid h2oload tnload tpload tssload bodload  area</span></span>
+<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>       1 02306…  <span style="text-decoration: underline;">2</span>021     1       1   <span style="text-decoration: underline;">7</span>661.   14.6   2.40    137.    33.7  210.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>       1 02306…  <span style="text-decoration: underline;">2</span>021     1       2  <span style="text-decoration: underline;">59</span>344.  133.   20.2    <span style="text-decoration: underline;">2</span>156.   439.   971.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>       1 02306…  <span style="text-decoration: underline;">2</span>021     1       3 <span style="text-decoration: underline;">108</span>271.  225.   39.9    <span style="text-decoration: underline;">6</span>912.  <span style="text-decoration: underline;">1</span>191.  <span style="text-decoration: underline;">1</span>267.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>       1 02306…  <span style="text-decoration: underline;">2</span>021     1       4  <span style="text-decoration: underline;">81</span>852.  159.   22.9    <span style="text-decoration: underline;">6</span>766.  <span style="text-decoration: underline;">1</span>408.   481.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>       1 02306…  <span style="text-decoration: underline;">2</span>021     1       5  <span style="text-decoration: underline;">58</span>995.   96.6  15.8    <span style="text-decoration: underline;">5</span>542.   566.   371.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>       1 02306…  <span style="text-decoration: underline;">2</span>021     1       7  <span style="text-decoration: underline;">27</span>446.   32.4   4.12    549.   225.   281.</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: bas_area &lt;dbl&gt;</span></span></span></code></pre></div>
 </div>
 </div>
 <div class="section level4">
@@ -758,6 +771,20 @@ these files if updated data are needed.</p>
 <span><span class="va">nps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps.html">anlz_nps</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, tbbase <span class="op">=</span> <span class="va">tbbase</span>, rain <span class="op">=</span> <span class="va">rain</span>, </span>
 <span>                vernafl <span class="op">=</span> <span class="va">vernafl</span>, allwq <span class="op">=</span> <span class="va">allwq</span>, allflo <span class="op">=</span> <span class="va">allflo</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Estimating ungaged NPS loads...</span></span>
+<span><span class="co">#&gt; Called from: anlz_nps_ungaged(yrrng = yrrng, tbbase, rain, lakemanpth, tampabypth, </span></span>
+<span><span class="co">#&gt;     bellshlpth, allflo = allflo, verbose = FALSE)</span></span>
+<span><span class="co">#&gt; debug: out &lt;- dplyr::summarise(dplyr::group_by(dplyr::mutate(dplyr::left_join(pflow, </span></span>
+<span><span class="co">#&gt;     npspol, by = "clucsid"), h2oload = pflow * bas_area * 10000, </span></span>
+<span><span class="co">#&gt;     tnload = mean_tn * 1000 * h2oload * 0.001 * 0.001, tpload = mean_tp * </span></span>
+<span><span class="co">#&gt;         1000 * h2oload * 0.001 * 0.001, tssload = mean_tss * </span></span>
+<span><span class="co">#&gt;         1000 * h2oload * 0.001 * 0.001, bodload = mean_bod * </span></span>
+<span><span class="co">#&gt;         1000 * h2oload * 0.001 * 0.001, ), bay_seg, basin, yr, </span></span>
+<span><span class="co">#&gt;     mo, clucsid), h2oload = sum(h2oload, na.rm = TRUE), tnload = sum(tnload, </span></span>
+<span><span class="co">#&gt;     na.rm = TRUE), tpload = sum(tpload, na.rm = TRUE), tssload = sum(tssload, </span></span>
+<span><span class="co">#&gt;     na.rm = TRUE), bodload = sum(bodload, na.rm = TRUE), area = sum(area, </span></span>
+<span><span class="co">#&gt;     na.rm = TRUE), bas_area = dplyr::first(bas_area), .groups = "drop")</span></span>
+<span><span class="co">#&gt; debug: out &lt;- dplyr::filter(out, (yr &gt;= yrs[1] &amp; yr &lt;= yrs[2]) | is.na(yr))</span></span>
+<span><span class="co">#&gt; debug: return(out)</span></span>
 <span><span class="co">#&gt; Estimating gaged NPS loads...</span></span>
 <span><span class="co">#&gt; Combining atmospheric data with ungaged NPS loads...</span></span>
 <span><span class="co">#&gt; Combining ungaged and gaged NPS loads, estimating final...</span></span>
@@ -826,6 +853,20 @@ estimates.</p>
 <code class="sourceCode R"><span><span class="va">npslu</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps.html">anlz_nps</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, tbbase <span class="op">=</span> <span class="va">tbbase</span>, rain <span class="op">=</span> <span class="va">rain</span>, </span>
 <span>                allwq <span class="op">=</span> <span class="va">allwq</span>, allflo <span class="op">=</span> <span class="va">allflo</span>, vernafl <span class="op">=</span> <span class="va">vernafl</span>, aslu <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Estimating ungaged NPS loads...</span></span>
+<span><span class="co">#&gt; Called from: anlz_nps_ungaged(yrrng = yrrng, tbbase, rain, lakemanpth, tampabypth, </span></span>
+<span><span class="co">#&gt;     bellshlpth, allflo = allflo, verbose = FALSE)</span></span>
+<span><span class="co">#&gt; debug: out &lt;- dplyr::summarise(dplyr::group_by(dplyr::mutate(dplyr::left_join(pflow, </span></span>
+<span><span class="co">#&gt;     npspol, by = "clucsid"), h2oload = pflow * bas_area * 10000, </span></span>
+<span><span class="co">#&gt;     tnload = mean_tn * 1000 * h2oload * 0.001 * 0.001, tpload = mean_tp * </span></span>
+<span><span class="co">#&gt;         1000 * h2oload * 0.001 * 0.001, tssload = mean_tss * </span></span>
+<span><span class="co">#&gt;         1000 * h2oload * 0.001 * 0.001, bodload = mean_bod * </span></span>
+<span><span class="co">#&gt;         1000 * h2oload * 0.001 * 0.001, ), bay_seg, basin, yr, </span></span>
+<span><span class="co">#&gt;     mo, clucsid), h2oload = sum(h2oload, na.rm = TRUE), tnload = sum(tnload, </span></span>
+<span><span class="co">#&gt;     na.rm = TRUE), tpload = sum(tpload, na.rm = TRUE), tssload = sum(tssload, </span></span>
+<span><span class="co">#&gt;     na.rm = TRUE), bodload = sum(bodload, na.rm = TRUE), area = sum(area, </span></span>
+<span><span class="co">#&gt;     na.rm = TRUE), bas_area = dplyr::first(bas_area), .groups = "drop")</span></span>
+<span><span class="co">#&gt; debug: out &lt;- dplyr::filter(out, (yr &gt;= yrs[1] &amp; yr &lt;= yrs[2]) | is.na(yr))</span></span>
+<span><span class="co">#&gt; debug: return(out)</span></span>
 <span><span class="co">#&gt; Combining atmospheric data with ungaged NPS loads...</span></span>
 <span><span class="co">#&gt; Summarizing ungaged NPS loads by land use...</span></span>
 <span>                </span>
