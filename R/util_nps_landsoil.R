@@ -23,7 +23,7 @@ util_nps_landsoil <- function(tbbase){
         hydgrp == "C/D" ~ "C",
         TRUE ~ hydgrp
       ), 
-      CLUCSID = case_when(
+      CLUCSID = dplyr::case_when(
         CLUCSID == 10 ~ 14, # manual fix to clucsid 10 to 14, per line 39 in RP code 11_F3D_2224_25Sep25.SAS at T:\03_BOARDS_COMMITTEES\05_TBNMC\TB_LOADS\2027_RA_Deliverables\2224\Extra from RP 20260109
         TRUE ~ CLUCSID
       )
