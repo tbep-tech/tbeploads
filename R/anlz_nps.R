@@ -108,7 +108,7 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
     cat('Combining atmospheric data with ungaged NPS loads...\n')
   
   # get verna data, fill missing w/ five-year avg
-  verna <- util_prepverna(vernafl) |>
+  verna <- util_prepverna(vernafl, typ = 'NPS') |>
     dplyr::rename(
       yr = Year,
       mo = Month,
@@ -212,7 +212,7 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
   
   if(verbose)
     cat('Combining ungaged and gaged NPS loads, estimating final...\n')
-  
+
   npsfinal <- estloads |>
     dplyr::full_join(nps_gaged, by = c("yr", "mo", "basin")) |>
     dplyr::mutate(
@@ -254,8 +254,8 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
   npsld <- npsfinal |>
     dplyr::group_by(yr, mo, bay_seg, basin) |>
     dplyr::summarise(
-      tn_load = sum(tnload, na.rm=TRUE) / 907.2, # kg to tons per month
-      tp_load = sum(tpload, na.rm=TRUE) / 907.2, # kg to tons per month
+      tn_load = sum(tnload_b, na.rm=TRUE) / 907.2, # kg to tons per month, use b
+      tp_load = sum(tpload_b, na.rm=TRUE) / 907.2, # kg to tons per month, use b
       tss_load = sum(tssload, na.rm=TRUE) / 907.2, # kg to tons per month
       bod_load = sum(bodload, na.rm=TRUE) / 907.2, # kg to tons per month
       hy_load = sum(h2oload, na.rm=TRUE), # m3 per month

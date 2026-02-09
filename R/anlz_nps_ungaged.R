@@ -205,7 +205,8 @@ anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain
       lu20 = (rowSums(dplyr::select(tbshydro, dplyr::starts_with("C_C20")), na.rm = TRUE)) / bas_area,
       lu21 = (rowSums(dplyr::select(tbshydro, dplyr::starts_with("C_C21")), na.rm = TRUE)) / bas_area, #Not used in model - tidal flats
       lu22 = (rowSums(dplyr::select(tbshydro, dplyr::starts_with("C_C22")), na.rm = TRUE)) / bas_area, #Not used NPDES areas
-
+      lu14 = lu10 + lu14,
+      lu10 = 0, 
       #Calculate aggregated land use (%)
       urb = lu01 + lu02 + lu03 + lu04 + lu05 + lu07,
       ag = lu06 + lu11 + lu12 + lu13 + lu14,

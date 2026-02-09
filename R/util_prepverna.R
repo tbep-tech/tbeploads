@@ -3,6 +3,7 @@
 #' Prep Verna Wellfield data for use in AD and NPS calculations
 #'
 #' @param fl text string for the file path to the Verna Wellfield data
+#' @param typ character string for the type of data to prepare, either 'AD' for atmospheric deposition or 'NPS' for nonpoint source.  Uses different TP calculation for each type.
 #' @param fillmis logical indicating whether to fill missing data with monthly means, see details
 #'
 #' @return A data frame with total nitrogen and phosphorus estimates as mg/l for each year and month of the input data
@@ -24,7 +25,9 @@
 #' @examples
 #' fl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
 #' util_prepverna(fl)
-util_prepverna <- function(fl, fillmis = T){
+util_prepverna <- function(fl, typ, fillmis = T){
+
+  typ <- match.arg(typ, choices = c('AD', 'NPS'))
 
   # import raw, subset relevant, fill -9 as NA
   dat <- read.csv(fl, header = T, stringsAsFactors = F) |>
@@ -101,13 +104,25 @@ util_prepverna <- function(fl, fillmis = T){
   }
 
   # create tn and tp estimates from nh4 and no3
-  out <- dat |>
-    dplyr::mutate(
-      nh4 = nh4 * 0.78, # NADP data are reported as mg NO3 and mg NH4, this corrects for % of ions that is N;
-      no3 = no3 * 0.23,
-      TNConc = nh4 + no3,
-      TPConc = 0.01262 * TNConc + 0.00110 # from regression relationship between TBADS TN and TP, applied to Verna;
-    )  |>
+  if(typ == 'AD')
+    out <- dat |>
+      dplyr::mutate(
+        nh4 = nh4 * 0.78, # NADP data are reported as mg NO3 and mg NH4, this corrects for % of ions that is N;
+        no3 = no3 * 0.23,
+        TNConc = nh4 + no3,
+        TPConc = 0.01262 * TNConc + 0.00110 # from regression relationship between TBADS TN and TP, applied to Verna;
+      ) 
+  
+  if(typ == 'NPS')
+    out <- dat |>
+      dplyr::mutate(
+        nh4 = nh4 * 0.78, # NADP data are reported as mg NO3 and mg NH4, this corrects for % of ions that is N;
+        no3 = no3 * 0.23,
+        TNConc = nh4 + no3,
+        TPConc = 0.195
+      ) 
+  
+  out <- out |>
     dplyr::select(Year, Month, TNConc, TPConc)
 
   return(out)

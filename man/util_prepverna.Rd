@@ -4,10 +4,12 @@
 \alias{util_prepverna}
 \title{Prep Verna Wellfield data for use in AD and NPS calculations}
 \usage{
-util_prepverna(fl, fillmis = T)
+util_prepverna(fl, typ, fillmis = T)
 }
 \arguments{
 \item{fl}{text string for the file path to the Verna Wellfield data}
+
+\item{typ}{character string for the type of data to prepare, either 'AD' for atmospheric deposition or 'NPS' for nonpoint source.  Uses different TP calculation for each type.}
 
 \item{fillmis}{logical indicating whether to fill missing data with monthly means, see details}
 }

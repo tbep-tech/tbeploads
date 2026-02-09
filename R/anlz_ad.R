@@ -30,7 +30,7 @@ anlz_ad <- function(rain, vernafl, summ = c('segment', 'all'), summtime = c('mon
   summtime <- match.arg(summtime)
 
   # prep verna
-  verna <- util_prepverna(vernafl)
+  verna <- util_prepverna(vernafl, typ = 'AD')
 
   # total monthly precip in
   # combine with distance data
