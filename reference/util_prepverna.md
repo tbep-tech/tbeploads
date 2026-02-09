@@ -37,12 +37,14 @@ Raw data can be obtained from
 Total nitrogen and phosphorus concentrations are estimated from ammonium
 and nitrate concentrations (mg/L) using the following relationships:
 
-\$\$TN = NH_4^+ \* 0.78 + NO_3^- \* 0.23\$\$ \$\$TP = 0.01262 \* TN +
-0.00110\$\$
+\$\$TN = NH_4^+ \* 0.78 + NO_3^- \* 0.23\$\$ \$\$TP = \begin{cases}
+0.01262 \cdot TN + 0.00110 & \text{if } typ = \`\`AD" \\ 0.195 &
+\text{if } typ = \`\`NPS" \end{cases}\$\$
 
 The first equation corrects for the % of ions in ammonium and nitrate
 that is N, and the second is a regression relationship between TBADS TN
-and TP, applied to Verna.
+and TP, applied to Verna for atmospheric deposition estimates. A
+constant is used for non-point source estimates.
 
 Missing data (-9 values) can be filled using monthly means from the
 previous five years where data exist for that month. If there are less
@@ -56,6 +58,19 @@ Years with incomplete seasonal data will be filled with NA values if
 
 ``` r
 fl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
-util_prepverna(fl)
-#> Error in util_prepverna(fl): argument "typ" is missing, with no default
+util_prepverna(fl, typ = 'AD')
+#> # A tibble: 504 × 4
+#>     Year Month  TNConc   TPConc
+#>    <int> <int>   <dbl>    <dbl>
+#>  1  1983     1 NA      NA      
+#>  2  1983     2 NA      NA      
+#>  3  1983     3 NA      NA      
+#>  4  1983     4 NA      NA      
+#>  5  1983     5 NA      NA      
+#>  6  1983     6 NA      NA      
+#>  7  1983     7 NA      NA      
+#>  8  1983     8 NA      NA      
+#>  9  1983     9  0.0101  0.00123
+#> 10  1983    10 NA      NA      
+#> # ℹ 494 more rows
 ```
