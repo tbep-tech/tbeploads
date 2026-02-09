@@ -21,7 +21,7 @@ test_that("util_prepverna does not fill missing values when fillmis is FALSE", {
   expect_true(any(is.na(result$TPConc)))
 })
 
-test_that("util_prepverna calculates TNConc and TPConc correctly", {
+test_that("util_prepverna calculates TNConc and TPConc correctly, typ = 'AD'", {
   result <- util_prepverna(vernafl, typ = 'AD', fillmis = TRUE)
   
   # find row where data exists
@@ -40,3 +40,21 @@ test_that("util_prepverna calculates TNConc and TPConc correctly", {
   expect_equal(resulttst$TPConc, expected_TPConc, tolerance = 1e-6)
 })
 
+test_that("util_prepverna calculates TNConc and TPConc correctly, typ = 'NPS'", {
+  result <- util_prepverna(vernafl, typ = 'NPS', fillmis = TRUE)
+  
+  # find row where data exists
+  tst <- which(verna$NH4 != -9 & verna$NO3 != -9)
+  tstmo <- verna[max(tst), 'seas'] # get month of last valid data
+  tstyr <- verna[max(tst), 'yr'] # get year of last valid data
+
+  vernatst <- verna[verna$yr == tstyr & verna$seas == tstmo, ]
+  resulttst <- result[result$Year == tstyr & result$Month == tstmo, ]
+
+  # Manually calculate the expected values for the first row
+  expected_TNConc <- (vernatst$NH4 * 0.78) + (vernatst$NO3 * 0.23)
+  expected_TPConc <- 0.195
+
+  expect_equal(resulttst$TNConc, expected_TNConc, tolerance = 1e-6)
+  expect_equal(resulttst$TPConc, expected_TPConc, tolerance = 1e-6)
+})

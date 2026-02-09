@@ -254,8 +254,8 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
   npsld <- npsfinal |>
     dplyr::group_by(yr, mo, bay_seg, basin) |>
     dplyr::summarise(
-      tn_load = sum(tnload_b, na.rm=TRUE) / 907.2, # kg to tons per month, use b
-      tp_load = sum(tpload_b, na.rm=TRUE) / 907.2, # kg to tons per month, use b
+      tn_load = sum(tnload_b, na.rm=TRUE) / 907.2, # kg to tons per month, use b, see line 378 in RP code 19_NPSMOD04_2224_26Sep25.SAS at T:\03_BOARDS_COMMITTEES\05_TBNMC\TB_LOADS\2027_RA_Deliverables\2224\Extra from RP 20260109
+      tp_load = sum(tpload_b, na.rm=TRUE) / 907.2, # kg to tons per month, use b, see line 378 in RP code 19_NPSMOD04_2224_26Sep25.SAS at T:\03_BOARDS_COMMITTEES\05_TBNMC\TB_LOADS\2027_RA_Deliverables\2224\Extra from RP 20260109
       tss_load = sum(tssload, na.rm=TRUE) / 907.2, # kg to tons per month
       bod_load = sum(bodload, na.rm=TRUE) / 907.2, # kg to tons per month
       hy_load = sum(h2oload, na.rm=TRUE), # m3 per month

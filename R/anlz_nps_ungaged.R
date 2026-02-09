@@ -84,9 +84,6 @@
 #'   \item \code{tnload}: Total nitrogen load (kg)
 #'   \item \code{tpload}: Total phosphorus load (kg)
 #'   \item \code{tssload}: Total suspended solids load (kg)
-#'   \item \code{stnload}: Stormwater total nitrogen load (kg)
-#'   \item \code{stpload}: Stormwater total phosphorus load (kg)
-#'   \item \code{stssload}: Stormwater total suspended solids load (kg)
 #'   \item \code{bodload}: Biochemical oxygen demand load (kg)
 #'   \item \code{area}: Land use area (hectares)
 #'   \item \code{bas_area}: Total basin area (hectares)
@@ -205,7 +202,7 @@ anlz_nps_ungaged <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain
       lu20 = (rowSums(dplyr::select(tbshydro, dplyr::starts_with("C_C20")), na.rm = TRUE)) / bas_area,
       lu21 = (rowSums(dplyr::select(tbshydro, dplyr::starts_with("C_C21")), na.rm = TRUE)) / bas_area, #Not used in model - tidal flats
       lu22 = (rowSums(dplyr::select(tbshydro, dplyr::starts_with("C_C22")), na.rm = TRUE)) / bas_area, #Not used NPDES areas
-      lu14 = lu10 + lu14,
+      lu14 = lu10 + lu14, # manual fix to clucsid 10 to 14, per line 39 in RP code 11_F3D_2224_25Sep25.SAS at T:\03_BOARDS_COMMITTEES\05_TBNMC\TB_LOADS\2027_RA_Deliverables\2224\Extra from RP 20260109
       lu10 = 0, 
       #Calculate aggregated land use (%)
       urb = lu01 + lu02 + lu03 + lu04 + lu05 + lu07,

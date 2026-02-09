@@ -122,7 +122,7 @@ util_prepverna <- function(fl, typ, fillmis = T){
         nh4 = nh4 * 0.78, # NADP data are reported as mg NO3 and mg NH4, this corrects for % of ions that is N;
         no3 = no3 * 0.23,
         TNConc = nh4 + no3,
-        TPConc = 0.195
+        TPConc = 0.195 # see line 147 in RP code 19_NPSMOD04_2224_26Sep25.SAS at T:\03_BOARDS_COMMITTEES\05_TBNMC\TB_LOADS\2027_RA_Deliverables\2224\Extra from RP 20260109
       ) 
   
   out <- out |>
