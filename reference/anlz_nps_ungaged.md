@@ -92,12 +92,6 @@ following columns:
 
 - `tssload`: Total suspended solids load (kg)
 
-- `stnload`: Stormwater total nitrogen load (kg)
-
-- `stpload`: Stormwater total phosphorus load (kg)
-
-- `stssload`: Stormwater total suspended solids load (kg)
-
 - `bodload`: Biochemical oxygen demand load (kg)
 
 - `area`: Land use area (hectares)
