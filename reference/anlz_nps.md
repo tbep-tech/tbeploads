@@ -206,10 +206,10 @@ head(nps)
 #> # A tibble: 6 × 10
 #>    Year Month source segment     basin tn_load tp_load tss_load bod_load hy_load
 #>   <dbl> <dbl> <chr>  <chr>       <chr>   <dbl>   <dbl>    <dbl>    <dbl>   <dbl>
-#> 1  2021     1 NPS    Boca Ciega… 207-5    2.43   0.398     80.8    14.5   1.22e6
-#> 2  2021     2 NPS    Boca Ciega… 207-5    1.66   0.272     55.3     9.94  8.34e5
-#> 3  2021     3 NPS    Boca Ciega… 207-5    1.37   0.225     45.6     8.21  6.89e5
-#> 4  2021     4 NPS    Boca Ciega… 207-5    1.58   0.259     52.6     9.46  7.94e5
-#> 5  2021     5 NPS    Boca Ciega… 207-5    1.20   0.197     40.1     7.20  6.04e5
-#> 6  2021     6 NPS    Boca Ciega… 207-5    2.66   0.435     88.4    15.9   1.33e6
+#> 1  2021     1 NPS    Boca Ciega… 207-5    2.42   0.404     80.8    14.5   1.22e6
+#> 2  2021     2 NPS    Boca Ciega… 207-5    1.65   0.276     55.3     9.94  8.34e5
+#> 3  2021     3 NPS    Boca Ciega… 207-5    1.37   0.228     45.6     8.21  6.89e5
+#> 4  2021     4 NPS    Boca Ciega… 207-5    1.58   0.263     52.6     9.46  7.94e5
+#> 5  2021     5 NPS    Boca Ciega… 207-5    1.21   0.200     40.1     7.20  6.04e5
+#> 6  2021     6 NPS    Boca Ciega… 207-5    2.64   0.441     88.4    15.9   1.33e6
 ```

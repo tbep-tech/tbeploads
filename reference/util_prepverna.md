@@ -5,7 +5,7 @@ Prep Verna Wellfield data for use in AD and NPS calculations
 ## Usage
 
 ``` r
-util_prepverna(fl, fillmis = T)
+util_prepverna(fl, typ, fillmis = T)
 ```
 
 ## Arguments
@@ -13,6 +13,12 @@ util_prepverna(fl, fillmis = T)
 - fl:
 
   text string for the file path to the Verna Wellfield data
+
+- typ:
+
+  character string for the type of data to prepare, either 'AD' for
+  atmospheric deposition or 'NPS' for nonpoint source. Uses different TP
+  calculation for each type.
 
 - fillmis:
 
@@ -51,18 +57,5 @@ Years with incomplete seasonal data will be filled with NA values if
 ``` r
 fl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
 util_prepverna(fl)
-#> # A tibble: 504 × 4
-#>     Year Month  TNConc   TPConc
-#>    <int> <int>   <dbl>    <dbl>
-#>  1  1983     1 NA      NA      
-#>  2  1983     2 NA      NA      
-#>  3  1983     3 NA      NA      
-#>  4  1983     4 NA      NA      
-#>  5  1983     5 NA      NA      
-#>  6  1983     6 NA      NA      
-#>  7  1983     7 NA      NA      
-#>  8  1983     8 NA      NA      
-#>  9  1983     9  0.0101  0.00123
-#> 10  1983    10 NA      NA      
-#> # ℹ 494 more rows
+#> Error in util_prepverna(fl): argument "typ" is missing, with no default
 ```

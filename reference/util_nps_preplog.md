@@ -25,7 +25,7 @@ segment and basins in the rows.
 
 ``` r
 util_nps_preplog(tbbase)
-#> # A tibble: 69 × 138
+#> # A tibble: 69 × 145
 #> # Groups:   bay_seg [8]
 #>    bay_seg basin       C_C01A C_C01B  C_C01C C_C01D     C_C02A C_C02B   C_C02C
 #>      <dbl> <chr>        <dbl>  <dbl>   <dbl>  <dbl>      <dbl>  <dbl>    <dbl>
@@ -40,7 +40,7 @@ util_nps_preplog(tbbase)
 #>  9       1 206-3W     NA       NA    NA          NA   NA        NA     NA     
 #> 10       1 207-5      NA       NA    NA          NA    0.00142  NA     NA     
 #> # ℹ 59 more rows
-#> # ℹ 129 more variables: C_C02D <dbl>, C_C03A <dbl>, C_C03B <dbl>, C_C03C <dbl>,
+#> # ℹ 136 more variables: C_C02D <dbl>, C_C03A <dbl>, C_C03B <dbl>, C_C03C <dbl>,
 #> #   C_C03D <dbl>, C_C04A <dbl>, C_C04B <dbl>, C_C04C <dbl>, C_C04D <dbl>,
 #> #   C_C05A <dbl>, C_C05B <dbl>, C_C05C <dbl>, C_C05D <dbl>, C_C06A <dbl>,
 #> #   C_C06B <dbl>, C_C06C <dbl>, C_C06D <dbl>, C_C07A <dbl>, C_C07B <dbl>,

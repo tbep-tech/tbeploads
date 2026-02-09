@@ -39,7 +39,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_prepverna</span><span class="op">(</span><span class="va">fl</span>, fillmis <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_prepverna</span><span class="op">(</span><span class="va">fl</span>, <span class="va">typ</span>, fillmis <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -48,6 +48,10 @@
 
 <dl><dt id="arg-fl">fl<a class="anchor" aria-label="anchor" href="#arg-fl"></a></dt>
 <dd><p>text string for the file path to the Verna Wellfield data</p></dd>
+
+
+<dt id="arg-typ">typ<a class="anchor" aria-label="anchor" href="#arg-typ"></a></dt>
+<dd><p>character string for the type of data to prepare, either 'AD' for atmospheric deposition or 'NPS' for nonpoint source.  Uses different TP calculation for each type.</p></dd>
 
 
 <dt id="arg-fillmis">fillmis<a class="anchor" aria-label="anchor" href="#arg-fillmis"></a></dt>
@@ -72,20 +76,7 @@ $$TP = 0.01262 * TN + 0.00110$$</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/verna-raw.csv'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">util_prepverna</span><span class="op">(</span><span class="va">fl</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 504 × 4</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Year Month  TNConc   TPConc</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">1</span>983     1 <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">1</span>983     2 <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">1</span>983     3 <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  <span style="text-decoration: underline;">1</span>983     4 <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>  <span style="text-decoration: underline;">1</span>983     5 <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>  <span style="text-decoration: underline;">1</span>983     6 <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>  <span style="text-decoration: underline;">1</span>983     7 <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>  <span style="text-decoration: underline;">1</span>983     8 <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>983     9  0.010<span style="text-decoration: underline;">1</span>  0.001<span style="text-decoration: underline;">23</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">1</span>983    10 <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 494 more rows</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in util_prepverna(fl):</span> argument "typ" is missing, with no default</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
