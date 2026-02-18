@@ -102,7 +102,7 @@ using
 [`util_nps_getusgsflow`](https://tbep-tech.github.io/tbeploads/reference/util_nps_getusgsflow.md).
 A preprocessed USGS flow data frame can be provided using the `usgsflow`
 argument to avoid re-downloading the data. All inputs for flow can be
-superceded by providing a complete flow data frame using the `allflo`
+superseded by providing a complete flow data frame using the `allflo`
 argument.
 
 Water Quality data are obtained from the FDEP WIN database API,
@@ -116,7 +116,7 @@ files using the `mancopth` and `pincopth` arguments, respectively. If
 these are not provided, the function will attempt to retrieve data from
 the FDEP WIN database using `read_importwqwin` from tbeptools. The EPC
 data are retrieved using `read_importepc` from tbeptools. All inputs for
-water quality can be superceded by providing a complete water quality
+water quality can be superseded by providing a complete water quality
 data frame using the `allwq` argument.
 
 The function assumes that the water quality data are in mg/L and flow
