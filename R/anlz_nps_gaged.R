@@ -12,9 +12,9 @@
 #'
 #' @details The function uses \code{\link{util_nps_getflow}} to retrieve flow data and \code{\link{util_nps_getwq}} to retrieve water quality data. It then combines these datasets and calculates loads for TN, TP, TSS, BOD, and hydrologic load.  See the help files for each function for more details.
 #'
-#' Required external data inputs are Lake Manatee, Tampa Bypass, and Alafia River Bell Shoals flow data.  These are not available from the USGS API and must be obtained from the contacts listed in \code{\link{util_nps_getextflow}}.  USGS flow data are for stations 02299950, 02300042, 02300500, 02300700, 02301000, 02301300, 02301500, 02301750, 02303000, 02303330, 02304500, 02306647, 02307000, 02307359, and 02307498.  The USGS flow data are from the NWIS database as returned by \code{\link[dataRetrieval]{read_waterdata_daily}} using \code{\link{util_nps_getusgsflow}}. A preprocessed USGS flow data frame can be provided using the `usgsflow` argument to avoid re-downloading the data.  All inputs for flow can be superceded by providing a complete flow data frame using the `allflo` argument.
+#' Required external data inputs are Lake Manatee, Tampa Bypass, and Alafia River Bell Shoals flow data.  These are not available from the USGS API and must be obtained from the contacts listed in \code{\link{util_nps_getextflow}}.  USGS flow data are for stations 02299950, 02300042, 02300500, 02300700, 02301000, 02301300, 02301500, 02301750, 02303000, 02303330, 02304500, 02306647, 02307000, 02307359, and 02307498.  The USGS flow data are from the NWIS database as returned by \code{\link[dataRetrieval]{read_waterdata_daily}} using \code{\link{util_nps_getusgsflow}}. A preprocessed USGS flow data frame can be provided using the `usgsflow` argument to avoid re-downloading the data.  All inputs for flow can be superseded by providing a complete flow data frame using the `allflo` argument.
 #'
-#' Water Quality data are obtained from the FDEP WIN database API, tbeptools, or local files as described in \code{\link{util_nps_getwq}}. Chosen stations are ER2 and UM2 for Manatee County and station 06-06 for Pinellas County. Environmental Protection Commission (EPC) of Hillsborough County stations retained are 105, 113, 114, 132, 141, 138, 142, and 147. Manatee or Pinellas County data can be imported from local files using the \code{mancopth} and \code{pincopth} arguments, respectively.  If these are not provided, the function will attempt to retrieve data from the FDEP WIN database using \code{read_importwqwin} from tbeptools.  The EPC data are retrieved using \code{read_importepc} from tbeptools.  All inputs for water quality can be superceded by providing a complete water quality data frame using the `allwq` argument.
+#' Water Quality data are obtained from the FDEP WIN database API, tbeptools, or local files as described in \code{\link{util_nps_getwq}}. Chosen stations are ER2 and UM2 for Manatee County and station 06-06 for Pinellas County. Environmental Protection Commission (EPC) of Hillsborough County stations retained are 105, 113, 114, 132, 141, 138, 142, and 147. Manatee or Pinellas County data can be imported from local files using the \code{mancopth} and \code{pincopth} arguments, respectively.  If these are not provided, the function will attempt to retrieve data from the FDEP WIN database using \code{read_importwqwin} from tbeptools.  The EPC data are retrieved using \code{read_importepc} from tbeptools.  All inputs for water quality can be superseded by providing a complete water quality data frame using the `allwq` argument.
 #'
 #' The function assumes that the water quality data are in mg/L and flow data are in cfs.  Missing water quality data are filled with previous five year averages for the end months, then linearly interpolated using \code{\link{util_nps_fillmiswq}}.
 #'
@@ -53,9 +53,9 @@ anlz_nps_gaged <- function(yrrng = c('2021-01-01', '2023-12-31'), mancopth = NUL
   # fill missing, combine with flow, fill miss
   alldat <- util_nps_fillmiswq(allwq, yrrng = yrrng) |>
     dplyr::full_join(allflo, by = c("basin", "yr", "mo")) |>
-    dplyr::filter(basin %in% c("02300500", "02300700", "02301500", "02301750",
-                               "02304500", "02306647", "02307000", "EVERSRES",
-                               "LMANATEE", "LTARPON", "TBYPASS"))
+    dplyr::filter(basin %in% c("02300500", "02300700", "02301500",
+                               "02304500", "02307000",
+                               "LMANATEE")) # several were removed here following review by RP 2/18/26 to get our estimates to match
 
   if(verbose)
     cat('Estimating gaged NPS loads...\n')
