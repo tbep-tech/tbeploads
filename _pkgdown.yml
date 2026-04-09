@@ -28,5 +28,5 @@ reference:
   - -starts_with('util')
 - title: Utility functions
   desc: |
-    Utility functions used by other functions.
+    Utility functions used by other functions or standalone.
   contents: starts_with('util')
