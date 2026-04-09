@@ -103,7 +103,7 @@ Supporting datasets used by the other functions.
 
 ## Utility functions
 
-Utility functions used by other functions.
+Utility functions used by other functions or standalone.
 
 - [`util_getrain()`](https://tbep-tech.github.io/tbeploads/reference/util_getrain.md)
   : Get rainfall data at NOAA NCDC sites for atmospheric deposition and
@@ -160,5 +160,7 @@ Utility functions used by other functions.
   : Fill missing point source data with annual average
 - [`util_ps_fixoutfall()`](https://tbep-tech.github.io/tbeploads/reference/util_ps_fixoutfall.md)
   : Light edits to the outfall ID column for point source data
+- [`util_ps_pascoreuse()`](https://tbep-tech.github.io/tbeploads/reference/util_ps_pascoreuse.md)
+  : Create Pasco Reuse point source input data
 - [`util_summ()`](https://tbep-tech.github.io/tbeploads/reference/util_summ.md)
   : Summarize load estimates
