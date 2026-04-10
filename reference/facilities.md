@@ -17,7 +17,7 @@ A `data.frame`
 
 ``` r
 facilities
-#> # A tibble: 101 × 11
+#> # A tibble: 102 × 11
 #>    bayseg basin  entity facname source entityshr facnameshr permit facid coastco
 #>     <dbl> <chr>  <chr>  <chr>   <chr>  <chr>     <chr>      <chr>  <chr> <chr>  
 #>  1      2 02303… Alpha… Alpha/… PS - … aoc       aoc        FL002… FL00… 327    
@@ -30,6 +30,6 @@ facilities
 #>  8      2 NA     CSX    Newport PS - … csx       newp       NA     NA    NA     
 #>  9      2 NA     CSX    Rockpo… PS - … csx       rock       NA     NA    NA     
 #> 10      1 206-1  Clear… City o… PS - … clearwat… east       FL002… PC691 480    
-#> # ℹ 91 more rows
+#> # ℹ 92 more rows
 #> # ℹ 1 more variable: coastid <chr>
 ```
