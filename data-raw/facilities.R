@@ -181,6 +181,17 @@ ipsfac <- read_sas(here('data-raw/ips1721monthentbas.sas7bdat')) |>
     )
   )
 
+# add Mosaic Black Point, was previously Yara, same permit, etc.
+# this change occurred in 2022
+mosaicbp <- tribble(
+  ~bayseg, ~basin, ~entity, ~facname, ~source, ~entityshr, ~facnameshr, ~permit, ~facid, ~coastco, ~coastid,
+  2, '206-2', 'Mosaic', 'Mosaic - Black Point', 'PS - Industrial', 'mosaic', 'blackpt', 'FL0038652', '4029P20069', '528', NA_character_
+)
+
+# combine ips
+ipsfac <- ipsfac |>
+  bind_rows(mosaicbp)
+
 # original T:/03_BOARDS_COMMITTEES/05_TBNMC/2022_RA_Update/01_FUNDING_OUT/DELIVERABLES/TO-9/datastick_deliverables/2017-2021LUEntityLoads/2017-2021DPSMonthlyEntityBasin/dps1721monthentbas.sas7bdat
 dpsfac <- read_sas(here('data-raw/dps1721monthentbas.sas7bdat')) |>
   select(bayseg, basin, entity, facname, source = source2) |>
