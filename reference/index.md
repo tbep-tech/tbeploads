@@ -160,6 +160,9 @@ Utility functions used by other functions or standalone.
   : Fill missing point source data with annual average
 - [`util_ps_fixoutfall()`](https://tbep-tech.github.io/tbeploads/reference/util_ps_fixoutfall.md)
   : Light edits to the outfall ID column for point source data
+- [`util_ps_mosaic()`](https://tbep-tech.github.io/tbeploads/reference/util_ps_mosaic.md)
+  : Fill missing concentration data for Mosaic industrial point source
+  facilities
 - [`util_ps_pascoreuse()`](https://tbep-tech.github.io/tbeploads/reference/util_ps_pascoreuse.md)
   : Create Pasco Reuse point source input data
 - [`util_summ()`](https://tbep-tech.github.io/tbeploads/reference/util_summ.md)
