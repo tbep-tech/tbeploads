@@ -8,7 +8,19 @@
       "Bash(where Rscript)",
       "Read(//c/Program Files/R//**)",
       "Bash(/c/Program Files/R/R-4.3.2/bin/Rscript.exe:*)",
-      "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::test\\(filter = 'util_ps_mosaic'\\)\")"
+      "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::test\\(filter = 'util_ps_mosaic'\\)\")",
+      "Read(//t/03_BOARDS_COMMITTEES/05_TBNMC/TB_LOADS/2027_RA_Deliverables/2224/Extra from RP 20260109/2224CalcNPSLessPS/**)",
+      "Read(//t//**)",
+      "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"library\\(tbeploads, lib.loc = 'C:/proj/tbeploads'\\); head\\(dbasing\\); names\\(dbasing\\)\")",
+      "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::load_all\\('C:/proj/tbeploads', quiet=TRUE\\); head\\(dbasing\\); cat\\(names\\(dbasing\\), sep='\\\\n'\\)\")",
+      "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::load_all\\('C:/proj/tbeploads', quiet=TRUE\\); dplyr::distinct\\(dbasing, basin, gagetype\\) |> dplyr::filter\\(gagetype=='Gaged'\\) |> head\\(20\\)\")",
+      "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::load_all\\('C:/proj/tbeploads', quiet=TRUE\\); fls <- list.files\\(system.file\\('extdata/', package='tbeploads'\\), pattern='ps_ind_', full.names=TRUE\\); r <- anlz_ips\\(fls, summ='basin', summtime='month'\\); head\\(r\\)\")",
+      "Bash('/c/Program Files/R/R-4.3.2/bin/Rscript.exe' -e ':*)",
+      "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::load_all\\('C:/proj/tbeploads', quiet=TRUE\\); fls <- list.files\\(system.file\\('extdata/', package='tbeploads'\\), full.names=TRUE\\); psindfls <- fls[grepl\\('ps_ind_', fls\\)]; psdomfls <- fls[grepl\\('ps_dom', fls\\)]; ips <- anlz_ips\\(psindfls, summ='basin', summtime='month'\\); cat\\(names\\(ips\\), sep='|'\\)\")",
+      "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::test\\('C:/proj/tbeploads', filter = 'anlz_nps_psremove'\\)\")",
+      "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::test\\('C:/proj/tbeploads'\\)\")",
+      "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::document\\('C:/proj/tbeploads'\\)\")",
+      "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::load_all\\('C:/proj/tbeploads', quiet=TRUE\\); fls <- list.files\\(system.file\\('extdata/', package='tbeploads'\\), full.names=TRUE\\); psindfls <- fls[grepl\\('ps_ind_', fls\\)]; cat\\(names\\(anlz_ips\\(psindfls, summ='segment', summtime='month'\\)\\), sep='|'\\)\")"
     ]
   }
 }

@@ -6,7 +6,7 @@
 \usage{
 anlz_ips(
   fls,
-  summ = c("entity", "facility", "segment", "all"),
+  summ = c("entity", "facility", "basin", "segment", "all"),
   summtime = c("month", "year")
 )
 }
@@ -24,7 +24,7 @@ data frame with loading data for TP, TN, TSS, and BOD as tons per month/year and
 Calculate IPS loads and summarize
 }
 \details{
-Input data files in \code{fls} are first processed by \code{\link{anlz_ips_facility}} to calculate IPS loads for each facility and outfall.  The data are summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed based on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}).
+Input data files in \code{fls} are first processed by \code{\link{anlz_ips_facility}} to calculate IPS loads for each facility and outfall.  The data are summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed based on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}).  Options for \code{summ} are \code{'entity'} to summarize by entity, \code{'facility'} to summarize by facility, \code{'basin'} to summarize by drainage basin (retains the \code{basin} column for use with \code{\link{anlz_nps_psremove}}), \code{'segment'} to summarize by bay segment, and \code{'all'} to summarize across all segments.
 }
 \examples{
 fls <- list.files(system.file('extdata/', package = 'tbeploads'),

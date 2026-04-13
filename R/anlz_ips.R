@@ -7,7 +7,7 @@
 #' @param summtime `r summ_params('summtime')`
 #'
 #' @details
-#' Input data files in \code{fls} are first processed by \code{\link{anlz_ips_facility}} to calculate IPS loads for each facility and outfall.  `r summ_params('descrip')`
+#' Input data files in \code{fls} are first processed by \code{\link{anlz_ips_facility}} to calculate IPS loads for each facility and outfall.  `r summ_params('descrip')`  Options for \code{summ} are \code{'entity'} to summarize by entity, \code{'facility'} to summarize by facility, \code{'basin'} to summarize by drainage basin (retains the \code{basin} column for use with \code{\link{anlz_nps_psremove}}), \code{'segment'} to summarize by bay segment, and \code{'all'} to summarize across all segments.
 #'
 #' @return data frame with loading data for TP, TN, TSS, and BOD as tons per month/year and hydro load as million cubic meters per month/year
 #' @export
@@ -18,7 +18,7 @@
 #' fls <- list.files(system.file('extdata/', package = 'tbeploads'),
 #'   pattern = 'ps_ind_', full.names = TRUE)
 #' anlz_ips(fls)
-anlz_ips <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summtime = c('month', 'year')){
+anlz_ips <- function(fls, summ = c('entity', 'facility', 'basin', 'segment', 'all'), summtime = c('month', 'year')){
 
   summ <- match.arg(summ)
   summtime <- match.arg(summtime)
@@ -40,7 +40,10 @@ anlz_ips <- function(fls, summ = c('entity', 'facility', 'segment', 'all'), summ
       ),
       source = 'IPS'
     ) |>
-    dplyr::select(-basin, -hectare, -coastco, -name, -bayseg)
+    dplyr::select(-hectare, -coastco, -name, -bayseg)
+
+  if (summ != 'basin')
+    ipsld <- dplyr::select(ipsld, -basin)
 
   ##
   # summarize by selection

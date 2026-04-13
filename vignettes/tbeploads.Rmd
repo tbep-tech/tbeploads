@@ -310,11 +310,40 @@ The following functions are used internally and are provided here for reference 
 
 Results can be summarized by basin, segment, baywide, monthly, or annually using the `summ` and `summtime` arguments. By default, loads are returned monthly for each basin. Note that Boca Ciega Bay and Boca Ciega Bay South results are returned separately. Only Boca Ciega Bay South is used when estimating total bay loads.  
 
-Loads by land use type (using CLUCSID) can also be returned if `aslu = TRUE`.  These results only apply to ungaged loading estimates. 
+Loads by land use type (using CLUCSID) can also be returned if `aslu = TRUE`.  These results only apply to ungaged loading estimates.
 
 ```{r}
-npslu <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain = rain, 
+npslu <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain = rain,
                 allwq = allwq, allflo = allflo, vernafl = vernafl, aslu = TRUE)
-                
+
 head(npslu)
 ```
+
+#### Removing point source loads from gaged NPS estimates
+
+Because stream gauges measure total flow at a location, gaged NPS load estimates from `anlz_nps()` include any point source discharges upstream of the gauge.  The `anlz_nps_psremove()` function subtracts the IPS and DPS loads occurring in gaged basins from the NPS totals so that point source contributions are not double-counted.  Only point source loads in basins classified as "Gaged" in the `dbasing` lookup table are subtracted. Loads in ungaged basins are unaffected.
+
+The function requires pre-computed basin-level monthly loads from `anlz_nps()`, `anlz_ips()`, and `anlz_dps()`, all called with `summ = 'basin'` and `summtime = 'month'`.  Nested basin identifiers (e.g., 02301000, 02301300) are reassigned to their parent basins (02301500, 02304500) before summing, consistent with the handling already applied inside `anlz_nps()`.
+
+An optional AD/AP TN adjustment (`ad_ap = TRUE` by default) applies fixed monthly reductions from the 2007 RA allocation analysis to the segment-level NPS totals: Old Tampa Bay (−2.41 tons/month), Hillsborough Bay (−4.31 tons/month), Middle Tampa Bay (−2.29 tons/month), Lower Tampa Bay (−0.36 tons/month), and Manatee River (−2.74 tons/month, representing the combined reduction for segments 55, 6, and 7).  Only TN is adjusted. TP, TSS, BOD, and hydrologic loads are unchanged.
+
+```{r eval = F}
+# pre-compute basin-level monthly loads for each source
+ipsfls <- list.files(system.file('extdata/', package = 'tbeploads'),
+  pattern = 'ps_ind_', full.names = TRUE)
+dpsfls <- list.files(system.file('extdata/', package = 'tbeploads'),
+  pattern = 'ps_dom', full.names = TRUE)
+
+nps_basin <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase,
+  rain = rain, vernafl = vernafl, allwq = allwq, allflo = allflo,
+  summ = 'basin', summtime = 'month')
+ips_basin <- anlz_ips(ipsfls, summ = 'basin', summtime = 'month')
+dps_basin <- anlz_dps(dpsfls, summ = 'basin', summtime = 'month')
+
+# subtract gaged PS loads and apply AD/AP TN adjustment
+nps_psremoved <- anlz_nps_psremove(nps_basin, ips_basin, dps_basin)
+
+head(nps_psremoved)
+```
+
+Results are returned at the segment/month level with the same column structure as `anlz_ips()` and `anlz_dps()`.  Annual totals can be obtained by setting `summtime = 'year'`.
