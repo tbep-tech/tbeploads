@@ -23,31 +23,31 @@
 #' @section Fill values (mg/L):
 #' \describe{
 #'   \item{Mosaic Bartow (all outfalls)}{TP = 1.61, TSS = 8.38, BOD = 9.6, always filled}
-#'   \item{Mosaic Bonnie D-001}{TP = 0.73, TSS = 26.46, BOD = 9.6}
-#'   \item{Mosaic Bonnie D-003}{TP = 2.30, TSS = 6.58, BOD = 9.6, always filled}
+#'   \item{Mosaic Black Point (fka Yara) I-002}{TP = 0.56, TSS = 8.2, BOD = 2.45}
 #'   \item{Mosaic Bonnie D-005}{TP = 0.18, TSS = 3.40, BOD = 9.6}
 #'   \item{Mosaic Bonnie D-006}{TP = 0.85, TSS = 1.63, BOD = 9.6}
 #'   \item{Mosaic Bonnie D-04A}{TP = 0.50, TSS = 2.26, BOD = 9.6}
-#'   \item{Mosaic Bonnie D-007A}{TP = 0.23, TSS = 1.70, BOD = 9.6}
+#'   \item{Mosaic Bonnie D-07A}{TP = 0.23, TSS = 1.70, BOD = 9.6}
+#'   \item{Mosaic Bonnie I-001}{TP = 0.73, TSS = 26.46, BOD = 9.6}
+#'   \item{Mosaic Bonnie I-003}{TP = 2.30, TSS = 6.58, BOD = 9.6, always filled}
 #'   \item{Mosaic Four Corners D-001, D-003}{TP = 1.12, TSS = 12.7, BOD = 9.6}
 #'   \item{Mosaic Green Bay (all outfalls)}{TP = 4.23, TSS = 7.90, BOD = 9.6, always filled}
 #'   \item{Mosaic Hookers Point (Ammonia Terminal) (all outfalls)}{TP = 25.3, TSS = 9.35, BOD = 9.6}
 #'   \item{Mosaic Lonesome (all outfalls)}{TP = 0.016, TSS = 2.4, BOD = 9.6}
 #'   \item{Mosaic Mulberry D-002}{TP = 2.21, TSS = 5.07, BOD = 9.6}
-#'   \item{Mosaic Mulberry Phospho Stack D-001F}{TP = 6.67, TSS = 6.78, BOD = 9.6}
+#'   \item{Mosaic Mulberry Phospho Stack D-01F}{TP = 6.67, TSS = 6.78, BOD = 9.6}
 #'   \item{Mosaic New Wales (all outfalls)}{TP = 0.27, TSS = 4.9, BOD = 9.6, always filled}
 #'   \item{Mosaic Nichols (all outfalls)}{TP = 0.21, TSS = 1.95, BOD = 1.85}
 #'   \item{Mosaic Plant City (all outfalls)}{TP = 0.65, TSS = 12.0, BOD = 9.6}
 #'   \item{Mosaic Port Sutton (all outfalls)}{TP = 0.66, TSS = 14.4, BOD = 9.6}
-#'   \item{Mosaic Riverview D-005B, D-021}{TP = 10.65, TSS = 11.49, BOD = 1.8}
+#'   \item{Mosaic Riverview D-001, D-021, D-022, D-05A, D-05B}{TP = 10.65, TSS = 11.49, BOD = 1.8}
 #'   \item{Mosaic Riverview D-025}{TP = 10.65, TSS = 8.70, BOD = 1.8}
 #'   \item{Mosaic South Pierce (all outfalls)}{TP = 1.50, TSS = 3.58, BOD = 9.6, always filled}
-#'   \item{Mosaic Tampa Marine Terminal SW-1}{TP = 22.0, TSS = 49.6, BOD = 9.6}
-#'   \item{Mosaic Tampa Marine Terminal SW-3}{TP = 25.3, TSS = 9.33, BOD = 9.6}
+#'   \item{Mosaic Tampa Marine Terminal D-SW1}{TP = 22.0, TSS = 49.6, BOD = 9.6}
+#'   \item{Mosaic Tampa Marine Terminal D-SW3}{TP = 25.3, TSS = 9.33, BOD = 9.6}
 #' }
-#' Mosaic Black Point (fka Yara), Mosaic Hookers Prairie, and Mosaic Riverview
-#' Stack Closure have no established fill values; TP, TSS, and BOD will be
-#' \code{NA} for those facilities.
+#' Mosaic Hookers Prairie and Mosaic Riverview Stack Closure have no established
+#' fill values; TP, TSS, and BOD will be \code{NA} for those facilities.
 #'
 #' Facilities with named outfall rules (Bonnie, Four Corners, Mulberry,
 #' Mulberry Phospho Stack, Riverview, and Tampa Marine Terminal) require that
@@ -126,8 +126,10 @@ util_ps_mosaic <- function(dat) {
       'Mosaic Bonnie', 'Mosaic Bonnie', 'Mosaic Bonnie',
       'Mosaic Bonnie', 'Mosaic Bonnie', 'Mosaic Bonnie',
       # Per-outfall fills — other facilities
+      'Mosaic Black Point (fka Yara)',
       'Mosaic Mulberry',
       'Mosaic Mulberry Phospho Stack',
+      'Mosaic Riverview', 'Mosaic Riverview', 'Mosaic Riverview', 
       'Mosaic Riverview', 'Mosaic Riverview', 'Mosaic Riverview',
       'Mosaic Tampa Marine Terminal', 'Mosaic Tampa Marine Terminal',
       'Mosaic Four Corners', 'Mosaic Four Corners'
@@ -135,20 +137,24 @@ util_ps_mosaic <- function(dat) {
     Outfall.ID = c(
       NA, NA, NA, NA,                              # facility-wide
       NA, NA, NA, NA, NA,                          # facility-wide
-      'D-005', 'D-006', 'D-04A',                  # Bonnie
-      'D-07A', 'I-001', 'I-003',                 # Bonnie (D-003 always filled)
+      'D-005', 'D-006', 'D-04A',                   # Bonnie
+      'D-07A', 'I-001', 'I-003',                   # Bonnie (D-003 always filled)
+      'I-002',                                     # Black Point
       'D-002',                                     # Mulberry
-      'D-001F',                                    # Mulberry Phospho Stack
-      'D-005B', 'D-021', 'D-025',                 # Riverview
-      'SW-1', 'SW-3',                              # Tampa Marine Terminal
+      'D-01F',                                     # Mulberry Phospho Stack
+      'D-001', 'D-021', 'D-022',                   # Riverview
+      'D-025', 'D-05A', 'D-05B',                   # Riverview
+      'D-SW1', 'D-SW3',                            # Tampa Marine Terminal
       'D-001', 'D-003'                             # Four Corners
     ),
     tp = c(
       1.61, 4.23, 0.27, 1.50,
       25.3, 0.21, 0.65, 0.66, 0.016,
       0.18, 0.85, 0.50, 0.23, 0.73, 2.30,
+      0.56,
       2.21,
       6.67,
+      10.65, 10.65, 10.65, 
       10.65, 10.65, 10.65,
       22.0, 25.3,
       1.12, 1.12
@@ -157,9 +163,11 @@ util_ps_mosaic <- function(dat) {
       8.38, 7.90, 4.9, 3.58,
       9.35, 1.95, 12.0, 14.4, 2.4,
       3.40, 1.63, 2.26, 1.70, 26.46, 6.58,
+      8.2,
       5.07,
       6.78,
-      11.49, 11.49, 8.70,
+      11.49, 11.49, 11.49, 
+      8.70, 11.49, 11.49,
       49.6, 9.33,
       12.7, 12.7
     ),
@@ -167,8 +175,10 @@ util_ps_mosaic <- function(dat) {
       9.6, 9.6, 9.6, 9.6,
       9.6, 1.85, 9.6, 9.6, 9.6,
       9.6, 9.6, 9.6, 9.6, 9.6, 9.6,
+      2.45,
       9.6,
       9.6,
+      1.8, 1.8, 1.8, 
       1.8, 1.8, 1.8,
       9.6, 9.6,
       9.6, 9.6
@@ -179,6 +189,8 @@ util_ps_mosaic <- function(dat) {
       TRUE, TRUE, TRUE, TRUE, TRUE, FALSE,
       TRUE,
       TRUE,
+      TRUE,
+      TRUE, TRUE, TRUE, 
       TRUE, TRUE, TRUE,
       TRUE, TRUE,
       TRUE, TRUE

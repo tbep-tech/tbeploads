@@ -33,7 +33,7 @@ bonnie <- data.frame(
 )
 res_bonnie <- util_ps_mosaic(bonnie)
 
-# Mosaic Black Point: no established fill values
+# Mosaic Black Point: per-outfall fill for I-002 (check_flow = TRUE)
 blackpt <- data.frame(
   Facility.Name                  = rep('Mosaic Black Point (fka Yara)', 2),
   Outfall.ID                     = rep('I-002', 2),
@@ -123,12 +123,12 @@ test_that("Bonnie D-005 and D-006 receive correct outfall-specific fills", {
   expect_equal(d006$BOD,     9.6)
 })
 
-# --- No fill values ----------------------------------------------------------
+# --- Per-outfall fill: Black Point -------------------------------------------
 
-test_that("Black Point: TP/TSS/BOD are NA (no established fill values)", {
-  expect_true(all(is.na(res_blackpt$Total.P)))
-  expect_true(all(is.na(res_blackpt$TSS)))
-  expect_true(all(is.na(res_blackpt$BOD)))
+test_that("Black Point I-002: TP/TSS/BOD filled with correct values when flow > 0", {
+  expect_true(all(res_blackpt$Total.P == 0.56))
+  expect_true(all(res_blackpt$TSS     == 8.2))
+  expect_true(all(res_blackpt$BOD     == 2.45))
 })
 
 # --- Missing flow replaced with zero -----------------------------------------
@@ -223,14 +223,14 @@ test_that("Facility-wide facilities do not error on arbitrary outfall IDs", {
 })
 
 test_that("No-fill facilities do not error on arbitrary outfall IDs", {
-  # Black Point has no fill rules at all; any outfall ID should be accepted
-  blackpt_new_outfall <- data.frame(
-    Facility.Name                  = rep('Mosaic Black Point (fka Yara)', 2),
-    Outfall.ID                     = c('I-002', 'EFF-002'),
+  # Hookers Prairie has no fill rules at all; any outfall ID should be accepted
+  hookers_prairie <- data.frame(
+    Facility.Name                  = rep('Mosaic Hookers Prairie', 2),
+    Outfall.ID                     = c('EFF-001', 'EFF-002'),
     Year                           = rep(2022L, 2),
     Month                          = 1:2,
     Average.Daily.Flow..ADF...mgd. = c(0.001, 0.002),
     Total.N                        = c(7.7, 7.4)
   )
-  expect_no_error(util_ps_mosaic(blackpt_new_outfall))
+  expect_no_error(util_ps_mosaic(hookers_prairie))
 })
