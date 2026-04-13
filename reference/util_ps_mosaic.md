@@ -47,13 +47,9 @@ added for each facility from FDEP permit records.
 
   TP = 1.61, TSS = 8.38, BOD = 9.6, always filled
 
-- Mosaic Bonnie D-001:
+- Mosaic Black Point (fka Yara) I-002:
 
-  TP = 0.73, TSS = 26.46, BOD = 9.6
-
-- Mosaic Bonnie D-003:
-
-  TP = 2.30, TSS = 6.58, BOD = 9.6, always filled
+  TP = 0.56, TSS = 8.2, BOD = 2.45
 
 - Mosaic Bonnie D-005:
 
@@ -67,9 +63,17 @@ added for each facility from FDEP permit records.
 
   TP = 0.50, TSS = 2.26, BOD = 9.6
 
-- Mosaic Bonnie D-007A:
+- Mosaic Bonnie D-07A:
 
   TP = 0.23, TSS = 1.70, BOD = 9.6
+
+- Mosaic Bonnie I-001:
+
+  TP = 0.73, TSS = 26.46, BOD = 9.6
+
+- Mosaic Bonnie I-003:
+
+  TP = 2.30, TSS = 6.58, BOD = 9.6, always filled
 
 - Mosaic Four Corners D-001, D-003:
 
@@ -91,7 +95,7 @@ added for each facility from FDEP permit records.
 
   TP = 2.21, TSS = 5.07, BOD = 9.6
 
-- Mosaic Mulberry Phospho Stack D-001F:
+- Mosaic Mulberry Phospho Stack D-01F:
 
   TP = 6.67, TSS = 6.78, BOD = 9.6
 
@@ -111,7 +115,7 @@ added for each facility from FDEP permit records.
 
   TP = 0.66, TSS = 14.4, BOD = 9.6
 
-- Mosaic Riverview D-005B, D-021:
+- Mosaic Riverview D-001, D-021, D-022, D-05A, D-05B:
 
   TP = 10.65, TSS = 11.49, BOD = 1.8
 
@@ -123,17 +127,17 @@ added for each facility from FDEP permit records.
 
   TP = 1.50, TSS = 3.58, BOD = 9.6, always filled
 
-- Mosaic Tampa Marine Terminal SW-1:
+- Mosaic Tampa Marine Terminal D-SW1:
 
   TP = 22.0, TSS = 49.6, BOD = 9.6
 
-- Mosaic Tampa Marine Terminal SW-3:
+- Mosaic Tampa Marine Terminal D-SW3:
 
   TP = 25.3, TSS = 9.33, BOD = 9.6
 
-Mosaic Black Point (fka Yara), Mosaic Hookers Prairie, and Mosaic
-Riverview Stack Closure have no established fill values; TP, TSS, and
-BOD will be `NA` for those facilities.
+Mosaic Hookers Prairie and Mosaic Riverview Stack Closure have no
+established fill values; TP, TSS, and BOD will be `NA` for those
+facilities.
 
 Facilities with named outfall rules (Bonnie, Four Corners, Mulberry,
 Mulberry Phospho Stack, Riverview, and Tampa Marine Terminal) require
