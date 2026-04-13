@@ -149,6 +149,12 @@ available or if there are changes in the fill rules. The current fill
 values and rules are based on historical permit compliance data and may
 not reflect future conditions.
 
+## See also
+
+[`util_ps_misc`](https://tbep-tech.github.io/tbeploads/reference/util_ps_misc.md)
+for filling missing data for miscellaneous industrial point source
+facilities
+
 ## Examples
 
 ``` r
