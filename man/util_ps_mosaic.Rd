@@ -86,3 +86,7 @@ dat <- data.frame(
 )
 util_ps_mosaic(dat)
 }
+\seealso{
+\code{\link{util_ps_misc}} for filling missing data for miscellaneous industrial
+point source facilities
+}

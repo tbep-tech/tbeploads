@@ -65,7 +65,10 @@
 #'   \code{BOD}, \code{BOD.Unit}.
 #'
 #' @export
-#'
+#' 
+#' @seealso \code{\link{util_ps_misc}} for filling missing data for miscellaneous industrial 
+#' point source facilities
+#' 
 #' @examples
 #' dat <- data.frame(
 #'   Facility.Name = rep('Mosaic Bartow', 3),
