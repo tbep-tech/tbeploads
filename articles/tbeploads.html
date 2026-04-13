@@ -822,12 +822,12 @@ loads.</p>
 <code>aslu = TRUE</code>. These results only apply to ungaged loading
 estimates.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">npslu</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps.html">anlz_nps</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, tbbase <span class="op">=</span> <span class="va">tbbase</span>, rain <span class="op">=</span> <span class="va">rain</span>, </span>
+<code class="sourceCode R"><span><span class="va">npslu</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps.html">anlz_nps</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, tbbase <span class="op">=</span> <span class="va">tbbase</span>, rain <span class="op">=</span> <span class="va">rain</span>,</span>
 <span>                allwq <span class="op">=</span> <span class="va">allwq</span>, allflo <span class="op">=</span> <span class="va">allflo</span>, vernafl <span class="op">=</span> <span class="va">vernafl</span>, aslu <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Estimating ungaged NPS loads...</span></span>
 <span><span class="co">#&gt; Combining atmospheric data with ungaged NPS loads...</span></span>
 <span><span class="co">#&gt; Summarizing ungaged NPS loads by land use...</span></span>
-<span>                </span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">npslu</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 11</span></span></span>
 <span><span class="co">#&gt;    Year Month source segment       basin lu    tn_load tp_load tss_load bod_load</span></span>
@@ -839,6 +839,53 @@ estimates.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>021     5 NPS    Boca Ciega B… 207-5 Barr… 3.52<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 2.84<span style="color: #949494;">e</span><span style="color: #BB0000;">-7</span> 0.000<span style="text-decoration: underline;">313</span>  4.12<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">2</span>021     6 NPS    Boca Ciega B… 207-5 Barr… 7.78<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 6.27<span style="color: #949494;">e</span><span style="color: #BB0000;">-7</span> 0.000<span style="text-decoration: underline;">690</span>  9.10<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: hy_load &lt;dbl&gt;</span></span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="removing-point-source-loads-from-gaged-nps-estimates">Removing point source loads from gaged NPS estimates<a class="anchor" aria-label="anchor" href="#removing-point-source-loads-from-gaged-nps-estimates"></a>
+</h4>
+<p>Because stream gauges measure total flow at a location, gaged NPS
+load estimates from <code><a href="../reference/anlz_nps.html">anlz_nps()</a></code> include any point source
+discharges upstream of the gauge. The <code><a href="../reference/anlz_nps_psremove.html">anlz_nps_psremove()</a></code>
+function subtracts the IPS and DPS loads occurring in gaged basins from
+the NPS totals so that point source contributions are not
+double-counted. Only point source loads in basins classified as “Gaged”
+in the <code>dbasing</code> lookup table are subtracted. Loads in
+ungaged basins are unaffected.</p>
+<p>The function requires pre-computed basin-level monthly loads from
+<code><a href="../reference/anlz_nps.html">anlz_nps()</a></code>, <code><a href="../reference/anlz_ips.html">anlz_ips()</a></code>, and
+<code><a href="../reference/anlz_dps.html">anlz_dps()</a></code>, all called with <code>summ = 'basin'</code> and
+<code>summtime = 'month'</code>. Nested basin identifiers (e.g.,
+02301000, 02301300) are reassigned to their parent basins (02301500,
+02304500) before summing, consistent with the handling already applied
+inside <code><a href="../reference/anlz_nps.html">anlz_nps()</a></code>.</p>
+<p>An optional AD/AP TN adjustment (<code>ad_ap = TRUE</code> by
+default) applies fixed monthly reductions from the 2007 RA allocation
+analysis to the segment-level NPS totals: Old Tampa Bay (−2.41
+tons/month), Hillsborough Bay (−4.31 tons/month), Middle Tampa Bay
+(−2.29 tons/month), Lower Tampa Bay (−0.36 tons/month), and Manatee
+River (−2.74 tons/month, representing the combined reduction for
+segments 55, 6, and 7). Only TN is adjusted. TP, TSS, BOD, and
+hydrologic loads are unchanged.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># pre-compute basin-level monthly loads for each source</span></span>
+<span><span class="va">ipsfls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span>,</span>
+<span>  pattern <span class="op">=</span> <span class="st">'ps_ind_'</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">dpsfls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span>,</span>
+<span>  pattern <span class="op">=</span> <span class="st">'ps_dom'</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">nps_basin</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps.html">anlz_nps</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'2021-01-01'</span>, <span class="st">'2023-12-31'</span><span class="op">)</span>, tbbase <span class="op">=</span> <span class="va">tbbase</span>,</span>
+<span>  rain <span class="op">=</span> <span class="va">rain</span>, vernafl <span class="op">=</span> <span class="va">vernafl</span>, allwq <span class="op">=</span> <span class="va">allwq</span>, allflo <span class="op">=</span> <span class="va">allflo</span>,</span>
+<span>  summ <span class="op">=</span> <span class="st">'basin'</span>, summtime <span class="op">=</span> <span class="st">'month'</span><span class="op">)</span></span>
+<span><span class="va">ips_basin</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_ips.html">anlz_ips</a></span><span class="op">(</span><span class="va">ipsfls</span>, summ <span class="op">=</span> <span class="st">'basin'</span>, summtime <span class="op">=</span> <span class="st">'month'</span><span class="op">)</span></span>
+<span><span class="va">dps_basin</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_dps.html">anlz_dps</a></span><span class="op">(</span><span class="va">dpsfls</span>, summ <span class="op">=</span> <span class="st">'basin'</span>, summtime <span class="op">=</span> <span class="st">'month'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># subtract gaged PS loads and apply AD/AP TN adjustment</span></span>
+<span><span class="va">nps_psremoved</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_nps_psremove.html">anlz_nps_psremove</a></span><span class="op">(</span><span class="va">nps_basin</span>, <span class="va">ips_basin</span>, <span class="va">dps_basin</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">nps_psremoved</span><span class="op">)</span></span></code></pre></div>
+<p>Results are returned at the segment/month level with the same column
+structure as <code><a href="../reference/anlz_ips.html">anlz_ips()</a></code> and <code><a href="../reference/anlz_dps.html">anlz_dps()</a></code>. Annual
+totals can be obtained by setting <code>summtime = 'year'</code>.</p>
 </div>
 </div>
 </div>

@@ -7,7 +7,7 @@ Calculate DPS reuse and end of pipe loads and summarize
 ``` r
 anlz_dps(
   fls,
-  summ = c("entity", "facility", "segment", "all"),
+  summ = c("entity", "facility", "basin", "segment", "all"),
   summtime = c("month", "year")
 )
 ```
@@ -41,6 +41,12 @@ to calculate DPS reuse and end of pipe for each facility and outfall.
 The data are summarized differently based on the `summ` and `summtime`
 arguments. All loading data are summed based on these arguments, e.g.,
 by bay segment (`summ = 'segment'`) and year (`summtime = 'year'`).
+Options for `summ` are `'entity'` to summarize by entity, `'facility'`
+to summarize by facility, `'basin'` to summarize by drainage basin
+(retains the `basin` column for use with
+[`anlz_nps_psremove`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps_psremove.md)),
+`'segment'` to summarize by bay segment, and `'all'` to summarize across
+all segments.
 
 ## See also
 

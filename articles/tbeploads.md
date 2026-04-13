@@ -854,12 +854,12 @@ Loads by land use type (using CLUCSID) can also be returned if
 `aslu = TRUE`. These results only apply to ungaged loading estimates.
 
 ``` r
-npslu <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain = rain, 
+npslu <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain = rain,
                 allwq = allwq, allflo = allflo, vernafl = vernafl, aslu = TRUE)
 #> Estimating ungaged NPS loads...
 #> Combining atmospheric data with ungaged NPS loads...
 #> Summarizing ungaged NPS loads by land use...
-                
+
 head(npslu)
 #> # A tibble: 6 × 11
 #>    Year Month source segment       basin lu    tn_load tp_load tss_load bod_load
@@ -872,3 +872,61 @@ head(npslu)
 #> 6  2021     6 NPS    Boca Ciega B… 207-5 Barr… 7.78e-5 6.27e-7 0.000690  9.10e-5
 #> # ℹ 1 more variable: hy_load <dbl>
 ```
+
+#### Removing point source loads from gaged NPS estimates
+
+Because stream gauges measure total flow at a location, gaged NPS load
+estimates from
+[`anlz_nps()`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps.md)
+include any point source discharges upstream of the gauge. The
+[`anlz_nps_psremove()`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps_psremove.md)
+function subtracts the IPS and DPS loads occurring in gaged basins from
+the NPS totals so that point source contributions are not
+double-counted. Only point source loads in basins classified as “Gaged”
+in the `dbasing` lookup table are subtracted. Loads in ungaged basins
+are unaffected.
+
+The function requires pre-computed basin-level monthly loads from
+[`anlz_nps()`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps.md),
+[`anlz_ips()`](https://tbep-tech.github.io/tbeploads/reference/anlz_ips.md),
+and
+[`anlz_dps()`](https://tbep-tech.github.io/tbeploads/reference/anlz_dps.md),
+all called with `summ = 'basin'` and `summtime = 'month'`. Nested basin
+identifiers (e.g., 02301000, 02301300) are reassigned to their parent
+basins (02301500, 02304500) before summing, consistent with the handling
+already applied inside
+[`anlz_nps()`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps.md).
+
+An optional AD/AP TN adjustment (`ad_ap = TRUE` by default) applies
+fixed monthly reductions from the 2007 RA allocation analysis to the
+segment-level NPS totals: Old Tampa Bay (−2.41 tons/month), Hillsborough
+Bay (−4.31 tons/month), Middle Tampa Bay (−2.29 tons/month), Lower Tampa
+Bay (−0.36 tons/month), and Manatee River (−2.74 tons/month,
+representing the combined reduction for segments 55, 6, and 7). Only TN
+is adjusted. TP, TSS, BOD, and hydrologic loads are unchanged.
+
+``` r
+# pre-compute basin-level monthly loads for each source
+ipsfls <- list.files(system.file('extdata/', package = 'tbeploads'),
+  pattern = 'ps_ind_', full.names = TRUE)
+dpsfls <- list.files(system.file('extdata/', package = 'tbeploads'),
+  pattern = 'ps_dom', full.names = TRUE)
+
+nps_basin <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase,
+  rain = rain, vernafl = vernafl, allwq = allwq, allflo = allflo,
+  summ = 'basin', summtime = 'month')
+ips_basin <- anlz_ips(ipsfls, summ = 'basin', summtime = 'month')
+dps_basin <- anlz_dps(dpsfls, summ = 'basin', summtime = 'month')
+
+# subtract gaged PS loads and apply AD/AP TN adjustment
+nps_psremoved <- anlz_nps_psremove(nps_basin, ips_basin, dps_basin)
+
+head(nps_psremoved)
+```
+
+Results are returned at the segment/month level with the same column
+structure as
+[`anlz_ips()`](https://tbep-tech.github.io/tbeploads/reference/anlz_ips.md)
+and
+[`anlz_dps()`](https://tbep-tech.github.io/tbeploads/reference/anlz_dps.md).
+Annual totals can be obtained by setting `summtime = 'year'`.

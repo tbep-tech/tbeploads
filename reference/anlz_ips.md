@@ -7,7 +7,7 @@ Calculate IPS loads and summarize
 ``` r
 anlz_ips(
   fls,
-  summ = c("entity", "facility", "segment", "all"),
+  summ = c("entity", "facility", "basin", "segment", "all"),
   summtime = c("month", "year")
 )
 ```
@@ -40,7 +40,13 @@ Input data files in `fls` are first processed by
 to calculate IPS loads for each facility and outfall. The data are
 summarized differently based on the `summ` and `summtime` arguments. All
 loading data are summed based on these arguments, e.g., by bay segment
-(`summ = 'segment'`) and year (`summtime = 'year'`).
+(`summ = 'segment'`) and year (`summtime = 'year'`). Options for `summ`
+are `'entity'` to summarize by entity, `'facility'` to summarize by
+facility, `'basin'` to summarize by drainage basin (retains the `basin`
+column for use with
+[`anlz_nps_psremove`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps_psremove.md)),
+`'segment'` to summarize by bay segment, and `'all'` to summarize across
+all segments.
 
 ## See also
 

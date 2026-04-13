@@ -53,6 +53,8 @@ Functions for analyzing data.
   : Calculate non-point source (NPS) loads for Tampa Bay
 - [`anlz_nps_gaged()`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps_gaged.md)
   : Calculate non-point source (NPS) loads for gaged basins
+- [`anlz_nps_psremove()`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps_psremove.md)
+  : Remove point source loads from non-point source load estimates
 - [`anlz_nps_ungaged()`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps_ungaged.md)
   : Estimated non-point source (NPS) ungaged loads
 
