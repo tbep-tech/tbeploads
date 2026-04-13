@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk -F'\\\\t' '$5 == \"0\" || $5 == 0' \"C:/proj/tbeploadsproc/data-raw/02_IPS/clean/ps_ind_mosaic_bartow_2224.txt\")",
+      "Bash(awk -F'\\\\t' '$5 == \"0\" || $5 == 0' \"C:/proj/tbeploadsproc/data-raw/02_IPS/clean/ps_ind_mosaic_newwales_2224.txt\")",
+      "Bash(Rscript:*)",
+      "Bash(C:/Program Files/R/R-4.4.2/bin/Rscript.exe:*)",
+      "Bash(where Rscript)",
+      "Read(//c/Program Files/R//**)",
+      "Bash(/c/Program Files/R/R-4.3.2/bin/Rscript.exe:*)",
+      "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::test\\(filter = 'util_ps_mosaic'\\)\")"
+    ]
+  }
+}
