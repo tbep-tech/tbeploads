@@ -63,8 +63,12 @@ A permit number is added for each facility from FDEP permit records.
 }
 Mosaic Black Point (fka Yara), Mosaic Hookers Prairie, and Mosaic Riverview
 Stack Closure have no established fill values; TP, TSS, and BOD will be
-\code{NA} for those facilities (and for any Riverview or Four Corners outfall
-not listed above).
+\code{NA} for those facilities.
+
+Facilities with named outfall rules (Bonnie, Four Corners, Mulberry,
+Mulberry Phospho Stack, Riverview, and Tampa Marine Terminal) require that
+every outfall present in \code{dat} matches a known entry.  An error is returned
+for unrecognised outfalls.
 
 Note that this function may need to be updated if new data become available or if
 there are changes in the fill rules. The current fill values and rules are based on

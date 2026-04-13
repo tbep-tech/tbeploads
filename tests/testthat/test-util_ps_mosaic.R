@@ -22,10 +22,10 @@ nichols <- data.frame(
 )
 res_nichols <- util_ps_mosaic(nichols)
 
-# Mosaic Bonnie: per-outfall fills; D-003 uses check_flow = FALSE
+# Mosaic Bonnie: per-outfall fills; I-003 uses check_flow = FALSE
 bonnie <- data.frame(
   Facility.Name                  = rep('Mosaic Bonnie', 4),
-  Outfall.ID                     = c('D-005', 'D-006', 'D-003', 'D-003'),
+  Outfall.ID                     = c('D-005', 'D-006', 'I-003', 'I-003'),
   Year                           = rep(2022L, 4),
   Month                          = 1:4,
   Average.Daily.Flow..ADF...mgd. = c(0.19, 0.45, 0.81, 0),
@@ -83,11 +83,11 @@ test_that("Bartow: TP/TSS/BOD filled regardless of flow", {
   expect_equal(res_bartow$BOD[2],     9.6)
 })
 
-test_that("Bonnie D-003: TP/TSS/BOD filled even when flow = 0", {
-  d003_zero <- res_bonnie[res_bonnie$Outfall.ID == "D-003" & res_bonnie$Month == 4, ]
-  expect_equal(d003_zero$Total.P, 2.30)
-  expect_equal(d003_zero$TSS,     6.58)
-  expect_equal(d003_zero$BOD,     9.6)
+test_that("Bonnie I-003: TP/TSS/BOD filled even when flow = 0", {
+  i003_zero <- res_bonnie[res_bonnie$Outfall.ID == "I-003" & res_bonnie$Month == 4, ]
+  expect_equal(i003_zero$Total.P, 2.30)
+  expect_equal(i003_zero$TSS,     6.58)
+  expect_equal(i003_zero$BOD,     9.6)
 })
 
 # --- Fill logic: flow-dependent (check_flow = TRUE) --------------------------
@@ -166,4 +166,71 @@ test_that("Error when input contains more than one facility", {
     util_ps_mosaic(mixed),
     "dat must contain data from exactly one facility"
   )
+})
+
+# --- Unknown outfall validation -----------------------------------------------
+
+test_that("Error when named-outfall facility has an unrecognised outfall", {
+  # Bonnie has named outfall rules; D-999 is not listed
+  bonnie_bad <- data.frame(
+    Facility.Name                  = rep('Mosaic Bonnie', 2),
+    Outfall.ID                     = c('D-005', 'D-999'),
+    Year                           = rep(2022L, 2),
+    Month                          = 1:2,
+    Average.Daily.Flow..ADF...mgd. = c(0.19, 0.30),
+    Total.N                        = c(0.95, 1.10)
+  )
+  expect_error(
+    util_ps_mosaic(bonnie_bad),
+    "has outfall\\(s\\) with no named fill rule"
+  )
+  expect_error(
+    util_ps_mosaic(bonnie_bad),
+    "D-999"
+  )
+})
+
+test_that("Error message names the unrecognised outfall(s) and the known ones", {
+  riverview_bad <- data.frame(
+    Facility.Name                  = rep('Mosaic Riverview', 2),
+    Outfall.ID                     = c('D-005B', 'D-099'),
+    Year                           = rep(2022L, 2),
+    Month                          = 1:2,
+    Average.Daily.Flow..ADF...mgd. = c(1.0, 0.5),
+    Total.N                        = c(5.0, 4.0)
+  )
+  expect_error(
+    util_ps_mosaic(riverview_bad),
+    "D-099"
+  )
+  expect_error(
+    util_ps_mosaic(riverview_bad),
+    "Known outfalls"
+  )
+})
+
+test_that("Facility-wide facilities do not error on arbitrary outfall IDs", {
+  # Bartow uses a facility-wide rule; any outfall ID should be accepted
+  bartow_new_outfall <- data.frame(
+    Facility.Name                  = rep('Mosaic Bartow', 2),
+    Outfall.ID                     = c('D-001', 'D-NEW'),
+    Year                           = rep(2022L, 2),
+    Month                          = 1:2,
+    Average.Daily.Flow..ADF...mgd. = c(0.5, 0.3),
+    Total.N                        = c(2.0, 1.5)
+  )
+  expect_no_error(util_ps_mosaic(bartow_new_outfall))
+})
+
+test_that("No-fill facilities do not error on arbitrary outfall IDs", {
+  # Black Point has no fill rules at all; any outfall ID should be accepted
+  blackpt_new_outfall <- data.frame(
+    Facility.Name                  = rep('Mosaic Black Point (fka Yara)', 2),
+    Outfall.ID                     = c('I-002', 'EFF-002'),
+    Year                           = rep(2022L, 2),
+    Month                          = 1:2,
+    Average.Daily.Flow..ADF...mgd. = c(0.001, 0.002),
+    Total.N                        = c(7.7, 7.4)
+  )
+  expect_no_error(util_ps_mosaic(blackpt_new_outfall))
 })

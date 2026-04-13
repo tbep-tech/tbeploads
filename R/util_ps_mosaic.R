@@ -47,8 +47,12 @@
 #' }
 #' Mosaic Black Point (fka Yara), Mosaic Hookers Prairie, and Mosaic Riverview
 #' Stack Closure have no established fill values; TP, TSS, and BOD will be
-#' \code{NA} for those facilities (and for any Riverview or Four Corners outfall
-#' not listed above).
+#' \code{NA} for those facilities.
+#'
+#' Facilities with named outfall rules (Bonnie, Four Corners, Mulberry,
+#' Mulberry Phospho Stack, Riverview, and Tampa Marine Terminal) require that
+#' every outfall present in \code{dat} matches a known entry.  An error is returned
+#' for unrecognised outfalls.
 #'
 #' Note that this function may need to be updated if new data become available or if 
 #' there are changes in the fill rules. The current fill values and rules are based on 
@@ -132,7 +136,7 @@ util_ps_mosaic <- function(dat) {
       NA, NA, NA, NA,                              # facility-wide
       NA, NA, NA, NA, NA,                          # facility-wide
       'D-005', 'D-006', 'D-04A',                  # Bonnie
-      'D-007A', 'D-001', 'D-003',                 # Bonnie (D-003 always filled)
+      'D-07A', 'I-001', 'I-003',                 # Bonnie (D-003 always filled)
       'D-002',                                     # Mulberry
       'D-001F',                                    # Mulberry Phospho Stack
       'D-005B', 'D-021', 'D-025',                 # Riverview
@@ -188,6 +192,28 @@ util_ps_mosaic <- function(dat) {
   fac_wide <- fill_vals[is.na(fill_vals$Outfall.ID), ] |>
     dplyr::select(-Outfall.ID) |>
     dplyr::rename(tp_fw = tp, tss_fw = tss, bod_fw = bod, cf_fw = check_flow)
+
+  # For facilities that rely on named outfall rules (no facility-wide fallback),
+  # any outfall not listed in per_outfall is unhandled — error rather than silently returning NA.
+  facs_with_named_outfalls <- setdiff(
+    unique(per_outfall$Facility.Name),
+    unique(fac_wide$Facility.Name)
+  )
+  if (fac_nm %in% facs_with_named_outfalls) {
+    known_outfalls <- per_outfall$Outfall.ID[per_outfall$Facility.Name == fac_nm]
+    unknown_outfalls <- setdiff(unique(dat$Outfall.ID), known_outfalls)
+    if (length(unknown_outfalls) > 0) {
+      stop(
+        sprintf(
+          "Facility '%s' has outfall(s) with no named fill rule: %s\n  Known outfalls: %s",
+          fac_nm,
+          paste(unknown_outfalls, collapse = ', '),
+          paste(known_outfalls, collapse = ', ')
+        ),
+        call. = FALSE
+      )
+    }
+  }
 
   out <- dat |>
     dplyr::left_join(per_outfall, by = c('Facility.Name', 'Outfall.ID')) |>
