@@ -13,8 +13,8 @@
 #'
 #' \itemize{
 #'  \item LMANATEE: Lake Manatee flow for the Manatee River dam, from Manatee County Utilities, input flow is cfs (Manatee County contact is Amanda ShawverKarnitz, <amanda.shawverkarnitz@mymanatee.org>).
-#'  \item TBYPASS: Tampa Bypass Canal flow from Tampa Bay Water.  Input flow is MGD and is converted to cfs (Tampa Bay Water contact is Cathleen Jonas, <cjonas@tampabaywater.org>, device ID 957).
-#'  \item 02301500: Alafia River Bell Shoals flow data from SWFWMD WMIS Pumpage Reports for Permit 11794 (<https://www18.swfwmd.state.fl.us/search/search/searchwupsimple.aspx>) or optionally from Tampa Bay Water reported withdrawals for Site 4626 (Cathleen Jonas, <cjonas@tampabaywater.org>, device ID 4626).  Input flow from latter is daily average converted to cfs.
+#'  \item TBYPASS: Tampa Bypass Canal flow from Tampa Bay Water.  Input flow is MGD and is converted to cfs (Tampa Bay Water contact is Cathleen Jonas, <cjonas@tampabaywater.org>, device ID 957). Requests for this data should be bundled with requests for the Lithia and Buckhorn spring discharge data (device IDs 3381, 4586, 3388, and 3649) used in the springs workflow.
+#'  \item 02301500: Alafia River Bell Shoals flow data from SWFWMD WMIS Pumpage Reports for Permit 11794 (<https://www18.swfwmd.state.fl.us/search/search/searchwupsimple.aspx>) or optionally from Tampa Bay Water reported withdrawals for Site 4626 (Cathleen Jonas, <cjonas@tampabaywater.org>, device ID 4626, request should be bundled with device IDs 3381, 4586, 3388, and 3649 used in the springs workflow).  Input flow from latter is daily average converted to cfs.
 #' }
 #'
 #' System files are included in the package which can be updated annually.

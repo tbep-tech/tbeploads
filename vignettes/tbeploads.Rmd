@@ -327,7 +327,7 @@ The function requires pre-computed basin-level monthly loads from `anlz_nps()`, 
 
 An optional AD/AP TN adjustment (`ad_ap = TRUE` by default) applies fixed monthly reductions from the 2007 RA allocation analysis to the segment-level NPS totals: Old Tampa Bay (−2.41 tons/month), Hillsborough Bay (−4.31 tons/month), Middle Tampa Bay (−2.29 tons/month), Lower Tampa Bay (−0.36 tons/month), and Manatee River (−2.74 tons/month, representing the combined reduction for segments 55, 6, and 7).  Only TN is adjusted. TP, TSS, BOD, and hydrologic loads are unchanged.
 
-```{r eval = F}
+```{r eval = T}
 # pre-compute basin-level monthly loads for each source
 ipsfls <- list.files(system.file('extdata/', package = 'tbeploads'),
   pattern = 'ps_ind_', full.names = TRUE)
@@ -348,67 +348,67 @@ head(nps_psremoved)
 
 Results are returned at the segment/month level with the same column structure as `anlz_ips()` and `anlz_dps()`.  Annual totals can be obtained by setting `summtime = 'year'`.
 
-### Springs
+### SPR
 
-Spring loads to Tampa Bay are estimated for three major springs that all discharge to Hillsborough Bay (bay segment 2): Lithia Spring, Buckhorn Spring, and Sulphur Spring.  The `anlz_spr()` function is the single entry point for these calculations.
+Spring loads to Tampa Bay are estimated for three major springs that all discharge to Hillsborough Bay (bay segment 2): Lithia Springs, Buckhorn Springs, and Sulphur Springs.  The `anlz_spr()` function is used for these calculations.
 
 #### Input data
 
 Two input files are required, plus an optional pre-fetched flow object to avoid a USGS API call.
 
-**TBW discharge (Lithia and Buckhorn):** Daily flow records for Lithia and Buckhorn springs are collected by Tampa Bay Water (TBW) and provided as an Excel workbook with one sheet per device.  Four device IDs are used: 3381 (Lithia Minor), 4586 (Lithia Major), 3388 (Buckhorn Upper), and 3649 (Buckhorn Lower).  Lithia total flow is the sum of Minor and Major.  Buckhorn total flow is Lower minus Upper, because the two gauges bracket the same stream reach.  A copy of the 2022–2024 file is bundled with the package and located using `system.file()`:
+**Discharge (Lithia and Buckhorn):** Daily flow records for Lithia and Buckhorn springs are collected by Tampa Bay Water (TBW) and provided as an Excel workbook with one sheet per device.  Four device IDs are used: 3381 (Lithia Minor), 4586 (Lithia Major), 3388 (Buckhorn Upper), and 3649 (Buckhorn Lower).  Lithia total flow is the sum of Minor and Major.  Buckhorn total flow is Lower minus Upper, because the two gauges bracket the same stream reach.  A copy of the 2022–2024 file is included with the package and located using `system.file()`:
 
 ```{r}
 tbwxlpth <- system.file('extdata/sprflow2224.xlsx', package = 'tbeploads')
 ```
 
-**Spring water quality (TN and TP):** Sample concentrations (mg/L) for total nitrogen and total phosphorus are supplied as a CSV with one row per sample.  Annual means are computed per spring before joining to the monthly flow estimates.  If a year within the requested range has no water quality observations for a given spring, the grand mean across all available years is substituted.  The bundled 2022–2024 file is:
+**Spring water quality (TN and TP):** Sample concentrations (mg/L) for total nitrogen and total phosphorus are supplied as a CSV with one row per sample. These data are from FDEP's Impaired Waters Rule dataset available at <https://publicfiles.dep.state.fl.us/dear/iwr/>. Annual means are computed per spring before joining to the monthly flow estimates.  If a year within the requested range has no water quality observations for a given spring, the grand mean across all available years is substituted.  The example 2022–2024 file included with the package is:
 
 ```{r}
 wqpth <- system.file('extdata/sprwq2224.csv', package = 'tbeploads')
 ```
 
-**TSS concentrations:** Total suspended solids are not collected as part of routine spring monitoring.  Instead, fixed concentrations from the historical SAS-based loading model (SPRMOD2) are applied: 4.4 mg/L for Sulphur Spring and 4.0 mg/L for Lithia and Buckhorn.  These values reflect the most recently available period averages and are assigned internally — no additional input is required.
+**TSS concentrations:** Total suspended solids are not collected as part of routine spring monitoring.  Instead, fixed concentrations from the historical SAS-based loading model (SPRMOD2) are applied: 4.4 mg/L for Sulphur Springs and 4.0 mg/L for Lithia and Buckhorn.  These values reflect the most recently available period averages and are assigned internally.  These values may need to be updated in the future as new data become available.
 
-**Sulphur Spring discharge (USGS):** Daily discharge for USGS station 02306000 is retrieved from the NWIS API via `util_nps_getusgsflow()`.  A pre-fetched data frame can be passed to the `sulphurflow` argument to avoid a repeat API call.
+**Sulphur Spring discharge (USGS):** Daily discharge for USGS station 02306000 is retrieved from the NWIS API via `util_nps_getusgsflow()`.  A data frame can also be passed to the `sulphurflow` argument to avoid a repeat API call.
 
 #### Estimating spring loads
 
-Calling `anlz_spr()` with default arguments returns monthly loads at the per-spring level.  The discharge record is linearly interpolated to fill any gaps before monthly means are computed, since springs are assumed to have continuous (non-zero) flow.
+Calling `anlz_spr()` with default arguments returns monthly loads for each spring.  The discharge record is linearly interpolated to fill any gaps before monthly means are computed, since springs are assumed to have continuous (non-zero) flow.
 
-```{r eval = FALSE}
+```{r}
 spr <- anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024))
 
 head(spr)
 ```
 
-Load columns are in kg/month and `h2oload` is in m³/month.  `tss_mgl` reflects the fixed lookup values described above.
+Load columns are in kg/month and `h2oload` is in m³/month.  `tss_mgl` is the fixed lookup values described above.
 
-#### Spatial summarization
+#### Spatial summary
 
-The `summ` argument controls the level of spatial aggregation, matching the pattern of `anlz_nps()` and `anlz_dps()`.
+The `summ` argument controls the level of spatial aggregation.
 
 `summ = 'spring'` (default) returns one row per spring per time period with full detail including individual flow and concentration columns.
 
-`summ = 'basin'` sums loads within drainage basins.  Lithia and Buckhorn are both assigned to the **Alafia River** basin; Sulphur is assigned to the **Hillsborough River** basin.  The `spring`, `site`, `flow_cfs`, and concentration columns are dropped in favour of a `majbasin` column.
+`summ = 'basin'` sums loads within drainage basins.  Lithia and Buckhorn are both assigned to the Alafia River basin and Sulphur is assigned to the Hillsborough River basin as shown with the `majbasin` column.  The `spring`, `site`, `flow_cfs`, and concentration columns are dropped.
 
-```{r eval = FALSE}
+```{r}
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
          summ = 'basin', summtime = 'month')
 ```
 
-`summ = 'segment'` sums all three springs to the single bay segment (segment 2, Hillsborough Bay), returning the most compact output.
+`summ = 'segment'` sums all three springs to the single bay segment (segment 2, Hillsborough Bay).
 
-```{r eval = FALSE}
+```{r}
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
          summ = 'segment', summtime = 'month')
 ```
 
-#### Temporal summarization
+#### Temporal summary
 
 The `summtime` argument works across all three spatial levels.  Setting `summtime = 'year'` sums load columns over months.  At the spring level, `flow_cfs` is returned as the annual mean rather than a sum.
 
-```{r eval = FALSE}
+```{r}
 # Annual segment totals
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
          summ = 'segment', summtime = 'year')

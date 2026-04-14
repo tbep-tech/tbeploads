@@ -14,20 +14,17 @@ anlz_spr(
 )
 }
 \arguments{
-\item{tbwxlpth}{character string, file path to the TBW discharge Excel workbook
-(.xlsx) for Lithia and Buckhorn springs. The workbook must contain one sheet
+\item{tbwxlpth}{character string, file path to the Tampa Bay Water discharge Excel
+workbook (.xlsx) for Lithia and Buckhorn springs. The workbook must contain one sheet
 per device, named by device ID: 3381 (Lithia Minor), 4586 (Lithia Major),
 3388 (Buckhorn Upper), and 3649 (Buckhorn Lower). Each sheet must contain
 columns \code{DeviceID}, \code{MeasureDateTime}, \code{Value},
-\code{MeasureType}, and \code{Units}. A copy of the 2022--2024 file is
-bundled with the package as \code{sprflow2224.xlsx}.}
+\code{MeasureType}, and \code{Units}.}
 
 \item{wqpth}{character string, file path to spring water quality data (.csv).
-Expected to contain columns \code{spring}, \code{year}, \code{month},
+Must contain columns \code{spring}, \code{year}, \code{month},
 \code{tn(mg/L)}, and \code{tp(mg/L)} with one row per sample. Spring names
-must match \code{"Lithia"}, \code{"Buckhorn"}, and \code{"Sulphur"}.
-A copy of the 2022--2024 file is bundled with the package as
-\code{sprwq2224.csv}.}
+must match \code{"Lithia"}, \code{"Buckhorn"}, and \code{"Sulphur"}.}
 
 \item{yrrng}{integer vector of length 2, start and end year for the analysis,
 e.g. \code{c(2022, 2024)}.}
@@ -67,7 +64,7 @@ Calculate spring loads to Hillsborough Bay
 Loads are calculated for Lithia, Buckhorn, and Sulphur springs, all of which
 discharge to Hillsborough Bay (bay segment 2).
 
-\strong{Discharge data (TBW -- Lithia and Buckhorn):}
+\strong{Discharge data (Lithia and Buckhorn):}
 The Excel workbook supplied in \code{tbwxlpth} contains one sheet per device.
 Device IDs map to sub-springs as follows: 3381 = Lithia Minor, 4586 = Lithia
 Major, 3388 = Buckhorn Upper, 3649 = Buckhorn Lower. Flow values in MGD are
@@ -76,10 +73,12 @@ Lithia total flow is the sum of Minor and Major. Buckhorn total flow is Lower
 minus Upper, because the two gauges bracket the spring input on the same
 stream reach.
 
-\strong{Discharge data (USGS -- Sulphur Spring):}
+Contact for gage data is Cathleen Jonas, \href{mailto:cjonas@tampabaywater.org}{cjonas@tampabaywater.org}. Device IDs 3381, 4586, 3388, and 3649 should be bundled with requests for Tampa Bypass Canal data (device ID 957) and Bell Shoals data (device ID 4626) used in the NPS workflow.
+
+\strong{Discharge data (Sulphur Springs):}
 Daily CFS values for station 02306000 are retrieved from the USGS NWIS API
 via \code{\link{util_nps_getusgsflow}}. A pre-fetched data frame can be
-supplied via the \code{sulphurflow} argument to avoid a repeat API call.
+supplied via the \code{sulphurflow} argument to avoid the API call.
 
 \strong{Interpolation:}
 Because springs are assumed never to have zero discharge, all gaps in the
@@ -89,14 +88,14 @@ trailing gaps are filled with the nearest observed value.
 
 \strong{Water quality data:}
 Sample concentrations (mg/L) for TN and TP are read from \code{wqpth}.
-Annual mean concentrations are computed per spring and joined to monthly
+These data are from FDEP's Impaired Waters Rule dataset available at \url{https://publicfiles.dep.state.fl.us/dear/iwr/}. Annual mean concentrations are computed per spring and joined to monthly
 flow estimates. If a year within \code{yrrng} has no WQ observations for a
 given spring, the grand mean across all available years is substituted.
 TSS concentrations are not collected as part of routine spring monitoring and
 are assigned from a fixed lookup table derived from the historical SAS-based
 loading model (SPRMOD2). The values used are the most recently available
-period averages: Sulphur Spring (02306000) = 4.4 mg/L, Buckhorn Spring
-(02301695) = 4.0 mg/L, Lithia Spring (02301600) = 4.0 mg/L.
+period averages: Sulphur Springs (02306000) = 4.4 mg/L, Buckhorn Springs
+(02301695) = 4.0 mg/L, Lithia Springs (02301600) = 4.0 mg/L.
 
 \strong{Load calculation:}
 Monthly mean flows (CFS) are computed from the complete daily discharge
@@ -104,11 +103,11 @@ series. Loads are then:
 \deqn{h2oload\,(m^3/month) = \overline{Q}_{cfs} \times 86400 \times \frac{365}{12} \times 28.32 \times 10^{-3}}
 \deqn{load\,(kg/month) = h2oload \times C_{mg/L} \times 10^{-3}}
 
-\strong{Spatial summarization:}
+\strong{Spatial summaries:}
 The data are summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed based on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}). For springs, valid options for \code{summ} are
 \code{'spring'} (one row per spring per time period), \code{'basin'} (loads
 summed within drainage basins: Lithia and Buckhorn combined into
-\code{"Alafia River"}; Sulphur into \code{"Hillsborough River"}), and
+\code{"Alafia River"}, Sulphur into \code{"Hillsborough River"}), and
 \code{'segment'} (all springs summed to bay segment 2, Hillsborough Bay).
 }
 \examples{
