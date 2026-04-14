@@ -54,22 +54,19 @@
 
 
 <dl><dt id="arg-tbwxlpth">tbwxlpth<a class="anchor" aria-label="anchor" href="#arg-tbwxlpth"></a></dt>
-<dd><p>character string, file path to the TBW discharge Excel workbook
-(.xlsx) for Lithia and Buckhorn springs. The workbook must contain one sheet
+<dd><p>character string, file path to the Tampa Bay Water discharge Excel
+workbook (.xlsx) for Lithia and Buckhorn springs. The workbook must contain one sheet
 per device, named by device ID: 3381 (Lithia Minor), 4586 (Lithia Major),
 3388 (Buckhorn Upper), and 3649 (Buckhorn Lower). Each sheet must contain
 columns <code>DeviceID</code>, <code>MeasureDateTime</code>, <code>Value</code>,
-<code>MeasureType</code>, and <code>Units</code>. A copy of the 2022–2024 file is
-bundled with the package as <code>sprflow2224.xlsx</code>.</p></dd>
+<code>MeasureType</code>, and <code>Units</code>.</p></dd>
 
 
 <dt id="arg-wqpth">wqpth<a class="anchor" aria-label="anchor" href="#arg-wqpth"></a></dt>
 <dd><p>character string, file path to spring water quality data (.csv).
-Expected to contain columns <code>spring</code>, <code>year</code>, <code>month</code>,
+Must contain columns <code>spring</code>, <code>year</code>, <code>month</code>,
 <code>tn(mg/L)</code>, and <code>tp(mg/L)</code> with one row per sample. Spring names
-must match <code>"Lithia"</code>, <code>"Buckhorn"</code>, and <code>"Sulphur"</code>.
-A copy of the 2022–2024 file is bundled with the package as
-<code>sprwq2224.csv</code>.</p></dd>
+must match <code>"Lithia"</code>, <code>"Buckhorn"</code>, and <code>"Sulphur"</code>.</p></dd>
 
 
 <dt id="arg-yrrng">yrrng<a class="anchor" aria-label="anchor" href="#arg-yrrng"></a></dt>
@@ -113,7 +110,7 @@ months and <code>flow_cfs</code> (spring level only) is the annual mean.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Loads are calculated for Lithia, Buckhorn, and Sulphur springs, all of which
 discharge to Hillsborough Bay (bay segment 2).</p>
-<p><strong>Discharge data (TBW – Lithia and Buckhorn):</strong>
+<p><strong>Discharge data (Lithia and Buckhorn):</strong>
 The Excel workbook supplied in <code>tbwxlpth</code> contains one sheet per device.
 Device IDs map to sub-springs as follows: 3381 = Lithia Minor, 4586 = Lithia
 Major, 3388 = Buckhorn Upper, 3649 = Buckhorn Lower. Flow values in MGD are
@@ -121,10 +118,11 @@ converted to CFS (1 MGD = 1.547 CFS); values already in CFS are used as-is.
 Lithia total flow is the sum of Minor and Major. Buckhorn total flow is Lower
 minus Upper, because the two gauges bracket the spring input on the same
 stream reach.</p>
-<p><strong>Discharge data (USGS – Sulphur Spring):</strong>
+<p>Contact for gage data is Cathleen Jonas, <a href="mailto:cjonas@tampabaywater.org">cjonas@tampabaywater.org</a>. Device IDs 3381, 4586, 3388, and 3649 should be bundled with requests for Tampa Bypass Canal data (device ID 957) and Bell Shoals data (device ID 4626) used in the NPS workflow.</p>
+<p><strong>Discharge data (Sulphur Springs):</strong>
 Daily CFS values for station 02306000 are retrieved from the USGS NWIS API
 via <code><a href="util_nps_getusgsflow.html">util_nps_getusgsflow</a></code>. A pre-fetched data frame can be
-supplied via the <code>sulphurflow</code> argument to avoid a repeat API call.</p>
+supplied via the <code>sulphurflow</code> argument to avoid the API call.</p>
 <p><strong>Interpolation:</strong>
 Because springs are assumed never to have zero discharge, all gaps in the
 daily discharge record are filled by linear interpolation between observed
@@ -132,24 +130,24 @@ values (<code><a href="https://rdrr.io/pkg/zoo/man/na.approx.html" class="extern
 trailing gaps are filled with the nearest observed value.</p>
 <p><strong>Water quality data:</strong>
 Sample concentrations (mg/L) for TN and TP are read from <code>wqpth</code>.
-Annual mean concentrations are computed per spring and joined to monthly
+These data are from FDEP's Impaired Waters Rule dataset available at <a href="https://publicfiles.dep.state.fl.us/dear/iwr/" class="external-link">https://publicfiles.dep.state.fl.us/dear/iwr/</a>. Annual mean concentrations are computed per spring and joined to monthly
 flow estimates. If a year within <code>yrrng</code> has no WQ observations for a
 given spring, the grand mean across all available years is substituted.
 TSS concentrations are not collected as part of routine spring monitoring and
 are assigned from a fixed lookup table derived from the historical SAS-based
 loading model (SPRMOD2). The values used are the most recently available
-period averages: Sulphur Spring (02306000) = 4.4 mg/L, Buckhorn Spring
-(02301695) = 4.0 mg/L, Lithia Spring (02301600) = 4.0 mg/L.</p>
+period averages: Sulphur Springs (02306000) = 4.4 mg/L, Buckhorn Springs
+(02301695) = 4.0 mg/L, Lithia Springs (02301600) = 4.0 mg/L.</p>
 <p><strong>Load calculation:</strong>
 Monthly mean flows (CFS) are computed from the complete daily discharge
 series. Loads are then:
 $$h2oload\,(m^3/month) = \overline{Q}_{cfs} \times 86400 \times \frac{365}{12} \times 28.32 \times 10^{-3}$$
 $$load\,(kg/month) = h2oload \times C_{mg/L} \times 10^{-3}$$</p>
-<p><strong>Spatial summarization:</strong>
+<p><strong>Spatial summaries:</strong>
 The data are summarized differently based on the <code>summ</code> and <code>summtime</code> arguments.  All loading data are summed based on these arguments, e.g., by bay segment (<code>summ = 'segment'</code>) and year (<code>summtime = 'year'</code>). For springs, valid options for <code>summ</code> are
 <code>'spring'</code> (one row per spring per time period), <code>'basin'</code> (loads
 summed within drainage basins: Lithia and Buckhorn combined into
-<code>"Alafia River"</code>; Sulphur into <code>"Hillsborough River"</code>), and
+<code>"Alafia River"</code>, Sulphur into <code>"Hillsborough River"</code>), and
 <code>'segment'</code> (all springs summed to bay segment 2, Hillsborough Bay).</p>
     </div>
 

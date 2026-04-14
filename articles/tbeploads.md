@@ -915,6 +915,10 @@ dpsfls <- list.files(system.file('extdata/', package = 'tbeploads'),
 nps_basin <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase,
   rain = rain, vernafl = vernafl, allwq = allwq, allflo = allflo,
   summ = 'basin', summtime = 'month')
+#> Estimating ungaged NPS loads...
+#> Estimating gaged NPS loads...
+#> Combining atmospheric data with ungaged NPS loads...
+#> Combining ungaged and gaged NPS loads, estimating final...
 ips_basin <- anlz_ips(ipsfls, summ = 'basin', summtime = 'month')
 dps_basin <- anlz_dps(dpsfls, summ = 'basin', summtime = 'month')
 
@@ -922,6 +926,15 @@ dps_basin <- anlz_dps(dpsfls, summ = 'basin', summtime = 'month')
 nps_psremoved <- anlz_nps_psremove(nps_basin, ips_basin, dps_basin)
 
 head(nps_psremoved)
+#> # A tibble: 6 × 9
+#>    Year Month source segment        tn_load tp_load tss_load bod_load  hy_load
+#>   <dbl> <dbl> <chr>  <chr>            <dbl>   <dbl>    <dbl>    <dbl>    <dbl>
+#> 1  2021     1 NPS    Boca Ciega Bay    2.42   0.404     80.8    14.5  1219659.
+#> 2  2021     2 NPS    Boca Ciega Bay    1.65   0.276     55.3     9.94  833813.
+#> 3  2021     3 NPS    Boca Ciega Bay    1.37   0.228     45.6     8.21  688504.
+#> 4  2021     4 NPS    Boca Ciega Bay    1.58   0.263     52.6     9.46  793689.
+#> 5  2021     5 NPS    Boca Ciega Bay    1.21   0.200     40.1     7.20  604228.
+#> 6  2021     6 NPS    Boca Ciega Bay    2.64   0.441     88.4    15.9  1333510.
 ```
 
 Results are returned at the segment/month level with the same column
@@ -931,27 +944,27 @@ and
 [`anlz_dps()`](https://tbep-tech.github.io/tbeploads/reference/anlz_dps.md).
 Annual totals can be obtained by setting `summtime = 'year'`.
 
-### Springs
+### SPR
 
 Spring loads to Tampa Bay are estimated for three major springs that all
-discharge to Hillsborough Bay (bay segment 2): Lithia Spring, Buckhorn
-Spring, and Sulphur Spring. The
+discharge to Hillsborough Bay (bay segment 2): Lithia Springs, Buckhorn
+Springs, and Sulphur Springs. The
 [`anlz_spr()`](https://tbep-tech.github.io/tbeploads/reference/anlz_spr.md)
-function is the single entry point for these calculations.
+function is used for these calculations.
 
 #### Input data
 
 Two input files are required, plus an optional pre-fetched flow object
 to avoid a USGS API call.
 
-**TBW discharge (Lithia and Buckhorn):** Daily flow records for Lithia
-and Buckhorn springs are collected by Tampa Bay Water (TBW) and provided
-as an Excel workbook with one sheet per device. Four device IDs are
-used: 3381 (Lithia Minor), 4586 (Lithia Major), 3388 (Buckhorn Upper),
-and 3649 (Buckhorn Lower). Lithia total flow is the sum of Minor and
-Major. Buckhorn total flow is Lower minus Upper, because the two gauges
-bracket the same stream reach. A copy of the 2022–2024 file is bundled
-with the package and located using
+**Discharge (Lithia and Buckhorn):** Daily flow records for Lithia and
+Buckhorn springs are collected by Tampa Bay Water (TBW) and provided as
+an Excel workbook with one sheet per device. Four device IDs are used:
+3381 (Lithia Minor), 4586 (Lithia Major), 3388 (Buckhorn Upper), and
+3649 (Buckhorn Lower). Lithia total flow is the sum of Minor and Major.
+Buckhorn total flow is Lower minus Upper, because the two gauges bracket
+the same stream reach. A copy of the 2022–2024 file is included with the
+package and located using
 [`system.file()`](https://rdrr.io/r/base/system.file.html):
 
 ``` r
@@ -960,10 +973,13 @@ tbwxlpth <- system.file('extdata/sprflow2224.xlsx', package = 'tbeploads')
 
 **Spring water quality (TN and TP):** Sample concentrations (mg/L) for
 total nitrogen and total phosphorus are supplied as a CSV with one row
-per sample. Annual means are computed per spring before joining to the
-monthly flow estimates. If a year within the requested range has no
-water quality observations for a given spring, the grand mean across all
-available years is substituted. The bundled 2022–2024 file is:
+per sample. These data are from FDEP’s Impaired Waters Rule dataset
+available at <https://publicfiles.dep.state.fl.us/dear/iwr/>. Annual
+means are computed per spring before joining to the monthly flow
+estimates. If a year within the requested range has no water quality
+observations for a given spring, the grand mean across all available
+years is substituted. The example 2022–2024 file included with the
+package is:
 
 ``` r
 wqpth <- system.file('extdata/sprwq2224.csv', package = 'tbeploads')
@@ -972,22 +988,23 @@ wqpth <- system.file('extdata/sprwq2224.csv', package = 'tbeploads')
 **TSS concentrations:** Total suspended solids are not collected as part
 of routine spring monitoring. Instead, fixed concentrations from the
 historical SAS-based loading model (SPRMOD2) are applied: 4.4 mg/L for
-Sulphur Spring and 4.0 mg/L for Lithia and Buckhorn. These values
+Sulphur Springs and 4.0 mg/L for Lithia and Buckhorn. These values
 reflect the most recently available period averages and are assigned
-internally — no additional input is required.
+internally. These values may need to be updated in the future as new
+data become available.
 
 **Sulphur Spring discharge (USGS):** Daily discharge for USGS station
 02306000 is retrieved from the NWIS API via
 [`util_nps_getusgsflow()`](https://tbep-tech.github.io/tbeploads/reference/util_nps_getusgsflow.md).
-A pre-fetched data frame can be passed to the `sulphurflow` argument to
-avoid a repeat API call.
+A data frame can also be passed to the `sulphurflow` argument to avoid a
+repeat API call.
 
 #### Estimating spring loads
 
 Calling
 [`anlz_spr()`](https://tbep-tech.github.io/tbeploads/reference/anlz_spr.md)
-with default arguments returns monthly loads at the per-spring level.
-The discharge record is linearly interpolated to fill any gaps before
+with default arguments returns monthly loads for each spring. The
+discharge record is linearly interpolated to fill any gaps before
 monthly means are computed, since springs are assumed to have continuous
 (non-zero) flow.
 
@@ -995,41 +1012,75 @@ monthly means are computed, since springs are assumed to have continuous
 spr <- anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024))
 
 head(spr)
+#> # A tibble: 6 × 14
+#>   source spring site  segment    yr    mo flow_cfs tn_mgl tp_mgl tss_mgl h2oload
+#>   <chr>  <chr>  <chr>   <int> <dbl> <dbl>    <dbl>  <dbl>  <dbl>   <dbl>   <dbl>
+#> 1 SPRING Buckh… 0230…       2  2022     1     9.46   2.26 0.0478       4 703734.
+#> 2 SPRING Buckh… 0230…       2  2022     2    10.8    2.26 0.0478       4 807310.
+#> 3 SPRING Buckh… 0230…       2  2022     3    10.1    2.26 0.0478       4 750086.
+#> 4 SPRING Buckh… 0230…       2  2022     4     9.94   2.26 0.0478       4 739426.
+#> 5 SPRING Buckh… 0230…       2  2022     5     7.94   2.26 0.0478       4 590656.
+#> 6 SPRING Buckh… 0230…       2  2022     6     8.96   2.26 0.0478       4 666862.
+#> # ℹ 3 more variables: tnload <dbl>, tpload <dbl>, tssload <dbl>
 ```
 
-Load columns are in kg/month and `h2oload` is in m³/month. `tss_mgl`
-reflects the fixed lookup values described above.
+Load columns are in kg/month and `h2oload` is in m³/month. `tss_mgl` is
+the fixed lookup values described above.
 
-#### Spatial summarization
+#### Spatial summary
 
-The `summ` argument controls the level of spatial aggregation, matching
-the pattern of
-[`anlz_nps()`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps.md)
-and
-[`anlz_dps()`](https://tbep-tech.github.io/tbeploads/reference/anlz_dps.md).
+The `summ` argument controls the level of spatial aggregation.
 
 `summ = 'spring'` (default) returns one row per spring per time period
 with full detail including individual flow and concentration columns.
 
 `summ = 'basin'` sums loads within drainage basins. Lithia and Buckhorn
-are both assigned to the **Alafia River** basin; Sulphur is assigned to
-the **Hillsborough River** basin. The `spring`, `site`, `flow_cfs`, and
-concentration columns are dropped in favour of a `majbasin` column.
+are both assigned to the Alafia River basin and Sulphur is assigned to
+the Hillsborough River basin as shown with the `majbasin` column. The
+`spring`, `site`, `flow_cfs`, and concentration columns are dropped.
 
 ``` r
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
          summ = 'basin', summtime = 'month')
+#> # A tibble: 72 × 9
+#>    source majbasin     segment    yr    mo  h2oload tnload tpload tssload
+#>    <chr>  <chr>          <int> <dbl> <dbl>    <dbl>  <dbl>  <dbl>   <dbl>
+#>  1 SPRING Alafia River       2  2022     1 4348722.  9843.   270.  17395.
+#>  2 SPRING Alafia River       2  2022     2 4117853.  9319.   253.  16471.
+#>  3 SPRING Alafia River       2  2022     3 3510207.  7943.   215.  14041.
+#>  4 SPRING Alafia River       2  2022     4 3800054.  8600.   233.  15200.
+#>  5 SPRING Alafia River       2  2022     5 3359796.  7604.   208.  13439.
+#>  6 SPRING Alafia River       2  2022     6 3778029.  8551.   233.  15112.
+#>  7 SPRING Alafia River       2  2022     7 4162945.  9422.   258.  16652.
+#>  8 SPRING Alafia River       2  2022     8 4536881. 10268.   281.  18148.
+#>  9 SPRING Alafia River       2  2022     9 4687897. 10610.   290.  18752.
+#> 10 SPRING Alafia River       2  2022    10 4990195. 11293.   306.  19961.
+#> # ℹ 62 more rows
 ```
 
 `summ = 'segment'` sums all three springs to the single bay segment
-(segment 2, Hillsborough Bay), returning the most compact output.
+(segment 2, Hillsborough Bay).
 
 ``` r
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
          summ = 'segment', summtime = 'month')
+#> # A tibble: 36 × 8
+#>    source segment    yr    mo  h2oload tnload tpload tssload
+#>    <chr>    <int> <dbl> <dbl>    <dbl>  <dbl>  <dbl>   <dbl>
+#>  1 SPRING       2  2022     1 5992578. 10138.   392.  24628.
+#>  2 SPRING       2  2022     2 4842061.  9449.   307.  19658.
+#>  3 SPRING       2  2022     3 3520026.  7945.   215.  14084.
+#>  4 SPRING       2  2022     4 5021268.  8819.   324.  20574.
+#>  5 SPRING       2  2022     5 3756722.  7675.   237.  15186.
+#>  6 SPRING       2  2022     6 4234204.  8633.   267.  17119.
+#>  7 SPRING       2  2022     7 5623595.  9685.   366.  23079.
+#>  8 SPRING       2  2022     8 6611417. 10641.   435.  27275.
+#>  9 SPRING       2  2022     9 7012684. 11028.   463.  28981.
+#> 10 SPRING       2  2022    10 7447179. 11734.   489.  30772.
+#> # ℹ 26 more rows
 ```
 
-#### Temporal summarization
+#### Temporal summary
 
 The `summtime` argument works across all three spatial levels. Setting
 `summtime = 'year'` sums load columns over months. At the spring level,
@@ -1039,4 +1090,10 @@ The `summtime` argument works across all three spatial levels. Setting
 # Annual segment totals
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
          summ = 'segment', summtime = 'year')
+#> # A tibble: 3 × 7
+#>   source segment    yr   h2oload  tnload tpload tssload
+#>   <chr>    <int> <dbl>     <dbl>   <dbl>  <dbl>   <dbl>
+#> 1 SPRING       2  2022 68958370. 120272.  4471. 282705.
+#> 2 SPRING       2  2023 61055062. 111931.  4735. 248700.
+#> 3 SPRING       2  2024 73396693. 122121.  5339. 301666.
 ```

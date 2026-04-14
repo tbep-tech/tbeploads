@@ -19,21 +19,19 @@ anlz_spr(
 
 - tbwxlpth:
 
-  character string, file path to the TBW discharge Excel workbook
-  (.xlsx) for Lithia and Buckhorn springs. The workbook must contain one
-  sheet per device, named by device ID: 3381 (Lithia Minor), 4586
-  (Lithia Major), 3388 (Buckhorn Upper), and 3649 (Buckhorn Lower). Each
-  sheet must contain columns `DeviceID`, `MeasureDateTime`, `Value`,
-  `MeasureType`, and `Units`. A copy of the 2022–2024 file is bundled
-  with the package as `sprflow2224.xlsx`.
+  character string, file path to the Tampa Bay Water discharge Excel
+  workbook (.xlsx) for Lithia and Buckhorn springs. The workbook must
+  contain one sheet per device, named by device ID: 3381 (Lithia Minor),
+  4586 (Lithia Major), 3388 (Buckhorn Upper), and 3649 (Buckhorn Lower).
+  Each sheet must contain columns `DeviceID`, `MeasureDateTime`,
+  `Value`, `MeasureType`, and `Units`.
 
 - wqpth:
 
-  character string, file path to spring water quality data (.csv).
-  Expected to contain columns `spring`, `year`, `month`, `tn(mg/L)`, and
-  `tp(mg/L)` with one row per sample. Spring names must match
-  `"Lithia"`, `"Buckhorn"`, and `"Sulphur"`. A copy of the 2022–2024
-  file is bundled with the package as `sprwq2224.csv`.
+  character string, file path to spring water quality data (.csv). Must
+  contain columns `spring`, `year`, `month`, `tn(mg/L)`, and `tp(mg/L)`
+  with one row per sample. Spring names must match `"Lithia"`,
+  `"Buckhorn"`, and `"Sulphur"`.
 
 - yrrng:
 
@@ -81,20 +79,25 @@ months and `flow_cfs` (spring level only) is the annual mean.
 Loads are calculated for Lithia, Buckhorn, and Sulphur springs, all of
 which discharge to Hillsborough Bay (bay segment 2).
 
-**Discharge data (TBW – Lithia and Buckhorn):** The Excel workbook
-supplied in `tbwxlpth` contains one sheet per device. Device IDs map to
-sub-springs as follows: 3381 = Lithia Minor, 4586 = Lithia Major, 3388 =
-Buckhorn Upper, 3649 = Buckhorn Lower. Flow values in MGD are converted
-to CFS (1 MGD = 1.547 CFS); values already in CFS are used as-is. Lithia
-total flow is the sum of Minor and Major. Buckhorn total flow is Lower
-minus Upper, because the two gauges bracket the spring input on the same
+**Discharge data (Lithia and Buckhorn):** The Excel workbook supplied in
+`tbwxlpth` contains one sheet per device. Device IDs map to sub-springs
+as follows: 3381 = Lithia Minor, 4586 = Lithia Major, 3388 = Buckhorn
+Upper, 3649 = Buckhorn Lower. Flow values in MGD are converted to CFS (1
+MGD = 1.547 CFS); values already in CFS are used as-is. Lithia total
+flow is the sum of Minor and Major. Buckhorn total flow is Lower minus
+Upper, because the two gauges bracket the spring input on the same
 stream reach.
 
-**Discharge data (USGS – Sulphur Spring):** Daily CFS values for station
+Contact for gage data is Cathleen Jonas, <cjonas@tampabaywater.org>.
+Device IDs 3381, 4586, 3388, and 3649 should be bundled with requests
+for Tampa Bypass Canal data (device ID 957) and Bell Shoals data (device
+ID 4626) used in the NPS workflow.
+
+**Discharge data (Sulphur Springs):** Daily CFS values for station
 02306000 are retrieved from the USGS NWIS API via
 [`util_nps_getusgsflow`](https://tbep-tech.github.io/tbeploads/reference/util_nps_getusgsflow.md).
 A pre-fetched data frame can be supplied via the `sulphurflow` argument
-to avoid a repeat API call.
+to avoid the API call.
 
 **Interpolation:** Because springs are assumed never to have zero
 discharge, all gaps in the daily discharge record are filled by linear
@@ -104,15 +107,17 @@ interpolation between observed values
 observed value.
 
 **Water quality data:** Sample concentrations (mg/L) for TN and TP are
-read from `wqpth`. Annual mean concentrations are computed per spring
-and joined to monthly flow estimates. If a year within `yrrng` has no WQ
-observations for a given spring, the grand mean across all available
-years is substituted. TSS concentrations are not collected as part of
-routine spring monitoring and are assigned from a fixed lookup table
-derived from the historical SAS-based loading model (SPRMOD2). The
-values used are the most recently available period averages: Sulphur
-Spring (02306000) = 4.4 mg/L, Buckhorn Spring (02301695) = 4.0 mg/L,
-Lithia Spring (02301600) = 4.0 mg/L.
+read from `wqpth`. These data are from FDEP's Impaired Waters Rule
+dataset available at <https://publicfiles.dep.state.fl.us/dear/iwr/>.
+Annual mean concentrations are computed per spring and joined to monthly
+flow estimates. If a year within `yrrng` has no WQ observations for a
+given spring, the grand mean across all available years is substituted.
+TSS concentrations are not collected as part of routine spring
+monitoring and are assigned from a fixed lookup table derived from the
+historical SAS-based loading model (SPRMOD2). The values used are the
+most recently available period averages: Sulphur Springs (02306000) =
+4.4 mg/L, Buckhorn Springs (02301695) = 4.0 mg/L, Lithia Springs
+(02301600) = 4.0 mg/L.
 
 **Load calculation:** Monthly mean flows (CFS) are computed from the
 complete daily discharge series. Loads are then:
@@ -120,13 +125,13 @@ complete daily discharge series. Loads are then:
 \frac{365}{12} \times 28.32 \times 10^{-3}\$\$ \$\$load\\(kg/month) =
 h2oload \times C\_{mg/L} \times 10^{-3}\$\$
 
-**Spatial summarization:** The data are summarized differently based on
-the `summ` and `summtime` arguments. All loading data are summed based
-on these arguments, e.g., by bay segment (`summ = 'segment'`) and year
+**Spatial summaries:** The data are summarized differently based on the
+`summ` and `summtime` arguments. All loading data are summed based on
+these arguments, e.g., by bay segment (`summ = 'segment'`) and year
 (`summtime = 'year'`). For springs, valid options for `summ` are
 `'spring'` (one row per spring per time period), `'basin'` (loads summed
 within drainage basins: Lithia and Buckhorn combined into
-`"Alafia River"`; Sulphur into `"Hillsborough River"`), and `'segment'`
+`"Alafia River"`, Sulphur into `"Hillsborough River"`), and `'segment'`
 (all springs summed to bay segment 2, Hillsborough Bay).
 
 ## Examples
