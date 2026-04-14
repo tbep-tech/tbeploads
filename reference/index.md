@@ -26,6 +26,8 @@ Functions for analyzing data.
   : Remove point source loads from non-point source load estimates
 - [`anlz_nps_ungaged()`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps_ungaged.md)
   : Estimated non-point source (NPS) ungaged loads
+- [`anlz_spr()`](https://tbep-tech.github.io/tbeploads/reference/anlz_spr.md)
+  : Calculate spring loads to Hillsborough Bay
 
 ## Internal datasets
 
