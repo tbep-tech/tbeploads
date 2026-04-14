@@ -888,6 +888,104 @@ structure as <code><a href="../reference/anlz_ips.html">anlz_ips()</a></code> an
 totals can be obtained by setting <code>summtime = 'year'</code>.</p>
 </div>
 </div>
+<div class="section level3">
+<h3 id="springs">Springs<a class="anchor" aria-label="anchor" href="#springs"></a>
+</h3>
+<p>Spring loads to Tampa Bay are estimated for three major springs that
+all discharge to Hillsborough Bay (bay segment 2): Lithia Spring,
+Buckhorn Spring, and Sulphur Spring. The <code><a href="../reference/anlz_spr.html">anlz_spr()</a></code>
+function is the single entry point for these calculations.</p>
+<div class="section level4">
+<h4 id="input-data">Input data<a class="anchor" aria-label="anchor" href="#input-data"></a>
+</h4>
+<p>Two input files are required, plus an optional pre-fetched flow
+object to avoid a USGS API call.</p>
+<p><strong>TBW discharge (Lithia and Buckhorn):</strong> Daily flow
+records for Lithia and Buckhorn springs are collected by Tampa Bay Water
+(TBW) and provided as an Excel workbook with one sheet per device. Four
+device IDs are used: 3381 (Lithia Minor), 4586 (Lithia Major), 3388
+(Buckhorn Upper), and 3649 (Buckhorn Lower). Lithia total flow is the
+sum of Minor and Major. Buckhorn total flow is Lower minus Upper,
+because the two gauges bracket the same stream reach. A copy of the
+2022–2024 file is bundled with the package and located using
+<code><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file()</a></code>:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">tbwxlpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/sprflow2224.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></code></pre></div>
+<p><strong>Spring water quality (TN and TP):</strong> Sample
+concentrations (mg/L) for total nitrogen and total phosphorus are
+supplied as a CSV with one row per sample. Annual means are computed per
+spring before joining to the monthly flow estimates. If a year within
+the requested range has no water quality observations for a given
+spring, the grand mean across all available years is substituted. The
+bundled 2022–2024 file is:</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">wqpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/sprwq2224.csv'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></code></pre></div>
+<p><strong>TSS concentrations:</strong> Total suspended solids are not
+collected as part of routine spring monitoring. Instead, fixed
+concentrations from the historical SAS-based loading model (SPRMOD2) are
+applied: 4.4 mg/L for Sulphur Spring and 4.0 mg/L for Lithia and
+Buckhorn. These values reflect the most recently available period
+averages and are assigned internally — no additional input is
+required.</p>
+<p><strong>Sulphur Spring discharge (USGS):</strong> Daily discharge for
+USGS station 02306000 is retrieved from the NWIS API via
+<code><a href="../reference/util_nps_getusgsflow.html">util_nps_getusgsflow()</a></code>. A pre-fetched data frame can be
+passed to the <code>sulphurflow</code> argument to avoid a repeat API
+call.</p>
+</div>
+<div class="section level4">
+<h4 id="estimating-spring-loads">Estimating spring loads<a class="anchor" aria-label="anchor" href="#estimating-spring-loads"></a>
+</h4>
+<p>Calling <code><a href="../reference/anlz_spr.html">anlz_spr()</a></code> with default arguments returns
+monthly loads at the per-spring level. The discharge record is linearly
+interpolated to fill any gaps before monthly means are computed, since
+springs are assumed to have continuous (non-zero) flow.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">spr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_spr.html">anlz_spr</a></span><span class="op">(</span>tbwxlpth <span class="op">=</span> <span class="va">tbwxlpth</span>, wqpth <span class="op">=</span> <span class="va">wqpth</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">spr</span><span class="op">)</span></span></code></pre></div>
+<p>Load columns are in kg/month and <code>h2oload</code> is in m³/month.
+<code>tss_mgl</code> reflects the fixed lookup values described
+above.</p>
+</div>
+<div class="section level4">
+<h4 id="spatial-summarization">Spatial summarization<a class="anchor" aria-label="anchor" href="#spatial-summarization"></a>
+</h4>
+<p>The <code>summ</code> argument controls the level of spatial
+aggregation, matching the pattern of <code><a href="../reference/anlz_nps.html">anlz_nps()</a></code> and
+<code><a href="../reference/anlz_dps.html">anlz_dps()</a></code>.</p>
+<p><code>summ = 'spring'</code> (default) returns one row per spring per
+time period with full detail including individual flow and concentration
+columns.</p>
+<p><code>summ = 'basin'</code> sums loads within drainage basins. Lithia
+and Buckhorn are both assigned to the <strong>Alafia River</strong>
+basin; Sulphur is assigned to the <strong>Hillsborough River</strong>
+basin. The <code>spring</code>, <code>site</code>,
+<code>flow_cfs</code>, and concentration columns are dropped in favour
+of a <code>majbasin</code> column.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/anlz_spr.html">anlz_spr</a></span><span class="op">(</span>tbwxlpth <span class="op">=</span> <span class="va">tbwxlpth</span>, wqpth <span class="op">=</span> <span class="va">wqpth</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>,</span>
+<span>         summ <span class="op">=</span> <span class="st">'basin'</span>, summtime <span class="op">=</span> <span class="st">'month'</span><span class="op">)</span></span></code></pre></div>
+<p><code>summ = 'segment'</code> sums all three springs to the single
+bay segment (segment 2, Hillsborough Bay), returning the most compact
+output.</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/anlz_spr.html">anlz_spr</a></span><span class="op">(</span>tbwxlpth <span class="op">=</span> <span class="va">tbwxlpth</span>, wqpth <span class="op">=</span> <span class="va">wqpth</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>,</span>
+<span>         summ <span class="op">=</span> <span class="st">'segment'</span>, summtime <span class="op">=</span> <span class="st">'month'</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="temporal-summarization">Temporal summarization<a class="anchor" aria-label="anchor" href="#temporal-summarization"></a>
+</h4>
+<p>The <code>summtime</code> argument works across all three spatial
+levels. Setting <code>summtime = 'year'</code> sums load columns over
+months. At the spring level, <code>flow_cfs</code> is returned as the
+annual mean rather than a sum.</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Annual segment totals</span></span>
+<span><span class="fu"><a href="../reference/anlz_spr.html">anlz_spr</a></span><span class="op">(</span>tbwxlpth <span class="op">=</span> <span class="va">tbwxlpth</span>, wqpth <span class="op">=</span> <span class="va">wqpth</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>,</span>
+<span>         summ <span class="op">=</span> <span class="st">'segment'</span>, summtime <span class="op">=</span> <span class="st">'year'</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
