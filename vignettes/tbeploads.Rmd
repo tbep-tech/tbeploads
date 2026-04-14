@@ -347,3 +347,69 @@ head(nps_psremoved)
 ```
 
 Results are returned at the segment/month level with the same column structure as `anlz_ips()` and `anlz_dps()`.  Annual totals can be obtained by setting `summtime = 'year'`.
+
+### Springs
+
+Spring loads to Tampa Bay are estimated for three major springs that all discharge to Hillsborough Bay (bay segment 2): Lithia Spring, Buckhorn Spring, and Sulphur Spring.  The `anlz_spr()` function is the single entry point for these calculations.
+
+#### Input data
+
+Two input files are required, plus an optional pre-fetched flow object to avoid a USGS API call.
+
+**TBW discharge (Lithia and Buckhorn):** Daily flow records for Lithia and Buckhorn springs are collected by Tampa Bay Water (TBW) and provided as an Excel workbook with one sheet per device.  Four device IDs are used: 3381 (Lithia Minor), 4586 (Lithia Major), 3388 (Buckhorn Upper), and 3649 (Buckhorn Lower).  Lithia total flow is the sum of Minor and Major.  Buckhorn total flow is Lower minus Upper, because the two gauges bracket the same stream reach.  A copy of the 2022–2024 file is bundled with the package and located using `system.file()`:
+
+```{r}
+tbwxlpth <- system.file('extdata/sprflow2224.xlsx', package = 'tbeploads')
+```
+
+**Spring water quality (TN and TP):** Sample concentrations (mg/L) for total nitrogen and total phosphorus are supplied as a CSV with one row per sample.  Annual means are computed per spring before joining to the monthly flow estimates.  If a year within the requested range has no water quality observations for a given spring, the grand mean across all available years is substituted.  The bundled 2022–2024 file is:
+
+```{r}
+wqpth <- system.file('extdata/sprwq2224.csv', package = 'tbeploads')
+```
+
+**TSS concentrations:** Total suspended solids are not collected as part of routine spring monitoring.  Instead, fixed concentrations from the historical SAS-based loading model (SPRMOD2) are applied: 4.4 mg/L for Sulphur Spring and 4.0 mg/L for Lithia and Buckhorn.  These values reflect the most recently available period averages and are assigned internally — no additional input is required.
+
+**Sulphur Spring discharge (USGS):** Daily discharge for USGS station 02306000 is retrieved from the NWIS API via `util_nps_getusgsflow()`.  A pre-fetched data frame can be passed to the `sulphurflow` argument to avoid a repeat API call.
+
+#### Estimating spring loads
+
+Calling `anlz_spr()` with default arguments returns monthly loads at the per-spring level.  The discharge record is linearly interpolated to fill any gaps before monthly means are computed, since springs are assumed to have continuous (non-zero) flow.
+
+```{r eval = FALSE}
+spr <- anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024))
+
+head(spr)
+```
+
+Load columns are in kg/month and `h2oload` is in m³/month.  `tss_mgl` reflects the fixed lookup values described above.
+
+#### Spatial summarization
+
+The `summ` argument controls the level of spatial aggregation, matching the pattern of `anlz_nps()` and `anlz_dps()`.
+
+`summ = 'spring'` (default) returns one row per spring per time period with full detail including individual flow and concentration columns.
+
+`summ = 'basin'` sums loads within drainage basins.  Lithia and Buckhorn are both assigned to the **Alafia River** basin; Sulphur is assigned to the **Hillsborough River** basin.  The `spring`, `site`, `flow_cfs`, and concentration columns are dropped in favour of a `majbasin` column.
+
+```{r eval = FALSE}
+anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
+         summ = 'basin', summtime = 'month')
+```
+
+`summ = 'segment'` sums all three springs to the single bay segment (segment 2, Hillsborough Bay), returning the most compact output.
+
+```{r eval = FALSE}
+anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
+         summ = 'segment', summtime = 'month')
+```
+
+#### Temporal summarization
+
+The `summtime` argument works across all three spatial levels.  Setting `summtime = 'year'` sums load columns over months.  At the spring level, `flow_cfs` is returned as the annual mean rather than a sum.
+
+```{r eval = FALSE}
+# Annual segment totals
+anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
+         summ = 'segment', summtime = 'year')
+```
