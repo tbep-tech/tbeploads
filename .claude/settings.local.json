@@ -20,7 +20,18 @@
       "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::test\\('C:/proj/tbeploads', filter = 'anlz_nps_psremove'\\)\")",
       "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::test\\('C:/proj/tbeploads'\\)\")",
       "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::document\\('C:/proj/tbeploads'\\)\")",
-      "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::load_all\\('C:/proj/tbeploads', quiet=TRUE\\); fls <- list.files\\(system.file\\('extdata/', package='tbeploads'\\), full.names=TRUE\\); psindfls <- fls[grepl\\('ps_ind_', fls\\)]; cat\\(names\\(anlz_ips\\(psindfls, summ='segment', summtime='month'\\)\\), sep='|'\\)\")"
+      "Bash(\"/c/Program Files/R/R-4.3.2/bin/Rscript.exe\" -e \"devtools::load_all\\('C:/proj/tbeploads', quiet=TRUE\\); fls <- list.files\\(system.file\\('extdata/', package='tbeploads'\\), full.names=TRUE\\); psindfls <- fls[grepl\\('ps_ind_', fls\\)]; cat\\(names\\(anlz_ips\\(psindfls, summ='segment', summtime='month'\\)\\), sep='|'\\)\")",
+      "Read(//mnt/**)",
+      "Bash(ls //t/)",
+      "Bash(cmd.exe /c \"dir T:\\\\05_TBNMC\\\\TB_LOADS\\\\2022_RA_DELIVERABLES\")",
+      "Bash(cmd.exe:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(\"C:/Program Files/R/R-4.4.3/bin/Rscript.exe\" -e \"library\\(readxl\\); cat\\(paste\\(excel_sheets\\('C:/Users/mbeck/Desktop/TBEP TBW Data Request_Through 2024.xlsx'\\), collapse='\\\\n'\\)\\)\")",
+      "Read(//c/Program Files/R/**)",
+      "Bash(/c/Program Files/R/R-4.5.1/bin/Rscript.exe:*)",
+      "Bash(/c/Program Files/R/R-4.4.2/bin/Rscript.exe:*)",
+      "Bash(python3:*)",
+      "Bash(\"/c/Program Files/R/R-4.4.2/bin/Rscript.exe\" --vanilla \"C:/proj/tbeploads/inspect_xlsx.R\")"
     ]
   }
 }
