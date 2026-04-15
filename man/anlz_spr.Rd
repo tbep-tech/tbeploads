@@ -6,11 +6,12 @@
 \usage{
 anlz_spr(
   tbwxlpth,
-  wqpth,
+  wqpth = NULL,
   yrrng = c(2022, 2024),
   summ = c("spring", "basin", "segment"),
   summtime = c("month", "year"),
-  sulphurflow = NULL
+  sulphurflow = NULL,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -21,10 +22,15 @@ per device, named by device ID: 3381 (Lithia Minor), 4586 (Lithia Major),
 columns \code{DeviceID}, \code{MeasureDateTime}, \code{Value},
 \code{MeasureType}, and \code{Units}.}
 
-\item{wqpth}{character string, file path to spring water quality data (.csv).
-Must contain columns \code{spring}, \code{year}, \code{month},
-\code{tn(mg/L)}, and \code{tp(mg/L)} with one row per sample. Spring names
-must match \code{"Lithia"}, \code{"Buckhorn"}, and \code{"Sulphur"}.}
+\item{wqpth}{character string or \code{NULL} (default). File path to spring water
+quality data (.csv). Must contain columns \code{spring}, \code{year},
+\code{month}, \code{tn(mg/L)}, and \code{tp(mg/L)} with one row per sample.
+Spring names must match \code{"Lithia"}, \code{"Buckhorn"}, and
+\code{"Sulphur"}. When \code{NULL}, water quality data are retrieved
+automatically from external APIs: Lithia and Buckhorn concentrations are
+fetched from the Water Atlas API (SWFWMD stations 17805 and 18276) and
+Sulphur Spring concentrations are fetched via
+\code{\link[tbeptools]{read_importepc}} (EPC station 174).}
 
 \item{yrrng}{integer vector of length 2, start and end year for the analysis,
 e.g. \code{c(2022, 2024)}.}
@@ -36,25 +42,29 @@ e.g. \code{c(2022, 2024)}.}
 \item{sulphurflow}{data frame of daily Sulphur Spring discharge already
 retrieved by \code{\link{util_nps_getusgsflow}}, or \code{NULL} (default)
 to fetch from the USGS API.}
+
+\item{verbose}{logical, if \code{TRUE} (default) progress messages are printed
+when water quality data are retrieved via API (\code{wqpth = NULL}).}
 }
 \value{
 A data frame whose structure depends on \code{summ}:
 \itemize{
 \item \code{'spring'}: one row per spring per time period, with columns
 \code{source}, \code{spring}, \code{site}, \code{segment}, \code{yr},
-\code{mo} (dropped for annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons),
-\code{tp_load} (tons), \code{tss_load} (tons).
+\code{mo} (dropped for annual), \code{flow_cfs}, \code{tn_mgl},
+\code{tp_mgl}, \code{tss_mgl}, \code{h2oload} (m3), \code{tnload} (kg),
+\code{tpload} (kg), \code{tssload} (kg).
 \item \code{'basin'}: one row per drainage basin per time period, with
 columns \code{source}, \code{majbasin}, \code{segment}, \code{yr},
-\code{mo} (dropped for annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons),
-\code{tp_load} (tons), \code{tss_load} (tons).
+\code{mo} (dropped for annual), \code{h2oload} (m3), \code{tnload} (kg),
+\code{tpload} (kg), \code{tssload} (kg).
 \item \code{'segment'}: one row per bay segment per time period, with
 columns \code{source}, \code{segment}, \code{yr}, \code{mo} (dropped for
-annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons), \code{tp_load} (tons),
-\code{tss_load} (tons).
+annual), \code{h2oload} (m3), \code{tnload} (kg), \code{tpload} (kg),
+\code{tssload} (kg).
 }
 For annual output (\code{summtime = 'year'}), load columns are summed over
-months.
+months and \code{flow_cfs} (spring level only) is the annual mean.
 }
 \description{
 Calculate spring loads to Hillsborough Bay
@@ -85,24 +95,40 @@ daily discharge record are filled by linear interpolation between observed
 values (\code{\link[zoo]{na.approx}} with \code{rule = 2}). Leading or
 trailing gaps are filled with the nearest observed value.
 
-\strong{Water quality data:}
-Sample concentrations (mg/L) for TN and TP are read from \code{wqpth}.
-These data are from FDEP's Impaired Waters Rule dataset available at \url{https://publicfiles.dep.state.fl.us/dear/iwr/}. Annual mean concentrations are computed per spring and joined to monthly
-flow estimates. If a year within \code{yrrng} has no WQ observations for a
-given spring, the grand mean across all available years is substituted.
-TSS concentrations are not collected as part of routine spring monitoring and
-are assigned from a fixed lookup table derived from the historical SAS-based
-loading model (SPRMOD2). The values used are the most recently available
-period averages: Sulphur Springs (02306000) = 4.4 mg/L, Buckhorn Springs
-(02301695) = 4.0 mg/L, Lithia Springs (02301600) = 4.0 mg/L.
+\strong{Water quality data (file path):}
+When \code{wqpth} is supplied, sample concentrations (mg/L) for TN and TP
+are read from the CSV. These data are from FDEP's Impaired Waters Rule
+dataset available at \url{https://publicfiles.dep.state.fl.us/dear/iwr/}.
+Annual mean concentrations are computed per spring and joined to monthly flow
+estimates. If a year within \code{yrrng} has no WQ observations for a given
+spring, the grand mean across all available years is substituted.
+
+\strong{Water quality data (API, \code{wqpth = NULL}):}
+When \code{wqpth} is \code{NULL}, water quality data are fetched
+automatically via \code{\link{util_spr_getwq}}. Lithia (SWFWMD station
+17805, Lithia Main Spring) and Buckhorn (SWFWMD station 18276, Buckhorn Main
+Spring) concentrations are retrieved from the
+\href{https://dev.api.wateratlas.org}{Water Atlas API}
+(\code{WIN_21FLSWFD} data source). These are the same quarterly SWFWMD
+observations that underlie the FDEP IWR file. Sulphur Spring (EPC station
+174) is retrieved via \code{\link[tbeptools]{read_importepc}}, providing
+monthly observations from the Environmental Protection Commission of
+Hillsborough County.
+
+\strong{TSS concentrations:}
+When \code{wqpth} is supplied, TSS concentrations are assigned from a fixed
+lookup table derived from the historical SAS-based loading model (SPRMOD2).
+When \code{wqpth = NULL}, TSS values from the API or EPC source are used
+where available; any spring-year with no observed TSS falls back to the same
+fixed values. The fixed values are: Sulphur Springs (02306000) = 4.4 mg/L,
+Buckhorn Springs (02301695) = 4.0 mg/L, Lithia Springs (02301600) = 4.0
+mg/L.
 
 \strong{Load calculation:}
 Monthly mean flows (CFS) are computed from the complete daily discharge
 series. Loads are then:
-\deqn{hy_load\,(m^3/month) = \overline{Q}_{cfs} \times 86400 \times \frac{365}{12} \times 28.32 \times 10^{-3}}
-\deqn{load\,(kg/month) = hy_load \times C_{mg/L} \times 10^{-3}}
-
-Note that \code{hy_load} is converted to 1e6 m3 in the output. Pollutant loads are converted from kg to tons.
+\deqn{h2oload\,(m^3/month) = \overline{Q}_{cfs} \times 86400 \times \frac{365}{12} \times 28.32 \times 10^{-3}}
+\deqn{load\,(kg/month) = h2oload \times C_{mg/L} \times 10^{-3}}
 
 \strong{Spatial summaries:}
 The data are summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed based on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}). For springs, valid options for \code{summ} are
@@ -115,7 +141,7 @@ summed within drainage basins: Lithia and Buckhorn combined into
 tbwxlpth <- system.file('extdata/sprflow2224.xlsx', package = 'tbeploads')
 wqpth    <- system.file('extdata/sprwq2224.csv',    package = 'tbeploads')
 
-# monthly per-spring loads (default)
+# monthly per-spring loads using a local water quality file
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024))
 
 # annual basin-level totals
@@ -125,4 +151,9 @@ anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
 # monthly segment-level totals
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
           summ = 'segment')
+
+\dontrun{
+# retrieve water quality from APIs automatically (no local file needed)
+anlz_spr(tbwxlpth = tbwxlpth, yrrng = c(2022, 2024))
+}
 }
