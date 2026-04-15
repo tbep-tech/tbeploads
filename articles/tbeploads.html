@@ -725,6 +725,11 @@ updated data are needed.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>       1 02306…  <span style="text-decoration: underline;">2</span>021     1       5  <span style="text-decoration: underline;">58</span>995.   96.6  15.8    <span style="text-decoration: underline;">5</span>542.   566.   371.</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>       1 02306…  <span style="text-decoration: underline;">2</span>021     1       7  <span style="text-decoration: underline;">27</span>446.   32.4   4.12    549.   225.   281.</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: bas_area &lt;dbl&gt;</span></span></span></code></pre></div>
+<p>A data frame is returned with columns for bay segment, basin, year,
+month, clucsid (land use code), hydrologic load in m3/month, TN load in
+kg/month, TP load in kg/month, TSS load in kg/month, BOD load in
+kg/month, area (hectares, basin/clucsid combination), and basin area
+(hectares).</p>
 </div>
 </div>
 <div class="section level4">
@@ -765,12 +770,12 @@ these files if updated data are needed.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 10</span></span></span>
 <span><span class="co">#&gt;    Year Month source segment     basin tn_load tp_load tss_load bod_load hy_load</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>021     1 NPS    Boca Ciega… 207-5    2.42   0.404     80.8    14.5   1.22<span style="color: #949494;">e</span>6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  <span style="text-decoration: underline;">2</span>021     2 NPS    Boca Ciega… 207-5    1.65   0.276     55.3     9.94  8.34<span style="color: #949494;">e</span>5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  <span style="text-decoration: underline;">2</span>021     3 NPS    Boca Ciega… 207-5    1.37   0.228     45.6     8.21  6.89<span style="color: #949494;">e</span>5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">2</span>021     4 NPS    Boca Ciega… 207-5    1.58   0.263     52.6     9.46  7.94<span style="color: #949494;">e</span>5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>021     5 NPS    Boca Ciega… 207-5    1.21   0.200     40.1     7.20  6.04<span style="color: #949494;">e</span>5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">2</span>021     6 NPS    Boca Ciega… 207-5    2.64   0.441     88.4    15.9   1.33<span style="color: #949494;">e</span>6</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>021     1 NPS    Boca Ciega… 207-5    2.42   0.404     80.8    14.5    1.22 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  <span style="text-decoration: underline;">2</span>021     2 NPS    Boca Ciega… 207-5    1.65   0.276     55.3     9.94   0.834</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  <span style="text-decoration: underline;">2</span>021     3 NPS    Boca Ciega… 207-5    1.37   0.228     45.6     8.21   0.689</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">2</span>021     4 NPS    Boca Ciega… 207-5    1.58   0.263     52.6     9.46   0.794</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>021     5 NPS    Boca Ciega… 207-5    1.21   0.200     40.1     7.20   0.604</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">2</span>021     6 NPS    Boca Ciega… 207-5    2.64   0.441     88.4    15.9    1.33</span></span></code></pre></div>
 <p>Unlike the individual gaged and ungaged functions,
 <code><a href="../reference/anlz_nps.html">anlz_nps()</a></code> returns loading results in tons per month or
 year depending on the summary arguments. Hydrologic load is returned as
@@ -839,6 +844,13 @@ estimates.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>021     5 NPS    Boca Ciega B… 207-5 Barr… 3.52<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 2.84<span style="color: #949494;">e</span><span style="color: #BB0000;">-7</span> 0.000<span style="text-decoration: underline;">313</span>  4.12<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">2</span>021     6 NPS    Boca Ciega B… 207-5 Barr… 7.78<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> 6.27<span style="color: #949494;">e</span><span style="color: #BB0000;">-7</span> 0.000<span style="text-decoration: underline;">690</span>  9.10<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: hy_load &lt;dbl&gt;</span></span></span></code></pre></div>
+<p>Note that results from <code><a href="../reference/anlz_nps.html">anlz_nps()</a></code> are returned in units
+of tons/month for TN, TP, TSS, and BOD and million cubic meters/month
+for hydrologic load if <code>summtime = 'month'</code> or tons/year for
+TN, TP, TSS, and BOD and million cubic meters/year for hydrologic load
+if <code>summtime = 'year'</code>. Results from the gaged and ungaged
+functions are returned in kg for TN, TP, TSS, and BOD and m3 for
+hydrologic load.</p>
 </div>
 <div class="section level4">
 <h4 id="removing-point-source-loads-from-gaged-nps-estimates">Removing point source loads from gaged NPS estimates<a class="anchor" aria-label="anchor" href="#removing-point-source-loads-from-gaged-nps-estimates"></a>
@@ -888,17 +900,19 @@ hydrologic loads are unchanged.</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">nps_psremoved</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 9</span></span></span>
-<span><span class="co">#&gt;    Year Month source segment        tn_load tp_load tss_load bod_load  hy_load</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>021     1 NPS    Boca Ciega Bay    2.42   0.404     80.8    14.5  1<span style="text-decoration: underline;">219</span>659.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  <span style="text-decoration: underline;">2</span>021     2 NPS    Boca Ciega Bay    1.65   0.276     55.3     9.94  <span style="text-decoration: underline;">833</span>813.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  <span style="text-decoration: underline;">2</span>021     3 NPS    Boca Ciega Bay    1.37   0.228     45.6     8.21  <span style="text-decoration: underline;">688</span>504.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">2</span>021     4 NPS    Boca Ciega Bay    1.58   0.263     52.6     9.46  <span style="text-decoration: underline;">793</span>689.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>021     5 NPS    Boca Ciega Bay    1.21   0.200     40.1     7.20  <span style="text-decoration: underline;">604</span>228.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">2</span>021     6 NPS    Boca Ciega Bay    2.64   0.441     88.4    15.9  1<span style="text-decoration: underline;">333</span>510.</span></span></code></pre></div>
+<span><span class="co">#&gt;    Year Month source segment        tn_load tp_load tss_load bod_load hy_load</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>021     1 NPS    Boca Ciega Bay    2.42   0.404     80.8    14.5    1.22 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  <span style="text-decoration: underline;">2</span>021     2 NPS    Boca Ciega Bay    1.65   0.276     55.3     9.94   0.834</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  <span style="text-decoration: underline;">2</span>021     3 NPS    Boca Ciega Bay    1.37   0.228     45.6     8.21   0.689</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">2</span>021     4 NPS    Boca Ciega Bay    1.58   0.263     52.6     9.46   0.794</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>021     5 NPS    Boca Ciega Bay    1.21   0.200     40.1     7.20   0.604</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">2</span>021     6 NPS    Boca Ciega Bay    2.64   0.441     88.4    15.9    1.33</span></span></code></pre></div>
 <p>Results are returned at the segment/month level with the same column
 structure as <code><a href="../reference/anlz_ips.html">anlz_ips()</a></code> and <code><a href="../reference/anlz_dps.html">anlz_dps()</a></code>. Annual
-totals can be obtained by setting <code>summtime = 'year'</code>.</p>
+totals can be obtained by setting <code>summtime = 'year'</code>. Load
+units are tons for TN, TP, TSS, and BOD and million cubic meters for
+hydrologic load.</p>
 </div>
 </div>
 <div class="section level3">

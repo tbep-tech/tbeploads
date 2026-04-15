@@ -758,6 +758,12 @@ head(nps_ungaged)
 #> # ℹ 1 more variable: bas_area <dbl>
 ```
 
+A data frame is returned with columns for bay segment, basin, year,
+month, clucsid (land use code), hydrologic load in m3/month, TN load in
+kg/month, TP load in kg/month, TSS load in kg/month, BOD load in
+kg/month, area (hectares, basin/clucsid combination), and basin area
+(hectares).
+
 #### Combined gaged and ungaged loads
 
 Refer to the prior sections for details on how the separate loads for
@@ -799,12 +805,12 @@ head(nps)
 #> # A tibble: 6 × 10
 #>    Year Month source segment     basin tn_load tp_load tss_load bod_load hy_load
 #>   <dbl> <dbl> <chr>  <chr>       <chr>   <dbl>   <dbl>    <dbl>    <dbl>   <dbl>
-#> 1  2021     1 NPS    Boca Ciega… 207-5    2.42   0.404     80.8    14.5   1.22e6
-#> 2  2021     2 NPS    Boca Ciega… 207-5    1.65   0.276     55.3     9.94  8.34e5
-#> 3  2021     3 NPS    Boca Ciega… 207-5    1.37   0.228     45.6     8.21  6.89e5
-#> 4  2021     4 NPS    Boca Ciega… 207-5    1.58   0.263     52.6     9.46  7.94e5
-#> 5  2021     5 NPS    Boca Ciega… 207-5    1.21   0.200     40.1     7.20  6.04e5
-#> 6  2021     6 NPS    Boca Ciega… 207-5    2.64   0.441     88.4    15.9   1.33e6
+#> 1  2021     1 NPS    Boca Ciega… 207-5    2.42   0.404     80.8    14.5    1.22 
+#> 2  2021     2 NPS    Boca Ciega… 207-5    1.65   0.276     55.3     9.94   0.834
+#> 3  2021     3 NPS    Boca Ciega… 207-5    1.37   0.228     45.6     8.21   0.689
+#> 4  2021     4 NPS    Boca Ciega… 207-5    1.58   0.263     52.6     9.46   0.794
+#> 5  2021     5 NPS    Boca Ciega… 207-5    1.21   0.200     40.1     7.20   0.604
+#> 6  2021     6 NPS    Boca Ciega… 207-5    2.64   0.441     88.4    15.9    1.33
 ```
 
 Unlike the individual gaged and ungaged functions,
@@ -873,6 +879,15 @@ head(npslu)
 #> # ℹ 1 more variable: hy_load <dbl>
 ```
 
+Note that results from
+[`anlz_nps()`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps.md)
+are returned in units of tons/month for TN, TP, TSS, and BOD and million
+cubic meters/month for hydrologic load if `summtime = 'month'` or
+tons/year for TN, TP, TSS, and BOD and million cubic meters/year for
+hydrologic load if `summtime = 'year'`. Results from the gaged and
+ungaged functions are returned in kg for TN, TP, TSS, and BOD and m3 for
+hydrologic load.
+
 #### Removing point source loads from gaged NPS estimates
 
 Because stream gauges measure total flow at a location, gaged NPS load
@@ -927,14 +942,14 @@ nps_psremoved <- anlz_nps_psremove(nps_basin, ips_basin, dps_basin)
 
 head(nps_psremoved)
 #> # A tibble: 6 × 9
-#>    Year Month source segment        tn_load tp_load tss_load bod_load  hy_load
-#>   <dbl> <dbl> <chr>  <chr>            <dbl>   <dbl>    <dbl>    <dbl>    <dbl>
-#> 1  2021     1 NPS    Boca Ciega Bay    2.42   0.404     80.8    14.5  1219659.
-#> 2  2021     2 NPS    Boca Ciega Bay    1.65   0.276     55.3     9.94  833813.
-#> 3  2021     3 NPS    Boca Ciega Bay    1.37   0.228     45.6     8.21  688504.
-#> 4  2021     4 NPS    Boca Ciega Bay    1.58   0.263     52.6     9.46  793689.
-#> 5  2021     5 NPS    Boca Ciega Bay    1.21   0.200     40.1     7.20  604228.
-#> 6  2021     6 NPS    Boca Ciega Bay    2.64   0.441     88.4    15.9  1333510.
+#>    Year Month source segment        tn_load tp_load tss_load bod_load hy_load
+#>   <dbl> <dbl> <chr>  <chr>            <dbl>   <dbl>    <dbl>    <dbl>   <dbl>
+#> 1  2021     1 NPS    Boca Ciega Bay    2.42   0.404     80.8    14.5    1.22 
+#> 2  2021     2 NPS    Boca Ciega Bay    1.65   0.276     55.3     9.94   0.834
+#> 3  2021     3 NPS    Boca Ciega Bay    1.37   0.228     45.6     8.21   0.689
+#> 4  2021     4 NPS    Boca Ciega Bay    1.58   0.263     52.6     9.46   0.794
+#> 5  2021     5 NPS    Boca Ciega Bay    1.21   0.200     40.1     7.20   0.604
+#> 6  2021     6 NPS    Boca Ciega Bay    2.64   0.441     88.4    15.9    1.33
 ```
 
 Results are returned at the segment/month level with the same column
@@ -942,7 +957,9 @@ structure as
 [`anlz_ips()`](https://tbep-tech.github.io/tbeploads/reference/anlz_ips.md)
 and
 [`anlz_dps()`](https://tbep-tech.github.io/tbeploads/reference/anlz_dps.md).
-Annual totals can be obtained by setting `summtime = 'year'`.
+Annual totals can be obtained by setting `summtime = 'year'`. Load units
+are tons for TN, TP, TSS, and BOD and million cubic meters for
+hydrologic load.
 
 ### SPR
 
