@@ -28,7 +28,7 @@ Buckhorn, and Sulphur springs from two external sources.
 Management District (SWFWMD) monitoring stations 17805 (Lithia Main Spring)
 and 18276 (Buckhorn Main Spring) from the \code{WIN_21FLSWFD} data source.
 This is the same underlying dataset as FDEP's Impaired Waters Rule file but
-accessed directly via API. TSS is not routinely measured at these spring-head
+accessed directly via API. TSS is not routinely measured at these
 stations and will typically be \code{NA}, in which case \code{\link{anlz_spr}}
 substitutes fixed historical values.
 

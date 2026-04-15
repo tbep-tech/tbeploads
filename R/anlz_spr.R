@@ -11,17 +11,16 @@
 #'   \code{month}, \code{tn(mg/L)}, and \code{tp(mg/L)} with one row per sample.
 #'   Spring names must match \code{"Lithia"}, \code{"Buckhorn"}, and
 #'   \code{"Sulphur"}. When \code{NULL}, water quality data are retrieved
-#'   automatically from external APIs: Lithia and Buckhorn concentrations are
-#'   fetched from the Water Atlas API (SWFWMD stations 17805 and 18276) and
-#'   Sulphur Spring concentrations are fetched via
+#'   automatically from external APIs. Lithia and Buckhorn concentrations are
+#'   obtained from the Water Atlas API (SWFWMD stations 17805 and 18276) and
+#'   Sulphur Spring concentrations are obtained via
 #'   \code{\link[tbeptools]{read_importepc}} (EPC station 174).
 #' @param yrrng integer vector of length 2, start and end year for the analysis,
 #'   e.g. \code{c(2022, 2024)}.
 #' @param summ `r summ_params('summ')`
 #' @param summtime `r summ_params('summtime')`
-#' @param sulphurflow data frame of daily Sulphur Spring discharge already
-#'   retrieved by \code{\link{util_nps_getusgsflow}}, or \code{NULL} (default)
-#'   to fetch from the USGS API.
+#' @param sulphurflow data frame of daily Sulphur Spring discharge or \code{NULL} (default)
+#'   to obtain from the USGS API.
 #' @param verbose logical, if \code{TRUE} (default) progress messages are printed
 #'   when water quality data are retrieved via API (\code{wqpth = NULL}).
 #'
@@ -42,8 +41,8 @@
 #'
 #' \strong{Discharge data (Sulphur Springs):}
 #' Daily CFS values for station 02306000 are retrieved from the USGS NWIS API
-#' via \code{\link{util_nps_getusgsflow}}. A pre-fetched data frame can be
-#' supplied via the \code{sulphurflow} argument to avoid the API call.
+#' via \code{\link{util_nps_getusgsflow}}. A data frame can also be
+#' supplied via the \code{sulphurflow} argument.
 #'
 #' \strong{Interpolation:}
 #' Because springs are assumed never to have zero discharge, all gaps in the
@@ -56,17 +55,17 @@
 #' are read from the CSV. These data are from FDEP's Impaired Waters Rule
 #' dataset available at \url{https://publicfiles.dep.state.fl.us/dear/iwr/}.
 #' Annual mean concentrations are computed per spring and joined to monthly flow
-#' estimates. If a year within \code{yrrng} has no WQ observations for a given
+#' estimates. If a year within \code{yrrng} has no water quality observations for a given
 #' spring, the grand mean across all available years is substituted.
 #'
 #' \strong{Water quality data (API, \code{wqpth = NULL}):}
-#' When \code{wqpth} is \code{NULL}, water quality data are fetched
-#' automatically via \code{\link{util_spr_getwq}}. Lithia (SWFWMD station
+#' When \code{wqpth} is \code{NULL}, water quality data are obtained using 
+#' \code{\link{util_spr_getwq}}. Lithia (SWFWMD station
 #' 17805, Lithia Main Spring) and Buckhorn (SWFWMD station 18276, Buckhorn Main
 #' Spring) concentrations are retrieved from the
 #' \href{https://dev.api.wateratlas.org}{Water Atlas API}
-#' (\code{WIN_21FLSWFD} data source). These are the same quarterly SWFWMD
-#' observations that underlie the FDEP IWR file. Sulphur Spring (EPC station
+#' (\code{WIN_21FLSWFD} data source). These are probably the same quarterly SWFWMD
+#' observations included in the FDEP IWR file. Sulphur Spring (EPC station
 #' 174) is retrieved via \code{\link[tbeptools]{read_importepc}}, providing
 #' monthly observations from the Environmental Protection Commission of
 #' Hillsborough County.
@@ -75,7 +74,7 @@
 #' When \code{wqpth} is supplied, TSS concentrations are assigned from a fixed
 #' lookup table derived from the historical SAS-based loading model (SPRMOD2).
 #' When \code{wqpth = NULL}, TSS values from the API or EPC source are used
-#' where available; any spring-year with no observed TSS falls back to the same
+#' where available. Any spring-year with no observed TSS falls back to the same
 #' fixed values. The fixed values are: Sulphur Springs (02306000) = 4.4 mg/L,
 #' Buckhorn Springs (02301695) = 4.0 mg/L, Lithia Springs (02301600) = 4.0
 #' mg/L.
@@ -83,13 +82,15 @@
 #' \strong{Load calculation:}
 #' Monthly mean flows (CFS) are computed from the complete daily discharge
 #' series. Loads are then:
-#' \deqn{h2oload\,(m^3/month) = \overline{Q}_{cfs} \times 86400 \times \frac{365}{12} \times 28.32 \times 10^{-3}}
-#' \deqn{load\,(kg/month) = h2oload \times C_{mg/L} \times 10^{-3}}
+#' \deqn{hy_load\,(m^3/month) = \overline{Q}_{cfs} \times 86400 \times \frac{365}{12} \times 28.32 \times 10^{-3}}
+#' \deqn{load\,(tons/month) = hy_load \times C_{mg/L} \times 10^{-3} / 907.1847}
 #'
+#' \code{hy_load} is converted to million m3 in the final output.
+#' 
 #' \strong{Spatial summaries:}
 #' `r summ_params('descrip')` For springs, valid options for \code{summ} are
 #' \code{'spring'} (one row per spring per time period), \code{'basin'} (loads
-#' summed within drainage basins: Lithia and Buckhorn combined into
+#' summed within drainage basins. Lithia and Buckhorn combined into
 #' \code{"Alafia River"}, Sulphur into \code{"Hillsborough River"}), and
 #' \code{'segment'} (all springs summed to bay segment 2, Hillsborough Bay).
 #'
@@ -97,20 +98,19 @@
 #' \itemize{
 #'   \item \code{'spring'}: one row per spring per time period, with columns
 #'     \code{source}, \code{spring}, \code{site}, \code{segment}, \code{yr},
-#'     \code{mo} (dropped for annual), \code{flow_cfs}, \code{tn_mgl},
-#'     \code{tp_mgl}, \code{tss_mgl}, \code{h2oload} (m3), \code{tnload} (kg),
-#'     \code{tpload} (kg), \code{tssload} (kg).
+#'     \code{mo} (dropped for annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons), 
+#'     \code{tp_load} (tons), and \code{tss_load} (tons).
 #'   \item \code{'basin'}: one row per drainage basin per time period, with
 #'     columns \code{source}, \code{majbasin}, \code{segment}, \code{yr},
-#'     \code{mo} (dropped for annual), \code{h2oload} (m3), \code{tnload} (kg),
-#'     \code{tpload} (kg), \code{tssload} (kg).
+#'     \code{mo} (dropped for annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons),
+#'     \code{tp_load} (tons), \code{tss_load} (tons).
 #'   \item \code{'segment'}: one row per bay segment per time period, with
 #'     columns \code{source}, \code{segment}, \code{yr}, \code{mo} (dropped for
-#'     annual), \code{h2oload} (m3), \code{tnload} (kg), \code{tpload} (kg),
-#'     \code{tssload} (kg).
+#'     annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons), \code{tp_load} (tons),
+#'     \code{tss_load} (tons).
 #' }
 #' For annual output (\code{summtime = 'year'}), load columns are summed over
-#' months and \code{flow_cfs} (spring level only) is the annual mean.
+#' months.
 #'
 #' @export
 #'
@@ -304,8 +304,9 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
   # ---------------------------------------------------------------------------
   # 7. Join flow and WQ; assign TSS; calculate loads
   #
-  # h2oload (m3/month) = mean_cfs * 86400 s/d * (365/12) d/mo * 28.32 L/ft3 * 1e-3 m3/L
-  # pollutant load (kg/month) = h2oload (m3) * C (mg/L) * 1e-3
+  # hy_load (m3/month) = mean_cfs * 86400 s/d * (365/12) d/mo * 28.32 L/ft3 * 1e-3 m3/L
+  # pollutant load (ton/month) = hy_load (m3) * C (mg/L) * 1e-3 / 907.1847 (kg/ton) to convert to tons
+  # hy_load is converted to million m3 in the final output
   #
   # TSS: use observed value from wq_filled where available (API path); fall back
   # to fixed site-level constant when NA or NaN (both paths).
@@ -320,14 +321,14 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
       ),
       segment = 2L,
       source  = "SPRING",
-      h2oload = flow_cfs * 86400 * (365 / 12) * 28.32 * 1e-3,
-      tnload  = h2oload * tn_mgl  * 1e-3,
-      tpload  = h2oload * tp_mgl  * 1e-3,
-      tssload = h2oload * tss_mgl * 1e-3
+      hy_load = flow_cfs * 86400 * (365 / 12) * 28.32 * 1e-3,
+      tn_load  = hy_load * tn_mgl  * 1e-3 / 907.1847,  # convert kg to tons
+      tp_load  = hy_load * tp_mgl  * 1e-3 / 907.1847,  # convert kg to tons
+      tss_load = hy_load * tss_mgl * 1e-3 / 907.1847   # convert kg to tons
     ) |>
     dplyr::select(source, spring, site, segment, yr, mo,
-                  flow_cfs, tn_mgl, tp_mgl, tss_mgl,
-                  h2oload, tnload, tpload, tssload)
+                  hy_load, tn_load, tp_load, tss_load) |>
+    dplyr::mutate(hy_load = hy_load / 1e6)  # convert to million m3
 
   # ---------------------------------------------------------------------------
   # 8. Spatial summarization (summ)
@@ -338,10 +339,10 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
       dplyr::left_join(basin_lookup, by = "spring") |>
       dplyr::group_by(source, majbasin, segment, yr, mo) |>
       dplyr::summarise(
-        h2oload = sum(h2oload, na.rm = TRUE),
-        tnload  = sum(tnload,  na.rm = TRUE),
-        tpload  = sum(tpload,  na.rm = TRUE),
-        tssload = sum(tssload, na.rm = TRUE),
+        hy_load = sum(hy_load, na.rm = TRUE),
+        tn_load  = sum(tn_load,  na.rm = TRUE),
+        tp_load  = sum(tp_load,  na.rm = TRUE),
+        tss_load = sum(tss_load, na.rm = TRUE),
         .groups = "drop"
       )
 
@@ -350,10 +351,10 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
     out <- out |>
       dplyr::group_by(source, segment, yr, mo) |>
       dplyr::summarise(
-        h2oload = sum(h2oload, na.rm = TRUE),
-        tnload  = sum(tnload,  na.rm = TRUE),
-        tpload  = sum(tpload,  na.rm = TRUE),
-        tssload = sum(tssload, na.rm = TRUE),
+        hy_load = sum(hy_load, na.rm = TRUE),
+        tn_load  = sum(tn_load,  na.rm = TRUE),
+        tp_load  = sum(tp_load,  na.rm = TRUE),
+        tss_load = sum(tss_load, na.rm = TRUE),
         .groups = "drop"
       )
 
@@ -369,14 +370,10 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
       out <- out |>
         dplyr::group_by(source, spring, site, segment, yr) |>
         dplyr::summarise(
-          flow_cfs = mean(flow_cfs, na.rm = TRUE),
-          tn_mgl   = mean(tn_mgl,   na.rm = TRUE),
-          tp_mgl   = mean(tp_mgl,   na.rm = TRUE),
-          tss_mgl  = mean(tss_mgl,  na.rm = TRUE),
-          h2oload  = sum(h2oload,   na.rm = TRUE),
-          tnload   = sum(tnload,    na.rm = TRUE),
-          tpload   = sum(tpload,    na.rm = TRUE),
-          tssload  = sum(tssload,   na.rm = TRUE),
+          hy_load  = sum(hy_load,   na.rm = TRUE),
+          tn_load   = sum(tn_load,    na.rm = TRUE),
+          tp_load   = sum(tp_load,    na.rm = TRUE),
+          tss_load  = sum(tss_load,   na.rm = TRUE),
           .groups  = "drop"
         ) |>
         dplyr::arrange(spring, yr)
@@ -386,10 +383,10 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
       out <- out |>
         dplyr::group_by(source, majbasin, segment, yr) |>
         dplyr::summarise(
-          h2oload = sum(h2oload, na.rm = TRUE),
-          tnload  = sum(tnload,  na.rm = TRUE),
-          tpload  = sum(tpload,  na.rm = TRUE),
-          tssload = sum(tssload, na.rm = TRUE),
+          hy_load = sum(hy_load, na.rm = TRUE),
+          tn_load  = sum(tn_load,  na.rm = TRUE),
+          tp_load  = sum(tp_load,  na.rm = TRUE),
+          tss_load = sum(tss_load, na.rm = TRUE),
           .groups = "drop"
         ) |>
         dplyr::arrange(majbasin, yr)
@@ -399,10 +396,10 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
       out <- out |>
         dplyr::group_by(source, segment, yr) |>
         dplyr::summarise(
-          h2oload = sum(h2oload, na.rm = TRUE),
-          tnload  = sum(tnload,  na.rm = TRUE),
-          tpload  = sum(tpload,  na.rm = TRUE),
-          tssload = sum(tssload, na.rm = TRUE),
+          hy_load = sum(hy_load, na.rm = TRUE),
+          tn_load  = sum(tn_load,  na.rm = TRUE),
+          tp_load  = sum(tp_load,  na.rm = TRUE),
+          tss_load = sum(tss_load, na.rm = TRUE),
           .groups = "drop"
         ) |>
         dplyr::arrange(yr)

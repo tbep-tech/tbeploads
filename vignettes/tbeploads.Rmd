@@ -362,18 +362,18 @@ One required input file (TBW discharge workbook) is needed, plus optional argume
 tbwxlpth <- system.file('extdata/sprflow2224.xlsx', package = 'tbeploads')
 ```
 
-**Spring water quality (TN and TP) — local file:** Sample concentrations (mg/L) for total nitrogen and total phosphorus can be supplied as a CSV with one row per sample via the `wqpth` argument. These data are from FDEP's Impaired Waters Rule dataset available at <https://publicfiles.dep.state.fl.us/dear/iwr/>. Annual means are computed per spring before joining to the monthly flow estimates.  If a year within the requested range has no water quality observations for a given spring, the grand mean across all available years is substituted.  The example 2022–2024 file included with the package is:
+**Spring water quality (TN and TP, local file):** Sample concentrations (mg/L) for total nitrogen and total phosphorus can be supplied as a CSV with one row per sample via the `wqpth` argument. These data are from FDEP's Impaired Waters Rule dataset available at <https://publicfiles.dep.state.fl.us/dear/iwr/>. Annual means are computed per spring before joining to the monthly flow estimates.  If a year within the requested range has no water quality observations for a given spring, the grand mean across all available years is substituted.  The example 2022–2024 file included with the package is:
 
 ```{r}
 wqpth <- system.file('extdata/sprwq2224.csv', package = 'tbeploads')
 ```
 
-**Spring water quality (TN and TP) — API (default):** When `wqpth = NULL` (the default), water quality data are retrieved automatically from two external APIs via `util_spr_getwq()`:
+**Spring water quality (TN and TP, API):** When `wqpth = NULL` (the default), water quality data are retrieved automatically from two external APIs via `util_spr_getwq()`:
 
-* **Lithia and Buckhorn** concentrations are fetched from the [Water Atlas API](https://dev.api.wateratlas.org) (`GET /api/samplingdata/stream`), using SWFWMD monitoring stations 17805 (Lithia Main Spring, water body ID 4000510) and 18276 (Buckhorn Main Spring, water body ID 4000529) from the `WIN_21FLSWFD` data source.  These are the same quarterly SWFWMD observations that underlie the FDEP IWR file, so results are numerically identical to using a current IWR download.
-* **Sulphur Spring** concentrations are retrieved via `tbeptools::read_importepc()`, which downloads the Environmental Protection Commission of Hillsborough County (EPC) monitoring spreadsheet and filters to station 174.  This source provides monthly TN and TP observations, the same program used in the FDEP IWR file.
+* **Lithia and Buckhorn** concentrations are obtained from the [Water Atlas API](https://dev.api.wateratlas.org) (`GET /api/samplingdata/stream`), using SWFWMD monitoring stations 17805 (Lithia Main Spring, water body ID 4000510) and 18276 (Buckhorn Main Spring, water body ID 4000529) from the `WIN_21FLSWFD` data source.  These are probably the same quarterly SWFWMD observations in the FDEP IWR file.
+* **Sulphur** concentrations are retrieved via `tbeptools::read_importepc()`, which downloads the Environmental Protection Commission of Hillsborough County (EPC) monitoring spreadsheet and filters to station 174.  This source provides monthly TN and TP observations.
 
-**TSS concentrations:** When `wqpth` is supplied, TSS concentrations are always assigned from a fixed lookup table derived from the historical SAS-based loading model (SPRMOD2): 4.4 mg/L for Sulphur Springs and 4.0 mg/L for Lithia and Buckhorn.  When `wqpth = NULL`, TSS values from the API or EPC source are used where available (Sulphur Spring via EPC may have periodic observations); any spring–year combination with no measured TSS falls back to the same fixed values.
+**TSS concentrations:** When `wqpth` is supplied, TSS concentrations are always assigned from a fixed lookup table derived from the historical SAS-based loading model (SPRMOD2): 4.4 mg/L for Sulphur Springs and 4.0 mg/L for Lithia and Buckhorn.  When `wqpth = NULL`, TSS values from the API or EPC source are used where available (Sulphur Spring via EPC may have periodic observations). Any spring–year combination with no measured TSS falls back to the same fixed values.
 
 **Sulphur Spring discharge (USGS):** Daily discharge for USGS station 02306000 is retrieved from the NWIS API via `util_nps_getusgsflow()`.  A data frame can also be passed to the `sulphurflow` argument to avoid a repeat API call.
 
@@ -394,7 +394,7 @@ When `wqpth` is omitted, water quality is fetched automatically from the Water A
 spr_api <- anlz_spr(tbwxlpth = tbwxlpth, yrrng = c(2022, 2024))
 ```
 
-Load columns are in kg/month and `h2oload` is in m³/month.
+Load columns are in tons/month and `hy_load` is in 1e6 m³/month.
 
 #### Spatial summary
 
@@ -418,7 +418,7 @@ anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
 
 #### Temporal summary
 
-The `summtime` argument works across all three spatial levels.  Setting `summtime = 'year'` sums load columns over months.  At the spring level, `flow_cfs` is returned as the annual mean rather than a sum.
+The `summtime` argument works across all three spatial levels.  Setting `summtime = 'year'` sums load columns over months.
 
 ```{r}
 # Annual segment totals

@@ -27,9 +27,9 @@ quality data (.csv). Must contain columns \code{spring}, \code{year},
 \code{month}, \code{tn(mg/L)}, and \code{tp(mg/L)} with one row per sample.
 Spring names must match \code{"Lithia"}, \code{"Buckhorn"}, and
 \code{"Sulphur"}. When \code{NULL}, water quality data are retrieved
-automatically from external APIs: Lithia and Buckhorn concentrations are
-fetched from the Water Atlas API (SWFWMD stations 17805 and 18276) and
-Sulphur Spring concentrations are fetched via
+automatically from external APIs. Lithia and Buckhorn concentrations are
+obtained from the Water Atlas API (SWFWMD stations 17805 and 18276) and
+Sulphur Spring concentrations are obtained via
 \code{\link[tbeptools]{read_importepc}} (EPC station 174).}
 
 \item{yrrng}{integer vector of length 2, start and end year for the analysis,
@@ -39,9 +39,8 @@ e.g. \code{c(2022, 2024)}.}
 
 \item{summtime}{chr string indicating how the returned data are summarized temporally (month or year), see details}
 
-\item{sulphurflow}{data frame of daily Sulphur Spring discharge already
-retrieved by \code{\link{util_nps_getusgsflow}}, or \code{NULL} (default)
-to fetch from the USGS API.}
+\item{sulphurflow}{data frame of daily Sulphur Spring discharge or \code{NULL} (default)
+to obtain from the USGS API.}
 
 \item{verbose}{logical, if \code{TRUE} (default) progress messages are printed
 when water quality data are retrieved via API (\code{wqpth = NULL}).}
@@ -51,20 +50,19 @@ A data frame whose structure depends on \code{summ}:
 \itemize{
 \item \code{'spring'}: one row per spring per time period, with columns
 \code{source}, \code{spring}, \code{site}, \code{segment}, \code{yr},
-\code{mo} (dropped for annual), \code{flow_cfs}, \code{tn_mgl},
-\code{tp_mgl}, \code{tss_mgl}, \code{h2oload} (m3), \code{tnload} (kg),
-\code{tpload} (kg), \code{tssload} (kg).
+\code{mo} (dropped for annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons),
+\code{tp_load} (tons), and \code{tss_load} (tons).
 \item \code{'basin'}: one row per drainage basin per time period, with
 columns \code{source}, \code{majbasin}, \code{segment}, \code{yr},
-\code{mo} (dropped for annual), \code{h2oload} (m3), \code{tnload} (kg),
-\code{tpload} (kg), \code{tssload} (kg).
+\code{mo} (dropped for annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons),
+\code{tp_load} (tons), \code{tss_load} (tons).
 \item \code{'segment'}: one row per bay segment per time period, with
 columns \code{source}, \code{segment}, \code{yr}, \code{mo} (dropped for
-annual), \code{h2oload} (m3), \code{tnload} (kg), \code{tpload} (kg),
-\code{tssload} (kg).
+annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons), \code{tp_load} (tons),
+\code{tss_load} (tons).
 }
 For annual output (\code{summtime = 'year'}), load columns are summed over
-months and \code{flow_cfs} (spring level only) is the annual mean.
+months.
 }
 \description{
 Calculate spring loads to Hillsborough Bay
@@ -86,8 +84,8 @@ Contact for gage data is Cathleen Jonas, \href{mailto:cjonas@tampabaywater.org}{
 
 \strong{Discharge data (Sulphur Springs):}
 Daily CFS values for station 02306000 are retrieved from the USGS NWIS API
-via \code{\link{util_nps_getusgsflow}}. A pre-fetched data frame can be
-supplied via the \code{sulphurflow} argument to avoid the API call.
+via \code{\link{util_nps_getusgsflow}}. A data frame can also be
+supplied via the \code{sulphurflow} argument.
 
 \strong{Interpolation:}
 Because springs are assumed never to have zero discharge, all gaps in the
@@ -100,17 +98,17 @@ When \code{wqpth} is supplied, sample concentrations (mg/L) for TN and TP
 are read from the CSV. These data are from FDEP's Impaired Waters Rule
 dataset available at \url{https://publicfiles.dep.state.fl.us/dear/iwr/}.
 Annual mean concentrations are computed per spring and joined to monthly flow
-estimates. If a year within \code{yrrng} has no WQ observations for a given
+estimates. If a year within \code{yrrng} has no water quality observations for a given
 spring, the grand mean across all available years is substituted.
 
 \strong{Water quality data (API, \code{wqpth = NULL}):}
-When \code{wqpth} is \code{NULL}, water quality data are fetched
-automatically via \code{\link{util_spr_getwq}}. Lithia (SWFWMD station
+When \code{wqpth} is \code{NULL}, water quality data are obtained using
+\code{\link{util_spr_getwq}}. Lithia (SWFWMD station
 17805, Lithia Main Spring) and Buckhorn (SWFWMD station 18276, Buckhorn Main
 Spring) concentrations are retrieved from the
 \href{https://dev.api.wateratlas.org}{Water Atlas API}
-(\code{WIN_21FLSWFD} data source). These are the same quarterly SWFWMD
-observations that underlie the FDEP IWR file. Sulphur Spring (EPC station
+(\code{WIN_21FLSWFD} data source). These are probably the same quarterly SWFWMD
+observations included in the FDEP IWR file. Sulphur Spring (EPC station
 174) is retrieved via \code{\link[tbeptools]{read_importepc}}, providing
 monthly observations from the Environmental Protection Commission of
 Hillsborough County.
@@ -119,7 +117,7 @@ Hillsborough County.
 When \code{wqpth} is supplied, TSS concentrations are assigned from a fixed
 lookup table derived from the historical SAS-based loading model (SPRMOD2).
 When \code{wqpth = NULL}, TSS values from the API or EPC source are used
-where available; any spring-year with no observed TSS falls back to the same
+where available. Any spring-year with no observed TSS falls back to the same
 fixed values. The fixed values are: Sulphur Springs (02306000) = 4.4 mg/L,
 Buckhorn Springs (02301695) = 4.0 mg/L, Lithia Springs (02301600) = 4.0
 mg/L.
@@ -127,13 +125,15 @@ mg/L.
 \strong{Load calculation:}
 Monthly mean flows (CFS) are computed from the complete daily discharge
 series. Loads are then:
-\deqn{h2oload\,(m^3/month) = \overline{Q}_{cfs} \times 86400 \times \frac{365}{12} \times 28.32 \times 10^{-3}}
-\deqn{load\,(kg/month) = h2oload \times C_{mg/L} \times 10^{-3}}
+\deqn{hy_load\,(m^3/month) = \overline{Q}_{cfs} \times 86400 \times \frac{365}{12} \times 28.32 \times 10^{-3}}
+\deqn{load\,(tons/month) = hy_load \times C_{mg/L} \times 10^{-3} / 907.1847}
+
+\code{hy_load} is converted to million m3 in the final output.
 
 \strong{Spatial summaries:}
 The data are summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed based on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}). For springs, valid options for \code{summ} are
 \code{'spring'} (one row per spring per time period), \code{'basin'} (loads
-summed within drainage basins: Lithia and Buckhorn combined into
+summed within drainage basins. Lithia and Buckhorn combined into
 \code{"Alafia River"}, Sulphur into \code{"Hillsborough River"}), and
 \code{'segment'} (all springs summed to bay segment 2, Hillsborough Bay).
 }
