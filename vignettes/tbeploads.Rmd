@@ -382,15 +382,15 @@ spr <- anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024))
 head(spr)
 ```
 
-Load columns are in kg/month and `h2oload` is in m³/month.  `tss_mgl` is the fixed lookup values described above.
+Load columns are in tons/month and `hy_load` is in 1e6 m³/month.
 
 #### Spatial summary
 
 The `summ` argument controls the level of spatial aggregation.
 
-`summ = 'spring'` (default) returns one row per spring per time period with full detail including individual flow and concentration columns.
+`summ = 'spring'` (default) returns one row per spring per time period.
 
-`summ = 'basin'` sums loads within drainage basins.  Lithia and Buckhorn are both assigned to the Alafia River basin and Sulphur is assigned to the Hillsborough River basin as shown with the `majbasin` column.  The `spring`, `site`, `flow_cfs`, and concentration columns are dropped.
+`summ = 'basin'` sums loads within drainage basins.  Lithia and Buckhorn are both assigned to the Alafia River basin and Sulphur is assigned to the Hillsborough River basin as shown with the `majbasin` column.
 
 ```{r}
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),

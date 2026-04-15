@@ -42,20 +42,19 @@ A data frame whose structure depends on \code{summ}:
 \itemize{
 \item \code{'spring'}: one row per spring per time period, with columns
 \code{source}, \code{spring}, \code{site}, \code{segment}, \code{yr},
-\code{mo} (dropped for annual), \code{flow_cfs}, \code{tn_mgl},
-\code{tp_mgl}, \code{tss_mgl}, \code{h2oload} (m3), \code{tnload} (kg),
-\code{tpload} (kg), \code{tssload} (kg).
+\code{mo} (dropped for annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons),
+\code{tp_load} (tons), \code{tss_load} (tons).
 \item \code{'basin'}: one row per drainage basin per time period, with
 columns \code{source}, \code{majbasin}, \code{segment}, \code{yr},
-\code{mo} (dropped for annual), \code{h2oload} (m3), \code{tnload} (kg),
-\code{tpload} (kg), \code{tssload} (kg).
+\code{mo} (dropped for annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons),
+\code{tp_load} (tons), \code{tss_load} (tons).
 \item \code{'segment'}: one row per bay segment per time period, with
 columns \code{source}, \code{segment}, \code{yr}, \code{mo} (dropped for
-annual), \code{h2oload} (m3), \code{tnload} (kg), \code{tpload} (kg),
-\code{tssload} (kg).
+annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons), \code{tp_load} (tons),
+\code{tss_load} (tons).
 }
 For annual output (\code{summtime = 'year'}), load columns are summed over
-months and \code{flow_cfs} (spring level only) is the annual mean.
+months.
 }
 \description{
 Calculate spring loads to Hillsborough Bay
@@ -100,8 +99,10 @@ period averages: Sulphur Springs (02306000) = 4.4 mg/L, Buckhorn Springs
 \strong{Load calculation:}
 Monthly mean flows (CFS) are computed from the complete daily discharge
 series. Loads are then:
-\deqn{h2oload\,(m^3/month) = \overline{Q}_{cfs} \times 86400 \times \frac{365}{12} \times 28.32 \times 10^{-3}}
-\deqn{load\,(kg/month) = h2oload \times C_{mg/L} \times 10^{-3}}
+\deqn{hy_load\,(m^3/month) = \overline{Q}_{cfs} \times 86400 \times \frac{365}{12} \times 28.32 \times 10^{-3}}
+\deqn{load\,(kg/month) = hy_load \times C_{mg/L} \times 10^{-3}}
+
+Note that \code{hy_load} is converted to 1e6 m3 in the output. Pollutant loads are converted from kg to tons.
 
 \strong{Spatial summaries:}
 The data are summarized differently based on the \code{summ} and \code{summtime} arguments.  All loading data are summed based on these arguments, e.g., by bay segment (\code{summ = 'segment'}) and year (\code{summtime = 'year'}). For springs, valid options for \code{summ} are

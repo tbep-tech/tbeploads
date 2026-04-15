@@ -58,9 +58,11 @@
 #' \strong{Load calculation:}
 #' Monthly mean flows (CFS) are computed from the complete daily discharge
 #' series. Loads are then:
-#' \deqn{h2oload\,(m^3/month) = \overline{Q}_{cfs} \times 86400 \times \frac{365}{12} \times 28.32 \times 10^{-3}}
-#' \deqn{load\,(kg/month) = h2oload \times C_{mg/L} \times 10^{-3}}
+#' \deqn{hy_load\,(m^3/month) = \overline{Q}_{cfs} \times 86400 \times \frac{365}{12} \times 28.32 \times 10^{-3}}
+#' \deqn{load\,(kg/month) = hy_load \times C_{mg/L} \times 10^{-3}}
 #'
+#' Note that \code{hy_load} is converted to 1e6 m3 in the output. Pollutant loads are converted from kg to tons.
+#' 
 #' \strong{Spatial summaries:}
 #' `r summ_params('descrip')` For springs, valid options for \code{summ} are
 #' \code{'spring'} (one row per spring per time period), \code{'basin'} (loads
@@ -72,20 +74,19 @@
 #' \itemize{
 #'   \item \code{'spring'}: one row per spring per time period, with columns
 #'     \code{source}, \code{spring}, \code{site}, \code{segment}, \code{yr},
-#'     \code{mo} (dropped for annual), \code{flow_cfs}, \code{tn_mgl},
-#'     \code{tp_mgl}, \code{tss_mgl}, \code{h2oload} (m3), \code{tnload} (kg),
-#'     \code{tpload} (kg), \code{tssload} (kg).
+#'     \code{mo} (dropped for annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons),
+#'     \code{tp_load} (tons), \code{tss_load} (tons).
 #'   \item \code{'basin'}: one row per drainage basin per time period, with
 #'     columns \code{source}, \code{majbasin}, \code{segment}, \code{yr},
-#'     \code{mo} (dropped for annual), \code{h2oload} (m3), \code{tnload} (kg),
-#'     \code{tpload} (kg), \code{tssload} (kg).
+#'     \code{mo} (dropped for annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons),
+#'     \code{tp_load} (tons), \code{tss_load} (tons).
 #'   \item \code{'segment'}: one row per bay segment per time period, with
 #'     columns \code{source}, \code{segment}, \code{yr}, \code{mo} (dropped for
-#'     annual), \code{h2oload} (m3), \code{tnload} (kg), \code{tpload} (kg),
-#'     \code{tssload} (kg).
+#'     annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons), \code{tp_load} (tons),
+#'     \code{tss_load} (tons).
 #' }
 #' For annual output (\code{summtime = 'year'}), load columns are summed over
-#' months and \code{flow_cfs} (spring level only) is the annual mean.
+#' months.
 #'
 #' @export
 #'
@@ -261,8 +262,9 @@ anlz_spr <- function(tbwxlpth, wqpth, yrrng = c(2022, 2024),
   # ---------------------------------------------------------------------------
   # 7. Join flow and WQ; assign TSS; calculate loads
   #
-  # h2oload (m3/month) = mean_cfs * 86400 s/d * (365/12) d/mo * 28.32 L/ft3 * 1e-3 m3/L
-  # pollutant load (kg/month) = h2oload (m3) * C (mg/L) * 1e-3
+  # hy_load (m3/month) = mean_cfs * 86400 s/d * (365/12) d/mo * 28.32 L/ft3 * 1e-3 m3/L
+  # pollutant load (tons/month) = hy_load (m3) * C (mg/L) * 1e-3 / 907.18474 (kg/ton) to convert to tons in summaries
+  # hy_load is converted to 1e6 m3 for the output.
   # ---------------------------------------------------------------------------
   out <- monthly_flow |>
     dplyr::left_join(wq_filled, by = c("spring", "yr")) |>
@@ -270,14 +272,16 @@ anlz_spr <- function(tbwxlpth, wqpth, yrrng = c(2022, 2024),
       tss_mgl = tss_site[site],
       segment = 2L,
       source  = "SPRING",
-      h2oload = flow_cfs * 86400 * (365 / 12) * 28.32 * 1e-3,
-      tnload  = h2oload * tn_mgl  * 1e-3,
-      tpload  = h2oload * tp_mgl  * 1e-3,
-      tssload = h2oload * tss_mgl * 1e-3
+      hy_load = flow_cfs * 86400 * (365 / 12) * 28.32 * 1e-3,
+      tn_load  = hy_load * tn_mgl  * 1e-3 / 907.18474,  # convert kg to tons
+      tp_load  = hy_load * tp_mgl  * 1e-3 / 907.18474,  # convert kg to tons
+      tss_load = hy_load * tss_mgl * 1e-3 / 907.18474   # convert kg to tons
     ) |>
     dplyr::select(source, spring, site, segment, yr, mo,
-                  flow_cfs, tn_mgl, tp_mgl, tss_mgl,
-                  h2oload, tnload, tpload, tssload)
+                  hy_load, tn_load, tp_load, tss_load) |>
+    dplyr::mutate(
+      hy_load = hy_load * 1e-6,  # convert m3 to million m3
+    )
 
   # ---------------------------------------------------------------------------
   # 8. Spatial summarization (summ)
@@ -288,10 +292,10 @@ anlz_spr <- function(tbwxlpth, wqpth, yrrng = c(2022, 2024),
       dplyr::left_join(basin_lookup, by = "spring") |>
       dplyr::group_by(source, majbasin, segment, yr, mo) |>
       dplyr::summarise(
-        h2oload = sum(h2oload, na.rm = TRUE),
-        tnload  = sum(tnload,  na.rm = TRUE),
-        tpload  = sum(tpload,  na.rm = TRUE),
-        tssload = sum(tssload, na.rm = TRUE),
+        hy_load = sum(hy_load, na.rm = TRUE),
+        tn_load  = sum(tn_load,  na.rm = TRUE),
+        tp_load  = sum(tp_load,  na.rm = TRUE),
+        tss_load = sum(tss_load, na.rm = TRUE),
         .groups = "drop"
       )
 
@@ -300,10 +304,10 @@ anlz_spr <- function(tbwxlpth, wqpth, yrrng = c(2022, 2024),
     out <- out |>
       dplyr::group_by(source, segment, yr, mo) |>
       dplyr::summarise(
-        h2oload = sum(h2oload, na.rm = TRUE),
-        tnload  = sum(tnload,  na.rm = TRUE),
-        tpload  = sum(tpload,  na.rm = TRUE),
-        tssload = sum(tssload, na.rm = TRUE),
+        hy_load = sum(hy_load, na.rm = TRUE),
+        tn_load  = sum(tn_load,  na.rm = TRUE),
+        tp_load  = sum(tp_load,  na.rm = TRUE),
+        tss_load = sum(tss_load, na.rm = TRUE),
         .groups = "drop"
       )
 
@@ -319,14 +323,10 @@ anlz_spr <- function(tbwxlpth, wqpth, yrrng = c(2022, 2024),
       out <- out |>
         dplyr::group_by(source, spring, site, segment, yr) |>
         dplyr::summarise(
-          flow_cfs = mean(flow_cfs, na.rm = TRUE),
-          tn_mgl   = mean(tn_mgl,   na.rm = TRUE),
-          tp_mgl   = mean(tp_mgl,   na.rm = TRUE),
-          tss_mgl  = mean(tss_mgl,  na.rm = TRUE),
-          h2oload  = sum(h2oload,   na.rm = TRUE),
-          tnload   = sum(tnload,    na.rm = TRUE),
-          tpload   = sum(tpload,    na.rm = TRUE),
-          tssload  = sum(tssload,   na.rm = TRUE),
+          hy_load  = sum(hy_load,   na.rm = TRUE),
+          tn_load  = sum(tn_load,    na.rm = TRUE),
+          tp_load  = sum(tp_load,    na.rm = TRUE),
+          tss_load = sum(tss_load, na.rm = TRUE),
           .groups  = "drop"
         ) |>
         dplyr::arrange(spring, yr)
@@ -336,10 +336,10 @@ anlz_spr <- function(tbwxlpth, wqpth, yrrng = c(2022, 2024),
       out <- out |>
         dplyr::group_by(source, majbasin, segment, yr) |>
         dplyr::summarise(
-          h2oload = sum(h2oload, na.rm = TRUE),
-          tnload  = sum(tnload,  na.rm = TRUE),
-          tpload  = sum(tpload,  na.rm = TRUE),
-          tssload = sum(tssload, na.rm = TRUE),
+          hy_load = sum(hy_load, na.rm = TRUE),
+          tn_load  = sum(tn_load,  na.rm = TRUE),
+          tp_load  = sum(tp_load,  na.rm = TRUE),
+          tss_load = sum(tss_load, na.rm = TRUE),
           .groups = "drop"
         ) |>
         dplyr::arrange(majbasin, yr)
@@ -349,10 +349,10 @@ anlz_spr <- function(tbwxlpth, wqpth, yrrng = c(2022, 2024),
       out <- out |>
         dplyr::group_by(source, segment, yr) |>
         dplyr::summarise(
-          h2oload = sum(h2oload, na.rm = TRUE),
-          tnload  = sum(tnload,  na.rm = TRUE),
-          tpload  = sum(tpload,  na.rm = TRUE),
-          tssload = sum(tssload, na.rm = TRUE),
+          hy_load = sum(hy_load, na.rm = TRUE),
+          tn_load  = sum(tn_load,  na.rm = TRUE),
+          tp_load  = sum(tp_load,  na.rm = TRUE),
+          tss_load = sum(tss_load, na.rm = TRUE),
           .groups = "drop"
         ) |>
         dplyr::arrange(yr)
