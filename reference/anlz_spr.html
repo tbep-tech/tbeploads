@@ -41,11 +41,12 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">anlz_spr</span><span class="op">(</span></span>
 <span>  <span class="va">tbwxlpth</span>,</span>
-<span>  <span class="va">wqpth</span>,</span>
+<span>  wqpth <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>,</span>
 <span>  summ <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"spring"</span>, <span class="st">"basin"</span>, <span class="st">"segment"</span><span class="op">)</span>,</span>
 <span>  summtime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"month"</span>, <span class="st">"year"</span><span class="op">)</span>,</span>
-<span>  sulphurflow <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  sulphurflow <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -63,10 +64,15 @@ columns <code>DeviceID</code>, <code>MeasureDateTime</code>, <code>Value</code>,
 
 
 <dt id="arg-wqpth">wqpth<a class="anchor" aria-label="anchor" href="#arg-wqpth"></a></dt>
-<dd><p>character string, file path to spring water quality data (.csv).
-Must contain columns <code>spring</code>, <code>year</code>, <code>month</code>,
-<code>tn(mg/L)</code>, and <code>tp(mg/L)</code> with one row per sample. Spring names
-must match <code>"Lithia"</code>, <code>"Buckhorn"</code>, and <code>"Sulphur"</code>.</p></dd>
+<dd><p>character string or <code>NULL</code> (default). File path to spring water
+quality data (.csv). Must contain columns <code>spring</code>, <code>year</code>,
+<code>month</code>, <code>tn(mg/L)</code>, and <code>tp(mg/L)</code> with one row per sample.
+Spring names must match <code>"Lithia"</code>, <code>"Buckhorn"</code>, and
+<code>"Sulphur"</code>. When <code>NULL</code>, water quality data are retrieved
+automatically from external APIs: Lithia and Buckhorn concentrations are
+fetched from the Water Atlas API (SWFWMD stations 17805 and 18276) and
+Sulphur Spring concentrations are fetched via
+<code><a href="https://rdrr.io/pkg/tbeptools/man/read_importepc.html" class="external-link">read_importepc</a></code> (EPC station 174).</p></dd>
 
 
 <dt id="arg-yrrng">yrrng<a class="anchor" aria-label="anchor" href="#arg-yrrng"></a></dt>
@@ -87,23 +93,29 @@ e.g. <code>c(2022, 2024)</code>.</p></dd>
 retrieved by <code><a href="util_nps_getusgsflow.html">util_nps_getusgsflow</a></code>, or <code>NULL</code> (default)
 to fetch from the USGS API.</p></dd>
 
+
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
+<dd><p>logical, if <code>TRUE</code> (default) progress messages are printed
+when water quality data are retrieved via API (<code>wqpth = NULL</code>).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A data frame whose structure depends on <code>summ</code>:</p><ul><li><p><code>'spring'</code>: one row per spring per time period, with columns
 <code>source</code>, <code>spring</code>, <code>site</code>, <code>segment</code>, <code>yr</code>,
-<code>mo</code> (dropped for annual), <code>hy_load</code> (1e6 m3), <code>tn_load</code> (tons),
-<code>tp_load</code> (tons), <code>tss_load</code> (tons).</p></li>
+<code>mo</code> (dropped for annual), <code>flow_cfs</code>, <code>tn_mgl</code>,
+<code>tp_mgl</code>, <code>tss_mgl</code>, <code>h2oload</code> (m3), <code>tnload</code> (kg),
+<code>tpload</code> (kg), <code>tssload</code> (kg).</p></li>
 <li><p><code>'basin'</code>: one row per drainage basin per time period, with
 columns <code>source</code>, <code>majbasin</code>, <code>segment</code>, <code>yr</code>,
-<code>mo</code> (dropped for annual), <code>hy_load</code> (1e6 m3), <code>tn_load</code> (tons),
-<code>tp_load</code> (tons), <code>tss_load</code> (tons).</p></li>
+<code>mo</code> (dropped for annual), <code>h2oload</code> (m3), <code>tnload</code> (kg),
+<code>tpload</code> (kg), <code>tssload</code> (kg).</p></li>
 <li><p><code>'segment'</code>: one row per bay segment per time period, with
 columns <code>source</code>, <code>segment</code>, <code>yr</code>, <code>mo</code> (dropped for
-annual), <code>hy_load</code> (1e6 m3), <code>tn_load</code> (tons), <code>tp_load</code> (tons),
-<code>tss_load</code> (tons).</p></li>
+annual), <code>h2oload</code> (m3), <code>tnload</code> (kg), <code>tpload</code> (kg),
+<code>tssload</code> (kg).</p></li>
 </ul><p>For annual output (<code>summtime = 'year'</code>), load columns are summed over
-months.</p>
+months and <code>flow_cfs</code> (spring level only) is the annual mean.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -127,22 +139,37 @@ Because springs are assumed never to have zero discharge, all gaps in the
 daily discharge record are filled by linear interpolation between observed
 values (<code><a href="https://rdrr.io/pkg/zoo/man/na.approx.html" class="external-link">na.approx</a></code> with <code>rule = 2</code>). Leading or
 trailing gaps are filled with the nearest observed value.</p>
-<p><strong>Water quality data:</strong>
-Sample concentrations (mg/L) for TN and TP are read from <code>wqpth</code>.
-These data are from FDEP's Impaired Waters Rule dataset available at <a href="https://publicfiles.dep.state.fl.us/dear/iwr/" class="external-link">https://publicfiles.dep.state.fl.us/dear/iwr/</a>. Annual mean concentrations are computed per spring and joined to monthly
-flow estimates. If a year within <code>yrrng</code> has no WQ observations for a
-given spring, the grand mean across all available years is substituted.
-TSS concentrations are not collected as part of routine spring monitoring and
-are assigned from a fixed lookup table derived from the historical SAS-based
-loading model (SPRMOD2). The values used are the most recently available
-period averages: Sulphur Springs (02306000) = 4.4 mg/L, Buckhorn Springs
-(02301695) = 4.0 mg/L, Lithia Springs (02301600) = 4.0 mg/L.</p>
+<p><strong>Water quality data (file path):</strong>
+When <code>wqpth</code> is supplied, sample concentrations (mg/L) for TN and TP
+are read from the CSV. These data are from FDEP's Impaired Waters Rule
+dataset available at <a href="https://publicfiles.dep.state.fl.us/dear/iwr/" class="external-link">https://publicfiles.dep.state.fl.us/dear/iwr/</a>.
+Annual mean concentrations are computed per spring and joined to monthly flow
+estimates. If a year within <code>yrrng</code> has no WQ observations for a given
+spring, the grand mean across all available years is substituted.</p>
+<p><strong>Water quality data (API, <code>wqpth = NULL</code>):</strong>
+When <code>wqpth</code> is <code>NULL</code>, water quality data are fetched
+automatically via <code><a href="util_spr_getwq.html">util_spr_getwq</a></code>. Lithia (SWFWMD station
+17805, Lithia Main Spring) and Buckhorn (SWFWMD station 18276, Buckhorn Main
+Spring) concentrations are retrieved from the
+<a href="https://dev.api.wateratlas.org" class="external-link">Water Atlas API</a>
+(<code>WIN_21FLSWFD</code> data source). These are the same quarterly SWFWMD
+observations that underlie the FDEP IWR file. Sulphur Spring (EPC station
+174) is retrieved via <code><a href="https://rdrr.io/pkg/tbeptools/man/read_importepc.html" class="external-link">read_importepc</a></code>, providing
+monthly observations from the Environmental Protection Commission of
+Hillsborough County.</p>
+<p><strong>TSS concentrations:</strong>
+When <code>wqpth</code> is supplied, TSS concentrations are assigned from a fixed
+lookup table derived from the historical SAS-based loading model (SPRMOD2).
+When <code>wqpth = NULL</code>, TSS values from the API or EPC source are used
+where available; any spring-year with no observed TSS falls back to the same
+fixed values. The fixed values are: Sulphur Springs (02306000) = 4.4 mg/L,
+Buckhorn Springs (02301695) = 4.0 mg/L, Lithia Springs (02301600) = 4.0
+mg/L.</p>
 <p><strong>Load calculation:</strong>
 Monthly mean flows (CFS) are computed from the complete daily discharge
 series. Loads are then:
-$$hy_load\,(m^3/month) = \overline{Q}_{cfs} \times 86400 \times \frac{365}{12} \times 28.32 \times 10^{-3}$$
-$$load\,(kg/month) = hy_load \times C_{mg/L} \times 10^{-3}$$</p>
-<p>Note that <code>hy_load</code> is converted to 1e6 m3 in the output. Pollutant loads are converted from kg to tons.</p>
+$$h2oload\,(m^3/month) = \overline{Q}_{cfs} \times 86400 \times \frac{365}{12} \times 28.32 \times 10^{-3}$$
+$$load\,(kg/month) = h2oload \times C_{mg/L} \times 10^{-3}$$</p>
 <p><strong>Spatial summaries:</strong>
 The data are summarized differently based on the <code>summ</code> and <code>summtime</code> arguments.  All loading data are summed based on these arguments, e.g., by bay segment (<code>summ = 'segment'</code>) and year (<code>summtime = 'year'</code>). For springs, valid options for <code>summ</code> are
 <code>'spring'</code> (one row per spring per time period), <code>'basin'</code> (loads
@@ -156,53 +183,59 @@ summed within drainage basins: Lithia and Buckhorn combined into
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">tbwxlpth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/sprflow2224.xlsx'</span>, package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">wqpth</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/sprwq2224.csv'</span>,    package <span class="op">=</span> <span class="st">'tbeploads'</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># monthly per-spring loads (default)</span></span></span>
+<span class="r-in"><span><span class="co"># monthly per-spring loads using a local water quality file</span></span></span>
 <span class="r-in"><span><span class="fu">anlz_spr</span><span class="op">(</span>tbwxlpth <span class="op">=</span> <span class="va">tbwxlpth</span>, wqpth <span class="op">=</span> <span class="va">wqpth</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 108 × 10</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    source spring   site     segment    yr    mo hy_load tn_load tp_load tss_load</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     1   0.704    1.75  0.037<span style="text-decoration: underline;">0</span>     3.10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     2   0.807    2.01  0.042<span style="text-decoration: underline;">5</span>     3.56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     3   0.750    1.86  0.039<span style="text-decoration: underline;">5</span>     3.31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     4   0.739    1.84  0.038<span style="text-decoration: underline;">9</span>     3.26</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     5   0.591    1.47  0.031<span style="text-decoration: underline;">1</span>     2.60</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     6   0.667    1.66  0.035<span style="text-decoration: underline;">1</span>     2.94</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     7   0.694    1.73  0.036<span style="text-decoration: underline;">5</span>     3.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     8   0.776    1.93  0.040<span style="text-decoration: underline;">8</span>     3.42</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     9   0.771    1.92  0.040<span style="text-decoration: underline;">6</span>     3.40</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022    10   0.984    2.45  0.051<span style="text-decoration: underline;">8</span>     4.34</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 108 × 14</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    source spring   site     segment    yr    mo flow_cfs tn_mgl tp_mgl tss_mgl</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     1     9.46   2.26 0.047<span style="text-decoration: underline;">8</span>       4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     2    10.8    2.26 0.047<span style="text-decoration: underline;">8</span>       4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     3    10.1    2.26 0.047<span style="text-decoration: underline;">8</span>       4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     4     9.94   2.26 0.047<span style="text-decoration: underline;">8</span>       4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     5     7.94   2.26 0.047<span style="text-decoration: underline;">8</span>       4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     6     8.96   2.26 0.047<span style="text-decoration: underline;">8</span>       4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     7     9.33   2.26 0.047<span style="text-decoration: underline;">8</span>       4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     8    10.4    2.26 0.047<span style="text-decoration: underline;">8</span>       4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     9    10.4    2.26 0.047<span style="text-decoration: underline;">8</span>       4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022    10    13.2    2.26 0.047<span style="text-decoration: underline;">8</span>       4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 98 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 4 more variables: h2oload &lt;dbl&gt;, tnload &lt;dbl&gt;, tpload &lt;dbl&gt;, tssload &lt;dbl&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># annual basin-level totals</span></span></span>
 <span class="r-in"><span><span class="fu">anlz_spr</span><span class="op">(</span>tbwxlpth <span class="op">=</span> <span class="va">tbwxlpth</span>, wqpth <span class="op">=</span> <span class="va">wqpth</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          summ <span class="op">=</span> <span class="st">'basin'</span>, summtime <span class="op">=</span> <span class="st">'year'</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   source majbasin           segment    yr hy_load tn_load tp_load tss_load</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> SPRING Alafia River             2  <span style="text-decoration: underline;">2</span>022    51.8  129.      3.52    228. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> SPRING Alafia River             2  <span style="text-decoration: underline;">2</span>023    49.9  122.      3.56    220. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> SPRING Alafia River             2  <span style="text-decoration: underline;">2</span>024    53.2  131.      3.70    235. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> SPRING Hillsborough River       2  <span style="text-decoration: underline;">2</span>022    17.2    3.40    1.41     83.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> SPRING Hillsborough River       2  <span style="text-decoration: underline;">2</span>023    11.2    1.70    1.66     54.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> SPRING Hillsborough River       2  <span style="text-decoration: underline;">2</span>024    20.2    3.32    2.18     98.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   source majbasin           segment    yr   h2oload  tnload tpload tssload</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> SPRING Alafia River             2  <span style="text-decoration: underline;">2</span>022 51<span style="text-decoration: underline;">778</span>360. <span style="text-decoration: underline;">117</span>185.  <span style="text-decoration: underline;">3</span>194. <span style="text-decoration: underline;">207</span>113.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> SPRING Alafia River             2  <span style="text-decoration: underline;">2</span>023 49<span style="text-decoration: underline;">855</span>415. <span style="text-decoration: underline;">110</span>389.  <span style="text-decoration: underline;">3</span>225. <span style="text-decoration: underline;">199</span>422.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> SPRING Alafia River             2  <span style="text-decoration: underline;">2</span>024 53<span style="text-decoration: underline;">199</span>624. <span style="text-decoration: underline;">119</span>112.  <span style="text-decoration: underline;">3</span>360. <span style="text-decoration: underline;">212</span>798.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> SPRING Hillsborough River       2  <span style="text-decoration: underline;">2</span>022 17<span style="text-decoration: underline;">180</span>010.   <span style="text-decoration: underline;">3</span>087.  <span style="text-decoration: underline;">1</span>277.  <span style="text-decoration: underline;">75</span>592.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> SPRING Hillsborough River       2  <span style="text-decoration: underline;">2</span>023 11<span style="text-decoration: underline;">199</span>647.   <span style="text-decoration: underline;">1</span>542.  <span style="text-decoration: underline;">1</span>509.  <span style="text-decoration: underline;">49</span>278.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> SPRING Hillsborough River       2  <span style="text-decoration: underline;">2</span>024 20<span style="text-decoration: underline;">197</span>069.   <span style="text-decoration: underline;">3</span>009.  <span style="text-decoration: underline;">1</span>979.  <span style="text-decoration: underline;">88</span>867.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># monthly segment-level totals</span></span></span>
 <span class="r-in"><span><span class="fu">anlz_spr</span><span class="op">(</span>tbwxlpth <span class="op">=</span> <span class="va">tbwxlpth</span>, wqpth <span class="op">=</span> <span class="va">wqpth</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          summ <span class="op">=</span> <span class="st">'segment'</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 36 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    source segment    yr    mo hy_load tn_load tp_load tss_load</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     1    5.99   11.2    0.432     27.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     2    4.84   10.4    0.338     21.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     3    3.52    8.76   0.237     15.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     4    5.02    9.72   0.357     22.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     5    3.76    8.46   0.261     16.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     6    4.23    9.52   0.295     18.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     7    5.62   10.7    0.404     25.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     8    6.61   11.7    0.479     30.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     9    7.01   12.2    0.511     31.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> SPRING       2  <span style="text-decoration: underline;">2</span>022    10    7.45   12.9    0.539     33.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    source segment    yr    mo  h2oload tnload tpload tssload</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     1 5<span style="text-decoration: underline;">992</span>578. <span style="text-decoration: underline;">10</span>138.   392.  <span style="text-decoration: underline;">24</span>628.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     2 4<span style="text-decoration: underline;">842</span>061.  <span style="text-decoration: underline;">9</span>449.   307.  <span style="text-decoration: underline;">19</span>658.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     3 3<span style="text-decoration: underline;">520</span>026.  <span style="text-decoration: underline;">7</span>945.   215.  <span style="text-decoration: underline;">14</span>084.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     4 5<span style="text-decoration: underline;">021</span>268.  <span style="text-decoration: underline;">8</span>819.   324.  <span style="text-decoration: underline;">20</span>574.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     5 3<span style="text-decoration: underline;">756</span>722.  <span style="text-decoration: underline;">7</span>675.   237.  <span style="text-decoration: underline;">15</span>186.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     6 4<span style="text-decoration: underline;">234</span>204.  <span style="text-decoration: underline;">8</span>633.   267.  <span style="text-decoration: underline;">17</span>119.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     7 5<span style="text-decoration: underline;">623</span>595.  <span style="text-decoration: underline;">9</span>685.   366.  <span style="text-decoration: underline;">23</span>079.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     8 6<span style="text-decoration: underline;">611</span>417. <span style="text-decoration: underline;">10</span>641.   435.  <span style="text-decoration: underline;">27</span>275.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     9 7<span style="text-decoration: underline;">012</span>684. <span style="text-decoration: underline;">11</span>028.   463.  <span style="text-decoration: underline;">28</span>981.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> SPRING       2  <span style="text-decoration: underline;">2</span>022    10 7<span style="text-decoration: underline;">447</span>179. <span style="text-decoration: underline;">11</span>734.   489.  <span style="text-decoration: underline;">30</span>772.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 26 more rows</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co"># retrieve water quality from APIs automatically (no local file needed)</span></span></span>
+<span class="r-in"><span><span class="fu">anlz_spr</span><span class="op">(</span>tbwxlpth <span class="op">=</span> <span class="va">tbwxlpth</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

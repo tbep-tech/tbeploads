@@ -172,5 +172,7 @@ Utility functions used by other functions or standalone.
   facilities
 - [`util_ps_pascoreuse()`](https://tbep-tech.github.io/tbeploads/reference/util_ps_pascoreuse.md)
   : Create Pasco Reuse point source input data
+- [`util_spr_getwq()`](https://tbep-tech.github.io/tbeploads/reference/util_spr_getwq.md)
+  : Retrieve spring water quality data from APIs
 - [`util_summ()`](https://tbep-tech.github.io/tbeploads/reference/util_summ.md)
   : Summarize load estimates
