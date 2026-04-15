@@ -34,8 +34,8 @@ using Southwest Florida Water Management District (SWFWMD) monitoring
 stations 17805 (Lithia Main Spring) and 18276 (Buckhorn Main Spring)
 from the `WIN_21FLSWFD` data source. This is the same underlying dataset
 as FDEP's Impaired Waters Rule file but accessed directly via API. TSS
-is not routinely measured at these spring-head stations and will
-typically be `NA`, in which case
+is not routinely measured at these stations and will typically be `NA`,
+in which case
 [`anlz_spr`](https://tbep-tech.github.io/tbeploads/reference/anlz_spr.md)
 substitutes fixed historical values.
 
