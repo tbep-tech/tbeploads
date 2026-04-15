@@ -273,6 +273,8 @@ nps_ungaged <- anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase = 
 head(nps_ungaged)
 ```
 
+A data frame is returned with columns for bay segment, basin, year, month, clucsid (land use code), hydrologic load in m3/month, TN load in kg/month, TP load in kg/month, TSS load in kg/month, BOD load in kg/month, area (hectares, basin/clucsid combination), and basin area (hectares).
+
 #### Combined gaged and ungaged loads {#nps-final}
 
 Refer to the prior sections for details on how the separate loads for gaged and ungaged portions of the wateshed are calculated.  The `anlz_nps()` function described below can be used to combine all steps. The function estimates non-point source (NPS) loads for Tampa Bay by combining gaged and ungaged NPS loads. Gaged loads are estimated using flow and water quality data. Ungaged loads are estimated using rainfall, flow, event mean concentration, land use, and soils data. The function also incorporates atmospheric concentration data from the Verna Wellfield site.
@@ -319,6 +321,8 @@ npslu <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain =
 head(npslu)
 ```
 
+Note that results from `anlz_nps()` are returned in units of tons/month for TN, TP, TSS, and BOD and million cubic meters/month for hydrologic load if `summtime = 'month'` or tons/year for TN, TP, TSS, and BOD and million cubic meters/year for hydrologic load if `summtime = 'year'`.  Results from the gaged and ungaged functions are returned in kg for TN, TP, TSS, and BOD and m3 for hydrologic load.
+
 #### Removing point source loads from gaged NPS estimates
 
 Because stream gauges measure total flow at a location, gaged NPS load estimates from `anlz_nps()` include any point source discharges upstream of the gauge.  The `anlz_nps_psremove()` function subtracts the IPS and DPS loads occurring in gaged basins from the NPS totals so that point source contributions are not double-counted.  Only point source loads in basins classified as "Gaged" in the `dbasing` lookup table are subtracted. Loads in ungaged basins are unaffected.
@@ -346,7 +350,7 @@ nps_psremoved <- anlz_nps_psremove(nps_basin, ips_basin, dps_basin)
 head(nps_psremoved)
 ```
 
-Results are returned at the segment/month level with the same column structure as `anlz_ips()` and `anlz_dps()`.  Annual totals can be obtained by setting `summtime = 'year'`.
+Results are returned at the segment/month level with the same column structure as `anlz_ips()` and `anlz_dps()`.  Annual totals can be obtained by setting `summtime = 'year'`. Load units are tons for TN, TP, TSS, and BOD and million cubic meters for hydrologic load.
 
 ### SPR
 
