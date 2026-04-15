@@ -1012,49 +1012,45 @@ monthly means are computed, since springs are assumed to have continuous
 spr <- anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024))
 
 head(spr)
-#> # A tibble: 6 × 14
-#>   source spring site  segment    yr    mo flow_cfs tn_mgl tp_mgl tss_mgl h2oload
-#>   <chr>  <chr>  <chr>   <int> <dbl> <dbl>    <dbl>  <dbl>  <dbl>   <dbl>   <dbl>
-#> 1 SPRING Buckh… 0230…       2  2022     1     9.46   2.26 0.0478       4 703734.
-#> 2 SPRING Buckh… 0230…       2  2022     2    10.8    2.26 0.0478       4 807310.
-#> 3 SPRING Buckh… 0230…       2  2022     3    10.1    2.26 0.0478       4 750086.
-#> 4 SPRING Buckh… 0230…       2  2022     4     9.94   2.26 0.0478       4 739426.
-#> 5 SPRING Buckh… 0230…       2  2022     5     7.94   2.26 0.0478       4 590656.
-#> 6 SPRING Buckh… 0230…       2  2022     6     8.96   2.26 0.0478       4 666862.
-#> # ℹ 3 more variables: tnload <dbl>, tpload <dbl>, tssload <dbl>
+#> # A tibble: 6 × 10
+#>   source spring   site     segment    yr    mo hy_load tn_load tp_load tss_load
+#>   <chr>  <chr>    <chr>      <int> <dbl> <dbl>   <dbl>   <dbl>   <dbl>    <dbl>
+#> 1 SPRING Buckhorn 02301695       2  2022     1   0.704    1.75  0.0370     3.10
+#> 2 SPRING Buckhorn 02301695       2  2022     2   0.807    2.01  0.0425     3.56
+#> 3 SPRING Buckhorn 02301695       2  2022     3   0.750    1.86  0.0395     3.31
+#> 4 SPRING Buckhorn 02301695       2  2022     4   0.739    1.84  0.0389     3.26
+#> 5 SPRING Buckhorn 02301695       2  2022     5   0.591    1.47  0.0311     2.60
+#> 6 SPRING Buckhorn 02301695       2  2022     6   0.667    1.66  0.0351     2.94
 ```
 
-Load columns are in kg/month and `h2oload` is in m³/month. `tss_mgl` is
-the fixed lookup values described above.
+Load columns are in tons/month and `hy_load` is in 1e6 m³/month.
 
 #### Spatial summary
 
 The `summ` argument controls the level of spatial aggregation.
 
-`summ = 'spring'` (default) returns one row per spring per time period
-with full detail including individual flow and concentration columns.
+`summ = 'spring'` (default) returns one row per spring per time period.
 
 `summ = 'basin'` sums loads within drainage basins. Lithia and Buckhorn
 are both assigned to the Alafia River basin and Sulphur is assigned to
-the Hillsborough River basin as shown with the `majbasin` column. The
-`spring`, `site`, `flow_cfs`, and concentration columns are dropped.
+the Hillsborough River basin as shown with the `majbasin` column.
 
 ``` r
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
          summ = 'basin', summtime = 'month')
 #> # A tibble: 72 × 9
-#>    source majbasin     segment    yr    mo  h2oload tnload tpload tssload
-#>    <chr>  <chr>          <int> <dbl> <dbl>    <dbl>  <dbl>  <dbl>   <dbl>
-#>  1 SPRING Alafia River       2  2022     1 4348722.  9843.   270.  17395.
-#>  2 SPRING Alafia River       2  2022     2 4117853.  9319.   253.  16471.
-#>  3 SPRING Alafia River       2  2022     3 3510207.  7943.   215.  14041.
-#>  4 SPRING Alafia River       2  2022     4 3800054.  8600.   233.  15200.
-#>  5 SPRING Alafia River       2  2022     5 3359796.  7604.   208.  13439.
-#>  6 SPRING Alafia River       2  2022     6 3778029.  8551.   233.  15112.
-#>  7 SPRING Alafia River       2  2022     7 4162945.  9422.   258.  16652.
-#>  8 SPRING Alafia River       2  2022     8 4536881. 10268.   281.  18148.
-#>  9 SPRING Alafia River       2  2022     9 4687897. 10610.   290.  18752.
-#> 10 SPRING Alafia River       2  2022    10 4990195. 11293.   306.  19961.
+#>    source majbasin     segment    yr    mo hy_load tn_load tp_load tss_load
+#>    <chr>  <chr>          <int> <dbl> <dbl>   <dbl>   <dbl>   <dbl>    <dbl>
+#>  1 SPRING Alafia River       2  2022     1    4.35   10.8    0.297     19.2
+#>  2 SPRING Alafia River       2  2022     2    4.12   10.3    0.279     18.2
+#>  3 SPRING Alafia River       2  2022     3    3.51    8.76   0.236     15.5
+#>  4 SPRING Alafia River       2  2022     4    3.80    9.48   0.257     16.8
+#>  5 SPRING Alafia River       2  2022     5    3.36    8.38   0.229     14.8
+#>  6 SPRING Alafia River       2  2022     6    3.78    9.43   0.257     16.7
+#>  7 SPRING Alafia River       2  2022     7    4.16   10.4    0.284     18.4
+#>  8 SPRING Alafia River       2  2022     8    4.54   11.3    0.309     20.0
+#>  9 SPRING Alafia River       2  2022     9    4.69   11.7    0.320     20.7
+#> 10 SPRING Alafia River       2  2022    10    4.99   12.4    0.338     22.0
 #> # ℹ 62 more rows
 ```
 
@@ -1065,18 +1061,18 @@ anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
          summ = 'segment', summtime = 'month')
 #> # A tibble: 36 × 8
-#>    source segment    yr    mo  h2oload tnload tpload tssload
-#>    <chr>    <int> <dbl> <dbl>    <dbl>  <dbl>  <dbl>   <dbl>
-#>  1 SPRING       2  2022     1 5992578. 10138.   392.  24628.
-#>  2 SPRING       2  2022     2 4842061.  9449.   307.  19658.
-#>  3 SPRING       2  2022     3 3520026.  7945.   215.  14084.
-#>  4 SPRING       2  2022     4 5021268.  8819.   324.  20574.
-#>  5 SPRING       2  2022     5 3756722.  7675.   237.  15186.
-#>  6 SPRING       2  2022     6 4234204.  8633.   267.  17119.
-#>  7 SPRING       2  2022     7 5623595.  9685.   366.  23079.
-#>  8 SPRING       2  2022     8 6611417. 10641.   435.  27275.
-#>  9 SPRING       2  2022     9 7012684. 11028.   463.  28981.
-#> 10 SPRING       2  2022    10 7447179. 11734.   489.  30772.
+#>    source segment    yr    mo hy_load tn_load tp_load tss_load
+#>    <chr>    <int> <dbl> <dbl>   <dbl>   <dbl>   <dbl>    <dbl>
+#>  1 SPRING       2  2022     1    5.99   11.2    0.432     27.1
+#>  2 SPRING       2  2022     2    4.84   10.4    0.338     21.7
+#>  3 SPRING       2  2022     3    3.52    8.76   0.237     15.5
+#>  4 SPRING       2  2022     4    5.02    9.72   0.357     22.7
+#>  5 SPRING       2  2022     5    3.76    8.46   0.261     16.7
+#>  6 SPRING       2  2022     6    4.23    9.52   0.295     18.9
+#>  7 SPRING       2  2022     7    5.62   10.7    0.404     25.4
+#>  8 SPRING       2  2022     8    6.61   11.7    0.479     30.1
+#>  9 SPRING       2  2022     9    7.01   12.2    0.511     31.9
+#> 10 SPRING       2  2022    10    7.45   12.9    0.539     33.9
 #> # ℹ 26 more rows
 ```
 
@@ -1091,9 +1087,9 @@ The `summtime` argument works across all three spatial levels. Setting
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
          summ = 'segment', summtime = 'year')
 #> # A tibble: 3 × 7
-#>   source segment    yr   h2oload  tnload tpload tssload
-#>   <chr>    <int> <dbl>     <dbl>   <dbl>  <dbl>   <dbl>
-#> 1 SPRING       2  2022 68958370. 120272.  4471. 282705.
-#> 2 SPRING       2  2023 61055062. 111931.  4735. 248700.
-#> 3 SPRING       2  2024 73396693. 122121.  5339. 301666.
+#>   source segment    yr hy_load tn_load tp_load tss_load
+#>   <chr>    <int> <dbl>   <dbl>   <dbl>   <dbl>    <dbl>
+#> 1 SPRING       2  2022    69.0    133.    4.93     312.
+#> 2 SPRING       2  2023    61.1    123.    5.22     274.
+#> 3 SPRING       2  2024    73.4    135.    5.89     333.
 ```

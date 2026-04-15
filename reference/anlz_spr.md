@@ -60,19 +60,20 @@ A data frame whose structure depends on `summ`:
 
 - `'spring'`: one row per spring per time period, with columns `source`,
   `spring`, `site`, `segment`, `yr`, `mo` (dropped for annual),
-  `flow_cfs`, `tn_mgl`, `tp_mgl`, `tss_mgl`, `h2oload` (m3), `tnload`
-  (kg), `tpload` (kg), `tssload` (kg).
+  `hy_load` (1e6 m3), `tn_load` (tons), `tp_load` (tons), `tss_load`
+  (tons).
 
 - `'basin'`: one row per drainage basin per time period, with columns
   `source`, `majbasin`, `segment`, `yr`, `mo` (dropped for annual),
-  `h2oload` (m3), `tnload` (kg), `tpload` (kg), `tssload` (kg).
+  `hy_load` (1e6 m3), `tn_load` (tons), `tp_load` (tons), `tss_load`
+  (tons).
 
 - `'segment'`: one row per bay segment per time period, with columns
-  `source`, `segment`, `yr`, `mo` (dropped for annual), `h2oload` (m3),
-  `tnload` (kg), `tpload` (kg), `tssload` (kg).
+  `source`, `segment`, `yr`, `mo` (dropped for annual), `hy_load` (1e6
+  m3), `tn_load` (tons), `tp_load` (tons), `tss_load` (tons).
 
 For annual output (`summtime = 'year'`), load columns are summed over
-months and `flow_cfs` (spring level only) is the annual mean.
+months.
 
 ## Details
 
@@ -121,9 +122,12 @@ most recently available period averages: Sulphur Springs (02306000) =
 
 **Load calculation:** Monthly mean flows (CFS) are computed from the
 complete daily discharge series. Loads are then:
-\$\$h2oload\\(m^3/month) = \overline{Q}\_{cfs} \times 86400 \times
+\$\$hy_load\\(m^3/month) = \overline{Q}\_{cfs} \times 86400 \times
 \frac{365}{12} \times 28.32 \times 10^{-3}\$\$ \$\$load\\(kg/month) =
-h2oload \times C\_{mg/L} \times 10^{-3}\$\$
+hy_load \times C\_{mg/L} \times 10^{-3}\$\$
+
+Note that `hy_load` is converted to 1e6 m3 in the output. Pollutant
+loads are converted from kg to tons.
 
 **Spatial summaries:** The data are summarized differently based on the
 `summ` and `summtime` arguments. All loading data are summed based on
@@ -142,50 +146,49 @@ wqpth    <- system.file('extdata/sprwq2224.csv',    package = 'tbeploads')
 
 # monthly per-spring loads (default)
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024))
-#> # A tibble: 108 × 14
-#>    source spring   site     segment    yr    mo flow_cfs tn_mgl tp_mgl tss_mgl
-#>    <chr>  <chr>    <chr>      <int> <dbl> <dbl>    <dbl>  <dbl>  <dbl>   <dbl>
-#>  1 SPRING Buckhorn 02301695       2  2022     1     9.46   2.26 0.0478       4
-#>  2 SPRING Buckhorn 02301695       2  2022     2    10.8    2.26 0.0478       4
-#>  3 SPRING Buckhorn 02301695       2  2022     3    10.1    2.26 0.0478       4
-#>  4 SPRING Buckhorn 02301695       2  2022     4     9.94   2.26 0.0478       4
-#>  5 SPRING Buckhorn 02301695       2  2022     5     7.94   2.26 0.0478       4
-#>  6 SPRING Buckhorn 02301695       2  2022     6     8.96   2.26 0.0478       4
-#>  7 SPRING Buckhorn 02301695       2  2022     7     9.33   2.26 0.0478       4
-#>  8 SPRING Buckhorn 02301695       2  2022     8    10.4    2.26 0.0478       4
-#>  9 SPRING Buckhorn 02301695       2  2022     9    10.4    2.26 0.0478       4
-#> 10 SPRING Buckhorn 02301695       2  2022    10    13.2    2.26 0.0478       4
+#> # A tibble: 108 × 10
+#>    source spring   site     segment    yr    mo hy_load tn_load tp_load tss_load
+#>    <chr>  <chr>    <chr>      <int> <dbl> <dbl>   <dbl>   <dbl>   <dbl>    <dbl>
+#>  1 SPRING Buckhorn 02301695       2  2022     1   0.704    1.75  0.0370     3.10
+#>  2 SPRING Buckhorn 02301695       2  2022     2   0.807    2.01  0.0425     3.56
+#>  3 SPRING Buckhorn 02301695       2  2022     3   0.750    1.86  0.0395     3.31
+#>  4 SPRING Buckhorn 02301695       2  2022     4   0.739    1.84  0.0389     3.26
+#>  5 SPRING Buckhorn 02301695       2  2022     5   0.591    1.47  0.0311     2.60
+#>  6 SPRING Buckhorn 02301695       2  2022     6   0.667    1.66  0.0351     2.94
+#>  7 SPRING Buckhorn 02301695       2  2022     7   0.694    1.73  0.0365     3.06
+#>  8 SPRING Buckhorn 02301695       2  2022     8   0.776    1.93  0.0408     3.42
+#>  9 SPRING Buckhorn 02301695       2  2022     9   0.771    1.92  0.0406     3.40
+#> 10 SPRING Buckhorn 02301695       2  2022    10   0.984    2.45  0.0518     4.34
 #> # ℹ 98 more rows
-#> # ℹ 4 more variables: h2oload <dbl>, tnload <dbl>, tpload <dbl>, tssload <dbl>
 
 # annual basin-level totals
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
           summ = 'basin', summtime = 'year')
 #> # A tibble: 6 × 8
-#>   source majbasin           segment    yr   h2oload  tnload tpload tssload
-#>   <chr>  <chr>                <int> <dbl>     <dbl>   <dbl>  <dbl>   <dbl>
-#> 1 SPRING Alafia River             2  2022 51778360. 117185.  3194. 207113.
-#> 2 SPRING Alafia River             2  2023 49855415. 110389.  3225. 199422.
-#> 3 SPRING Alafia River             2  2024 53199624. 119112.  3360. 212798.
-#> 4 SPRING Hillsborough River       2  2022 17180010.   3087.  1277.  75592.
-#> 5 SPRING Hillsborough River       2  2023 11199647.   1542.  1509.  49278.
-#> 6 SPRING Hillsborough River       2  2024 20197069.   3009.  1979.  88867.
+#>   source majbasin           segment    yr hy_load tn_load tp_load tss_load
+#>   <chr>  <chr>                <int> <dbl>   <dbl>   <dbl>   <dbl>    <dbl>
+#> 1 SPRING Alafia River             2  2022    51.8  129.      3.52    228. 
+#> 2 SPRING Alafia River             2  2023    49.9  122.      3.56    220. 
+#> 3 SPRING Alafia River             2  2024    53.2  131.      3.70    235. 
+#> 4 SPRING Hillsborough River       2  2022    17.2    3.40    1.41     83.3
+#> 5 SPRING Hillsborough River       2  2023    11.2    1.70    1.66     54.3
+#> 6 SPRING Hillsborough River       2  2024    20.2    3.32    2.18     98.0
 
 # monthly segment-level totals
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
           summ = 'segment')
 #> # A tibble: 36 × 8
-#>    source segment    yr    mo  h2oload tnload tpload tssload
-#>    <chr>    <int> <dbl> <dbl>    <dbl>  <dbl>  <dbl>   <dbl>
-#>  1 SPRING       2  2022     1 5992578. 10138.   392.  24628.
-#>  2 SPRING       2  2022     2 4842061.  9449.   307.  19658.
-#>  3 SPRING       2  2022     3 3520026.  7945.   215.  14084.
-#>  4 SPRING       2  2022     4 5021268.  8819.   324.  20574.
-#>  5 SPRING       2  2022     5 3756722.  7675.   237.  15186.
-#>  6 SPRING       2  2022     6 4234204.  8633.   267.  17119.
-#>  7 SPRING       2  2022     7 5623595.  9685.   366.  23079.
-#>  8 SPRING       2  2022     8 6611417. 10641.   435.  27275.
-#>  9 SPRING       2  2022     9 7012684. 11028.   463.  28981.
-#> 10 SPRING       2  2022    10 7447179. 11734.   489.  30772.
+#>    source segment    yr    mo hy_load tn_load tp_load tss_load
+#>    <chr>    <int> <dbl> <dbl>   <dbl>   <dbl>   <dbl>    <dbl>
+#>  1 SPRING       2  2022     1    5.99   11.2    0.432     27.1
+#>  2 SPRING       2  2022     2    4.84   10.4    0.338     21.7
+#>  3 SPRING       2  2022     3    3.52    8.76   0.237     15.5
+#>  4 SPRING       2  2022     4    5.02    9.72   0.357     22.7
+#>  5 SPRING       2  2022     5    3.76    8.46   0.261     16.7
+#>  6 SPRING       2  2022     6    4.23    9.52   0.295     18.9
+#>  7 SPRING       2  2022     7    5.62   10.7    0.404     25.4
+#>  8 SPRING       2  2022     8    6.61   11.7    0.479     30.1
+#>  9 SPRING       2  2022     9    7.01   12.2    0.511     31.9
+#> 10 SPRING       2  2022    10    7.45   12.9    0.539     33.9
 #> # ℹ 26 more rows
 ```
