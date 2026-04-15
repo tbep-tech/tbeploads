@@ -18,7 +18,7 @@ util_nps_lusumm(
 \item{summtime}{chr string indicating how the returned data are summarized temporally (month or year), see details}
 }
 \value{
-Data frame with summarized loading data based on user-supplied arguments
+Data frame with summarized loading data based on user-supplied arguments, loading data in tons per month or year depending on the \code{summtime} argument, and hydrologic load in million cubic meters per month or year depending on the \code{summtime} argument.
 }
 \description{
 Summarize non-point source (NPS) ungaged loads by land use

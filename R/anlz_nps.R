@@ -17,7 +17,7 @@
 #' @param aslu logical indicating whether to summarize by land use type (ungaged loads only), default is FALSE
 #' @param verbose logical indicating whether to print verbose output
 #'
-#' @returns A data frame of non-point source loads for Tampa Bay, including columns for year, month, bay segment, basin, and loads for total nitrogen (TN), total phosphorus (TP), total suspended solids (TSS), biochemical oxygen demand (BOD), and hydrology using default values for the \code{summ} and \code{summtime} arguments. TN, TP, TSS, and BOD Loads are tons per month or year depending on the \code{summtime} argument. Hydrologic loads are cubic meters per month or year depending on the \code{summtime} argument.
+#' @returns A data frame of non-point source loads for Tampa Bay, including columns for year, month, bay segment, basin, and loads for total nitrogen (TN), total phosphorus (TP), total suspended solids (TSS), biochemical oxygen demand (BOD), and hydrology using default values for the \code{summ} and \code{summtime} arguments. TN, TP, TSS, and BOD Loads are tons per month or year depending on the \code{summtime} argument. Hydrologic loads are million cubic meters per month or year depending on the \code{summtime} argument.
 #'
 #' @export
 #'
@@ -258,7 +258,7 @@ anlz_nps <- function(yrrng = c('2021-01-01', '2023-12-31'), tbbase, rain, mancop
       tp_load = sum(tpload_b, na.rm=TRUE) / 907.2, # kg to tons per month, use b, see line 378 in RP code 19_NPSMOD04_2224_26Sep25.SAS at T:\03_BOARDS_COMMITTEES\05_TBNMC\TB_LOADS\2027_RA_Deliverables\2224\Extra from RP 20260109
       tss_load = sum(tssload, na.rm=TRUE) / 907.2, # kg to tons per month
       bod_load = sum(bodload, na.rm=TRUE) / 907.2, # kg to tons per month
-      hy_load = sum(h2oload, na.rm=TRUE), # m3 per month
+      hy_load = sum(h2oload, na.rm=TRUE) / 1e6, # 1e6 m3 per month
       bas_area = sum(bas_area, na.rm=TRUE), # hectares
       segment = dplyr::first(segment),
       majbasin = dplyr::first(majbasin),

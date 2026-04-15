@@ -8,7 +8,7 @@
 #'
 #' @details `r summ_params('descrip')`
 #'
-#' @returns Data frame with summarized loading data based on user-supplied arguments
+#' @returns Data frame with summarized loading data based on user-supplied arguments, loading data in tons per month or year depending on the `summtime` argument, and hydrologic load in million cubic meters per month or year depending on the `summtime` argument.
 #'
 #' @export
 #' @examples
@@ -57,7 +57,7 @@ util_nps_lusumm <- function(dat, summ = c('basin', 'segment', 'all'), summtime =
       tp_load = sum(tp_load, na.rm=TRUE) / 907.2, # kg to tons per month
       tss_load = sum(tss_load, na.rm=TRUE) / 907.2, # kg to tons per month
       bod_load = sum(bod_load, na.rm=TRUE) / 907.2, # kg to tons per month
-      hy_load = sum(hy_load, na.rm=TRUE), # m3 per month
+      hy_load = sum(hy_load, na.rm=TRUE) / 1e6, # million m3 per month
       .by = c(Year, Month, source, segment, basin, clucsid)
     ) |> 
     dplyr::left_join(ludescrip, by = "clucsid") |> 
