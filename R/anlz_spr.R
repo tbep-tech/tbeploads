@@ -14,7 +14,7 @@
 #'   automatically from external APIs. Lithia and Buckhorn concentrations are
 #'   obtained from the Water Atlas API (SWFWMD stations 17805 and 18276) and
 #'   Sulphur Spring concentrations are obtained via
-#'   \code{\link[tbeptools]{read_importepc}} (EPC station 174).
+#'   \href{https://tbep-tech.github.io/tbeptools/reference/read_importepc.html}{\code{read_importepc}} (EPC station 174).
 #' @param yrrng integer vector of length 2, start and end year for the analysis,
 #'   e.g. \code{c(2022, 2024)}.
 #' @param summ `r summ_params('summ')`
@@ -66,7 +66,7 @@
 #' \href{https://dev.api.wateratlas.org}{Water Atlas API}
 #' (\code{WIN_21FLSWFD} data source). These are probably the same quarterly SWFWMD
 #' observations included in the FDEP IWR file. Sulphur Spring (EPC station
-#' 174) is retrieved via \code{\link[tbeptools]{read_importepc}}, providing
+#' 174) is retrieved via \href{https://tbep-tech.github.io/tbeptools/reference/read_importepc.html}{\code{read_importepc}}, providing
 #' monthly observations from the Environmental Protection Commission of
 #' Hillsborough County.
 #'
