@@ -37,7 +37,7 @@ anlz_spr(
   and Buckhorn concentrations are obtained from the Water Atlas API
   (SWFWMD stations 17805 and 18276) and Sulphur Spring concentrations
   are obtained via
-  [`read_importepc`](https://rdrr.io/pkg/tbeptools/man/read_importepc.html)
+  [`read_importepc`](https://tbep-tech.github.io/tbeptools/reference/read_importepc.html)
   (EPC station 174).
 
 - yrrng:
@@ -135,7 +135,7 @@ the [Water Atlas API](https://dev.api.wateratlas.org) (`WIN_21FLSWFD`
 data source). These are probably the same quarterly SWFWMD observations
 included in the FDEP IWR file. Sulphur Spring (EPC station 174) is
 retrieved via
-[`read_importepc`](https://rdrr.io/pkg/tbeptools/man/read_importepc.html),
+[`read_importepc`](https://tbep-tech.github.io/tbeptools/reference/read_importepc.html),
 providing monthly observations from the Environmental Protection
 Commission of Hillsborough County.
 

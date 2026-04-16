@@ -40,7 +40,7 @@ in which case
 substitutes fixed historical values.
 
 **Sulphur Spring** data are retrieved via
-[`read_importepc`](https://rdrr.io/pkg/tbeptools/man/read_importepc.html),
+[`read_importepc`](https://tbep-tech.github.io/tbeptools/reference/read_importepc.html),
 which downloads the Environmental Protection Commission of Hillsborough
 County (EPC) monitoring spreadsheet. Station 174 corresponds to the
 Sulphur Spring sampling location and provides monthly TN, TP, and TSS

@@ -115,9 +115,11 @@ Hillsborough County stations retained are 105, 113, 114, 132, 141, 138,
 files using the `mancopth` and `pincopth` arguments, respectively. If
 these are not provided, the function will attempt to retrieve data from
 the FDEP WIN database using `read_importwqwin` from tbeptools. The EPC
-data are retrieved using `read_importepc` from tbeptools. All inputs for
-water quality can be superseded by providing a complete water quality
-data frame using the `allwq` argument.
+data are retrieved using
+[`read_importepc`](https://tbep-tech.github.io/tbeptools/reference/read_importepc.html)
+from tbeptools. All inputs for water quality can be superseded by
+providing a complete water quality data frame using the `allwq`
+argument.
 
 The function assumes that the water quality data are in mg/L and flow
 data are in cfs. Missing water quality data are filled with previous

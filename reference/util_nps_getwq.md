@@ -50,7 +50,8 @@ Hillsborough County data is retrieved using
 If `mancopth` or `pincopth` are not `NULL`, then data are imported from
 disk using the path specified. Data from the Environmental Protection
 Commission (EPC) of Hillsborough County are imported using
-`read_importepc` from the tbeptools R package.
+[`read_importepc`](https://tbep-tech.github.io/tbeptools/reference/read_importepc.html)
+from the tbeptools R package.
 
 Local data files can be downloaded from the FDEP WIN database at
 <https://prodenv.dep.state.fl.us/DearWin/public/wavesSearchFilter?calledBy=menu>,
