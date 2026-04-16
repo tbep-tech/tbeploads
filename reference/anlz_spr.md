@@ -69,19 +69,20 @@ anlz_spr(
 
 A data frame whose structure depends on `summ`:
 
-- `'spring'`: one row per spring per time period, with columns `source`,
-  `spring`, `site`, `segment`, `yr`, `mo` (dropped for annual),
-  `hy_load` (1e6 m3), `tn_load` (tons), `tp_load` (tons), and `tss_load`
-  (tons).
+- `'spring'`: one row per spring per time period, with columns `Year`,
+  `Month` (dropped for annual), `source`, `segment`, `spring`, `tn_load`
+  (tons), `tp_load` (tons), `tss_load` (tons), `bod_load` (tons), and
+  `hy_load` (1e6 m3).
 
 - `'basin'`: one row per drainage basin per time period, with columns
-  `source`, `majbasin`, `segment`, `yr`, `mo` (dropped for annual),
-  `hy_load` (1e6 m3), `tn_load` (tons), `tp_load` (tons), `tss_load`
-  (tons).
+  `Year`, `Month` (dropped for annual), `source`, `segment`, `basin`,
+  `tn_load` (tons), `tp_load` (tons), `tss_load` (tons), `bod_load`
+  (tons), and `hy_load` (1e6 m3).
 
 - `'segment'`: one row per bay segment per time period, with columns
-  `source`, `segment`, `yr`, `mo` (dropped for annual), `hy_load` (1e6
-  m3), `tn_load` (tons), `tp_load` (tons), `tss_load` (tons).
+  `Year`, `Month` (dropped for annual), `source`, `segment`, `tn_load`
+  (tons), `tp_load` (tons), `tss_load` (tons), `bod_load` (tons), and
+  `hy_load` (1e6 m3).
 
 For annual output (`summtime = 'year'`), load columns are summed over
 months.
@@ -147,6 +148,9 @@ TSS falls back to the same fixed values. The fixed values are: Sulphur
 Springs (02306000) = 4.4 mg/L, Buckhorn Springs (02301695) = 4.0 mg/L,
 Lithia Springs (02301600) = 4.0 mg/L.
 
+**BOD concentrations:** BOD loads are returned as zero because BOD is
+not measured at the springs.
+
 **Load calculation:** Monthly mean flows (CFS) are computed from the
 complete daily discharge series. Loads are then:
 \$\$hy_load\\(m^3/month) = \overline{Q}\_{cfs} \times 86400 \times
@@ -162,7 +166,7 @@ these arguments, e.g., by bay segment (`summ = 'segment'`) and year
 `'spring'` (one row per spring per time period), `'basin'` (loads summed
 within drainage basins. Lithia and Buckhorn combined into
 `"Alafia River"`, Sulphur into `"Hillsborough River"`), and `'segment'`
-(all springs summed to bay segment 2, Hillsborough Bay).
+(all springs summed to bay segment Hillsborough Bay).
 
 ## Examples
 
@@ -173,49 +177,49 @@ wqpth    <- system.file('extdata/sprwq2224.csv',    package = 'tbeploads')
 # monthly per-spring loads using a local water quality file
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024))
 #> # A tibble: 108 × 10
-#>    source spring   site     segment    yr    mo hy_load tn_load tp_load tss_load
-#>    <chr>  <chr>    <chr>      <int> <dbl> <dbl>   <dbl>   <dbl>   <dbl>    <dbl>
-#>  1 SPRING Buckhorn 02301695       2  2022     1   0.704    1.75  0.0370     3.10
-#>  2 SPRING Buckhorn 02301695       2  2022     2   0.807    2.01  0.0425     3.56
-#>  3 SPRING Buckhorn 02301695       2  2022     3   0.750    1.86  0.0395     3.31
-#>  4 SPRING Buckhorn 02301695       2  2022     4   0.739    1.84  0.0389     3.26
-#>  5 SPRING Buckhorn 02301695       2  2022     5   0.591    1.47  0.0311     2.60
-#>  6 SPRING Buckhorn 02301695       2  2022     6   0.667    1.66  0.0351     2.94
-#>  7 SPRING Buckhorn 02301695       2  2022     7   0.694    1.73  0.0365     3.06
-#>  8 SPRING Buckhorn 02301695       2  2022     8   0.776    1.93  0.0408     3.42
-#>  9 SPRING Buckhorn 02301695       2  2022     9   0.771    1.92  0.0406     3.40
-#> 10 SPRING Buckhorn 02301695       2  2022    10   0.984    2.45  0.0518     4.34
+#>     Year Month source segment   spring tn_load tp_load tss_load bod_load hy_load
+#>    <dbl> <dbl> <chr>  <chr>     <chr>    <dbl>   <dbl>    <dbl>    <dbl>   <dbl>
+#>  1  2022     1 SPR    Hillsbor… Buckh…    1.75  0.0370     3.10        0   0.704
+#>  2  2022     2 SPR    Hillsbor… Buckh…    2.01  0.0425     3.56        0   0.807
+#>  3  2022     3 SPR    Hillsbor… Buckh…    1.86  0.0395     3.31        0   0.750
+#>  4  2022     4 SPR    Hillsbor… Buckh…    1.84  0.0389     3.26        0   0.739
+#>  5  2022     5 SPR    Hillsbor… Buckh…    1.47  0.0311     2.60        0   0.591
+#>  6  2022     6 SPR    Hillsbor… Buckh…    1.66  0.0351     2.94        0   0.667
+#>  7  2022     7 SPR    Hillsbor… Buckh…    1.73  0.0365     3.06        0   0.694
+#>  8  2022     8 SPR    Hillsbor… Buckh…    1.93  0.0408     3.42        0   0.776
+#>  9  2022     9 SPR    Hillsbor… Buckh…    1.92  0.0406     3.40        0   0.771
+#> 10  2022    10 SPR    Hillsbor… Buckh…    2.45  0.0518     4.34        0   0.984
 #> # ℹ 98 more rows
 
 # annual basin-level totals
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
           summ = 'basin', summtime = 'year')
-#> # A tibble: 6 × 8
-#>   source majbasin           segment    yr hy_load tn_load tp_load tss_load
-#>   <chr>  <chr>                <int> <dbl>   <dbl>   <dbl>   <dbl>    <dbl>
-#> 1 SPRING Alafia River             2  2022    51.8  129.      3.52    228. 
-#> 2 SPRING Alafia River             2  2023    49.9  122.      3.56    220. 
-#> 3 SPRING Alafia River             2  2024    53.2  131.      3.70    235. 
-#> 4 SPRING Hillsborough River       2  2022    17.2    3.40    1.41     83.3
-#> 5 SPRING Hillsborough River       2  2023    11.2    1.70    1.66     54.3
-#> 6 SPRING Hillsborough River       2  2024    20.2    3.32    2.18     98.0
+#> # A tibble: 6 × 9
+#>    Year source segment        majbasin tn_load tp_load tss_load bod_load hy_load
+#>   <dbl> <chr>  <chr>          <chr>      <dbl>   <dbl>    <dbl>    <dbl>   <dbl>
+#> 1  2022 SPR    Hillsborough … Alafia …  129.      3.52    228.         0    51.8
+#> 2  2023 SPR    Hillsborough … Alafia …  122.      3.56    220.         0    49.9
+#> 3  2024 SPR    Hillsborough … Alafia …  131.      3.70    235.         0    53.2
+#> 4  2022 SPR    Hillsborough … Hillsbo…    3.40    1.41     83.3        0    17.2
+#> 5  2023 SPR    Hillsborough … Hillsbo…    1.70    1.66     54.3        0    11.2
+#> 6  2024 SPR    Hillsborough … Hillsbo…    3.32    2.18     98.0        0    20.2
 
 # monthly segment-level totals
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
           summ = 'segment')
-#> # A tibble: 36 × 8
-#>    source segment    yr    mo hy_load tn_load tp_load tss_load
-#>    <chr>    <int> <dbl> <dbl>   <dbl>   <dbl>   <dbl>    <dbl>
-#>  1 SPRING       2  2022     1    5.99   11.2    0.432     27.1
-#>  2 SPRING       2  2022     2    4.84   10.4    0.338     21.7
-#>  3 SPRING       2  2022     3    3.52    8.76   0.237     15.5
-#>  4 SPRING       2  2022     4    5.02    9.72   0.357     22.7
-#>  5 SPRING       2  2022     5    3.76    8.46   0.261     16.7
-#>  6 SPRING       2  2022     6    4.23    9.52   0.295     18.9
-#>  7 SPRING       2  2022     7    5.62   10.7    0.404     25.4
-#>  8 SPRING       2  2022     8    6.61   11.7    0.479     30.1
-#>  9 SPRING       2  2022     9    7.01   12.2    0.511     31.9
-#> 10 SPRING       2  2022    10    7.45   12.9    0.539     33.9
+#> # A tibble: 36 × 9
+#>     Year Month source segment          tn_load tp_load tss_load bod_load hy_load
+#>    <dbl> <dbl> <chr>  <chr>              <dbl>   <dbl>    <dbl>    <dbl>   <dbl>
+#>  1  2022     1 SPR    Hillsborough Bay   11.2    0.432     27.1        0    5.99
+#>  2  2022     2 SPR    Hillsborough Bay   10.4    0.338     21.7        0    4.84
+#>  3  2022     3 SPR    Hillsborough Bay    8.76   0.237     15.5        0    3.52
+#>  4  2022     4 SPR    Hillsborough Bay    9.72   0.357     22.7        0    5.02
+#>  5  2022     5 SPR    Hillsborough Bay    8.46   0.261     16.7        0    3.76
+#>  6  2022     6 SPR    Hillsborough Bay    9.52   0.295     18.9        0    4.23
+#>  7  2022     7 SPR    Hillsborough Bay   10.7    0.404     25.4        0    5.62
+#>  8  2022     8 SPR    Hillsborough Bay   11.7    0.479     30.1        0    6.61
+#>  9  2022     9 SPR    Hillsborough Bay   12.2    0.511     31.9        0    7.01
+#> 10  2022    10 SPR    Hillsborough Bay   12.9    0.539     33.9        0    7.45
 #> # ℹ 26 more rows
 
 if (FALSE) { # \dontrun{

@@ -101,17 +101,17 @@ when water quality data are retrieved via API (<code>wqpth = NULL</code>).</p></
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A data frame whose structure depends on <code>summ</code>:</p><ul><li><p><code>'spring'</code>: one row per spring per time period, with columns
-<code>source</code>, <code>spring</code>, <code>site</code>, <code>segment</code>, <code>yr</code>,
-<code>mo</code> (dropped for annual), <code>hy_load</code> (1e6 m3), <code>tn_load</code> (tons),
-<code>tp_load</code> (tons), and <code>tss_load</code> (tons).</p></li>
+<code>Year</code>, <code>Month</code> (dropped for annual), <code>source</code>, <code>segment</code>,
+<code>spring</code>, <code>tn_load</code> (tons), <code>tp_load</code> (tons),
+<code>tss_load</code> (tons), <code>bod_load</code> (tons), and <code>hy_load</code> (1e6 m3).</p></li>
 <li><p><code>'basin'</code>: one row per drainage basin per time period, with
-columns <code>source</code>, <code>majbasin</code>, <code>segment</code>, <code>yr</code>,
-<code>mo</code> (dropped for annual), <code>hy_load</code> (1e6 m3), <code>tn_load</code> (tons),
-<code>tp_load</code> (tons), <code>tss_load</code> (tons).</p></li>
+columns <code>Year</code>, <code>Month</code> (dropped for annual), <code>source</code>,
+<code>segment</code>, <code>basin</code>, <code>tn_load</code> (tons), <code>tp_load</code> (tons),
+<code>tss_load</code> (tons), <code>bod_load</code> (tons), and <code>hy_load</code> (1e6 m3).</p></li>
 <li><p><code>'segment'</code>: one row per bay segment per time period, with
-columns <code>source</code>, <code>segment</code>, <code>yr</code>, <code>mo</code> (dropped for
-annual), <code>hy_load</code> (1e6 m3), <code>tn_load</code> (tons), <code>tp_load</code> (tons),
-<code>tss_load</code> (tons).</p></li>
+columns <code>Year</code>, <code>Month</code> (dropped for annual), <code>source</code>,
+<code>segment</code>, <code>tn_load</code> (tons), <code>tp_load</code> (tons),
+<code>tss_load</code> (tons), <code>bod_load</code> (tons), and <code>hy_load</code> (1e6 m3).</p></li>
 </ul><p>For annual output (<code>summtime = 'year'</code>), load columns are summed over
 months.</p>
     </div>
@@ -163,6 +163,8 @@ where available. Any spring-year with no observed TSS falls back to the same
 fixed values. The fixed values are: Sulphur Springs (02306000) = 4.4 mg/L,
 Buckhorn Springs (02301695) = 4.0 mg/L, Lithia Springs (02301600) = 4.0
 mg/L.</p>
+<p><strong>BOD concentrations:</strong>
+BOD loads are returned as zero because BOD is not measured at the springs.</p>
 <p><strong>Load calculation:</strong>
 Monthly mean flows (CFS) are computed from the complete daily discharge
 series. Loads are then:
@@ -174,7 +176,7 @@ The data are summarized differently based on the <code>summ</code> and <code>sum
 <code>'spring'</code> (one row per spring per time period), <code>'basin'</code> (loads
 summed within drainage basins. Lithia and Buckhorn combined into
 <code>"Alafia River"</code>, Sulphur into <code>"Hillsborough River"</code>), and
-<code>'segment'</code> (all springs summed to bay segment 2, Hillsborough Bay).</p>
+<code>'segment'</code> (all springs summed to bay segment Hillsborough Bay).</p>
     </div>
 
     <div class="section level2">
@@ -185,49 +187,49 @@ summed within drainage basins. Lithia and Buckhorn combined into
 <span class="r-in"><span><span class="co"># monthly per-spring loads using a local water quality file</span></span></span>
 <span class="r-in"><span><span class="fu">anlz_spr</span><span class="op">(</span>tbwxlpth <span class="op">=</span> <span class="va">tbwxlpth</span>, wqpth <span class="op">=</span> <span class="va">wqpth</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 108 × 10</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    source spring   site     segment    yr    mo hy_load tn_load tp_load tss_load</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     1   0.704    1.75  0.037<span style="text-decoration: underline;">0</span>     3.10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     2   0.807    2.01  0.042<span style="text-decoration: underline;">5</span>     3.56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     3   0.750    1.86  0.039<span style="text-decoration: underline;">5</span>     3.31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     4   0.739    1.84  0.038<span style="text-decoration: underline;">9</span>     3.26</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     5   0.591    1.47  0.031<span style="text-decoration: underline;">1</span>     2.60</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     6   0.667    1.66  0.035<span style="text-decoration: underline;">1</span>     2.94</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     7   0.694    1.73  0.036<span style="text-decoration: underline;">5</span>     3.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     8   0.776    1.93  0.040<span style="text-decoration: underline;">8</span>     3.42</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022     9   0.771    1.92  0.040<span style="text-decoration: underline;">6</span>     3.40</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> SPRING Buckhorn 02301695       2  <span style="text-decoration: underline;">2</span>022    10   0.984    2.45  0.051<span style="text-decoration: underline;">8</span>     4.34</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Year Month source segment   spring tn_load tp_load tss_load bod_load hy_load</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">2</span>022     1 SPR    Hillsbor… Buckh…    1.75  0.037<span style="text-decoration: underline;">0</span>     3.10        0   0.704</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">2</span>022     2 SPR    Hillsbor… Buckh…    2.01  0.042<span style="text-decoration: underline;">5</span>     3.56        0   0.807</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">2</span>022     3 SPR    Hillsbor… Buckh…    1.86  0.039<span style="text-decoration: underline;">5</span>     3.31        0   0.750</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  <span style="text-decoration: underline;">2</span>022     4 SPR    Hillsbor… Buckh…    1.84  0.038<span style="text-decoration: underline;">9</span>     3.26        0   0.739</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>  <span style="text-decoration: underline;">2</span>022     5 SPR    Hillsbor… Buckh…    1.47  0.031<span style="text-decoration: underline;">1</span>     2.60        0   0.591</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>  <span style="text-decoration: underline;">2</span>022     6 SPR    Hillsbor… Buckh…    1.66  0.035<span style="text-decoration: underline;">1</span>     2.94        0   0.667</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>  <span style="text-decoration: underline;">2</span>022     7 SPR    Hillsbor… Buckh…    1.73  0.036<span style="text-decoration: underline;">5</span>     3.06        0   0.694</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>  <span style="text-decoration: underline;">2</span>022     8 SPR    Hillsbor… Buckh…    1.93  0.040<span style="text-decoration: underline;">8</span>     3.42        0   0.776</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">2</span>022     9 SPR    Hillsbor… Buckh…    1.92  0.040<span style="text-decoration: underline;">6</span>     3.40        0   0.771</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>022    10 SPR    Hillsbor… Buckh…    2.45  0.051<span style="text-decoration: underline;">8</span>     4.34        0   0.984</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 98 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># annual basin-level totals</span></span></span>
 <span class="r-in"><span><span class="fu">anlz_spr</span><span class="op">(</span>tbwxlpth <span class="op">=</span> <span class="va">tbwxlpth</span>, wqpth <span class="op">=</span> <span class="va">wqpth</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          summ <span class="op">=</span> <span class="st">'basin'</span>, summtime <span class="op">=</span> <span class="st">'year'</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   source majbasin           segment    yr hy_load tn_load tp_load tss_load</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> SPRING Alafia River             2  <span style="text-decoration: underline;">2</span>022    51.8  129.      3.52    228. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> SPRING Alafia River             2  <span style="text-decoration: underline;">2</span>023    49.9  122.      3.56    220. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> SPRING Alafia River             2  <span style="text-decoration: underline;">2</span>024    53.2  131.      3.70    235. </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> SPRING Hillsborough River       2  <span style="text-decoration: underline;">2</span>022    17.2    3.40    1.41     83.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> SPRING Hillsborough River       2  <span style="text-decoration: underline;">2</span>023    11.2    1.70    1.66     54.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> SPRING Hillsborough River       2  <span style="text-decoration: underline;">2</span>024    20.2    3.32    2.18     98.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 9</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Year source segment        majbasin tn_load tp_load tss_load bod_load hy_load</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>022 SPR    Hillsborough … Alafia …  129.      3.52    228.         0    51.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>  <span style="text-decoration: underline;">2</span>023 SPR    Hillsborough … Alafia …  122.      3.56    220.         0    49.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  <span style="text-decoration: underline;">2</span>024 SPR    Hillsborough … Alafia …  131.      3.70    235.         0    53.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">2</span>022 SPR    Hillsborough … Hillsbo…    3.40    1.41     83.3        0    17.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>023 SPR    Hillsborough … Hillsbo…    1.70    1.66     54.3        0    11.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">2</span>024 SPR    Hillsborough … Hillsbo…    3.32    2.18     98.0        0    20.2</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># monthly segment-level totals</span></span></span>
 <span class="r-in"><span><span class="fu">anlz_spr</span><span class="op">(</span>tbwxlpth <span class="op">=</span> <span class="va">tbwxlpth</span>, wqpth <span class="op">=</span> <span class="va">wqpth</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          summ <span class="op">=</span> <span class="st">'segment'</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 36 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    source segment    yr    mo hy_load tn_load tp_load tss_load</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     1    5.99   11.2    0.432     27.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     2    4.84   10.4    0.338     21.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     3    3.52    8.76   0.237     15.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     4    5.02    9.72   0.357     22.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     5    3.76    8.46   0.261     16.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     6    4.23    9.52   0.295     18.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     7    5.62   10.7    0.404     25.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     8    6.61   11.7    0.479     30.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> SPRING       2  <span style="text-decoration: underline;">2</span>022     9    7.01   12.2    0.511     31.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> SPRING       2  <span style="text-decoration: underline;">2</span>022    10    7.45   12.9    0.539     33.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 36 × 9</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Year Month source segment          tn_load tp_load tss_load bod_load hy_load</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">2</span>022     1 SPR    Hillsborough Bay   11.2    0.432     27.1        0    5.99</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">2</span>022     2 SPR    Hillsborough Bay   10.4    0.338     21.7        0    4.84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">2</span>022     3 SPR    Hillsborough Bay    8.76   0.237     15.5        0    3.52</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  <span style="text-decoration: underline;">2</span>022     4 SPR    Hillsborough Bay    9.72   0.357     22.7        0    5.02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>  <span style="text-decoration: underline;">2</span>022     5 SPR    Hillsborough Bay    8.46   0.261     16.7        0    3.76</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>  <span style="text-decoration: underline;">2</span>022     6 SPR    Hillsborough Bay    9.52   0.295     18.9        0    4.23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>  <span style="text-decoration: underline;">2</span>022     7 SPR    Hillsborough Bay   10.7    0.404     25.4        0    5.62</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>  <span style="text-decoration: underline;">2</span>022     8 SPR    Hillsborough Bay   11.7    0.479     30.1        0    6.61</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">2</span>022     9 SPR    Hillsborough Bay   12.2    0.511     31.9        0    7.01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>022    10 SPR    Hillsborough Bay   12.9    0.539     33.9        0    7.45</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 26 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
