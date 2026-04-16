@@ -379,6 +379,8 @@ wqpth <- system.file('extdata/sprwq2224.csv', package = 'tbeploads')
 
 **TSS concentrations:** When `wqpth` is supplied, TSS concentrations are always assigned from a fixed lookup table derived from the historical SAS-based loading model (SPRMOD2): 4.4 mg/L for Sulphur Springs and 4.0 mg/L for Lithia and Buckhorn.  When `wqpth = NULL`, TSS values from the API or EPC source are used where available (Sulphur Spring via EPC may have periodic observations). Any spring–year combination with no measured TSS falls back to the same fixed values.
 
+**BOD concentrations:** BOD loads are returned as zero because BOD is not measured at the springs.
+
 **Sulphur Spring discharge (USGS):** Daily discharge for USGS station 02306000 is retrieved from the NWIS API via `util_nps_getusgsflow()`.  A data frame can also be passed to the `sulphurflow` argument to avoid a repeat API call.
 
 #### Estimating spring loads

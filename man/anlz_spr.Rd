@@ -49,17 +49,17 @@ when water quality data are retrieved via API (\code{wqpth = NULL}).}
 A data frame whose structure depends on \code{summ}:
 \itemize{
 \item \code{'spring'}: one row per spring per time period, with columns
-\code{source}, \code{spring}, \code{site}, \code{segment}, \code{yr},
-\code{mo} (dropped for annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons),
-\code{tp_load} (tons), and \code{tss_load} (tons).
+\code{Year}, \code{Month} (dropped for annual), \code{source}, \code{segment},
+\code{spring}, \code{tn_load} (tons), \code{tp_load} (tons),
+\code{tss_load} (tons), \code{bod_load} (tons), and \code{hy_load} (1e6 m3).
 \item \code{'basin'}: one row per drainage basin per time period, with
-columns \code{source}, \code{majbasin}, \code{segment}, \code{yr},
-\code{mo} (dropped for annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons),
-\code{tp_load} (tons), \code{tss_load} (tons).
+columns \code{Year}, \code{Month} (dropped for annual), \code{source},
+\code{segment}, \code{basin}, \code{tn_load} (tons), \code{tp_load} (tons),
+\code{tss_load} (tons), \code{bod_load} (tons), and \code{hy_load} (1e6 m3).
 \item \code{'segment'}: one row per bay segment per time period, with
-columns \code{source}, \code{segment}, \code{yr}, \code{mo} (dropped for
-annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons), \code{tp_load} (tons),
-\code{tss_load} (tons).
+columns \code{Year}, \code{Month} (dropped for annual), \code{source},
+\code{segment}, \code{tn_load} (tons), \code{tp_load} (tons),
+\code{tss_load} (tons), \code{bod_load} (tons), and \code{hy_load} (1e6 m3).
 }
 For annual output (\code{summtime = 'year'}), load columns are summed over
 months.
@@ -122,6 +122,9 @@ fixed values. The fixed values are: Sulphur Springs (02306000) = 4.4 mg/L,
 Buckhorn Springs (02301695) = 4.0 mg/L, Lithia Springs (02301600) = 4.0
 mg/L.
 
+\strong{BOD concentrations:}
+BOD loads are returned as zero because BOD is not measured at the springs.
+
 \strong{Load calculation:}
 Monthly mean flows (CFS) are computed from the complete daily discharge
 series. Loads are then:
@@ -135,7 +138,7 @@ The data are summarized differently based on the \code{summ} and \code{summtime}
 \code{'spring'} (one row per spring per time period), \code{'basin'} (loads
 summed within drainage basins. Lithia and Buckhorn combined into
 \code{"Alafia River"}, Sulphur into \code{"Hillsborough River"}), and
-\code{'segment'} (all springs summed to bay segment 2, Hillsborough Bay).
+\code{'segment'} (all springs summed to bay segment Hillsborough Bay).
 }
 \examples{
 tbwxlpth <- system.file('extdata/sprflow2224.xlsx', package = 'tbeploads')

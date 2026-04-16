@@ -22,15 +22,15 @@ test_that("anlz_spr spring/month returns correct structure and values", {
 
   expect_s3_class(result, "data.frame")
 
-  expected_cols <- c("source", "spring", "site", "segment", "yr", "mo",
-                     "hy_load", "tn_load", "tp_load", "tss_load")
+  expected_cols <- c("Year", "Month", "source", "segment", "spring",
+                     "tn_load", "tp_load", "tss_load", "bod_load", "hy_load")
   expect_identical(names(result), expected_cols)
 
   # 3 springs x 3 years x 12 months
   expect_equal(nrow(result), 108L)
 
-  expect_true(all(result$source == "SPRING"))
-  expect_true(all(result$segment == 2L))
+  expect_true(all(result$source == "SPR"))
+  expect_true(all(result$segment == "Hillsborough Bay"))
   expect_setequal(unique(result$spring), c("Lithia", "Buckhorn", "Sulphur"))
 
   # All loads positive
@@ -41,7 +41,7 @@ test_that("anlz_spr spring/month returns correct structure and values", {
 
 })
 
-test_that("anlz_spr spring/year drops mo and aggregates correctly", {
+test_that("anlz_spr spring/year drops month and aggregates correctly", {
 
   result_mo <- anlz_spr(tbwxlpth, wqpth, yrrng = c(2022, 2024),
                         summ = 'spring', summtime = 'month',
@@ -51,15 +51,15 @@ test_that("anlz_spr spring/year drops mo and aggregates correctly", {
                         summ = 'spring', summtime = 'year',
                         sulphurflow = mock_sulphurflow)
 
-  # 3 springs x 3 years, no mo column
+  # 3 springs x 3 years, no Month column
   expect_equal(nrow(result_yr), 9L)
-  expect_false("mo" %in% names(result_yr))
+  expect_false("Month" %in% names(result_yr))
 
   # Annual tn_load for each spring/year must equal the sum of monthly tnloads
   for (spr in c("Lithia", "Buckhorn", "Sulphur")) {
     for (yr in 2022:2024) {
-      annual  <- result_yr$tn_load[result_yr$spring == spr & result_yr$yr == yr]
-      monthly <- sum(result_mo$tn_load[result_mo$spring == spr & result_mo$yr == yr])
+      annual  <- result_yr$tn_load[result_yr$spring == spr & result_yr$Year == yr]
+      monthly <- sum(result_mo$tn_load[result_mo$spring == spr & result_mo$Year == yr])
       expect_equal(annual, monthly, tolerance = 1e-6,
                    label = paste("tn_load", spr, yr))
     }
@@ -77,8 +77,8 @@ test_that("anlz_spr basin/month returns correct structure", {
                      summ = 'basin', summtime = 'month',
                      sulphurflow = mock_sulphurflow)
 
-  expected_cols <- c("source", "majbasin", "segment", "yr", "mo",
-                     "hy_load", "tn_load", "tp_load", "tss_load")
+  expected_cols <- c("Year", "Month", "source", "segment", "majbasin",
+                     "tn_load", "tp_load", "tss_load", "bod_load", "hy_load")
   expect_identical(names(result), expected_cols)
 
   # 2 basins x 3 years x 12 months
@@ -89,7 +89,6 @@ test_that("anlz_spr basin/month returns correct structure", {
 
   # spring/site columns should not be present
   expect_false("spring" %in% names(result))
-  expect_false("site"   %in% names(result))
 
   # All loads positive
   expect_true(all(result$tn_load > 0))
@@ -128,7 +127,7 @@ test_that("anlz_spr basin/year drops mo and has correct row count", {
 
   # 2 basins x 3 years
   expect_equal(nrow(result), 6L)
-  expect_false("mo" %in% names(result))
+  expect_false("Month" %in% names(result))
 
 })
 
@@ -142,13 +141,13 @@ test_that("anlz_spr segment/month returns correct structure", {
                      summ = 'segment', summtime = 'month',
                      sulphurflow = mock_sulphurflow)
 
-  expected_cols <- c("source", "segment", "yr", "mo",
-                     "hy_load", "tn_load", "tp_load", "tss_load")
+  expected_cols <- c("Year", "Month", "source", "segment",
+                     "tn_load", "tp_load", "tss_load", "bod_load", "hy_load")
   expect_identical(names(result), expected_cols)
 
   # 1 segment x 3 years x 12 months
   expect_equal(nrow(result), 36L)
-  expect_true(all(result$segment == 2L))
+  expect_true(all(result$segment == "Hillsborough Bay"))
 
 })
 
@@ -185,8 +184,8 @@ test_that("anlz_spr segment/year drops mo and aggregates across months", {
 
   # Annual totals must equal sum of monthly totals for each year
   for (yr in 2022:2024) {
-    annual  <- seg_yr$tn_load[seg_yr$yr == yr]
-    monthly <- sum(seg_mo$tn_load[seg_mo$yr == yr])
+    annual  <- seg_yr$tn_load[seg_yr$Year == yr]
+    monthly <- sum(seg_mo$tn_load[seg_mo$Year == yr])
     expect_equal(annual, monthly, tolerance = 1e-6,
                  label = paste("segment tn_load", yr))
   }
@@ -229,8 +228,8 @@ test_that("anlz_spr wqpth=NULL calls util_spr_getwq and returns correct structur
   expect_equal(nrow(result), 108L)
   expect_setequal(unique(result$spring), c("Lithia", "Buckhorn", "Sulphur"))
 
-  expected_cols <- c("source", "spring", "site", "segment", "yr", "mo",
-                     "hy_load", "tn_load", "tp_load", "tss_load")
+  expected_cols <- c("Year", "Month", "source", "segment", "spring",
+                     "tn_load", "tp_load", "tss_load", "bod_load", "hy_load")
   expect_identical(names(result), expected_cols)
 
 })

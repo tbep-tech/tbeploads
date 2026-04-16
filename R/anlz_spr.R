@@ -79,6 +79,9 @@
 #' Buckhorn Springs (02301695) = 4.0 mg/L, Lithia Springs (02301600) = 4.0
 #' mg/L.
 #'
+#' \strong{BOD concentrations:}
+#' BOD loads are returned as zero because BOD is not measured at the springs.
+#' 
 #' \strong{Load calculation:}
 #' Monthly mean flows (CFS) are computed from the complete daily discharge
 #' series. Loads are then:
@@ -92,22 +95,22 @@
 #' \code{'spring'} (one row per spring per time period), \code{'basin'} (loads
 #' summed within drainage basins. Lithia and Buckhorn combined into
 #' \code{"Alafia River"}, Sulphur into \code{"Hillsborough River"}), and
-#' \code{'segment'} (all springs summed to bay segment 2, Hillsborough Bay).
+#' \code{'segment'} (all springs summed to bay segment Hillsborough Bay).
 #'
 #' @return A data frame whose structure depends on \code{summ}:
 #' \itemize{
 #'   \item \code{'spring'}: one row per spring per time period, with columns
-#'     \code{source}, \code{spring}, \code{site}, \code{segment}, \code{yr},
-#'     \code{mo} (dropped for annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons), 
-#'     \code{tp_load} (tons), and \code{tss_load} (tons).
+#'     \code{Year}, \code{Month} (dropped for annual), \code{source}, \code{segment}, 
+#'     \code{spring}, \code{tn_load} (tons), \code{tp_load} (tons), 
+#'     \code{tss_load} (tons), \code{bod_load} (tons), and \code{hy_load} (1e6 m3).
 #'   \item \code{'basin'}: one row per drainage basin per time period, with
-#'     columns \code{source}, \code{majbasin}, \code{segment}, \code{yr},
-#'     \code{mo} (dropped for annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons),
-#'     \code{tp_load} (tons), \code{tss_load} (tons).
+#'     columns \code{Year}, \code{Month} (dropped for annual), \code{source}, 
+#'     \code{segment}, \code{basin}, \code{tn_load} (tons), \code{tp_load} (tons), 
+#'     \code{tss_load} (tons), \code{bod_load} (tons), and \code{hy_load} (1e6 m3).
 #'   \item \code{'segment'}: one row per bay segment per time period, with
-#'     columns \code{source}, \code{segment}, \code{yr}, \code{mo} (dropped for
-#'     annual), \code{hy_load} (1e6 m3), \code{tn_load} (tons), \code{tp_load} (tons),
-#'     \code{tss_load} (tons).
+#'     columns \code{Year}, \code{Month} (dropped for annual), \code{source}, 
+#'     \code{segment}, \code{tn_load} (tons), \code{tp_load} (tons), 
+#'     \code{tss_load} (tons), \code{bod_load} (tons), and \code{hy_load} (1e6 m3).
 #' }
 #' For annual output (\code{summtime = 'year'}), load columns are summed over
 #' months.
@@ -319,15 +322,16 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
         unname(tss_site[site]),
         tss_mgl
       ),
-      segment = 2L,
-      source  = "SPRING",
+      segment = 'Hillsborough Bay',
+      source  = 'SPR',
       hy_load = flow_cfs * 86400 * (365 / 12) * 28.32 * 1e-3,
       tn_load  = hy_load * tn_mgl  * 1e-3 / 907.1847,  # convert kg to tons
       tp_load  = hy_load * tp_mgl  * 1e-3 / 907.1847,  # convert kg to tons
-      tss_load = hy_load * tss_mgl * 1e-3 / 907.1847   # convert kg to tons
+      tss_load = hy_load * tss_mgl * 1e-3 / 907.1847,  # convert kg to tons
+      bod_load = 0
     ) |>
-    dplyr::select(source, spring, site, segment, yr, mo,
-                  hy_load, tn_load, tp_load, tss_load) |>
+    dplyr::select(Year = yr, Month = mo, source, segment, spring,
+                  tn_load, tp_load, tss_load, bod_load, hy_load) |>
     dplyr::mutate(hy_load = hy_load / 1e6)  # convert to million m3
 
   # ---------------------------------------------------------------------------
@@ -337,24 +341,26 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
 
     out <- out |>
       dplyr::left_join(basin_lookup, by = "spring") |>
-      dplyr::group_by(source, majbasin, segment, yr, mo) |>
+      dplyr::group_by(Year, Month, source, segment, majbasin) |>
       dplyr::summarise(
-        hy_load = sum(hy_load, na.rm = TRUE),
         tn_load  = sum(tn_load,  na.rm = TRUE),
         tp_load  = sum(tp_load,  na.rm = TRUE),
         tss_load = sum(tss_load, na.rm = TRUE),
+        bod_load = sum(bod_load, na.rm = TRUE),
+        hy_load = sum(hy_load, na.rm = TRUE),
         .groups = "drop"
       )
 
   } else if (summ == 'segment') {
 
     out <- out |>
-      dplyr::group_by(source, segment, yr, mo) |>
+      dplyr::group_by(Year, Month, source, segment) |>
       dplyr::summarise(
-        hy_load = sum(hy_load, na.rm = TRUE),
         tn_load  = sum(tn_load,  na.rm = TRUE),
         tp_load  = sum(tp_load,  na.rm = TRUE),
         tss_load = sum(tss_load, na.rm = TRUE),
+        bod_load = sum(bod_load, na.rm = TRUE),
+        hy_load = sum(hy_load, na.rm = TRUE),
         .groups = "drop"
       )
 
@@ -368,41 +374,44 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
     if (summ == 'spring') {
 
       out <- out |>
-        dplyr::group_by(source, spring, site, segment, yr) |>
+        dplyr::group_by(Year, source, segment, spring) |>
         dplyr::summarise(
-          hy_load  = sum(hy_load,   na.rm = TRUE),
-          tn_load   = sum(tn_load,    na.rm = TRUE),
-          tp_load   = sum(tp_load,    na.rm = TRUE),
-          tss_load  = sum(tss_load,   na.rm = TRUE),
+          tn_load  = sum(tn_load,  na.rm = TRUE),
+          tp_load  = sum(tp_load,  na.rm = TRUE),
+          tss_load = sum(tss_load, na.rm = TRUE),
+          bod_load = sum(bod_load, na.rm = TRUE),
+          hy_load = sum(hy_load, na.rm = TRUE),
           .groups  = "drop"
         ) |>
-        dplyr::arrange(spring, yr)
+        dplyr::arrange(spring, Year)
 
     } else if (summ == 'basin') {
 
       out <- out |>
-        dplyr::group_by(source, majbasin, segment, yr) |>
+        dplyr::group_by(Year, source, segment, majbasin) |>
         dplyr::summarise(
-          hy_load = sum(hy_load, na.rm = TRUE),
           tn_load  = sum(tn_load,  na.rm = TRUE),
           tp_load  = sum(tp_load,  na.rm = TRUE),
           tss_load = sum(tss_load, na.rm = TRUE),
+          bod_load = sum(bod_load, na.rm = TRUE),
+          hy_load = sum(hy_load, na.rm = TRUE),
           .groups = "drop"
         ) |>
-        dplyr::arrange(majbasin, yr)
+        dplyr::arrange(majbasin, Year)
 
     } else if (summ == 'segment') {
 
       out <- out |>
-        dplyr::group_by(source, segment, yr) |>
+        dplyr::group_by(Year, source, segment) |>
         dplyr::summarise(
-          hy_load = sum(hy_load, na.rm = TRUE),
           tn_load  = sum(tn_load,  na.rm = TRUE),
           tp_load  = sum(tp_load,  na.rm = TRUE),
           tss_load = sum(tss_load, na.rm = TRUE),
+          bod_load = sum(bod_load, na.rm = TRUE),
+          hy_load = sum(hy_load, na.rm = TRUE),
           .groups = "drop"
         ) |>
-        dplyr::arrange(yr)
+        dplyr::arrange(Year)
 
     }
 
