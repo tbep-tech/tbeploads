@@ -126,6 +126,11 @@ Utility functions used by other functions or standalone.
 - [`util_gw_getcontour()`](https://tbep-tech.github.io/tbeploads/reference/util_gw_getcontour.md)
   : Download FDEP Upper Floridan Aquifer potentiometric surface contour
   lines
+- [`util_gw_getwq()`](https://tbep-tech.github.io/tbeploads/reference/util_gw_getwq.md)
+  : Get groundwater quality concentrations for Floridan aquifer segments
+- [`util_gw_grad()`](https://tbep-tech.github.io/tbeploads/reference/util_gw_grad.md)
+  : Compute hydraulic gradient per bay segment from UFA potentiometric
+  surface contours
 - [`util_nps_fillmiswq()`](https://tbep-tech.github.io/tbeploads/reference/util_nps_fillmiswq.md)
   : Fill in missing water quality values for non-point source (NPS) data
 - [`util_nps_getextflow()`](https://tbep-tech.github.io/tbeploads/reference/util_nps_getextflow.md)
