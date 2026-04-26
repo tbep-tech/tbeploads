@@ -93,6 +93,9 @@ Supporting datasets used by the other functions.
   : Simple feature polygons of 2023 land use in the Tampa Bay Estuary
   Program boundary
 
+- [`tbsegdetail`](https://tbep-tech.github.io/tbeploads/reference/tbsegdetail.md)
+  : Simple feature polygons of Tampa Bay segments with shoreline detail
+
 - [`tbsoil`](https://tbep-tech.github.io/tbeploads/reference/tbsoil.md)
   : Simple feature polygons of soil data in the Tampa Bay Estuary
   Program boundary
