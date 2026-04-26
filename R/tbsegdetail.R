@@ -1,0 +1,32 @@
+#' Simple feature polygons of Tampa Bay segments with shoreline detail
+#'
+#' @format A \code{\link[sf]{sf}} object
+#'
+#' @details Detailed shoreline polygons for the major bay segments,
+#'   including a North/South split for Boca Ciega Bay. Note that the 
+#'   Boca Ciega Bay segment is only the northern portion. The data includes the
+#'   following columns.
+#'
+#' \itemize{
+#'   \item \code{bay_seg}: Integer, numeric segment identifier matching
+#'   \item \code{geometry}: The geometry column
+#' }
+#'
+#' Bay segments included:
+#'
+#' \itemize{
+#'   \item 1: Old Tampa Bay
+#'   \item 2: Hillsborough Bay
+#'   \item 3: Middle Tampa Bay
+#'   \item 4: Lower Tampa Bay
+#'   \item 5: Boca Ciega Bay (North)
+#'   \item 6: Terra Ceia Bay
+#'   \item 7: Manatee River
+#'   \item 55: Boca Ciega Bay South
+#' }
+#'
+#' Projection is NAD83(2011) / Florida West (ftUS), CRS 6443.
+#'
+#' @examples
+#' tbsegdetail
+"tbsegdetail"
