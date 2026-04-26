@@ -25,6 +25,8 @@
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/anlz_nps_ungaged.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/anlz_spr.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/clucsid.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/contdry.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/contwet.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/dbasing.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/emc.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/facilities.html</loc></url>
@@ -43,6 +45,7 @@
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/tbsubshed.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/usgsflow.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/util_getrain.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/util_gw_getcontour.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/util_nps_fillmiswq.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/util_nps_getextflow.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/util_nps_getflow.html</loc></url>

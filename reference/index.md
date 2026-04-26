@@ -50,6 +50,14 @@ Supporting datasets used by the other functions.
 - [`clucsid`](https://tbep-tech.github.io/tbeploads/reference/clucsid.md)
   : Lookup table for FLUCCSCODE conversion to CLUCSID and IMPROVED
 
+- [`contdry`](https://tbep-tech.github.io/tbeploads/reference/contdry.md)
+  : Upper Floridan Aquifer potentiometric surface contour lines, dry
+  season 2022
+
+- [`contwet`](https://tbep-tech.github.io/tbeploads/reference/contwet.md)
+  : Upper Floridan Aquifer potentiometric surface contour lines, wet
+  season 2022
+
 - [`dbasing`](https://tbep-tech.github.io/tbeploads/reference/dbasing.md)
   : Basin information for coastal subbasin codes
 
@@ -115,6 +123,9 @@ Utility functions used by other functions or standalone.
 - [`util_getrain()`](https://tbep-tech.github.io/tbeploads/reference/util_getrain.md)
   : Get rainfall data at NOAA NCDC sites for atmospheric deposition and
   non-point source ungaged calculations
+- [`util_gw_getcontour()`](https://tbep-tech.github.io/tbeploads/reference/util_gw_getcontour.md)
+  : Download FDEP Upper Floridan Aquifer potentiometric surface contour
+  lines
 - [`util_nps_fillmiswq()`](https://tbep-tech.github.io/tbeploads/reference/util_nps_fillmiswq.md)
   : Fill in missing water quality values for non-point source (NPS) data
 - [`util_nps_getextflow()`](https://tbep-tech.github.io/tbeploads/reference/util_nps_getextflow.md)
