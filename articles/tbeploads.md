@@ -1159,10 +1159,9 @@ are Q x C x 8.342 x 30.5 / 2.2, where C is the TN or TP concentration in
 mg/L. Monthly hydrologic load (m³/month) is Q x 3785 x 30.5.
 Transmissivity and flow zone length are fixed constants per segment from
 Zarbock et al. (1994). Hydraulic gradients are season-specific: months
-1-6 and 11-12 are dry season; months 7-10 are wet season. Segments 4-7
-(Lower Tampa Bay, Remainder Lower Tampa Bay) have zero gradient in the
-dry season; segment 5 (Boca Ciega Bay) has zero gradient in both
-seasons.
+1-6 and 11-12 are dry season; months 7-10 are wet season. Lower Tampa
+Bay and Remainder Lower Tampa Bay have zero gradient in the dry season
+and Boca Ciega Bay has zero gradient in both seasons.
 
 **Surficial and intermediate aquifers:** Loads are fixed monthly
 constants per segment derived from 1995-1998 (surficial) and 1999-2003
@@ -1176,11 +1175,11 @@ the [Water Atlas API](https://dev.api.wateratlas.org) using
 [`util_gw_getwq()`](https://tbep-tech.github.io/tbeploads/reference/util_gw_getwq.md).
 The default stations are 18340 (CR 581 North Fldn) and 18965 (SR 52 and
 CR 581 Deep), the two Pasco County Floridan aquifer monitoring wells
-used in the 2022-2024 loading analysis. Segment 1 (Old Tampa Bay) uses
-the first station mean only and segment 2 (Hillsborough Bay) uses the
-arithmetic mean of both station means. Segments 3-7 retain fixed
-historical values from the 1995-1998 SWFWMD analysis that have been used
-unchanged in every loading cycle through 2021.
+used in the 2022-2024 loading analysis. Old Tampa Bay uses the first
+station mean only and Hillsborough Bay uses the arithmetic mean of both
+station means. The rest of the bay segments retain fixed historical
+values from the 1995-1998 SWFWMD analysis that have been used unchanged
+in every loading cycle through 2021.
 
 ``` r
 wqdat <- util_gw_getwq()
@@ -1201,13 +1200,13 @@ available when the 2022-2024 analysis was run.
 gw <- anlz_gw(yrrng = c(2022, 2024))
 
 head(gw)
-#>   Year Month source bay_seg          segment      tn_load     tp_load   hy_load
-#> 1 2022     1     GW       1    Old Tampa Bay 0.5487809114 0.163081117 5.0150378
-#> 2 2022     1     GW       2 Hillsborough Bay 1.7256820120 0.205373694 6.1532324
-#> 3 2022     1     GW       3 Middle Tampa Bay 0.0227613545 0.129185120 0.7931208
-#> 4 2022     1     GW       4  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856
-#> 5 2022     1     GW       5   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126
-#> 6 2022     1     GW       6   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045
+#>   Year Month source        segment      tn_load     tp_load   hy_load
+#> 1 2022     1     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126
+#> 2 2022     2     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126
+#> 3 2022     3     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126
+#> 4 2022     4     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126
+#> 5 2022     5     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126
+#> 6 2022     6     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126
 ```
 
 Load columns are in tons/month and `hy_load` is in million m³/month.
@@ -1227,26 +1226,26 @@ Setting `summtime = 'year'` sums monthly loads to annual totals. The
 
 ``` r
 anlz_gw(yrrng = c(2022, 2024), summtime = 'year')
-#>    Year source bay_seg          segment     tn_load    tp_load    hy_load
-#> 1  2022     GW       1    Old Tampa Bay  6.58537094 1.95697341 60.1804539
-#> 2  2022     GW       2 Hillsborough Bay 20.72632859 2.46652041 73.9028084
-#> 3  2022     GW       3 Middle Tampa Bay  0.28633333 1.62254143  9.9954764
-#> 4  2022     GW       4  Lower Tampa Bay  0.10948950 0.62279120  3.8203550
-#> 5  2022     GW       5   Boca Ciega Bay  0.00502654 0.04748757  0.1585512
-#> 6  2022     GW       6   Terra Ceia Bay  0.01894529 0.10028212  0.6552311
-#> 7  2022     GW       7    Manatee River  0.10249411 0.50923100  3.5031130
-#> 8  2023     GW       1    Old Tampa Bay  6.58537094 1.95697341 60.1804539
-#> 9  2023     GW       2 Hillsborough Bay 20.72632859 2.46652041 73.9028084
-#> 10 2023     GW       3 Middle Tampa Bay  0.28633333 1.62254143  9.9954764
-#> 11 2023     GW       4  Lower Tampa Bay  0.10948950 0.62279120  3.8203550
-#> 12 2023     GW       5   Boca Ciega Bay  0.00502654 0.04748757  0.1585512
-#> 13 2023     GW       6   Terra Ceia Bay  0.01894529 0.10028212  0.6552311
-#> 14 2023     GW       7    Manatee River  0.10249411 0.50923100  3.5031130
-#> 15 2024     GW       1    Old Tampa Bay  6.58537094 1.95697341 60.1804539
-#> 16 2024     GW       2 Hillsborough Bay 20.72632859 2.46652041 73.9028084
-#> 17 2024     GW       3 Middle Tampa Bay  0.28633333 1.62254143  9.9954764
-#> 18 2024     GW       4  Lower Tampa Bay  0.10948950 0.62279120  3.8203550
-#> 19 2024     GW       5   Boca Ciega Bay  0.00502654 0.04748757  0.1585512
-#> 20 2024     GW       6   Terra Ceia Bay  0.01894529 0.10028212  0.6552311
-#> 21 2024     GW       7    Manatee River  0.10249411 0.50923100  3.5031130
+#>    Year source          segment     tn_load    tp_load    hy_load
+#> 1  2022     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512
+#> 2  2023     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512
+#> 3  2024     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512
+#> 4  2022     GW Hillsborough Bay 20.72632859 2.46652041 73.9028084
+#> 5  2023     GW Hillsborough Bay 20.72632859 2.46652041 73.9028084
+#> 6  2024     GW Hillsborough Bay 20.72632859 2.46652041 73.9028084
+#> 7  2022     GW  Lower Tampa Bay  0.10948950 0.62279120  3.8203550
+#> 8  2023     GW  Lower Tampa Bay  0.10948950 0.62279120  3.8203550
+#> 9  2024     GW  Lower Tampa Bay  0.10948950 0.62279120  3.8203550
+#> 10 2022     GW    Manatee River  0.10249411 0.50923100  3.5031130
+#> 11 2023     GW    Manatee River  0.10249411 0.50923100  3.5031130
+#> 12 2024     GW    Manatee River  0.10249411 0.50923100  3.5031130
+#> 13 2022     GW Middle Tampa Bay  0.28633333 1.62254143  9.9954764
+#> 14 2023     GW Middle Tampa Bay  0.28633333 1.62254143  9.9954764
+#> 15 2024     GW Middle Tampa Bay  0.28633333 1.62254143  9.9954764
+#> 16 2022     GW    Old Tampa Bay  6.58537094 1.95697341 60.1804539
+#> 17 2023     GW    Old Tampa Bay  6.58537094 1.95697341 60.1804539
+#> 18 2024     GW    Old Tampa Bay  6.58537094 1.95697341 60.1804539
+#> 19 2022     GW   Terra Ceia Bay  0.01894529 0.10028212  0.6552311
+#> 20 2023     GW   Terra Ceia Bay  0.01894529 0.10028212  0.6552311
+#> 21 2024     GW   Terra Ceia Bay  0.01894529 0.10028212  0.6552311
 ```
