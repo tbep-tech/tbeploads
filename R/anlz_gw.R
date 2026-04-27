@@ -59,14 +59,17 @@
 #'
 #' @examples
 #' # monthly segment loads using hardcoded 2022-2024 gradients and concentrations
-#' anlz_gw(yrrng = c(2022, 2024))
-#'
+#' gw <- anlz_gw(yrrng = c(2022, 2024))
+#' head(gw)
+#' 
 #' # annual totals
-#' anlz_gw(yrrng = c(2022, 2024), summtime = 'year')
-#'
+#' gw <- anlz_gw(yrrng = c(2022, 2024), summtime = 'year')
+#' head(gw)
+#' 
 #' \dontrun{
 #' # pass concentrations from the Water Atlas API
-#' anlz_gw(yrrng = c(2022, 2024), wqdat = util_gw_getwq())
+#' gw <- anlz_gw(yrrng = c(2022, 2024), wqdat = util_gw_getwq())
+#' head(gw)
 #' }
 anlz_gw <- function(yrrng = c(2022, 2024), wqdat = NULL,
                     summtime = c('month', 'year')) {

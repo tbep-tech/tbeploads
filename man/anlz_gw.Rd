@@ -70,13 +70,16 @@ Months 1-6 and 11-12 are dry season; months 7-10 are wet season.
 }
 \examples{
 # monthly segment loads using hardcoded 2022-2024 gradients and concentrations
-anlz_gw(yrrng = c(2022, 2024))
+gw <- anlz_gw(yrrng = c(2022, 2024))
+head(gw)
 
 # annual totals
-anlz_gw(yrrng = c(2022, 2024), summtime = 'year')
+gw <- anlz_gw(yrrng = c(2022, 2024), summtime = 'year')
+head(gw)
 
 \dontrun{
 # pass concentrations from the Water Atlas API
-anlz_gw(yrrng = c(2022, 2024), wqdat = util_gw_getwq())
+gw <- anlz_gw(yrrng = c(2022, 2024), wqdat = util_gw_getwq())
+head(gw)
 }
 }
