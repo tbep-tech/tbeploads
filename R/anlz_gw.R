@@ -29,10 +29,10 @@
 #' gradients dynamically from FDEP potentiometric surface contours. This
 #' approach requires Floridan aquifer flow-zone polygons (not yet available)
 #' to replace \code{\link{tbsubshed}}, which gives incorrect gradients for
-#' segments 4, 6, and 7 in the wet season. Until those polygons are obtained,
-#' hardcoded gradient values from the 2021 FDEP potentiometric surface map
-#' are used (the same values applied for 2022-2024 in the original SAS
-#' analysis, as no updated contours were available at that time).
+#' Lower Tampa Bay, Terra Ceia Bay, and Manatee River in the wet season. 
+#' Until those polygons are obtained, hardcoded gradient values from the 2021 
+#' FDEP potentiometric surface map are used (the same values applied for 2022-2024 
+#' in the original SAS analysis, as no updated contours were available at that time).
 #'
 #' \strong{Surficial and intermediate aquifers:}
 #' Loads are fixed constants per segment. Surficial values are from
@@ -48,7 +48,6 @@
 #'   \item \code{Year}: integer
 #'   \item \code{Month}: integer (omitted when \code{summtime = 'year'})
 #'   \item \code{source}: character, \code{"GW"}
-#'   \item \code{bay_seg}: integer, bay segment number (1-7)
 #'   \item \code{segment}: character, bay segment name
 #'   \item \code{tn_load}: numeric, total nitrogen load (tons/month or tons/year)
 #'   \item \code{tp_load}: numeric, total phosphorus load (tons/month or tons/year)
@@ -210,7 +209,6 @@ anlz_gw <- function(yrrng = c(2022, 2024), wqdat = NULL,
     Year    = grid$Year,
     Month   = grid$Month,
     source  = "GW",
-    bay_seg = grid$bay_seg,
     segment = seg_names[as.character(grid$bay_seg)],
     tn_load = (grid$tnfl + grid$tns + grid$tnin) / 907.1847,
     tp_load = (grid$tpfl + grid$tps + grid$tpin) / 907.1847,
@@ -219,15 +217,15 @@ anlz_gw <- function(yrrng = c(2022, 2024), wqdat = NULL,
     row.names = NULL
   )
 
-  out <- out[order(out$Year, out$Month, out$bay_seg), ]
+  out <- out[order(out$segment, out$Year, out$Month), ]
 
   if (summtime == 'year') {
     out <- aggregate(
-      cbind(tn_load, tp_load, hy_load) ~ Year + source + bay_seg + segment,
+      cbind(tn_load, tp_load, hy_load) ~ Year + source + segment,
       data = out,
       FUN  = sum
     )
-    out <- out[order(out$Year, out$bay_seg), ]
+    out <- out[order(out$segment, out$Year), ]
   }
 
   rownames(out) <- NULL
