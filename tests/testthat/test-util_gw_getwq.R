@@ -1,48 +1,53 @@
-make_wq_csv <- function(dir, station, sid, params, values, n = 3) {
-  rows <- expand.grid(param = params, i = seq_len(n), stringsAsFactors = FALSE)
-  rows$result <- values[match(rows$param, params)]
-  dat <- data.frame(
-    SID                           = sid,
-    `Station Name`                = station,
-    `Parameter Name`              = rows$param,
-    `Sample Date and Time`        = "01/01/2022 10:00:00",
-    Timezone                      = "(GMT-05:00)",
-    `Sample Result`               = rows$result,
-    `Measuring Unit`              = "milligram per litre",
-    Remark                        = "",
-    `Method Name`                 = "EPA",
-    Medium                        = "Water",
-    `Value Qualifier`             = "",
-    `Analysis Date and Time`      = "",
-    `Measuring program Name`      = "Test",
-    `Activity Depth`              = 77,
-    `Activity Depth Unit`         = "ft",
-    `Sampling Agency`             = "SWFMD",
-    check.names                   = FALSE,
-    stringsAsFactors              = FALSE
+make_ndjson_resp <- function(sid, tn_vals, tp_vals) {
+  recs <- c(
+    lapply(tn_vals, function(v)
+      jsonlite::toJSON(list(stationID = sid, parameter = "TN_mgl",
+                            resultValue = v), auto_unbox = TRUE)),
+    lapply(tp_vals, function(v)
+      jsonlite::toJSON(list(stationID = sid, parameter = "TP_mgl",
+                            resultValue = v), auto_unbox = TRUE))
   )
-  fname <- file.path(dir, paste0(station, ".csv"))
-  write.csv(dat, fname, row.names = FALSE, quote = TRUE)
-  fname
+  paste(recs, collapse = "\n")
 }
 
-setup_wq_dir <- function() {
-  dir <- tempfile("gwwq")
-  dir.create(dir)
-  make_wq_csv(dir, "CR 581 North Fldn", 18340,
-              params = c("Nitrogen- Total (Total)", "Phosphorus- Total (Total)"),
-              values = c(0.10, 0.02933333))
-  make_wq_csv(dir, "SR 52 and CR 581 Deep", 18665,
-              params = c("Nitrogen- Total (Total)", "Phosphorus- Total (Total)"),
-              values = c(0.4133333, 0.02833333))
-  dir
+mock_resp_ok <- function(body) {
+  structure(
+    list(status_code = 200L, body = charToRaw(body)),
+    class = "response"
+  )
+}
+
+setup_mocks <- function(tn1 = c(0.06, 0.12, 0.12), tp1 = c(0.027, 0.03, 0.031),
+                        tn2 = c(0.39, 0.41, 0.44), tp2 = c(0.027, 0.028, 0.03)) {
+  resp1 <- mock_resp_ok(make_ndjson_resp("18340", tn1, tp1))
+  resp2 <- mock_resp_ok(make_ndjson_resp("18965", tn2, tp2))
+
+  local_mocked_bindings(
+    GET         = mock(resp1, resp2, cycle = FALSE),
+    status_code = mock(200L, cycle = TRUE),
+    content     = mock(
+      make_ndjson_resp("18340", tn1, tp1),
+      make_ndjson_resp("18965", tn2, tp2),
+      cycle = FALSE
+    ),
+    .package = "httr",
+    .env     = parent.frame()
+  )
 }
 
 test_that("util_gw_getwq returns correct structure", {
-  dir <- setup_wq_dir()
-  on.exit(unlink(dir, recursive = TRUE))
+  local_mocked_bindings(
+    GET         = mock(mock_resp_ok(make_ndjson_resp("18340", c(0.1), c(0.029))),
+                       mock_resp_ok(make_ndjson_resp("18965", c(0.41), c(0.028))),
+                       cycle = FALSE),
+    status_code = mock(200L, cycle = TRUE),
+    content     = mock(make_ndjson_resp("18340", c(0.1), c(0.029)),
+                       make_ndjson_resp("18965", c(0.41), c(0.028)),
+                       cycle = FALSE),
+    .package = "httr"
+  )
 
-  result <- util_gw_getwq(dir)
+  result <- util_gw_getwq(verbose = FALSE)
 
   expect_s3_class(result, "data.frame")
   expect_equal(nrow(result), 7L)
@@ -50,33 +55,63 @@ test_that("util_gw_getwq returns correct structure", {
   expect_equal(result$bay_seg, 1L:7L)
 })
 
-test_that("util_gw_getwq seg 1 uses CR 581 North Fldn only", {
-  dir <- setup_wq_dir()
-  on.exit(unlink(dir, recursive = TRUE))
+test_that("util_gw_getwq seg 1 uses first station only", {
+  tn1 <- c(0.06, 0.12, 0.12); tp1 <- c(0.027, 0.03, 0.031)
+  tn2 <- c(0.39, 0.41, 0.44); tp2 <- c(0.027, 0.028, 0.03)
 
-  result <- util_gw_getwq(dir)
+  local_mocked_bindings(
+    GET         = mock(mock_resp_ok(make_ndjson_resp("18340", tn1, tp1)),
+                       mock_resp_ok(make_ndjson_resp("18965", tn2, tp2)),
+                       cycle = FALSE),
+    status_code = mock(200L, cycle = TRUE),
+    content     = mock(make_ndjson_resp("18340", tn1, tp1),
+                       make_ndjson_resp("18965", tn2, tp2),
+                       cycle = FALSE),
+    .package = "httr"
+  )
 
-  expect_equal(result$tn_mgl[result$bay_seg == 1L], 0.10, tolerance = 1e-4)
-  expect_equal(result$tp_mgl[result$bay_seg == 1L], 0.02933333, tolerance = 1e-4)
+  result <- util_gw_getwq(verbose = FALSE)
+
+  expect_equal(result$tn_mgl[result$bay_seg == 1L], mean(tn1), tolerance = 1e-6)
+  expect_equal(result$tp_mgl[result$bay_seg == 1L], mean(tp1), tolerance = 1e-6)
 })
 
-test_that("util_gw_getwq seg 2 averages both Pasco stations", {
-  dir <- setup_wq_dir()
-  on.exit(unlink(dir, recursive = TRUE))
+test_that("util_gw_getwq seg 2 averages both station means", {
+  tn1 <- c(0.06, 0.12, 0.12); tp1 <- c(0.027, 0.03, 0.031)
+  tn2 <- c(0.39, 0.41, 0.44); tp2 <- c(0.027, 0.028, 0.03)
 
-  result <- util_gw_getwq(dir)
+  local_mocked_bindings(
+    GET         = mock(mock_resp_ok(make_ndjson_resp("18340", tn1, tp1)),
+                       mock_resp_ok(make_ndjson_resp("18965", tn2, tp2)),
+                       cycle = FALSE),
+    status_code = mock(200L, cycle = TRUE),
+    content     = mock(make_ndjson_resp("18340", tn1, tp1),
+                       make_ndjson_resp("18965", tn2, tp2),
+                       cycle = FALSE),
+    .package = "httr"
+  )
 
-  expected_tn <- mean(c(0.10, 0.4133333))
-  expected_tp <- mean(c(0.02933333, 0.02833333))
-  expect_equal(result$tn_mgl[result$bay_seg == 2L], expected_tn, tolerance = 1e-4)
-  expect_equal(result$tp_mgl[result$bay_seg == 2L], expected_tp, tolerance = 1e-4)
+  result <- util_gw_getwq(verbose = FALSE)
+
+  expected_tn <- mean(c(mean(tn1), mean(tn2)))
+  expected_tp <- mean(c(mean(tp1), mean(tp2)))
+  expect_equal(result$tn_mgl[result$bay_seg == 2L], expected_tn, tolerance = 1e-6)
+  expect_equal(result$tp_mgl[result$bay_seg == 2L], expected_tp, tolerance = 1e-6)
 })
 
 test_that("util_gw_getwq segs 3-7 return fixed historical values", {
-  dir <- setup_wq_dir()
-  on.exit(unlink(dir, recursive = TRUE))
+  local_mocked_bindings(
+    GET         = mock(mock_resp_ok(make_ndjson_resp("18340", c(0.1), c(0.029))),
+                       mock_resp_ok(make_ndjson_resp("18965", c(0.41), c(0.028))),
+                       cycle = FALSE),
+    status_code = mock(200L, cycle = TRUE),
+    content     = mock(make_ndjson_resp("18340", c(0.1), c(0.029)),
+                       make_ndjson_resp("18965", c(0.41), c(0.028)),
+                       cycle = FALSE),
+    .package = "httr"
+  )
 
-  result <- util_gw_getwq(dir)
+  result <- util_gw_getwq(verbose = FALSE)
 
   expect_equal(result$tn_mgl[result$bay_seg == 3L], 0.025)
   expect_equal(result$tp_mgl[result$bay_seg == 3L], 0.137)
@@ -84,34 +119,84 @@ test_that("util_gw_getwq segs 3-7 return fixed historical values", {
   expect_equal(result$tp_mgl[result$bay_seg == 7L], 0.114)
 })
 
-test_that("util_gw_getwq errors when no CSV files found", {
-  dir <- tempfile("gwwq_empty")
-  dir.create(dir)
-  on.exit(unlink(dir, recursive = TRUE))
+test_that("util_gw_getwq respects custom sta_ids", {
+  local_mocked_bindings(
+    GET         = mock(mock_resp_ok(make_ndjson_resp("99999", c(0.5), c(0.05))),
+                       cycle = FALSE),
+    status_code = mock(200L, cycle = TRUE),
+    content     = mock(make_ndjson_resp("99999", c(0.5), c(0.05)), cycle = FALSE),
+    .package = "httr"
+  )
 
-  expect_error(util_gw_getwq(dir), "No CSV files found")
+  result <- util_gw_getwq(sta_ids = "99999", verbose = FALSE)
+
+  expect_equal(result$tn_mgl[result$bay_seg == 1L], 0.5)
+  expect_equal(result$tn_mgl[result$bay_seg == 2L], 0.5)
 })
 
-test_that("util_gw_getwq errors when required station is missing", {
-  dir <- tempfile("gwwq_missing")
-  dir.create(dir)
-  on.exit(unlink(dir, recursive = TRUE))
+test_that("util_gw_getwq errors on HTTP failure", {
+  bad_resp <- structure(list(status_code = 500L), class = "response")
+  local_mocked_bindings(
+    GET         = mock(bad_resp, cycle = TRUE),
+    status_code = mock(500L, cycle = TRUE),
+    .package    = "httr"
+  )
 
-  # Only supply one of the two required stations
-  make_wq_csv(dir, "CR 581 North Fldn", 18340,
-              params = c("Nitrogen- Total (Total)", "Phosphorus- Total (Total)"),
-              values = c(0.10, 0.029))
-
-  expect_error(util_gw_getwq(dir), "SR 52 and CR 581 Deep")
+  expect_error(util_gw_getwq(verbose = FALSE), "HTTP 500")
 })
 
-test_that("util_gw_getwq errors on wrong column count", {
-  dir <- tempfile("gwwq_bad")
-  dir.create(dir)
-  on.exit(unlink(dir, recursive = TRUE))
+test_that("util_gw_getwq errors when API returns no data", {
+  empty_resp <- mock_resp_ok("")
+  local_mocked_bindings(
+    GET         = mock(empty_resp, cycle = TRUE),
+    status_code = mock(200L, cycle = TRUE),
+    content     = mock("", cycle = TRUE),
+    .package    = "httr"
+  )
 
-  # Write a CSV with too few columns
-  write.csv(data.frame(a = 1, b = 2), file.path(dir, "bad.csv"), row.names = FALSE)
+  expect_error(util_gw_getwq(verbose = FALSE), "No data returned")
+})
 
-  expect_error(util_gw_getwq(dir), "Unexpected number of columns")
+test_that("util_gw_getwq passes yrrng as date query params", {
+  mock_get <- mock(
+    mock_resp_ok(make_ndjson_resp("18340", c(0.1), c(0.029))),
+    mock_resp_ok(make_ndjson_resp("18965", c(0.41), c(0.028))),
+    cycle = FALSE
+  )
+  local_mocked_bindings(
+    GET         = mock_get,
+    status_code = mock(200L, cycle = TRUE),
+    content     = mock(make_ndjson_resp("18340", c(0.1), c(0.029)),
+                       make_ndjson_resp("18965", c(0.41), c(0.028)),
+                       cycle = FALSE),
+    .package = "httr"
+  )
+
+  util_gw_getwq(yrrng = c(2020, 2024), verbose = FALSE)
+
+  args1 <- mock_args(mock_get)[[1]]
+  expect_equal(args1$query$startDate, "2020-01-01")
+  expect_equal(args1$query$endDate,   "2024-12-31")
+})
+
+test_that("util_gw_getwq omits date params when yrrng is NULL", {
+  mock_get <- mock(
+    mock_resp_ok(make_ndjson_resp("18340", c(0.1), c(0.029))),
+    mock_resp_ok(make_ndjson_resp("18965", c(0.41), c(0.028))),
+    cycle = FALSE
+  )
+  local_mocked_bindings(
+    GET         = mock_get,
+    status_code = mock(200L, cycle = TRUE),
+    content     = mock(make_ndjson_resp("18340", c(0.1), c(0.029)),
+                       make_ndjson_resp("18965", c(0.41), c(0.028)),
+                       cycle = FALSE),
+    .package = "httr"
+  )
+
+  util_gw_getwq(verbose = FALSE)
+
+  args1 <- mock_args(mock_get)[[1]]
+  expect_null(args1$query$startDate)
+  expect_null(args1$query$endDate)
 })

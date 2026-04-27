@@ -1,0 +1,236 @@
+#' Calculate groundwater loads to Tampa Bay segments
+#'
+#' @param yrrng integer vector of length 2, start and end year, e.g.
+#'   \code{c(2022, 2024)}.
+#' @param wqdat data frame of Floridan aquifer TN and TP concentrations (mg/L)
+#'   as returned by \code{\link{util_gw_getwq}}, with columns \code{bay_seg},
+#'   \code{tn_mgl}, and \code{tp_mgl}. When \code{NULL} (default), hardcoded
+#'   concentrations from the 2022-2024 loading analysis are used.
+#' @param summtime character, temporal summarization: \code{'month'} (default)
+#'   returns one row per segment per month, \code{'year'} sums to annual totals.
+#'
+#' @details
+#' Estimates groundwater loads to each Tampa Bay segment for three aquifer
+#' layers following the methodology in Zarbock et al. (1994).
+#'
+#' \strong{Floridan aquifer:}
+#' Flow is computed with Darcy's Law:
+#' \deqn{Q = 7.4805 \times 10^{-6} \cdot T \cdot I \cdot L}
+#' where \eqn{T} is transmissivity (ft\eqn{^2}/day), \eqn{I} is the hydraulic
+#' gradient (ft/mile), and \eqn{L} is the flow zone length (miles). \eqn{Q}
+#' is in MGD. Nutrient loads (kg/month) are:
+#' \deqn{\text{load} = Q \cdot C \cdot 8.342 \cdot 30.5 / 2.2}
+#' where \eqn{C} is the TN or TP concentration (mg/L). Hydrologic load
+#' (m\eqn{^3}/month) is \eqn{Q \cdot 3785 \cdot 30.5}.
+#'
+#' \strong{Hydraulic gradients:}
+#' The gradient section below contains a commented-out framework that calls
+#' \code{\link{util_gw_getcontour}} and \code{\link{util_gw_grad}} to compute
+#' gradients dynamically from FDEP potentiometric surface contours. This
+#' approach requires Floridan aquifer flow-zone polygons (not yet available)
+#' to replace \code{\link{tbsubshed}}, which gives incorrect gradients for
+#' segments 4, 6, and 7 in the wet season. Until those polygons are obtained,
+#' hardcoded gradient values from the 2021 FDEP potentiometric surface map
+#' are used (the same values applied for 2022-2024 in the original SAS
+#' analysis, as no updated contours were available at that time).
+#'
+#' \strong{Surficial and intermediate aquifers:}
+#' Loads are fixed constants per segment. Surficial values are from
+#' \code{gwupdate95-98_final.xls} (1995-1998 SWFWMD monitoring data).
+#' Intermediate values are means from SWFWMD monitoring over 1999-2003.
+#' These have not changed since the original analysis.
+#'
+#' \strong{Season assignment:}
+#' Months 1-6 and 11-12 are dry season; months 7-10 are wet season.
+#'
+#' @return A data frame with columns:
+#' \itemize{
+#'   \item \code{Year}: integer
+#'   \item \code{Month}: integer (omitted when \code{summtime = 'year'})
+#'   \item \code{source}: character, \code{"GW"}
+#'   \item \code{bay_seg}: integer, bay segment number (1-7)
+#'   \item \code{segment}: character, bay segment name
+#'   \item \code{tn_load}: numeric, total nitrogen load (tons/month or tons/year)
+#'   \item \code{tp_load}: numeric, total phosphorus load (tons/month or tons/year)
+#'   \item \code{hy_load}: numeric, hydrologic load (million m\eqn{^3}/month or
+#'     million m\eqn{^3}/year)
+#' }
+#'
+#' @export
+#'
+#' @examples
+#' # monthly segment loads using hardcoded 2022-2024 gradients and concentrations
+#' anlz_gw(yrrng = c(2022, 2024))
+#'
+#' # annual totals
+#' anlz_gw(yrrng = c(2022, 2024), summtime = 'year')
+#'
+#' \dontrun{
+#' # pass concentrations from the Water Atlas API
+#' anlz_gw(yrrng = c(2022, 2024), wqdat = util_gw_getwq())
+#' }
+anlz_gw <- function(yrrng = c(2022, 2024), wqdat = NULL,
+                    summtime = c('month', 'year')) {
+
+  summtime <- match.arg(summtime)
+
+  # -------------------------------------------------------------------------
+  # 1. Floridan aquifer hydraulic gradient (I, ft/mile) per segment and season
+  # -------------------------------------------------------------------------
+  # Framework for dynamic gradient computation from FDEP potentiometric surface
+  # contours. Requires Floridan aquifer flow-zone polygons to replace tbsubshed
+  # (tbsubshed gives incorrect gradients for segments 4, 6, and 7 in wet season
+  # because the surface watersheds are too narrow to capture the relevant
+  # potentiometric high points). TODO: swap in flow-zone polygons when available.
+  #
+  # contdry <- util_gw_getcontour("dry", yr)   # one call per year
+  # contwet <- util_gw_getcontour("wet", yr)
+  # grad_dry <- util_gw_grad(contdry)           # returns bay_seg + grad
+  # grad_wet <- util_gw_grad(contwet)
+
+  # Hardcoded gradients from the 2021 FDEP potentiometric surface map.
+  # Applied unchanged for 2022-2024 because updated contours were not
+  # available when that analysis was run. Source: GWld2224_SASCode.txt.
+  grad_dry <- data.frame(
+    bay_seg = 1L:7L,
+    grad    = c(
+      100 / 27,
+      (120 / 43) * 0.4 + (100 / 25) * 0.3 + (80 / 31) * 0.3,
+      50  / 31,
+      0, 0, 0, 0
+    )
+  )
+  grad_wet <- data.frame(
+    bay_seg = 1L:7L,
+    grad    = c(
+      100 / 27,
+      (120 / 44) * 0.4 + (100 / 25) * 0.3 + (70 / 26) * 0.3,
+      60  / 32,
+      50  / 32,
+      0,
+      50  / 34,
+      50  / 40
+    )
+  )
+
+  # -------------------------------------------------------------------------
+  # 2. Floridan aquifer TN/TP concentrations (mg/L)
+  # -------------------------------------------------------------------------
+  # Framework for API-based concentrations:
+  # wqdat <- util_gw_getwq()
+
+  if (is.null(wqdat)) {
+    # Hardcoded concentrations from the 2022-2024 analysis.
+    # Segments 1-2 updated from Pasco County well data (SWFWMD stations 18340
+    # and 18965); segments 3-7 from gwupdate95-98_final.xls (unchanged since
+    # 1995-1998 and used in every loading script through 2021).
+    wqdat <- data.frame(
+      bay_seg = 1L:7L,
+      tn_mgl  = c(0.1000, (0.1000 + 0.4133) / 2,
+                  0.025, 0.025, 0.022, 0.025, 0.025),
+      tp_mgl  = c(0.0293, (0.0293 + 0.0283) / 2,
+                  0.137, 0.137, 0.118, 0.125, 0.114)
+    )
+  }
+
+  # -------------------------------------------------------------------------
+  # 3. Floridan aquifer transmissivity (T, ft²/day) and flow zone length (L, miles)
+  #    Source: Zarbock et al. (1994) Tampa Bay groundwater loading model
+  # -------------------------------------------------------------------------
+  fl_params <- data.frame(
+    bay_seg = 1L:7L,
+    t       = c( 48500, 150000, 66000, 66000, 48500, 100000, 100000),
+    l       = c(32.0,  15.2,   8.0,   9.6,   8.5,   1.2,    7.2)
+  )
+
+  # -------------------------------------------------------------------------
+  # 4. Fixed surficial and intermediate aquifer loads (kg/month; m3/month)
+  #    Surficial: gwupdate95-98_final.xls (1995-1998 SWFWMD monitoring)
+  #    Intermediate: SWFWMD monitoring means, 1999-2003
+  # -------------------------------------------------------------------------
+  fixed_loads <- data.frame(
+    bay_seg = 1L:7L,
+    tns     = c(0.56, 0.50, 0.53, 0.64, 0.38, 0.06, 0.36),
+    tps     = c(2.24, 1.35, 3.06, 3.67, 3.59, 1.02, 6.31),
+    h2os    = c(51123.2, 15095.2, 16580.5, 19896.6, 13212.6, 1813.5, 11191.8),
+    tnin    = c(0.0, 0.5,  1.7,  0.5,  0.0, 0.1, 0.9),
+    tpin    = c(0.0, 9.4,  13.2, 4.3,  0.0, 0.2, 2.6),
+    h2oin   = c(0,   53200, 41115, 13489, 0,  1991, 21664)
+  )
+
+  # -------------------------------------------------------------------------
+  # 5. Build monthly grid and assign season
+  # -------------------------------------------------------------------------
+  grid <- expand.grid(
+    Year    = seq(yrrng[1], yrrng[2]),
+    Month   = 1L:12L,
+    bay_seg = 1L:7L,
+    stringsAsFactors = FALSE
+  )
+
+  grid$season <- ifelse(grid$Month %in% c(1:6, 11:12), "dry", "wet")
+
+  # Join gradient by segment and season
+  grid <- merge(grid, grad_dry, by = "bay_seg", suffixes = c("", "_dry"))
+  names(grid)[names(grid) == "grad"] <- "grad_dry"
+  grid <- merge(grid, grad_wet, by = "bay_seg", suffixes = c("", "_wet"))
+  names(grid)[names(grid) == "grad"] <- "grad_wet"
+  grid$grad    <- ifelse(grid$season == "dry", grid$grad_dry, grid$grad_wet)
+  grid$grad_dry <- NULL
+  grid$grad_wet <- NULL
+
+  # Join remaining parameters
+  grid <- merge(grid, wqdat,       by = "bay_seg")
+  grid <- merge(grid, fl_params,   by = "bay_seg")
+  grid <- merge(grid, fixed_loads, by = "bay_seg")
+
+  # -------------------------------------------------------------------------
+  # 6. Darcy's Law: Floridan aquifer flow (MGD) and monthly loads
+  #    Q  (MGD)       = 7.4805e-6 * T * I * L
+  #    tn/tpfl (kg/mo) = Q * C(mg/L) * 8.342(lb/gal) * 30.5(d/mo) / 2.2(lb/kg)
+  #    h2ofl (m3/mo)  = Q * 3785(m3/MGal) * 30.5(d/mo)
+  # -------------------------------------------------------------------------
+  grid$q     <- 7.4805e-6 * grid$grad * grid$t * grid$l
+  grid$tnfl  <- grid$q * grid$tn_mgl * 8.342 * 30.5 / 2.2
+  grid$tpfl  <- grid$q * grid$tp_mgl * 8.342 * 30.5 / 2.2
+  grid$h2ofl <- grid$q * 3785 * 30.5
+
+  # -------------------------------------------------------------------------
+  # 7. Total loads: Floridan + surficial + intermediate
+  #    Convert: kg/month -> tons/month (/907.1847); m3/month -> Mm3 (/1e6)
+  # -------------------------------------------------------------------------
+  seg_names <- c(
+    "1" = "Old Tampa Bay",    "2" = "Hillsborough Bay",
+    "3" = "Middle Tampa Bay", "4" = "Lower Tampa Bay",
+    "5" = "Boca Ciega Bay",   "6" = "Terra Ceia Bay",
+    "7" = "Manatee River"
+  )
+
+  out <- data.frame(
+    Year    = grid$Year,
+    Month   = grid$Month,
+    source  = "GW",
+    bay_seg = grid$bay_seg,
+    segment = seg_names[as.character(grid$bay_seg)],
+    tn_load = (grid$tnfl + grid$tns + grid$tnin) / 907.1847,
+    tp_load = (grid$tpfl + grid$tps + grid$tpin) / 907.1847,
+    hy_load = (grid$h2ofl + grid$h2os + grid$h2oin) / 1e6,
+    stringsAsFactors = FALSE,
+    row.names = NULL
+  )
+
+  out <- out[order(out$Year, out$Month, out$bay_seg), ]
+
+  if (summtime == 'year') {
+    out <- aggregate(
+      cbind(tn_load, tp_load, hy_load) ~ Year + source + bay_seg + segment,
+      data = out,
+      FUN  = sum
+    )
+    out <- out[order(out$Year, out$bay_seg), ]
+  }
+
+  rownames(out) <- NULL
+  out
+
+}

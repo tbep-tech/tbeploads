@@ -4,12 +4,20 @@
 \alias{util_gw_getwq}
 \title{Get groundwater quality concentrations for Floridan aquifer segments}
 \usage{
-util_gw_getwq(path)
+util_gw_getwq(sta_ids = NULL, yrrng = NULL, verbose = TRUE)
 }
 \arguments{
-\item{path}{character string, path to a folder containing one or more water
-quality CSV files downloaded from the SWFMD District database (see
-Details).}
+\item{sta_ids}{character vector of SWFWMD station IDs to query. When
+\code{NULL} (default), uses stations 18340 (CR 581 North Fldn) and 18965
+(SR 52 and CR 581 Deep), the two Pasco County Floridan aquifer monitoring
+wells used in the 2022-2024 Tampa Bay groundwater loading analysis.}
+
+\item{yrrng}{integer vector of length 2 specifying the start and end year
+for computing concentration means, e.g. \code{c(2020, 2024)}. When
+\code{NULL} (default), all available observations are used.}
+
+\item{verbose}{logical, if \code{TRUE} (default) a progress message is
+printed.}
 }
 \value{
 A data frame with one row per bay segment (1-7) and columns:
@@ -23,36 +31,40 @@ A data frame with one row per bay segment (1-7) and columns:
 Get groundwater quality concentrations for Floridan aquifer segments
 }
 \details{
-Reads SWFMD District water quality CSV files for Upper Floridan Aquifer
-monitoring stations and computes mean TN and TP concentrations (mg/L) per
-station. Station means are then mapped to bay segments following the
-methodology in Zarbock et al. (1994) as applied in the 2022-2024 Tampa Bay
-groundwater loading analysis:
+Retrieves TN and TP concentrations (mg/L) from the
+\href{https://dev.api.wateratlas.org}{Water Atlas API}
+(\code{GET /api/samplingdata/stream}) for Upper Floridan Aquifer monitoring
+stations and computes grand-mean concentrations per station. Station means
+are then mapped to bay segments:
 
 \itemize{
-\item \strong{OTB (segment 1):} CR 581 North Fldn well (Pasco County,
-77 ft depth; SWFMD station 18340).
-\item \strong{HB (segment 2):} arithmetic mean of CR 581 North Fldn and
-SR 52 and CR 581 Deep (Pasco County, 83 ft depth) stations.
-\item \strong{Segments 3-7:} fixed historical concentrations from earlier
-monitoring periods (late 1990s to early 2000s). These values are
-returned as constants and are not updated from the CSV files.
+\item \strong{OTB (segment 1):} mean of \code{sta_ids[1]} only (default:
+CR 581 North Fldn, station 18340).
+\item \strong{HB (segment 2):} arithmetic mean of the per-station means
+across all \code{sta_ids} (default: mean of stations 18340 and 18965,
+SR 52 and CR 581 Deep).
+\item \strong{Segments 3-7:} fixed constants carried forward from
+\code{gwupdate95-98_final.xls} (the original 1995-1998 SWFWMD monitoring
+analysis). These values were used unchanged in every loading script from
+2012 through 2021 and are not updated from the API.
 }
 
-TN is taken from \code{"Nitrogen- Total (Total)"} and TP from
-\code{"Phosphorus- Total (Total)"}. All qualifying flags are retained;
-non-detect values (\code{qualifier = "U"}) are included at the reported
-instrument value.
+\strong{History:} Through the 2021 loading cycle, all seven segments used
+hardcoded Floridan concentrations sourced from the 1995-1998 spreadsheet
+(TN: 0.010-0.025 mg/L, TP: 0.097-0.137 mg/L). For the 2022-2024 update,
+new SWFWMD well data showed substantially higher TN in the Pasco County
+Floridan aquifer, so segments 1 and 2 were revised using stations 18340 and
+18965. Segments 3-7 retained the original values.
 
-CSV files must match the format produced by the SWFMD Water Management
-Information System (WMIS) data download tool, with columns: SID, Station
-Name, Parameter Name, Sample Date and Time, Timezone, Sample Result,
-Measuring Unit, Remark, Method Name, Medium, Value Qualifier, Analysis Date
-and Time, Measuring program Name, Activity Depth, Activity Depth Unit,
-Sampling Agency.
+TN is taken from the \code{TN_mgl} parameter and TP from \code{TP_mgl} in
+the Water Atlas API response.
 }
 \examples{
 \dontrun{
-conc <- util_gw_getwq("path/to/GW_DistrictWQData")
+# default stations, all available data
+conc <- util_gw_getwq()
+
+# restrict to a specific period
+conc <- util_gw_getwq(yrrng = c(2020, 2024))
 }
 }
