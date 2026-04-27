@@ -41,6 +41,8 @@ Functions for analyzing data.
   : Calculate DPS reuse and end of pipe loads and summarize
 - [`anlz_dps_facility()`](https://tbep-tech.github.io/tbeploads/reference/anlz_dps_facility.md)
   : Calculate DPS reuse and end of pipe loads from raw facility data
+- [`anlz_gw()`](https://tbep-tech.github.io/tbeploads/reference/anlz_gw.md)
+  : Calculate groundwater loads to Tampa Bay segments
 - [`anlz_ips()`](https://tbep-tech.github.io/tbeploads/reference/anlz_ips.md)
   : Calculate IPS loads and summarize
 - [`anlz_ips_facility()`](https://tbep-tech.github.io/tbeploads/reference/anlz_ips_facility.md)

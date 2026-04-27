@@ -1080,6 +1080,110 @@ months.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  <span style="text-decoration: underline;">2</span>024 SPR    Hillsborough Bay    135.    5.89     333.        0    73.4</span></span></code></pre></div>
 </div>
 </div>
+<div class="section level3">
+<h3 id="gw">GW<a class="anchor" aria-label="anchor" href="#gw"></a>
+</h3>
+<p>Groundwater loads to Tampa Bay are estimated using the three-aquifer
+framework from Zarbock et al. (1994). The <code><a href="../reference/anlz_gw.html">anlz_gw()</a></code>
+function computes monthly TN, TP, and hydrologic loads for each bay
+segment.</p>
+<div class="section level4">
+<h4 id="methodology">Methodology<a class="anchor" aria-label="anchor" href="#methodology"></a>
+</h4>
+<p>Three aquifer types contribute to each bay segment each month.</p>
+<p><strong>Floridan aquifer:</strong> Flow is estimated with Darcy’s
+Law: Q = 7.4805 x 10^-6 x T x I x L, where T is transmissivity
+(ft²/day), I is the hydraulic gradient (ft/mile), and L is the flow zone
+length (miles). Q is in million gallons per day (MGD). Monthly nutrient
+loads (kg/month) are Q x C x 8.342 x 30.5 / 2.2, where C is the TN or TP
+concentration in mg/L. Monthly hydrologic load (m³/month) is Q x 3785 x
+30.5. Transmissivity and flow zone length are fixed constants per
+segment from Zarbock et al. (1994). Hydraulic gradients are
+season-specific: months 1-6 and 11-12 are dry season; months 7-10 are
+wet season. Segments 4-7 (Lower Tampa Bay, Remainder Lower Tampa Bay)
+have zero gradient in the dry season; segment 5 (Boca Ciega Bay) has
+zero gradient in both seasons.</p>
+<p><strong>Surficial and intermediate aquifers:</strong> Loads are fixed
+monthly constants per segment derived from 1995-1998 (surficial) and
+1999-2003 (intermediate) SWFWMD monitoring data. These values have not
+changed since the original analysis.</p>
+</div>
+<div class="section level4">
+<h4 id="floridan-aquifer-concentrations">Floridan aquifer concentrations<a class="anchor" aria-label="anchor" href="#floridan-aquifer-concentrations"></a>
+</h4>
+<p>Floridan aquifer TN and TP concentrations (mg/L) can be obtained from
+the <a href="https://dev.api.wateratlas.org" class="external-link">Water Atlas API</a> using
+<code><a href="../reference/util_gw_getwq.html">util_gw_getwq()</a></code>. The default stations are 18340 (CR 581
+North Fldn) and 18965 (SR 52 and CR 581 Deep), the two Pasco County
+Floridan aquifer monitoring wells used in the 2022-2024 loading
+analysis. Segment 1 (Old Tampa Bay) uses the first station mean only and
+segment 2 (Hillsborough Bay) uses the arithmetic mean of both station
+means. Segments 3-7 retain fixed historical values from the 1995-1998
+SWFWMD analysis that have been used unchanged in every loading cycle
+through 2021.</p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">wqdat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getwq.html">util_gw_getwq</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>When <code>wqdat = NULL</code> (the default in
+<code><a href="../reference/anlz_gw.html">anlz_gw()</a></code>), hardcoded concentrations from the 2022-2024
+analysis are used directly.</p>
+</div>
+<div class="section level4">
+<h4 id="estimating-groundwater-loads">Estimating groundwater loads<a class="anchor" aria-label="anchor" href="#estimating-groundwater-loads"></a>
+</h4>
+<p><code><a href="../reference/anlz_gw.html">anlz_gw()</a></code> requires only a year range. Hardcoded 2021
+FDEP potentiometric surface gradients are used for all years because
+updated contours were not available when the 2022-2024 analysis was
+run.</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gw</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   Year Month source bay_seg          segment      tn_load     tp_load   hy_load</span></span>
+<span><span class="co">#&gt; 1 2022     1     GW       1    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span></span>
+<span><span class="co">#&gt; 2 2022     1     GW       2 Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span></span>
+<span><span class="co">#&gt; 3 2022     1     GW       3 Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span></span>
+<span><span class="co">#&gt; 4 2022     1     GW       4  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span></span>
+<span><span class="co">#&gt; 5 2022     1     GW       5   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span></span>
+<span><span class="co">#&gt; 6 2022     1     GW       6   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span></span></code></pre></div>
+<p>Load columns are in tons/month and <code>hy_load</code> is in million
+m³/month.</p>
+<p>To use concentrations retrieved from the API:</p>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Requires internet access</span></span>
+<span><span class="va">wqdat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getwq.html">util_gw_getwq</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">gw_api</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, wqdat <span class="op">=</span> <span class="va">wqdat</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="temporal-summary-1">Temporal summary<a class="anchor" aria-label="anchor" href="#temporal-summary-1"></a>
+</h4>
+<p>Setting <code>summtime = 'year'</code> sums monthly loads to annual
+totals. The <code>Month</code> column is dropped.</p>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, summtime <span class="op">=</span> <span class="st">'year'</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    Year source bay_seg          segment     tn_load    tp_load    hy_load</span></span>
+<span><span class="co">#&gt; 1  2022     GW       1    Old Tampa Bay  6.58537094 1.95697341 60.1804539</span></span>
+<span><span class="co">#&gt; 2  2022     GW       2 Hillsborough Bay 20.72632859 2.46652041 73.9028084</span></span>
+<span><span class="co">#&gt; 3  2022     GW       3 Middle Tampa Bay  0.28633333 1.62254143  9.9954764</span></span>
+<span><span class="co">#&gt; 4  2022     GW       4  Lower Tampa Bay  0.10948950 0.62279120  3.8203550</span></span>
+<span><span class="co">#&gt; 5  2022     GW       5   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span></span>
+<span><span class="co">#&gt; 6  2022     GW       6   Terra Ceia Bay  0.01894529 0.10028212  0.6552311</span></span>
+<span><span class="co">#&gt; 7  2022     GW       7    Manatee River  0.10249411 0.50923100  3.5031130</span></span>
+<span><span class="co">#&gt; 8  2023     GW       1    Old Tampa Bay  6.58537094 1.95697341 60.1804539</span></span>
+<span><span class="co">#&gt; 9  2023     GW       2 Hillsborough Bay 20.72632859 2.46652041 73.9028084</span></span>
+<span><span class="co">#&gt; 10 2023     GW       3 Middle Tampa Bay  0.28633333 1.62254143  9.9954764</span></span>
+<span><span class="co">#&gt; 11 2023     GW       4  Lower Tampa Bay  0.10948950 0.62279120  3.8203550</span></span>
+<span><span class="co">#&gt; 12 2023     GW       5   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span></span>
+<span><span class="co">#&gt; 13 2023     GW       6   Terra Ceia Bay  0.01894529 0.10028212  0.6552311</span></span>
+<span><span class="co">#&gt; 14 2023     GW       7    Manatee River  0.10249411 0.50923100  3.5031130</span></span>
+<span><span class="co">#&gt; 15 2024     GW       1    Old Tampa Bay  6.58537094 1.95697341 60.1804539</span></span>
+<span><span class="co">#&gt; 16 2024     GW       2 Hillsborough Bay 20.72632859 2.46652041 73.9028084</span></span>
+<span><span class="co">#&gt; 17 2024     GW       3 Middle Tampa Bay  0.28633333 1.62254143  9.9954764</span></span>
+<span><span class="co">#&gt; 18 2024     GW       4  Lower Tampa Bay  0.10948950 0.62279120  3.8203550</span></span>
+<span><span class="co">#&gt; 19 2024     GW       5   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span></span>
+<span><span class="co">#&gt; 20 2024     GW       6   Terra Ceia Bay  0.01894529 0.10028212  0.6552311</span></span>
+<span><span class="co">#&gt; 21 2024     GW       7    Manatee River  0.10249411 0.50923100  3.5031130</span></span></code></pre></div>
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

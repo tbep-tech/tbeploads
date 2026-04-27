@@ -39,17 +39,29 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_gw_getwq</span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_gw_getwq</span><span class="op">(</span>sta_ids <span class="op">=</span> <span class="cn">NULL</span>, yrrng <span class="op">=</span> <span class="cn">NULL</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
-<dd><p>character string, path to a folder containing one or more water
-quality CSV files downloaded from the SWFMD District database (see
-Details).</p></dd>
+<dl><dt id="arg-sta-ids">sta_ids<a class="anchor" aria-label="anchor" href="#arg-sta-ids"></a></dt>
+<dd><p>character vector of SWFWMD station IDs to query. When
+<code>NULL</code> (default), uses stations 18340 (CR 581 North Fldn) and 18965
+(SR 52 and CR 581 Deep), the two Pasco County Floridan aquifer monitoring
+wells used in the 2022-2024 Tampa Bay groundwater loading analysis.</p></dd>
+
+
+<dt id="arg-yrrng">yrrng<a class="anchor" aria-label="anchor" href="#arg-yrrng"></a></dt>
+<dd><p>integer vector of length 2 specifying the start and end year
+for computing concentration means, e.g. <code>c(2020, 2024)</code>. When
+<code>NULL</code> (default), all available observations are used.</p></dd>
+
+
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
+<dd><p>logical, if <code>TRUE</code> (default) a progress message is
+printed.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -60,34 +72,38 @@ Details).</p></dd>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Reads SWFMD District water quality CSV files for Upper Floridan Aquifer
-monitoring stations and computes mean TN and TP concentrations (mg/L) per
-station. Station means are then mapped to bay segments following the
-methodology in Zarbock et al. (1994) as applied in the 2022-2024 Tampa Bay
-groundwater loading analysis:</p>
-<ul><li><p><strong>OTB (segment 1):</strong> CR 581 North Fldn well (Pasco County,
-77 ft depth; SWFMD station 18340).</p></li>
-<li><p><strong>HB (segment 2):</strong> arithmetic mean of CR 581 North Fldn and
-SR 52 and CR 581 Deep (Pasco County, 83 ft depth) stations.</p></li>
-<li><p><strong>Segments 3-7:</strong> fixed historical concentrations from earlier
-monitoring periods (late 1990s to early 2000s). These values are
-returned as constants and are not updated from the CSV files.</p></li>
-</ul><p>TN is taken from <code>"Nitrogen- Total (Total)"</code> and TP from
-<code>"Phosphorus- Total (Total)"</code>. All qualifying flags are retained;
-non-detect values (<code>qualifier = "U"</code>) are included at the reported
-instrument value.</p>
-<p>CSV files must match the format produced by the SWFMD Water Management
-Information System (WMIS) data download tool, with columns: SID, Station
-Name, Parameter Name, Sample Date and Time, Timezone, Sample Result,
-Measuring Unit, Remark, Method Name, Medium, Value Qualifier, Analysis Date
-and Time, Measuring program Name, Activity Depth, Activity Depth Unit,
-Sampling Agency.</p>
+    <p>Retrieves TN and TP concentrations (mg/L) from the
+<a href="https://dev.api.wateratlas.org" class="external-link">Water Atlas API</a>
+(<code>GET /api/samplingdata/stream</code>) for Upper Floridan Aquifer monitoring
+stations and computes grand-mean concentrations per station. Station means
+are then mapped to bay segments:</p>
+<ul><li><p><strong>OTB (segment 1):</strong> mean of <code>sta_ids[1]</code> only (default:
+CR 581 North Fldn, station 18340).</p></li>
+<li><p><strong>HB (segment 2):</strong> arithmetic mean of the per-station means
+across all <code>sta_ids</code> (default: mean of stations 18340 and 18965,
+SR 52 and CR 581 Deep).</p></li>
+<li><p><strong>Segments 3-7:</strong> fixed constants carried forward from
+<code>gwupdate95-98_final.xls</code> (the original 1995-1998 SWFWMD monitoring
+analysis). These values were used unchanged in every loading script from
+2012 through 2021 and are not updated from the API.</p></li>
+</ul><p><strong>History:</strong> Through the 2021 loading cycle, all seven segments used
+hardcoded Floridan concentrations sourced from the 1995-1998 spreadsheet
+(TN: 0.010-0.025 mg/L, TP: 0.097-0.137 mg/L). For the 2022-2024 update,
+new SWFWMD well data showed substantially higher TN in the Pasco County
+Floridan aquifer, so segments 1 and 2 were revised using stations 18340 and
+18965. Segments 3-7 retained the original values.</p>
+<p>TN is taken from the <code>TN_mgl</code> parameter and TP from <code>TP_mgl</code> in
+the Water Atlas API response.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">conc</span> <span class="op">&lt;-</span> <span class="fu">util_gw_getwq</span><span class="op">(</span><span class="st">"path/to/GW_DistrictWQData"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># default stations, all available data</span></span></span>
+<span class="r-in"><span><span class="va">conc</span> <span class="op">&lt;-</span> <span class="fu">util_gw_getwq</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># restrict to a specific period</span></span></span>
+<span class="r-in"><span><span class="va">conc</span> <span class="op">&lt;-</span> <span class="fu">util_gw_getwq</span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2020</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
