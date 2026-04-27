@@ -1,0 +1,44 @@
+---
+title: "Material Losses (ML)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Material Losses (ML)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = F,
+  message = F,
+  fig.align = "center"
+)
+```
+
+```{r}
+library(tbeploads)
+```
+
+Material losses (ML) are estimates of nutrient loads to the bay primarily from fertilizer shipping activities at ports.  Historically, loadings from material losses were much higher than at present.  Only a few entities report material losses, typically as a total for the year and only for total nitrogen. The material losses as tons/yr are estimated from the tons shipped using an agreed upon loss rate.  Values reported in the example files represent the estimated loss as the total tons of N shipped each year multiplied by 0.0023 and divided by 2000. The total N shipped at a facility each year can be obtained using a simple back-calculation (multiply by 2000, divide by 0.0023).
+
+The core function is `anlz_ml_facility()` that requires only a vector of file paths as input, where each file should be one row per year per facility, where the row shows the total tons per year of total nitrogen loss. The file names must follow a specific convention, where metadata for each entity is found in the <code><a href="../reference/facilities.html">facilities</a></code> data object using information in the file name.
+
+For convenience, four example files are included with the package. These files represent actual entities and facilities, but the data have been randomized. The paths to these files are used as input to the function. The output is nearly identical to the input data since no load calculations are used, except results are shown as monthly load as the annual loss divided by 12.  Additional empty columns (e.g., TP load, TSS load, etc.) are also returned for consistency of reporting with other loading sources.
+
+```{r}
+mlfls <- list.files(system.file('extdata/', package = 'tbeploads'),
+  pattern = 'ps_indml', full.names = TRUE)
+anlz_ml_facility(mlfls)
+```
+
+The `anlz_ml()` function uses `anlz_ml_facility()` to summarize the ML results by location as facility, entity (combines facility data), bay segment (combines entity data), and as all (combines bay segment data).  The results can also be temporally summarized as monthly or annual totals.  The location summary is defined by the `summ` argument and the temporal summary is defined by the `summtime` argument.  The `fls` argument used by `anlz_ml_facility()` is also used by `anlz_ml()`.  The output is tons per month of TN if `summtime = 'month'` or tons per year of TN if `summtime = 'year'`. Columns for TP, TSS, BOD, and hydrologic load are also returned with zero load for consistency with other point source load calculation functions. Material loss loads are often combined with IPS loads for reporting.
+
+```{r}
+# combine by entity and month
+anlz_ml(mlfls, summ = 'entity', summtime = 'month')
+
+# combine by bay segment and year
+anlz_ml(mlfls, summ = "segment", summtime = "year")
+```

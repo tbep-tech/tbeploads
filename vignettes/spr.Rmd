@@ -1,0 +1,100 @@
+---
+title: "Springs (SPR)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Springs (SPR)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = F,
+  message = F,
+  fig.align = "center"
+)
+```
+
+```{r}
+library(tbeploads)
+```
+
+Spring loads to Tampa Bay are estimated for three major springs that all discharge to Hillsborough Bay (bay segment 2): Lithia Springs, Buckhorn Springs, and Sulphur Springs.  The `anlz_spr()` function is used for these calculations.
+
+## Input data
+
+One required input file (TBW discharge workbook) is needed, plus optional arguments for water quality and Sulphur Spring discharge.
+
+**Discharge (Lithia and Buckhorn):** Daily flow records for Lithia and Buckhorn springs are collected by Tampa Bay Water (TBW) and provided as an Excel workbook with one sheet per device.  Four device IDs are used: 3381 (Lithia Minor), 4586 (Lithia Major), 3388 (Buckhorn Upper), and 3649 (Buckhorn Lower).  Lithia total flow is the sum of Minor and Major.  Buckhorn total flow is Lower minus Upper, because the two gauges bracket the same stream reach.  A copy of the 2022-2024 file is included with the package and located using `system.file()`:
+
+```{r}
+tbwxlpth <- system.file('extdata/sprflow2224.xlsx', package = 'tbeploads')
+```
+
+**Spring water quality (TN and TP, local file):** Sample concentrations (mg/L) for total nitrogen and total phosphorus can be supplied as a CSV with one row per sample via the `wqpth` argument. These data are from FDEP's Impaired Waters Rule dataset available at <https://publicfiles.dep.state.fl.us/dear/iwr/>. Annual means are computed per spring before joining to the monthly flow estimates.  If a year within the requested range has no water quality observations for a given spring, the grand mean across all available years is substituted.  The example 2022-2024 file included with the package is:
+
+```{r}
+wqpth <- system.file('extdata/sprwq2224.csv', package = 'tbeploads')
+```
+
+**Spring water quality (TN and TP, API):** When `wqpth = NULL` (the default), water quality data are retrieved automatically from two external APIs via `util_spr_getwq()`:
+
+* **Lithia and Buckhorn** concentrations are obtained from the [Water Atlas API](https://dev.api.wateratlas.org) (`GET /api/samplingdata/stream`), using SWFWMD monitoring stations 17805 (Lithia Main Spring, water body ID 4000510) and 18276 (Buckhorn Main Spring, water body ID 4000529) from the `WIN_21FLSWFD` data source.  These are probably the same quarterly SWFWMD observations in the FDEP IWR file.
+* **Sulphur** concentrations are retrieved via `tbeptools::read_importepc()`, which downloads the Environmental Protection Commission of Hillsborough County (EPC) monitoring spreadsheet and filters to station 174.  This source provides monthly TN and TP observations.
+
+**TSS concentrations:** When `wqpth` is supplied, TSS concentrations are always assigned from a fixed lookup table derived from the historical SAS-based loading model (SPRMOD2): 4.4 mg/L for Sulphur Springs and 4.0 mg/L for Lithia and Buckhorn.  When `wqpth = NULL`, TSS values from the API or EPC source are used where available (Sulphur Spring via EPC may have periodic observations). Any spring-year combination with no measured TSS falls back to the same fixed values.
+
+**BOD concentrations:** BOD loads are returned as zero because BOD is not measured at the springs.
+
+**Sulphur Spring discharge (USGS):** Daily discharge for USGS station 02306000 is retrieved from the NWIS API via `util_nps_getusgsflow()`.  A data frame can also be passed to the `sulphurflow` argument to avoid a repeat API call.
+
+## Estimating spring loads
+
+Calling `anlz_spr()` with a local water quality file returns monthly loads for each spring.  The discharge record is linearly interpolated to fill any gaps before monthly means are computed, since springs are assumed to have continuous (non-zero) flow.
+
+```{r}
+spr <- anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024))
+
+head(spr)
+```
+
+When `wqpth` is omitted, water quality is fetched automatically from the Water Atlas API (Lithia, Buckhorn) and EPC via `tbeptools` (Sulphur):
+
+```{r, eval = FALSE}
+# Requires internet access; water quality retrieved from APIs
+spr_api <- anlz_spr(tbwxlpth = tbwxlpth, yrrng = c(2022, 2024))
+```
+
+Load columns are in tons/month and `hy_load` is in 1e6 m³/month.
+
+## Spatial summary
+
+The `summ` argument controls the level of spatial aggregation.
+
+`summ = 'spring'` (default) returns one row per spring per time period.
+
+`summ = 'basin'` sums loads within drainage basins.  Lithia and Buckhorn are both assigned to the Alafia River basin and Sulphur is assigned to the Hillsborough River basin as shown with the `majbasin` column.
+
+```{r}
+anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
+         summ = 'basin', summtime = 'month')
+```
+
+`summ = 'segment'` sums all three springs to the single bay segment (segment 2, Hillsborough Bay).
+
+```{r}
+anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
+         summ = 'segment', summtime = 'month')
+```
+
+## Temporal summary
+
+The `summtime` argument works across all three spatial levels.  Setting `summtime = 'year'` sums load columns over months.
+
+```{r}
+# Annual segment totals
+anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
+         summ = 'segment', summtime = 'year')
+```

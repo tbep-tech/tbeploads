@@ -1,0 +1,71 @@
+---
+title: "Groundwater (GW)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Groundwater (GW)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = F,
+  message = F,
+  fig.align = "center"
+)
+```
+
+```{r}
+library(tbeploads)
+```
+
+Groundwater loads to Tampa Bay are estimated using the three-aquifer framework from Zarbock et al. (1994).  The `anlz_gw()` function computes monthly TN, TP, and hydrologic loads for seven bay segments (1 = Old Tampa Bay through 7 = Manatee River).
+
+## Methodology
+
+Three aquifer types contribute to each bay segment each month.
+
+**Floridan aquifer:** Flow is estimated with Darcy's Law: Q = 7.4805 x 10^-6 x T x I x L, where T is transmissivity (ft²/day), I is the hydraulic gradient (ft/mile), and L is the flow zone length (miles).  Q is in million gallons per day (MGD).  Monthly nutrient loads (kg/month) are Q x C x 8.342 x 30.5 / 2.2, where C is the TN or TP concentration in mg/L.  Monthly hydrologic load (m³/month) is Q x 3785 x 30.5.  Transmissivity and flow zone length are fixed constants per segment from Zarbock et al. (1994).  Hydraulic gradients are season-specific: months 1-6 and 11-12 are dry season; months 7-10 are wet season.  Segments 4-7 have zero gradient in the dry season; segment 5 has zero gradient in both seasons.
+
+**Surficial and intermediate aquifers:** Loads are fixed monthly constants per segment derived from 1995-1998 (surficial) and 1999-2003 (intermediate) SWFWMD monitoring data.  These values have not changed since the original analysis.
+
+## Floridan aquifer concentrations
+
+Floridan aquifer TN and TP concentrations (mg/L) can be obtained from the [Water Atlas API](https://dev.api.wateratlas.org) using `util_gw_getwq()`.  The default stations are 18340 (CR 581 North Fldn) and 18965 (SR 52 and CR 581 Deep), the two Pasco County Floridan aquifer monitoring wells used in the 2022-2024 loading analysis.  Segment 1 (Old Tampa Bay) uses the first station mean only; segment 2 (Hillsborough Bay) uses the arithmetic mean of both station means.  Segments 3-7 retain fixed historical values from the 1995-1998 SWFWMD analysis that have been used unchanged in every loading cycle through 2021.
+
+```{r, eval = FALSE}
+# Requires internet access; retrieves Floridan aquifer concentrations
+wqdat <- util_gw_getwq()
+```
+
+When `wqdat = NULL` (the default in `anlz_gw()`), hardcoded concentrations from the 2022-2024 analysis are used directly.
+
+## Estimating groundwater loads
+
+`anlz_gw()` requires only a year range.  Hardcoded 2021 FDEP potentiometric surface gradients are used for all years because updated contours were not available when the 2022-2024 analysis was run.
+
+```{r}
+gw <- anlz_gw(yrrng = c(2022, 2024))
+
+head(gw)
+```
+
+Load columns are in tons/month and `hy_load` is in million m³/month.
+
+To pass concentrations retrieved from the API:
+
+```{r, eval = FALSE}
+# Requires internet access
+wqdat <- util_gw_getwq()
+gw_api <- anlz_gw(yrrng = c(2022, 2024), wqdat = wqdat)
+```
+
+## Temporal summary
+
+Setting `summtime = 'year'` sums monthly loads to annual totals.  The `Month` column is dropped.
+
+```{r}
+anlz_gw(yrrng = c(2022, 2024), summtime = 'year')
+```

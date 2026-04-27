@@ -12,6 +12,16 @@ articles:
   navbar: ~
   contents:
   - tbeploads
+- title: Loading sources
+  navbar: Loading sources
+  contents:
+  - dps
+  - ips
+  - ml
+  - ad
+  - nps
+  - spr
+  - gw
 
 reference:
 - title: Analyze data

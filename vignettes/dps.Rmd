@@ -1,0 +1,42 @@
+---
+title: "Domestic Point Source (DPS)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Domestic Point Source (DPS)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = F,
+  message = F,
+  fig.align = "center"
+)
+```
+
+```{r}
+library(tbeploads)
+```
+
+The domestic point source (DPS) functions are designed to work with raw entity data provided by partners.  The core function is `anlz_dps_facility()` that requires only a vector of file paths as input, where each path points to a file with monthly parameter concentration (mg/L) and flow data (million gallons per day).  The data also describe whether the observations are end of pipe (direct inflow to the bay) or reuse (applied to the land), with each defined by outfall Ids typically noted as D-001, D-002, etc. and R-001, R-002, etc, respectively. Both are estimated as concentration times flow, whereas reuse includes an attenuation factor for land application depending on location.  The file names must follow a specific convention, where metadata for each entity is found in the <code><a href="../reference/facilities.html">facilities</a></code> data object using information in the file name.
+
+For convenience, four example files are included with the package. These files represent actual entities and facilities, but the data have been randomized. The paths to these files are used as input to the function. Non-trivial data pre-processing and quality control is needed for each file and those included in the package are the correct format. The output is returned as tons per month for TN, TP, TSS, and BOD and million cubic meters per month for flow (hy).
+
+```{r}
+dpsfls <- list.files(system.file('extdata/', package = 'tbeploads'),
+  pattern = 'ps_dom', full.names = TRUE)
+anlz_dps_facility(dpsfls)
+```
+
+The `anlz_dps()` function uses `anlz_dps_facility()` to summarize the DPS results by location as facility (combines outfall data), entity (combines facility data), bay segment (combines entity data), and as all (combines bay segment data).  The results can also be temporally summarized as monthly or annual totals.  The location summary is defined by the `summ` argument and the temporal summary is defined by the `summtime` argument.  The `fls` argument used by `anlz_dps_facility()` is also used by `anlz_dps()`.  The output is tons per month for TN, TP, TSS, and BOD and as million cubic meters per month for flow (hy) if `summtime = 'month'` or tons per year for TN, TP, TSS, and BOD and million cubic meters per year for flow (hy) if `summtime = 'year'`.
+
+```{r}
+# combine by entity and month
+anlz_dps(dpsfls, summ = 'entity', summtime = 'month')
+
+# combine by bay segment and year
+anlz_dps(dpsfls, summ = "segment", summtime = "year")
+```
