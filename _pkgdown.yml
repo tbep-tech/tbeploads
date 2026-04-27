@@ -13,7 +13,7 @@ articles:
   contents:
   - tbeploads
 - title: Loading sources
-  navbar: Loading sources
+  navbar: ~
   contents:
   - dps
   - ips
