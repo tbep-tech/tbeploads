@@ -121,289 +121,31 @@ Months 1-6 and 11-12 are dry season; months 7-10 are wet season.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># monthly segment loads using hardcoded 2022-2024 gradients and concentrations</span></span></span>
-<span class="r-in"><span><span class="fu">anlz_gw</span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Year Month source          segment      tn_load     tp_load   hy_load</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   2022     1     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2022     2     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   2022     3     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   2022     4     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   2022     5     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   2022     6     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   2022     7     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8   2022     8     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9   2022     9     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10  2022    10     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11  2022    11     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12  2022    12     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13  2023     1     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14  2023     2     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15  2023     3     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16  2023     4     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17  2023     5     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18  2023     6     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19  2023     7     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20  2023     8     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21  2023     9     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22  2023    10     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23  2023    11     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24  2023    12     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25  2024     1     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26  2024     2     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27  2024     3     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28  2024     4     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29  2024     5     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30  2024     6     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 31  2024     7     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 32  2024     8     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 33  2024     9     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 34  2024    10     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 35  2024    11     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 36  2024    12     GW   Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37  2022     1     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38  2022     2     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 39  2022     3     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 40  2022     4     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 41  2022     5     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 42  2022     6     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 43  2022     7     GW Hillsborough Bay 1.7302181240 0.205882714 6.1692374</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 44  2022     8     GW Hillsborough Bay 1.7302181240 0.205882714 6.1692374</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 45  2022     9     GW Hillsborough Bay 1.7302181240 0.205882714 6.1692374</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 46  2022    10     GW Hillsborough Bay 1.7302181240 0.205882714 6.1692374</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 47  2022    11     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 48  2022    12     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 49  2023     1     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 50  2023     2     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 51  2023     3     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 52  2023     4     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 53  2023     5     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 54  2023     6     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 55  2023     7     GW Hillsborough Bay 1.7302181240 0.205882714 6.1692374</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 56  2023     8     GW Hillsborough Bay 1.7302181240 0.205882714 6.1692374</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 57  2023     9     GW Hillsborough Bay 1.7302181240 0.205882714 6.1692374</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 58  2023    10     GW Hillsborough Bay 1.7302181240 0.205882714 6.1692374</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 59  2023    11     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60  2023    12     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 61  2024     1     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 62  2024     2     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 63  2024     3     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 64  2024     4     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 65  2024     5     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 66  2024     6     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 67  2024     7     GW Hillsborough Bay 1.7302181240 0.205882714 6.1692374</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 68  2024     8     GW Hillsborough Bay 1.7302181240 0.205882714 6.1692374</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 69  2024     9     GW Hillsborough Bay 1.7302181240 0.205882714 6.1692374</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 70  2024    10     GW Hillsborough Bay 1.7302181240 0.205882714 6.1692374</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71  2024    11     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 72  2024    12     GW Hillsborough Bay 1.7256820120 0.205373694 6.1532324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 73  2022     1     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 74  2022     2     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 75  2022     3     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 76  2022     4     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 77  2022     5     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 78  2022     6     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 79  2022     7     GW  Lower Tampa Bay 0.0248591051 0.138126958 0.8883175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 80  2022     8     GW  Lower Tampa Bay 0.0248591051 0.138126958 0.8883175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 81  2022     9     GW  Lower Tampa Bay 0.0248591051 0.138126958 0.8883175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 82  2022    10     GW  Lower Tampa Bay 0.0248591051 0.138126958 0.8883175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 83  2022    11     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 84  2022    12     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 85  2023     1     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 86  2023     2     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 87  2023     3     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 88  2023     4     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 89  2023     5     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 90  2023     6     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 91  2023     7     GW  Lower Tampa Bay 0.0248591051 0.138126958 0.8883175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 92  2023     8     GW  Lower Tampa Bay 0.0248591051 0.138126958 0.8883175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 93  2023     9     GW  Lower Tampa Bay 0.0248591051 0.138126958 0.8883175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 94  2023    10     GW  Lower Tampa Bay 0.0248591051 0.138126958 0.8883175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 95  2023    11     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 96  2023    12     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 97  2024     1     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 98  2024     2     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 99  2024     3     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 100 2024     4     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 101 2024     5     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 102 2024     6     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 103 2024     7     GW  Lower Tampa Bay 0.0248591051 0.138126958 0.8883175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 104 2024     8     GW  Lower Tampa Bay 0.0248591051 0.138126958 0.8883175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 105 2024     9     GW  Lower Tampa Bay 0.0248591051 0.138126958 0.8883175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 106 2024    10     GW  Lower Tampa Bay 0.0248591051 0.138126958 0.8883175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 107 2024    11     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 108 2024    12     GW  Lower Tampa Bay 0.0012566349 0.008785422 0.0333856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 109 2022     1     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 110 2022     2     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 111 2022     3     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 112 2022     4     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 113 2022     5     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 114 2022     6     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 115 2022     7     GW    Manatee River 0.0228457034 0.107664561 0.8100667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 116 2022     8     GW    Manatee River 0.0228457034 0.107664561 0.8100667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 117 2022     9     GW    Manatee River 0.0228457034 0.107664561 0.8100667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 118 2022    10     GW    Manatee River 0.0228457034 0.107664561 0.8100667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 119 2022    11     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 120 2022    12     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 121 2023     1     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 122 2023     2     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 123 2023     3     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 124 2023     4     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 125 2023     5     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 126 2023     6     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 127 2023     7     GW    Manatee River 0.0228457034 0.107664561 0.8100667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 128 2023     8     GW    Manatee River 0.0228457034 0.107664561 0.8100667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 129 2023     9     GW    Manatee River 0.0228457034 0.107664561 0.8100667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 130 2023    10     GW    Manatee River 0.0228457034 0.107664561 0.8100667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 131 2023    11     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 132 2023    12     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 133 2024     1     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 134 2024     2     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 135 2024     3     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 136 2024     4     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 137 2024     5     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 138 2024     6     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 139 2024     7     GW    Manatee River 0.0228457034 0.107664561 0.8100667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 140 2024     8     GW    Manatee River 0.0228457034 0.107664561 0.8100667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 141 2024     9     GW    Manatee River 0.0228457034 0.107664561 0.8100667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 142 2024    10     GW    Manatee River 0.0228457034 0.107664561 0.8100667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 143 2024    11     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 144 2024    12     GW    Manatee River 0.0013889123 0.009821594 0.0328558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 145 2022     1     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 146 2022     2     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 147 2022     3     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 148 2022     4     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 149 2022     5     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 150 2022     6     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 151 2022     7     GW Middle Tampa Bay 0.0260606245 0.147265119 0.9126274</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 152 2022     8     GW Middle Tampa Bay 0.0260606245 0.147265119 0.9126274</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 153 2022     9     GW Middle Tampa Bay 0.0260606245 0.147265119 0.9126274</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 154 2022    10     GW Middle Tampa Bay 0.0260606245 0.147265119 0.9126274</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 155 2022    11     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 156 2022    12     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 157 2023     1     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 158 2023     2     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 159 2023     3     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 160 2023     4     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 161 2023     5     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 162 2023     6     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 163 2023     7     GW Middle Tampa Bay 0.0260606245 0.147265119 0.9126274</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 164 2023     8     GW Middle Tampa Bay 0.0260606245 0.147265119 0.9126274</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 165 2023     9     GW Middle Tampa Bay 0.0260606245 0.147265119 0.9126274</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 166 2023    10     GW Middle Tampa Bay 0.0260606245 0.147265119 0.9126274</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 167 2023    11     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 168 2023    12     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 169 2024     1     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 170 2024     2     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 171 2024     3     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 172 2024     4     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 173 2024     5     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 174 2024     6     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 175 2024     7     GW Middle Tampa Bay 0.0260606245 0.147265119 0.9126274</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 176 2024     8     GW Middle Tampa Bay 0.0260606245 0.147265119 0.9126274</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 177 2024     9     GW Middle Tampa Bay 0.0260606245 0.147265119 0.9126274</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 178 2024    10     GW Middle Tampa Bay 0.0260606245 0.147265119 0.9126274</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 179 2024    11     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 180 2024    12     GW Middle Tampa Bay 0.0227613545 0.129185120 0.7931208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 181 2022     1     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 182 2022     2     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 183 2022     3     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 184 2022     4     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 185 2022     5     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 186 2022     6     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 187 2022     7     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 188 2022     8     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 189 2022     9     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 190 2022    10     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 191 2022    11     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 192 2022    12     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 193 2023     1     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 194 2023     2     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 195 2023     3     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 196 2023     4     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 197 2023     5     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 198 2023     6     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 199 2023     7     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 200 2023     8     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 201 2023     9     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 202 2023    10     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 203 2023    11     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 204 2023    12     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 205 2024     1     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 206 2024     2     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 207 2024     3     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 208 2024     4     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 209 2024     5     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 210 2024     6     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 211 2024     7     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 212 2024     8     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 213 2024     9     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 214 2024    10     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 215 2024    11     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 216 2024    12     GW    Old Tampa Bay 0.5487809114 0.163081117 5.0150378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 217 2022     1     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 218 2022     2     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 219 2022     3     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 220 2022     4     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 221 2022     5     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 222 2022     6     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 223 2022     7     GW   Terra Ceia Bay 0.0043835838 0.022380890 0.1561988</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 224 2022     8     GW   Terra Ceia Bay 0.0043835838 0.022380890 0.1561988</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 225 2022     9     GW   Terra Ceia Bay 0.0043835838 0.022380890 0.1561988</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 226 2022    10     GW   Terra Ceia Bay 0.0043835838 0.022380890 0.1561988</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 227 2022    11     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 228 2022    12     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 229 2023     1     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 230 2023     2     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 231 2023     3     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 232 2023     4     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 233 2023     5     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 234 2023     6     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 235 2023     7     GW   Terra Ceia Bay 0.0043835838 0.022380890 0.1561988</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 236 2023     8     GW   Terra Ceia Bay 0.0043835838 0.022380890 0.1561988</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 237 2023     9     GW   Terra Ceia Bay 0.0043835838 0.022380890 0.1561988</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 238 2023    10     GW   Terra Ceia Bay 0.0043835838 0.022380890 0.1561988</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 239 2023    11     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 240 2023    12     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 241 2024     1     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 242 2024     2     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 243 2024     3     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 244 2024     4     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 245 2024     5     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 246 2024     6     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 247 2024     7     GW   Terra Ceia Bay 0.0043835838 0.022380890 0.1561988</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 248 2024     8     GW   Terra Ceia Bay 0.0043835838 0.022380890 0.1561988</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 249 2024     9     GW   Terra Ceia Bay 0.0043835838 0.022380890 0.1561988</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 250 2024    10     GW   Terra Ceia Bay 0.0043835838 0.022380890 0.1561988</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 251 2024    11     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 252 2024    12     GW   Terra Ceia Bay 0.0001763698 0.001344820 0.0038045</span>
+<span class="r-in"><span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu">anlz_gw</span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gw</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Year Month source        segment      tn_load     tp_load   hy_load</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 2022     1     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 2022     2     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 2022     3     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 2022     4     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 2022     5     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 2022     6     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># annual totals</span></span></span>
-<span class="r-in"><span><span class="fu">anlz_gw</span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, summtime <span class="op">=</span> <span class="st">'year'</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Year source          segment     tn_load    tp_load    hy_load</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  2022     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  2023     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  2024     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  2022     GW Hillsborough Bay 20.72632859 2.46652041 73.9028084</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  2023     GW Hillsborough Bay 20.72632859 2.46652041 73.9028084</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  2024     GW Hillsborough Bay 20.72632859 2.46652041 73.9028084</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7  2022     GW  Lower Tampa Bay  0.10948950 0.62279120  3.8203550</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  2023     GW  Lower Tampa Bay  0.10948950 0.62279120  3.8203550</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  2024     GW  Lower Tampa Bay  0.10948950 0.62279120  3.8203550</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 2022     GW    Manatee River  0.10249411 0.50923100  3.5031130</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 2023     GW    Manatee River  0.10249411 0.50923100  3.5031130</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12 2024     GW    Manatee River  0.10249411 0.50923100  3.5031130</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13 2022     GW Middle Tampa Bay  0.28633333 1.62254143  9.9954764</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14 2023     GW Middle Tampa Bay  0.28633333 1.62254143  9.9954764</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15 2024     GW Middle Tampa Bay  0.28633333 1.62254143  9.9954764</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16 2022     GW    Old Tampa Bay  6.58537094 1.95697341 60.1804539</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17 2023     GW    Old Tampa Bay  6.58537094 1.95697341 60.1804539</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18 2024     GW    Old Tampa Bay  6.58537094 1.95697341 60.1804539</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19 2022     GW   Terra Ceia Bay  0.01894529 0.10028212  0.6552311</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20 2023     GW   Terra Ceia Bay  0.01894529 0.10028212  0.6552311</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21 2024     GW   Terra Ceia Bay  0.01894529 0.10028212  0.6552311</span>
+<span class="r-in"><span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu">anlz_gw</span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, summtime <span class="op">=</span> <span class="st">'year'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gw</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Year source          segment     tn_load    tp_load    hy_load</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 2022     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 2023     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 2024     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 2022     GW Hillsborough Bay 20.72632859 2.46652041 73.9028084</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 2023     GW Hillsborough Bay 20.72632859 2.46652041 73.9028084</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 2024     GW Hillsborough Bay 20.72632859 2.46652041 73.9028084</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="co"># pass concentrations from the Water Atlas API</span></span></span>
-<span class="r-in"><span><span class="fu">anlz_gw</span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, wqdat <span class="op">=</span> <span class="fu"><a href="util_gw_getwq.html">util_gw_getwq</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu">anlz_gw</span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, wqdat <span class="op">=</span> <span class="fu"><a href="util_gw_getwq.html">util_gw_getwq</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gw</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

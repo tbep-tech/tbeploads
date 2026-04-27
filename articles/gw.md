@@ -7,8 +7,8 @@ library(tbeploads)
 Groundwater loads to Tampa Bay are estimated using the three-aquifer
 framework from Zarbock et al. (1994). The
 [`anlz_gw()`](https://tbep-tech.github.io/tbeploads/reference/anlz_gw.md)
-function computes monthly TN, TP, and hydrologic loads for seven bay
-segments (1 = Old Tampa Bay through 7 = Manatee River).
+function computes monthly TN, TP, and hydrologic loads for all bay
+segments.
 
 ## Methodology
 
@@ -22,9 +22,9 @@ are Q x C x 8.342 x 30.5 / 2.2, where C is the TN or TP concentration in
 mg/L. Monthly hydrologic load (m³/month) is Q x 3785 x 30.5.
 Transmissivity and flow zone length are fixed constants per segment from
 Zarbock et al. (1994). Hydraulic gradients are season-specific: months
-1-6 and 11-12 are dry season; months 7-10 are wet season. Segments 4-7
-have zero gradient in the dry season; segment 5 has zero gradient in
-both seasons.
+1-6 and 11-12 are dry season; months 7-10 are wet season. Lower Tampa
+Bay and Remainder Lower Tampa Bay have zero gradient in the dry season
+and Boca Ciega Bay has zero gradient in both seasons.
 
 **Surficial and intermediate aquifers:** Loads are fixed monthly
 constants per segment derived from 1995-1998 (surficial) and 1999-2003
@@ -38,11 +38,11 @@ the [Water Atlas API](https://dev.api.wateratlas.org) using
 [`util_gw_getwq()`](https://tbep-tech.github.io/tbeploads/reference/util_gw_getwq.md).
 The default stations are 18340 (CR 581 North Fldn) and 18965 (SR 52 and
 CR 581 Deep), the two Pasco County Floridan aquifer monitoring wells
-used in the 2022-2024 loading analysis. Segment 1 (Old Tampa Bay) uses
-the first station mean only; segment 2 (Hillsborough Bay) uses the
-arithmetic mean of both station means. Segments 3-7 retain fixed
-historical values from the 1995-1998 SWFWMD analysis that have been used
-unchanged in every loading cycle through 2021.
+used in the 2022-2024 loading analysis. Old Tampa Bay uses the first
+station mean only and Hillsborough Bay uses the arithmetic mean of both
+station means. The rest of the bay segments retain fixed historical
+values from the 1995-1998 SWFWMD analysis that have been used unchanged
+in every loading cycle through 2021.
 
 ``` r
 # Requires internet access; retrieves Floridan aquifer concentrations
