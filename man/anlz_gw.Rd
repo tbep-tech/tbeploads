@@ -51,13 +51,15 @@ where \eqn{C} is the TN or TP concentration (mg/L). Hydrologic load
 \strong{Hydraulic gradients:}
 The gradient section below contains a commented-out framework that calls
 \code{\link{util_gw_getcontour}} and \code{\link{util_gw_grad}} to compute
-gradients dynamically from FDEP potentiometric surface contours. This
-approach requires Floridan aquifer flow-zone polygons (not yet available)
-to replace \code{\link{tbsubshed}}, which gives incorrect gradients for
-Lower Tampa Bay, Terra Ceia Bay, and Manatee River in the wet season.
-Until those polygons are obtained, hardcoded gradient values from the 2021
-FDEP potentiometric surface map are used (the same values applied for 2022-2024
-in the original SAS analysis, as no updated contours were available at that time).
+gradients dynamically from FDEP potentiometric surface contours. The key
+challenge is that potentiometric high points for some segments (notably Old
+Tampa Bay) lie north of the subwatershed boundary; \code{util_gw_getcontour}
+accepts a \code{buf_dist} argument and \code{util_gw_grad} accepts a
+\code{buf_segs} argument to expand the search area for those segments.
+Until the buffer distances are calibrated against known SAS gradients,
+hardcoded gradient values from the 2021 FDEP potentiometric surface map are
+used (the same values applied for 2022-2024 in the original SAS analysis,
+as no updated contours were available at that time).
 
 \strong{Surficial and intermediate aquifers:}
 Loads are fixed constants per segment. Surficial values are from

@@ -32,6 +32,7 @@ Depends:
 Imports:
   dataRetrieval,
   dplyr,
+  ggplot2,
   httr,
   jsonlite,
   lubridate,
@@ -40,7 +41,7 @@ Imports:
   sf,
   tbeptools,
   tibble,
-  tidyr, 
+  tidyr,
   zoo
 LazyData: true
 LazyDataCompression: xz

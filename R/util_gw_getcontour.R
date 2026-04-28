@@ -5,6 +5,14 @@
 #'   observations are available from 2010 through 2022.
 #' @param max_records integer, maximum number of records per paginated request.
 #'   Default is 1000.
+#' @param north_dist numeric, distance in CRS units (US Survey Feet for EPSG
+#'   6443) to extend the spatial filter and clipping boundary northward beyond
+#'   the Tampa Bay watershed (\code{\link{tbfullshed}}). Use a positive value
+#'   when the potentiometric high point for one or more bay segments lies north
+#'   of the watershed boundary (e.g., Old Tampa Bay). The same value (or larger)
+#'   should be passed as \code{north_dist} in \code{\link{util_gw_grad}} so
+#'   that the returned contours cover the extended search areas. Default 0 (no
+#'   extension).
 #' @param verbose logical, if \code{TRUE} (default) progress messages are
 #'   printed during download.
 #'
@@ -17,7 +25,8 @@
 #' Contours are available biannually: \code{"dry"} season maps to May of
 #' \code{yr} and \code{"wet"} season maps to September of \code{yr}.
 #' Results are spatially filtered to the Tampa Bay watershed
-#' (\code{\link{tbfullshed}}) and clipped to that boundary before return.
+#' (\code{\link{tbfullshed}}), optionally extended northward by
+#' \code{north_dist}, and clipped to that boundary before return.
 #'
 #' The \code{CONTOUR} field contains potentiometric surface elevations in feet
 #' above mean sea level. These are used to compute the hydraulic
@@ -36,9 +45,12 @@
 #' \dontrun{
 #' dry_contours <- util_gw_getcontour("dry", 2022)
 #' wet_contours <- util_gw_getcontour("wet", 2022)
+#'
+#' # extend north by ~28 miles for OTB high-point search
+#' dry_contours <- util_gw_getcontour("dry", 2022, north_dist = 150000)
 #' }
 util_gw_getcontour <- function(season = c("dry", "wet"), yr, max_records = 1000,
-                            verbose = TRUE) {
+                               north_dist = 0, verbose = TRUE) {
 
   season <- match.arg(season)
 
@@ -49,7 +61,23 @@ util_gw_getcontour <- function(season = c("dry", "wet"), yr, max_records = 1000,
 
   url <- "https://ca.dep.state.fl.us/arcgis/rest/services/OpenData/FGS_PUBLIC/MapServer/8/query"
 
-  tbep_bb <- tbfullshed |>
+  if (north_dist > 0) {
+    bb   <- sf::st_bbox(tbfullshed)
+    xmin <- as.numeric(bb["xmin"]); xmax <- as.numeric(bb["xmax"])
+    ymax <- as.numeric(bb["ymax"])
+    north_rect <- sf::st_sfc(
+      sf::st_polygon(list(matrix(c(
+        xmin, ymax, xmax, ymax, xmax, ymax + north_dist,
+        xmin, ymax + north_dist, xmin, ymax
+      ), ncol = 2, byrow = TRUE))),
+      crs = sf::st_crs(tbfullshed)
+    )
+    shed <- sf::st_union(sf::st_geometry(tbfullshed), north_rect)
+  } else {
+    shed <- sf::st_geometry(tbfullshed)
+  }
+
+  tbep_bb <- shed |>
     sf::st_transform(4326) |>
     sf::st_bbox()
 
@@ -111,7 +139,7 @@ util_gw_getcontour <- function(season = c("dry", "wet"), yr, max_records = 1000,
 
   out <- do.call(rbind, all_features) |>
     sf::st_transform(crs = sf::st_crs(tbfullshed)) |>
-    sf::st_intersection(tbfullshed) |>
+    sf::st_intersection(shed) |>
     dplyr::select(CONTOUR, MONTH_YEAR)
 
   return(out)

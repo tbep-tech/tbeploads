@@ -4,7 +4,12 @@
 \alias{util_gw_grad}
 \title{Compute hydraulic gradient per bay segment from UFA potentiometric surface contours}
 \usage{
-util_gw_grad(contours, segs = tbsubshed, shoreline = tbsegdetail)
+util_gw_grad(
+  contours,
+  segs = tbsubshed,
+  shoreline = tbsegdetail,
+  north_segs = NULL
+)
 }
 \arguments{
 \item{contours}{\code{\link[sf]{sf}} object of Upper Floridan Aquifer contour
@@ -16,13 +21,25 @@ to \code{\link{tbsubshed}}.}
 \item{shoreline}{\code{\link[sf]{sf}} object of bay segment polygons used to
 measure distance from the watershed high point to the bay. Defaults to
 \code{\link{tbsegdetail}}.}
+
+\item{north_segs}{named numeric vector mapping bay segment IDs to northward
+extension distances (in CRS units, US Survey Feet for EPSG 6443). Segments
+listed here have a rectangular extension appended to the north side of
+their sub-watershed polygon before the contour clipping step, allowing the
+high-point search to reach potentiometric highs that lie north of the
+standard subwatershed boundary.  Use this for segments such as Old Tampa
+Bay (segment 1) where the high point is north of the subwatershed. Names
+must be coercible to the integer bay segment IDs in \code{segs}.  The
+\code{contours} passed to this function must already cover the extended
+area — pass the same distance (or larger) as \code{north_dist} in
+\code{\link{util_gw_getcontour}}.  Default \code{NULL} (no extension).}
 }
 \value{
 A data frame with columns:
 \itemize{
 \item \code{bay_seg}: integer, bay segment number
 \item \code{grad}: numeric, hydraulic gradient (ft/mile); 0 for segments
-with no direct Floridan aquifer discharge
+with no reliably computable Floridan aquifer gradient
 }
 }
 \description{
@@ -36,15 +53,21 @@ bay segment using Darcy's Law as applied in the Tampa Bay loading model
 \deqn{I = \frac{\text{elevation (ft)}}{\text{distance to shoreline (miles)}}}
 
 where elevation is the maximum UFA potentiometric surface contour value
-within the segment watershed, and distance is the straight-line distance from
-that contour's representative point to the nearest bay shoreline.
+within the (optionally extended) segment watershed, and distance is the
+straight-line distance from that contour's representative point to the
+nearest bay shoreline.
 
 The season (dry or wet) is inferred from the \code{MONTH_YEAR} field in
 \code{contours} (\code{"May"} = dry, \code{"September"} = wet). Segments
-with no direct Floridan aquifer discharge to the bay receive a gradient of 0:
+with no reliably computable Floridan aquifer gradient receive a value of 0:
 \itemize{
 \item Dry season: segments 4, 5, 6, 7, 55
-\item Wet season: segments 5, 55
+\item Wet season: segments 4, 5, 6, 7, 55 — Lower Tampa Bay, Terra Ceia
+Bay, and Manatee River are included here because the subwatershed
+geometry does not reliably capture the correct potentiometric high point
+for those segments, and the analyst-specified wet-season gradients
+(50/32, 50/34, and 50/40 ft/mile for the 2022-2024 analysis) were read
+manually from the 2021 FDEP map rather than computed algorithmically.
 }
 
 \strong{Hillsborough Bay (segment 2):}

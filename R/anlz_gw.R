@@ -26,13 +26,15 @@
 #' \strong{Hydraulic gradients:}
 #' The gradient section below contains a commented-out framework that calls
 #' \code{\link{util_gw_getcontour}} and \code{\link{util_gw_grad}} to compute
-#' gradients dynamically from FDEP potentiometric surface contours. This
-#' approach requires Floridan aquifer flow-zone polygons (not yet available)
-#' to replace \code{\link{tbsubshed}}, which gives incorrect gradients for
-#' Lower Tampa Bay, Terra Ceia Bay, and Manatee River in the wet season. 
-#' Until those polygons are obtained, hardcoded gradient values from the 2021 
-#' FDEP potentiometric surface map are used (the same values applied for 2022-2024 
-#' in the original SAS analysis, as no updated contours were available at that time).
+#' gradients dynamically from FDEP potentiometric surface contours. The key
+#' challenge is that potentiometric high points for some segments (notably Old
+#' Tampa Bay) lie north of the subwatershed boundary; \code{util_gw_getcontour}
+#' accepts a \code{buf_dist} argument and \code{util_gw_grad} accepts a
+#' \code{buf_segs} argument to expand the search area for those segments.
+#' Until the buffer distances are calibrated against known SAS gradients,
+#' hardcoded gradient values from the 2021 FDEP potentiometric surface map are
+#' used (the same values applied for 2022-2024 in the original SAS analysis,
+#' as no updated contours were available at that time).
 #'
 #' \strong{Surficial and intermediate aquifers:}
 #' Loads are fixed constants per segment. Surficial values are from
@@ -80,15 +82,21 @@ anlz_gw <- function(yrrng = c(2022, 2024), wqdat = NULL,
   # 1. Floridan aquifer hydraulic gradient (I, ft/mile) per segment and season
   # -------------------------------------------------------------------------
   # Framework for dynamic gradient computation from FDEP potentiometric surface
-  # contours. Requires Floridan aquifer flow-zone polygons to replace tbsubshed
-  # (tbsubshed gives incorrect gradients for segments 4, 6, and 7 in wet season
-  # because the surface watersheds are too narrow to capture the relevant
-  # potentiometric high points). TODO: swap in flow-zone polygons when available.
+  # contours. For OTB (seg 1) the potentiometric high lies north of the
+  # subwatershed; north_dist extends the contour fetch area northward and
+  # north_segs applies a per-segment northward extension inside util_gw_grad().
+  # Distances are in US Survey Feet (CRS 6443); north_dist must be >= north_segs.
+  # LTB (4) and TCB (6) are set to zero in wet season inside util_gw_grad()
+  # because their subwatershed geometry does not reliably locate the high point.
+  # Tune north_dist / north_segs empirically against known SAS gradients.
   #
-  # contdry <- util_gw_getcontour("dry", yr)   # one call per year
-  # contwet <- util_gw_getcontour("wet", yr)
-  # grad_dry <- util_gw_grad(contdry)           # returns bay_seg + grad
-  # grad_wet <- util_gw_grad(contwet)
+  # north_dist <- 150000   # ~28 miles north of watershed
+  # north_segs <- c("1" = 150000)   # OTB: high point outside subwatershed
+  #
+  # contdry <- util_gw_getcontour("dry", yr, north_dist = north_dist)
+  # contwet <- util_gw_getcontour("wet", yr, north_dist = north_dist)
+  # grad_dry <- util_gw_grad(contdry, north_segs = north_segs)
+  # grad_wet <- util_gw_grad(contwet, north_segs = north_segs)
 
   # Hardcoded gradients from the 2021 FDEP potentiometric surface map.
   # Applied unchanged for 2022-2024 because updated contours were not

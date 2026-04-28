@@ -7,6 +7,17 @@
 #' @param shoreline \code{\link[sf]{sf}} object of bay segment polygons used to
 #'   measure distance from the watershed high point to the bay. Defaults to
 #'   \code{\link{tbsegdetail}}.
+#' @param north_segs named numeric vector mapping bay segment IDs to northward
+#'   extension distances (in CRS units, US Survey Feet for EPSG 6443). Segments
+#'   listed here have a rectangular extension appended to the north side of
+#'   their sub-watershed polygon before the contour clipping step, allowing the
+#'   high-point search to reach potentiometric highs that lie north of the
+#'   standard subwatershed boundary.  Use this for segments such as Old Tampa
+#'   Bay (segment 1) where the high point is north of the subwatershed. Names
+#'   must be coercible to the integer bay segment IDs in \code{segs}.  The
+#'   \code{contours} passed to this function must already cover the extended
+#'   area — pass the same distance (or larger) as \code{north_dist} in
+#'   \code{\link{util_gw_getcontour}}.  Default \code{NULL} (no extension).
 #'
 #' @details
 #' Computes the Floridan aquifer hydraulic gradient \eqn{I} (ft/mile) for each
@@ -16,15 +27,21 @@
 #' \deqn{I = \frac{\text{elevation (ft)}}{\text{distance to shoreline (miles)}}}
 #'
 #' where elevation is the maximum UFA potentiometric surface contour value
-#' within the segment watershed, and distance is the straight-line distance from
-#' that contour's representative point to the nearest bay shoreline.
+#' within the (optionally extended) segment watershed, and distance is the
+#' straight-line distance from that contour's representative point to the
+#' nearest bay shoreline.
 #'
 #' The season (dry or wet) is inferred from the \code{MONTH_YEAR} field in
 #' \code{contours} (\code{"May"} = dry, \code{"September"} = wet). Segments
-#' with no direct Floridan aquifer discharge to the bay receive a gradient of 0:
+#' with no reliably computable Floridan aquifer gradient receive a value of 0:
 #' \itemize{
 #'   \item Dry season: segments 4, 5, 6, 7, 55
-#'   \item Wet season: segments 5, 55
+#'   \item Wet season: segments 4, 5, 6, 7, 55 — Lower Tampa Bay, Terra Ceia
+#'     Bay, and Manatee River are included here because the subwatershed
+#'     geometry does not reliably capture the correct potentiometric high point
+#'     for those segments, and the analyst-specified wet-season gradients
+#'     (50/32, 50/34, and 50/40 ft/mile for the 2022-2024 analysis) were read
+#'     manually from the 2021 FDEP map rather than computed algorithmically.
 #' }
 #'
 #' \strong{Hillsborough Bay (segment 2):}
@@ -43,7 +60,7 @@
 #' \itemize{
 #'   \item \code{bay_seg}: integer, bay segment number
 #'   \item \code{grad}: numeric, hydraulic gradient (ft/mile); 0 for segments
-#'     with no direct Floridan aquifer discharge
+#'     with no reliably computable Floridan aquifer gradient
 #' }
 #'
 #' @export
@@ -51,7 +68,8 @@
 #' @examples
 #' util_gw_grad(contdry)
 #' util_gw_grad(contwet)
-util_gw_grad <- function(contours, segs = tbsubshed, shoreline = tbsegdetail) {
+util_gw_grad <- function(contours, segs = tbsubshed, shoreline = tbsegdetail,
+                         north_segs = NULL) {
 
   # Infer season from MONTH_YEAR
   month_year <- unique(contours$MONTH_YEAR)
@@ -60,8 +78,12 @@ util_gw_grad <- function(contours, segs = tbsubshed, shoreline = tbsegdetail) {
          paste(month_year, collapse = ", "))
   season <- if (grepl("May", month_year)) "dry" else "wet"
 
-  # Segments with zero Floridan aquifer gradient (no direct discharge to bay)
-  zero_segs   <- if (season == "dry") c(4L, 5L, 6L, 7L, 55L) else c(5L, 55L)
+  # Segments with no reliably computable gradient (set to zero).
+  # LTB (4), TCB (6), and MR (7) are zero in wet season because subwatershed
+  # geometry does not reliably locate the correct potentiometric high point;
+  # the 2022-2024 SAS values for those segments (50/32, 50/34, 50/40 ft/mile)
+  # were read manually from the 2021 FDEP map rather than computed from contours.
+  zero_segs   <- if (season == "dry") c(4L, 5L, 6L, 7L, 55L) else c(4L, 5L, 6L, 7L, 55L)
   active_segs <- setdiff(sort(unique(segs$bay_seg)), zero_segs)
 
   # Basin-to-sub-zone lookup for Hillsborough Bay (segment 2)
@@ -90,6 +112,24 @@ util_gw_grad <- function(contours, segs = tbsubshed, shoreline = tbsegdetail) {
   results <- lapply(active_segs, function(seg) {
 
     watershed <- dplyr::filter(segs, .data$bay_seg == seg)
+    seg_key   <- as.character(seg)
+
+    if (!is.null(north_segs) && seg_key %in% names(north_segs)) {
+      ws_geom <- sf::st_union(watershed)
+      bb      <- sf::st_bbox(ws_geom)
+      xmin    <- as.numeric(bb["xmin"]); xmax <- as.numeric(bb["xmax"])
+      ymax    <- as.numeric(bb["ymax"])
+      dist    <- north_segs[[seg_key]]
+      north_rect <- sf::st_sfc(
+        sf::st_polygon(list(matrix(c(
+          xmin, ymax, xmax, ymax, xmax, ymax + dist,
+          xmin, ymax + dist, xmin, ymax
+        ), ncol = 2, byrow = TRUE))),
+        crs = sf::st_crs(watershed)
+      )
+      watershed <- sf::st_union(ws_geom, north_rect)
+    }
+
     shore     <- dplyr::filter(shoreline, .data$bay_seg == seg)
     cont_clip <- suppressWarnings(sf::st_intersection(contours, watershed))
 
