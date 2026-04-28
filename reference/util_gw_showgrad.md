@@ -10,7 +10,8 @@ util_gw_showgrad(
   seg,
   segs = tbsubshed,
   shoreline = tbsegdetail,
-  north_segs = NULL
+  north_segs = NULL,
+  buf_segs = NULL
 )
 ```
 
@@ -46,6 +47,15 @@ util_gw_showgrad(
   [`util_gw_grad`](https://tbep-tech.github.io/tbeploads/reference/util_gw_grad.md).
   Default `NULL` (no extension).
 
+- buf_segs:
+
+  named numeric vector of omnidirectional buffer distances (in CRS
+  units, US Survey Feet for EPSG 6443), in the same format accepted by
+  [`util_gw_grad`](https://tbep-tech.github.io/tbeploads/reference/util_gw_grad.md).
+  When supplied for the requested segment, the search area shown is the
+  buffered subwatershed with all bay water removed. Default `NULL` (no
+  buffering).
+
 ## Value
 
 A [`ggplot`](https://ggplot2.tidyverse.org/reference/ggplot.html)
@@ -54,7 +64,7 @@ object.
 ## Details
 
 Returns a `ggplot2` map showing, for the requested segment: the
-subwatershed search area (optionally extended northward), all clipped
+subwatershed search area (optionally extended or buffered), all clipped
 contour lines coloured by elevation, the maximum-elevation contour
 highlighted in red, the representative high point used in the gradient
 computation, and a dashed line to the nearest bay shoreline point. The
@@ -72,4 +82,6 @@ used in
 util_gw_showgrad(contdry, seg = 1, north_segs = c("1" = 150000))
 
 util_gw_showgrad(contwet, seg = 3)
+
+util_gw_showgrad(contwet, seg = 7, buf_segs = c("7" = 100000))
 ```

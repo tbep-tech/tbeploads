@@ -53,7 +53,8 @@
 <span>  <span class="va">contours</span>,</span>
 <span>  segs <span class="op">=</span> <span class="va">tbsubshed</span>,</span>
 <span>  shoreline <span class="op">=</span> <span class="va">tbsegdetail</span>,</span>
-<span>  north_segs <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  north_segs <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  buf_segs <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -90,6 +91,24 @@ must be coercible to the integer bay segment IDs in <code>segs</code>.  The
 area — pass the same distance (or larger) as <code>north_dist</code> in
 <code><a href="util_gw_getcontour.html">util_gw_getcontour</a></code>.  Default <code>NULL</code> (no extension).</p></dd>
 
+
+<dt id="arg-buf-segs">buf_segs<a class="anchor" aria-label="anchor" href="#arg-buf-segs"></a></dt>
+<dd><p>named numeric vector mapping bay segment IDs to omnidirectional
+buffer distances (in CRS units, US Survey Feet for EPSG 6443). Segments
+listed here have their sub-watershed polygon buffered outward by the given
+distance, and then all bay water (<code>shoreline</code>) is removed from that
+buffer with <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_difference</a></code> before contour clipping.  This
+allows the high-point search to extend beyond the subwatershed onto
+surrounding land without accidentally capturing potentiometric contours
+that pass under the open bay.  Segments listed in <code>buf_segs</code> are
+removed from the default zero-gradient set and computed dynamically.  Use
+this for segments such as Lower Tampa Bay (4), Terra Ceia Bay (6), and
+Manatee River (7) whose wet-season high points lie outside the
+subwatershed.  The <code>contours</code> passed to this function must already
+cover the buffered area — pass an equivalent or larger value as
+<code>north_dist</code> in <code><a href="util_gw_getcontour.html">util_gw_getcontour</a></code> if the buffer extends
+north of the watershed.  Default <code>NULL</code> (no buffering).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -111,11 +130,18 @@ nearest bay shoreline.</p>
 <code>contours</code> (<code>"May"</code> = dry, <code>"September"</code> = wet). Segments
 with no reliably computable Floridan aquifer gradient receive a value of 0:</p><ul><li><p>Dry season: segments 4, 5, 6, 7, 55</p></li>
 <li><p>Wet season: segments 4, 5, 6, 7, 55 — Lower Tampa Bay, Terra Ceia
-Bay, and Manatee River are included here because the subwatershed
-geometry does not reliably capture the correct potentiometric high point
-for those segments, and the analyst-specified wet-season gradients
-(50/32, 50/34, and 50/40 ft/mile for the 2022-2024 analysis) were read
-manually from the 2021 FDEP map rather than computed algorithmically.</p></li>
+Bay, and Manatee River are included by default because the subwatershed
+geometry does not reliably capture the correct potentiometric high point.
+Supply <code>buf_segs</code> for any of these segments to compute them
+dynamically using a buffered, bay-clipped search area instead.</p></li>
+</ul><p><strong>Search area expansion:</strong>
+Two mechanisms are available and may be combined across different segments:</p><ul><li><p><code>north_segs</code>: appends a rectangular extension to the north face
+of the subwatershed bounding box.  Best for segments (e.g., OTB) whose
+high point lies directly north of the subwatershed.</p></li>
+<li><p><code>buf_segs</code>: omnidirectional buffer with bay water removed.  Best
+for segments (e.g., LTB, TCB, MR) whose high point lies east or
+southeast of the subwatershed.  Removing the bay polygon prevents the
+algorithm from matching potentiometric contours that pass under open water.</p></li>
 </ul><p><strong>Hillsborough Bay (segment 2):</strong>
 Segment 2 uses a weighted average of three sub-zone gradients following the
 original flow net analysis. Sub-zones are constructed by unioning
