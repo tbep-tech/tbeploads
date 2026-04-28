@@ -59,6 +59,6 @@ save(clip_mask,        file = "data-raw/tbsegdetail_clip_mask.RData")
 #
 # Or pass it explicitly: util_gw_grad(contdry, shoreline = tbsegdetail_clip)
 tbsegdetail <- tbsegdetail_clip
-save(tbsegdetail, file = "data-raw/tbsegdetail.RData")
+save(tbsegdetail, file = "data/tbsegdetail.RData")
 
 message("Saved:\n  data-raw/tbsegdetail_clip_mask.RData\n  data-raw/tbsegdetail_clip.RData")
