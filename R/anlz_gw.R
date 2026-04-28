@@ -82,21 +82,29 @@ anlz_gw <- function(yrrng = c(2022, 2024), wqdat = NULL,
   # 1. Floridan aquifer hydraulic gradient (I, ft/mile) per segment and season
   # -------------------------------------------------------------------------
   # Framework for dynamic gradient computation from FDEP potentiometric surface
-  # contours. For OTB (seg 1) the potentiometric high lies north of the
-  # subwatershed; north_dist extends the contour fetch area northward and
-  # north_segs applies a per-segment northward extension inside util_gw_grad().
-  # Distances are in US Survey Feet (CRS 6443); north_dist must be >= north_segs.
-  # LTB (4) and TCB (6) are set to zero in wet season inside util_gw_grad()
-  # because their subwatershed geometry does not reliably locate the high point.
-  # Tune north_dist / north_segs empirically against known SAS gradients.
+  # contours.  Two expansion mechanisms are available and may be combined:
   #
-  # north_dist <- 150000   # ~28 miles north of watershed
-  # north_segs <- c("1" = 150000)   # OTB: high point outside subwatershed
+  # north_segs: rectangular northward extension for segments whose high point
+  #   lies north of the subwatershed (OTB, seg 1).  north_dist in
+  #   util_gw_getcontour must be >= the north_segs value so the contours cover
+  #   the extended area.
+  #
+  # buf_segs: omnidirectional buffer with all bay water removed via
+  #   st_difference.  Use for segments whose high point lies east or southeast
+  #   of the subwatershed (LTB 4, TCB 6, MR 7 in wet season).  Listing a
+  #   segment in buf_segs removes it from the default zero-gradient set so it
+  #   is computed dynamically.  Tune buffer distances against known SAS values.
+  #
+  # All distances are in US Survey Feet (CRS 6443).
+  #
+  # north_dist <- 150000          # ~28 miles; covers OTB north extension
+  # north_segs <- c("1" = 150000) # OTB northward extension
+  # buf_segs   <- c("4" = 100000, "6" = 100000, "7" = 100000) # starting point
   #
   # contdry <- util_gw_getcontour("dry", yr, north_dist = north_dist)
   # contwet <- util_gw_getcontour("wet", yr, north_dist = north_dist)
   # grad_dry <- util_gw_grad(contdry, north_segs = north_segs)
-  # grad_wet <- util_gw_grad(contwet, north_segs = north_segs)
+  # grad_wet <- util_gw_grad(contwet, north_segs = north_segs, buf_segs = buf_segs)
 
   # Hardcoded gradients from the 2021 FDEP potentiometric surface map.
   # Applied unchanged for 2022-2024 because updated contours were not

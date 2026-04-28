@@ -18,6 +18,21 @@
 #'   \code{contours} passed to this function must already cover the extended
 #'   area — pass the same distance (or larger) as \code{north_dist} in
 #'   \code{\link{util_gw_getcontour}}.  Default \code{NULL} (no extension).
+#' @param buf_segs named numeric vector mapping bay segment IDs to omnidirectional
+#'   buffer distances (in CRS units, US Survey Feet for EPSG 6443). Segments
+#'   listed here have their sub-watershed polygon buffered outward by the given
+#'   distance, and then all bay water (\code{shoreline}) is removed from that
+#'   buffer with \code{\link[sf]{st_difference}} before contour clipping.  This
+#'   allows the high-point search to extend beyond the subwatershed onto
+#'   surrounding land without accidentally capturing potentiometric contours
+#'   that pass under the open bay.  Segments listed in \code{buf_segs} are
+#'   removed from the default zero-gradient set and computed dynamically.  Use
+#'   this for segments such as Lower Tampa Bay (4), Terra Ceia Bay (6), and
+#'   Manatee River (7) whose wet-season high points lie outside the
+#'   subwatershed.  The \code{contours} passed to this function must already
+#'   cover the buffered area — pass an equivalent or larger value as
+#'   \code{north_dist} in \code{\link{util_gw_getcontour}} if the buffer extends
+#'   north of the watershed.  Default \code{NULL} (no buffering).
 #'
 #' @details
 #' Computes the Floridan aquifer hydraulic gradient \eqn{I} (ft/mile) for each
@@ -37,11 +52,22 @@
 #' \itemize{
 #'   \item Dry season: segments 4, 5, 6, 7, 55
 #'   \item Wet season: segments 4, 5, 6, 7, 55 — Lower Tampa Bay, Terra Ceia
-#'     Bay, and Manatee River are included here because the subwatershed
-#'     geometry does not reliably capture the correct potentiometric high point
-#'     for those segments, and the analyst-specified wet-season gradients
-#'     (50/32, 50/34, and 50/40 ft/mile for the 2022-2024 analysis) were read
-#'     manually from the 2021 FDEP map rather than computed algorithmically.
+#'     Bay, and Manatee River are included by default because the subwatershed
+#'     geometry does not reliably capture the correct potentiometric high point.
+#'     Supply \code{buf_segs} for any of these segments to compute them
+#'     dynamically using a buffered, bay-clipped search area instead.
+#' }
+#'
+#' \strong{Search area expansion:}
+#' Two mechanisms are available and may be combined across different segments:
+#' \itemize{
+#'   \item \code{north_segs}: appends a rectangular extension to the north face
+#'     of the subwatershed bounding box.  Best for segments (e.g., OTB) whose
+#'     high point lies directly north of the subwatershed.
+#'   \item \code{buf_segs}: omnidirectional buffer with bay water removed.  Best
+#'     for segments (e.g., LTB, TCB, MR) whose high point lies east or
+#'     southeast of the subwatershed.  Removing the bay polygon prevents the
+#'     algorithm from matching potentiometric contours that pass under open water.
 #' }
 #'
 #' \strong{Hillsborough Bay (segment 2):}
@@ -69,7 +95,7 @@
 #' util_gw_grad(contdry)
 #' util_gw_grad(contwet)
 util_gw_grad <- function(contours, segs = tbsubshed, shoreline = tbsegdetail,
-                         north_segs = NULL) {
+                         north_segs = NULL, buf_segs = NULL) {
 
   # Infer season from MONTH_YEAR
   month_year <- unique(contours$MONTH_YEAR)
@@ -79,12 +105,19 @@ util_gw_grad <- function(contours, segs = tbsubshed, shoreline = tbsegdetail,
   season <- if (grepl("May", month_year)) "dry" else "wet"
 
   # Segments with no reliably computable gradient (set to zero).
-  # LTB (4), TCB (6), and MR (7) are zero in wet season because subwatershed
-  # geometry does not reliably locate the correct potentiometric high point;
-  # the 2022-2024 SAS values for those segments (50/32, 50/34, 50/40 ft/mile)
-  # were read manually from the 2021 FDEP map rather than computed from contours.
-  zero_segs   <- if (season == "dry") c(4L, 5L, 6L, 7L, 55L) else c(4L, 5L, 6L, 7L, 55L)
+  # LTB (4), TCB (6), and MR (7) are zero in wet season by default because
+  # subwatershed geometry does not reliably locate the correct potentiometric
+  # high point; the 2022-2024 SAS values for those segments were read manually
+  # from the 2021 FDEP map.  Supplying buf_segs for any of these overrides the
+  # zero and computes the gradient using a buffered, bay-clipped search area.
+  zero_segs <- if (season == "dry") c(4L, 5L, 6L, 7L, 55L) else c(4L, 5L, 6L, 7L, 55L)
+  if (!is.null(buf_segs))
+    zero_segs <- setdiff(zero_segs, as.integer(names(buf_segs)))
+
   active_segs <- setdiff(sort(unique(segs$bay_seg)), zero_segs)
+
+  # Union of all bay polygons used to remove open water from buffered search areas
+  all_bay <- sf::st_union(sf::st_geometry(shoreline))
 
   # Basin-to-sub-zone lookup for Hillsborough Bay (segment 2)
   hb_zone_lookup <- data.frame(
@@ -128,6 +161,11 @@ util_gw_grad <- function(contours, segs = tbsubshed, shoreline = tbsegdetail,
         crs = sf::st_crs(watershed)
       )
       watershed <- sf::st_union(ws_geom, north_rect)
+
+    } else if (!is.null(buf_segs) && seg_key %in% names(buf_segs)) {
+      ws_geom   <- sf::st_union(watershed)
+      buffered  <- sf::st_buffer(ws_geom, dist = buf_segs[[seg_key]])
+      watershed <- suppressWarnings(sf::st_difference(buffered, all_bay))
     }
 
     shore     <- dplyr::filter(shoreline, .data$bay_seg == seg)

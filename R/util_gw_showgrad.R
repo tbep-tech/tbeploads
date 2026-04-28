@@ -11,10 +11,15 @@
 #' @param north_segs named numeric vector of northward extension distances (in
 #'   CRS units, US Survey Feet for EPSG 6443), in the same format accepted by
 #'   \code{\link{util_gw_grad}}. Default \code{NULL} (no extension).
+#' @param buf_segs named numeric vector of omnidirectional buffer distances (in
+#'   CRS units, US Survey Feet for EPSG 6443), in the same format accepted by
+#'   \code{\link{util_gw_grad}}. When supplied for the requested segment, the
+#'   search area shown is the buffered subwatershed with all bay water removed.
+#'   Default \code{NULL} (no buffering).
 #'
 #' @details
 #' Returns a \code{ggplot2} map showing, for the requested segment: the
-#' subwatershed search area (optionally extended northward), all clipped
+#' subwatershed search area (optionally extended or buffered), all clipped
 #' contour lines coloured by elevation, the maximum-elevation contour
 #' highlighted in red, the representative high point used in the gradient
 #' computation, and a dashed line to the nearest bay shoreline point.  The
@@ -32,8 +37,9 @@
 #' @examples
 #' util_gw_showgrad(contdry, seg = 1, north_segs = c("1" = 150000))
 #' util_gw_showgrad(contwet, seg = 3)
+#' util_gw_showgrad(contwet, seg = 7, buf_segs = c("7" = 100000))
 util_gw_showgrad <- function(contours, seg, segs = tbsubshed, shoreline = tbsegdetail,
-                             north_segs = NULL) {
+                             north_segs = NULL, buf_segs = NULL) {
 
   seg_names <- c(
     "1" = "Old Tampa Bay",    "2" = "Hillsborough Bay",
@@ -44,6 +50,7 @@ util_gw_showgrad <- function(contours, seg, segs = tbsubshed, shoreline = tbsegd
 
   watershed <- dplyr::filter(segs, .data$bay_seg == seg)
   seg_key   <- as.character(seg)
+  all_bay   <- sf::st_union(sf::st_geometry(shoreline))
 
   if (!is.null(north_segs) && seg_key %in% names(north_segs)) {
     ws_geom <- sf::st_union(watershed)
@@ -59,6 +66,12 @@ util_gw_showgrad <- function(contours, seg, segs = tbsubshed, shoreline = tbsegd
       crs = sf::st_crs(watershed)
     )
     search_area <- sf::st_union(ws_geom, north_rect)
+
+  } else if (!is.null(buf_segs) && seg_key %in% names(buf_segs)) {
+    ws_geom     <- sf::st_union(watershed)
+    buffered    <- sf::st_buffer(ws_geom, dist = buf_segs[[seg_key]])
+    search_area <- suppressWarnings(sf::st_difference(buffered, all_bay))
+
   } else {
     search_area <- sf::st_union(watershed)
   }

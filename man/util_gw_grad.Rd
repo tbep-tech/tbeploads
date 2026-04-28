@@ -8,7 +8,8 @@ util_gw_grad(
   contours,
   segs = tbsubshed,
   shoreline = tbsegdetail,
-  north_segs = NULL
+  north_segs = NULL,
+  buf_segs = NULL
 )
 }
 \arguments{
@@ -33,6 +34,22 @@ must be coercible to the integer bay segment IDs in \code{segs}.  The
 \code{contours} passed to this function must already cover the extended
 area — pass the same distance (or larger) as \code{north_dist} in
 \code{\link{util_gw_getcontour}}.  Default \code{NULL} (no extension).}
+
+\item{buf_segs}{named numeric vector mapping bay segment IDs to omnidirectional
+buffer distances (in CRS units, US Survey Feet for EPSG 6443). Segments
+listed here have their sub-watershed polygon buffered outward by the given
+distance, and then all bay water (\code{shoreline}) is removed from that
+buffer with \code{\link[sf]{st_difference}} before contour clipping.  This
+allows the high-point search to extend beyond the subwatershed onto
+surrounding land without accidentally capturing potentiometric contours
+that pass under the open bay.  Segments listed in \code{buf_segs} are
+removed from the default zero-gradient set and computed dynamically.  Use
+this for segments such as Lower Tampa Bay (4), Terra Ceia Bay (6), and
+Manatee River (7) whose wet-season high points lie outside the
+subwatershed.  The \code{contours} passed to this function must already
+cover the buffered area — pass an equivalent or larger value as
+\code{north_dist} in \code{\link{util_gw_getcontour}} if the buffer extends
+north of the watershed.  Default \code{NULL} (no buffering).}
 }
 \value{
 A data frame with columns:
@@ -63,11 +80,22 @@ with no reliably computable Floridan aquifer gradient receive a value of 0:
 \itemize{
 \item Dry season: segments 4, 5, 6, 7, 55
 \item Wet season: segments 4, 5, 6, 7, 55 — Lower Tampa Bay, Terra Ceia
-Bay, and Manatee River are included here because the subwatershed
-geometry does not reliably capture the correct potentiometric high point
-for those segments, and the analyst-specified wet-season gradients
-(50/32, 50/34, and 50/40 ft/mile for the 2022-2024 analysis) were read
-manually from the 2021 FDEP map rather than computed algorithmically.
+Bay, and Manatee River are included by default because the subwatershed
+geometry does not reliably capture the correct potentiometric high point.
+Supply \code{buf_segs} for any of these segments to compute them
+dynamically using a buffered, bay-clipped search area instead.
+}
+
+\strong{Search area expansion:}
+Two mechanisms are available and may be combined across different segments:
+\itemize{
+\item \code{north_segs}: appends a rectangular extension to the north face
+of the subwatershed bounding box.  Best for segments (e.g., OTB) whose
+high point lies directly north of the subwatershed.
+\item \code{buf_segs}: omnidirectional buffer with bay water removed.  Best
+for segments (e.g., LTB, TCB, MR) whose high point lies east or
+southeast of the subwatershed.  Removing the bay polygon prevents the
+algorithm from matching potentiometric contours that pass under open water.
 }
 
 \strong{Hillsborough Bay (segment 2):}

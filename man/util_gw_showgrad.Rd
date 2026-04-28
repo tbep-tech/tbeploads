@@ -9,7 +9,8 @@ util_gw_showgrad(
   seg,
   segs = tbsubshed,
   shoreline = tbsegdetail,
-  north_segs = NULL
+  north_segs = NULL,
+  buf_segs = NULL
 )
 }
 \arguments{
@@ -28,6 +29,12 @@ measure distance from the watershed high point to the bay. Defaults to
 \item{north_segs}{named numeric vector of northward extension distances (in
 CRS units, US Survey Feet for EPSG 6443), in the same format accepted by
 \code{\link{util_gw_grad}}. Default \code{NULL} (no extension).}
+
+\item{buf_segs}{named numeric vector of omnidirectional buffer distances (in
+CRS units, US Survey Feet for EPSG 6443), in the same format accepted by
+\code{\link{util_gw_grad}}. When supplied for the requested segment, the
+search area shown is the buffered subwatershed with all bay water removed.
+Default \code{NULL} (no buffering).}
 }
 \value{
 A \code{\link[ggplot2]{ggplot}} object.
@@ -37,7 +44,7 @@ Visualise the hydraulic gradient line for a bay segment
 }
 \details{
 Returns a \code{ggplot2} map showing, for the requested segment: the
-subwatershed search area (optionally extended northward), all clipped
+subwatershed search area (optionally extended or buffered), all clipped
 contour lines coloured by elevation, the maximum-elevation contour
 highlighted in red, the representative high point used in the gradient
 computation, and a dashed line to the nearest bay shoreline point.  The
@@ -51,4 +58,5 @@ in \code{\link{util_gw_grad}}.
 \examples{
 util_gw_showgrad(contdry, seg = 1, north_segs = c("1" = 150000))
 util_gw_showgrad(contwet, seg = 3)
+util_gw_showgrad(contwet, seg = 7, buf_segs = c("7" = 100000))
 }
