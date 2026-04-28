@@ -6,6 +6,8 @@
 #'   including a North/South split for Boca Ciega Bay. Note that the 
 #'   Boca Ciega Bay segment is only the northern portion. The data includes the
 #'   following columns.
+#' 
+#'   Layer was clipped to retain only the main open-water bay areas, excluding tidal rivers and creek arms.  The clipping mask is available in \code{data-raw/tbsegdetail_clip_mask.RData} for reproducibility.  See \code{data-raw/tbsegdetail_clip.R} for the clipping workflow.
 #'
 #' \itemize{
 #'   \item \code{bay_seg}: Integer, numeric segment identifier matching
