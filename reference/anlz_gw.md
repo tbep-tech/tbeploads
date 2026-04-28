@@ -65,14 +65,15 @@ commented-out framework that calls
 and
 [`util_gw_grad`](https://tbep-tech.github.io/tbeploads/reference/util_gw_grad.md)
 to compute gradients dynamically from FDEP potentiometric surface
-contours. This approach requires Floridan aquifer flow-zone polygons
-(not yet available) to replace
-[`tbsubshed`](https://tbep-tech.github.io/tbeploads/reference/tbsubshed.md),
-which gives incorrect gradients for Lower Tampa Bay, Terra Ceia Bay, and
-Manatee River in the wet season. Until those polygons are obtained,
-hardcoded gradient values from the 2021 FDEP potentiometric surface map
-are used (the same values applied for 2022-2024 in the original SAS
-analysis, as no updated contours were available at that time).
+contours. The key challenge is that potentiometric high points for some
+segments (notably Old Tampa Bay) lie north of the subwatershed boundary;
+`util_gw_getcontour` accepts a `buf_dist` argument and `util_gw_grad`
+accepts a `buf_segs` argument to expand the search area for those
+segments. Until the buffer distances are calibrated against known SAS
+gradients, hardcoded gradient values from the 2021 FDEP potentiometric
+surface map are used (the same values applied for 2022-2024 in the
+original SAS analysis, as no updated contours were available at that
+time).
 
 **Surficial and intermediate aquifers:** Loads are fixed constants per
 segment. Surficial values are from `gwupdate95-98_final.xls` (1995-1998

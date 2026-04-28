@@ -49,7 +49,12 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_gw_grad</span><span class="op">(</span><span class="va">contours</span>, segs <span class="op">=</span> <span class="va">tbsubshed</span>, shoreline <span class="op">=</span> <span class="va">tbsegdetail</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_gw_grad</span><span class="op">(</span></span>
+<span>  <span class="va">contours</span>,</span>
+<span>  segs <span class="op">=</span> <span class="va">tbsubshed</span>,</span>
+<span>  shoreline <span class="op">=</span> <span class="va">tbsegdetail</span>,</span>
+<span>  north_segs <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -71,12 +76,26 @@ to <code><a href="tbsubshed.html">tbsubshed</a></code>.</p></dd>
 measure distance from the watershed high point to the bay. Defaults to
 <code><a href="tbsegdetail.html">tbsegdetail</a></code>.</p></dd>
 
+
+<dt id="arg-north-segs">north_segs<a class="anchor" aria-label="anchor" href="#arg-north-segs"></a></dt>
+<dd><p>named numeric vector mapping bay segment IDs to northward
+extension distances (in CRS units, US Survey Feet for EPSG 6443). Segments
+listed here have a rectangular extension appended to the north side of
+their sub-watershed polygon before the contour clipping step, allowing the
+high-point search to reach potentiometric highs that lie north of the
+standard subwatershed boundary.  Use this for segments such as Old Tampa
+Bay (segment 1) where the high point is north of the subwatershed. Names
+must be coercible to the integer bay segment IDs in <code>segs</code>.  The
+<code>contours</code> passed to this function must already cover the extended
+area — pass the same distance (or larger) as <code>north_dist</code> in
+<code><a href="util_gw_getcontour.html">util_gw_getcontour</a></code>.  Default <code>NULL</code> (no extension).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A data frame with columns:</p><ul><li><p><code>bay_seg</code>: integer, bay segment number</p></li>
 <li><p><code>grad</code>: numeric, hydraulic gradient (ft/mile); 0 for segments
-with no direct Floridan aquifer discharge</p></li>
+with no reliably computable Floridan aquifer gradient</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -85,12 +104,18 @@ bay segment using Darcy's Law as applied in the Tampa Bay loading model
 (Zarbock et al., 1994):</p>
 <p>$$I = \frac{\text{elevation (ft)}}{\text{distance to shoreline (miles)}}$$</p>
 <p>where elevation is the maximum UFA potentiometric surface contour value
-within the segment watershed, and distance is the straight-line distance from
-that contour's representative point to the nearest bay shoreline.</p>
+within the (optionally extended) segment watershed, and distance is the
+straight-line distance from that contour's representative point to the
+nearest bay shoreline.</p>
 <p>The season (dry or wet) is inferred from the <code>MONTH_YEAR</code> field in
 <code>contours</code> (<code>"May"</code> = dry, <code>"September"</code> = wet). Segments
-with no direct Floridan aquifer discharge to the bay receive a gradient of 0:</p><ul><li><p>Dry season: segments 4, 5, 6, 7, 55</p></li>
-<li><p>Wet season: segments 5, 55</p></li>
+with no reliably computable Floridan aquifer gradient receive a value of 0:</p><ul><li><p>Dry season: segments 4, 5, 6, 7, 55</p></li>
+<li><p>Wet season: segments 4, 5, 6, 7, 55 — Lower Tampa Bay, Terra Ceia
+Bay, and Manatee River are included here because the subwatershed
+geometry does not reliably capture the correct potentiometric high point
+for those segments, and the analyst-specified wet-season gradients
+(50/32, 50/34, and 50/40 ft/mile for the 2022-2024 analysis) were read
+manually from the 2021 FDEP map rather than computed algorithmically.</p></li>
 </ul><p><strong>Hillsborough Bay (segment 2):</strong>
 Segment 2 uses a weighted average of three sub-zone gradients following the
 original flow net analysis. Sub-zones are constructed by unioning
@@ -114,15 +139,15 @@ original flow net analysis. Sub-zones are constructed by unioning
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7       7 0.000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8      55 0.000000</span>
 <span class="r-in"><span><span class="fu">util_gw_grad</span><span class="op">(</span><span class="va">contwet</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   bay_seg       grad</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       1   5.732379</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       2   5.228272</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       3   2.573333</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4       4  11.385912</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5       5   0.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6       6 119.253153</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7       7   2.347513</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8      55   0.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   bay_seg     grad</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       1 5.732379</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       2 5.228272</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       3 2.573333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       4 0.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       5 0.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       6 0.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7       7 0.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8      55 0.000000</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
