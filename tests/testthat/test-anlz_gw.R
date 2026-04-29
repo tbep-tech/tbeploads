@@ -1,12 +1,4 @@
-skip_if_no_terra <- function() {
-  skip_if(
-    inherits(tryCatch(terra::unwrap(contdry), error = function(e) e), "error"),
-    "terra/PROJ not available on this platform"
-  )
-}
-
 test_that("anlz_gw monthly output has correct structure", {
-  skip_if_no_terra()
   out <- anlz_gw(contdry, contwet, yrrng = c(2022, 2024))
 
   expect_s3_class(out, "data.frame")
@@ -23,7 +15,6 @@ test_that("anlz_gw monthly output has correct structure", {
 })
 
 test_that("anlz_gw dry season sets Floridan gradient to zero for LTB and RALTB", {
-  skip_if_no_terra()
   out <- anlz_gw(contdry, contwet, yrrng = c(2022, 2022))
 
   segs <- c('Lower Tampa Bay', 'Boca Ciega Bay', 'Terra Ceia Bay', 'Manatee River')
@@ -42,7 +33,6 @@ test_that("anlz_gw dry season sets Floridan gradient to zero for LTB and RALTB",
 })
 
 test_that("anlz_gw OTB Jan 2022 matches SAS output within rounding", {
-  skip_if_no_terra()
   out <- anlz_gw(contdry, contwet, yrrng = c(2022, 2022))
   otb  <- out[out$Month == 1L & out$segment == "Old Tampa Bay", ]
 
@@ -54,7 +44,6 @@ test_that("anlz_gw OTB Jan 2022 matches SAS output within rounding", {
 })
 
 test_that("anlz_gw LTB Jan 2022 matches SAS output within rounding", {
-  skip_if_no_terra()
   out <- anlz_gw(contdry, contwet, yrrng = c(2022, 2022))
   ltb  <- out[out$Month == 1L & out$segment == 'Hillsborough Bay', ]
 
@@ -64,7 +53,6 @@ test_that("anlz_gw LTB Jan 2022 matches SAS output within rounding", {
 })
 
 test_that("anlz_gw annual summtime sums months correctly", {
-  skip_if_no_terra()
   monthly <- anlz_gw(contdry, contwet, yrrng = c(2022, 2022), summtime = 'month')
   annual  <- anlz_gw(contdry, contwet, yrrng = c(2022, 2022), summtime = 'year')
 
@@ -85,7 +73,6 @@ test_that("anlz_gw annual summtime sums months correctly", {
 })
 
 test_that("anlz_gw custom wqdat changes OTB, HB loads but not others", {
-  skip_if_no_terra()
   default_out <- anlz_gw(contdry, contwet, yrrng = c(2022, 2022))
 
   # Double the concentrations for OTB, HB, leave others unchanged
@@ -118,7 +105,6 @@ test_that("anlz_gw custom wqdat changes OTB, HB loads but not others", {
 })
 
 test_that("anlz_gw all load values are non-negative", {
-  skip_if_no_terra()
   out <- anlz_gw(contdry, contwet, yrrng = c(2022, 2024))
   expect_true(all(out$tn_load >= 0))
   expect_true(all(out$tp_load >= 0))
