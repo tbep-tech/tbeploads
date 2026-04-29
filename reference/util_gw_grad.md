@@ -1,27 +1,36 @@
-# Compute hydraulic gradient per bay segment from UFA potentiometric surface contours
+# Compute hydraulic gradient per bay segment from potentiometric surface raster
 
-Compute hydraulic gradient per bay segment from UFA potentiometric
-surface contours
+Compute hydraulic gradient per bay segment from potentiometric surface
+raster
 
 ## Usage
 
 ``` r
 util_gw_grad(
-  contours,
+  pot_rast,
+  season = c("dry", "wet"),
   segs = tbsubshed,
   shoreline = tbsegdetail,
-  north_segs = NULL,
   buf_segs = NULL
 )
 ```
 
 ## Arguments
 
-- contours:
+- pot_rast:
 
-  [`sf`](https://r-spatial.github.io/sf/reference/sf.html) object of
-  Upper Floridan Aquifer contour lines produced by
-  [`util_gw_getcontour`](https://tbep-tech.github.io/tbeploads/reference/util_gw_getcontour.md).
+  [`SpatRaster`](https://rspatial.github.io/terra/reference/SpatRaster-class.html)
+  (or `PackedSpatRaster`) of Upper Floridan Aquifer potentiometric head
+  (ft above MSL) as returned by
+  [`util_gw_getcontour`](https://tbep-tech.github.io/tbeploads/reference/util_gw_getcontour.md),
+  or the package datasets
+  [`contdry`](https://tbep-tech.github.io/tbeploads/reference/contdry.md)
+  /
+  [`contwet`](https://tbep-tech.github.io/tbeploads/reference/contwet.md).
+
+- season:
+
+  character, `"dry"` or `"wet"`.
 
 - segs:
 
@@ -32,129 +41,103 @@ util_gw_grad(
 - shoreline:
 
   [`sf`](https://r-spatial.github.io/sf/reference/sf.html) object of bay
-  segment polygons used to measure distance from the watershed high
-  point to the bay. Defaults to
+  segment polygons used to derive the bay water mask and measure
+  distances. Defaults to
   [`tbsegdetail`](https://tbep-tech.github.io/tbeploads/reference/tbsegdetail.md).
-
-- north_segs:
-
-  named numeric vector mapping bay segment IDs to northward extension
-  distances (in CRS units, US Survey Feet for EPSG 6443). Segments
-  listed here have a rectangular extension appended to the north side of
-  their sub-watershed polygon before the contour clipping step, allowing
-  the high-point search to reach potentiometric highs that lie north of
-  the standard subwatershed boundary. Use this for segments such as Old
-  Tampa Bay (segment 1) where the high point is north of the
-  subwatershed. Names must be coercible to the integer bay segment IDs
-  in `segs`. The `contours` passed to this function must already cover
-  the extended area — pass the same distance (or larger) as `north_dist`
-  in
-  [`util_gw_getcontour`](https://tbep-tech.github.io/tbeploads/reference/util_gw_getcontour.md).
-  Default `NULL` (no extension).
 
 - buf_segs:
 
-  named numeric vector mapping bay segment IDs to omnidirectional buffer
-  distances (in CRS units, US Survey Feet for EPSG 6443). Segments
-  listed here have their sub-watershed polygon buffered outward by the
-  given distance, and then all bay water (`shoreline`) is removed from
-  that buffer with
-  [`st_difference`](https://r-spatial.github.io/sf/reference/geos_binary_ops.html)
-  before contour clipping. This allows the high-point search to extend
-  beyond the subwatershed onto surrounding land without accidentally
-  capturing potentiometric contours that pass under the open bay.
-  Segments listed in `buf_segs` are removed from the default
-  zero-gradient set and computed dynamically. Use this for segments such
-  as Lower Tampa Bay (4), Terra Ceia Bay (6), and Manatee River (7)
-  whose wet-season high points lie outside the subwatershed. The
-  `contours` passed to this function must already cover the buffered
-  area — pass an equivalent or larger value as `north_dist` in
-  [`util_gw_getcontour`](https://tbep-tech.github.io/tbeploads/reference/util_gw_getcontour.md)
-  if the buffer extends north of the watershed. Default `NULL` (no
-  buffering).
+  named numeric vector mapping bay segment IDs (as character strings) to
+  omnidirectional buffer distances in US Survey Feet (CRS 6443). The
+  subwatershed for each listed segment is buffered outward by the given
+  distance and bay water is removed before the potentiometric high-point
+  search. Listing a segment here also removes it from the default
+  zero-gradient set so it is computed dynamically. When `NULL`,
+  season-specific defaults are used (see Details).
 
 ## Value
 
-A data frame with columns:
-
-- `bay_seg`: integer, bay segment number
-
-- `grad`: numeric, hydraulic gradient (ft/mile); 0 for segments with no
-  reliably computable Floridan aquifer gradient
+A data frame with columns `bay_seg` (integer) and `grad` (numeric,
+ft/mile; 0 for zero-gradient segments).
 
 ## Details
 
-Computes the Floridan aquifer hydraulic gradient \\I\\ (ft/mile) for
-each bay segment using Darcy's Law as applied in the Tampa Bay loading
-model (Zarbock et al., 1994):
+Computes the Floridan Aquifer hydraulic gradient \\I\\ (ft/mile) per bay
+segment using the Darcy's Law framework of Zarbock et al. (1994):
 
 \$\$I = \frac{\text{elevation (ft)}}{\text{distance to shoreline
 (miles)}}\$\$
 
-where elevation is the maximum UFA potentiometric surface contour value
-within the (optionally extended) segment watershed, and distance is the
-straight-line distance from that contour's representative point to the
-nearest bay shoreline.
+The max potentiometric head within the search area is located in the
+interpolated raster and the distance is measured from the nearest
+shoreline crossing along the bay centroid-to-head transect (see below).
 
-The season (dry or wet) is inferred from the `MONTH_YEAR` field in
-`contours` (`"May"` = dry, `"September"` = wet). Segments with no
-reliably computable Floridan aquifer gradient receive a value of 0:
+**Zero-gradient segments (hardcoded):** The following segments always
+receive a gradient of 0 based on the original SAS loading analysis
+(Zarbock et al., 1994; GWld2224_SASCode.txt):
 
-- Dry season: segments 4, 5, 6, 7, 55
+- Boca Ciega Bay (segments 5 and 55), both seasons: the urbanized
+  coastal watershed has no meaningful Floridan Aquifer recharge directed
+  toward the bay.
 
-- Wet season: segments 4, 5, 6, 7, 55 — Lower Tampa Bay, Terra Ceia Bay,
-  and Manatee River are included by default because the subwatershed
-  geometry does not reliably capture the correct potentiometric high
-  point. Supply `buf_segs` for any of these segments to compute them
-  dynamically using a buffered, bay-clipped search area instead.
+- Lower Tampa Bay (4), Terra Ceia Bay (6), Manatee River (7), dry season
+  only: the potentiometric gradient is negligible during the dry season.
+  These segments are computed dynamically in the wet season via the
+  default `buf_segs`.
 
-**Search area expansion:** Two mechanisms are available and may be
-combined across different segments:
+Any segment listed in `buf_segs` is removed from the zero set and
+computed dynamically.
 
-- `north_segs`: appends a rectangular extension to the north face of the
-  subwatershed bounding box. Best for segments (e.g., OTB) whose high
-  point lies directly north of the subwatershed.
+**Default buf_segs (calibrated against 2021 SAS reference values):**
 
-- `buf_segs`: omnidirectional buffer with bay water removed. Best for
-  segments (e.g., LTB, TCB, MR) whose high point lies east or southeast
-  of the subwatershed. Removing the bay polygon prevents the algorithm
-  from matching potentiometric contours that pass under open water.
+- Dry season: `c("1" = 100000)` – Old Tampa Bay subwatershed buffered
+  ~19 miles; captures the potentiometric high north/northeast of the
+  standard watershed boundary.
 
-**Hillsborough Bay (segment 2):** Segment 2 uses a weighted average of
-three sub-zone gradients following the original flow net analysis.
-Sub-zones are constructed by unioning
+- Wet season:
+  `c("1" = 100000, "4" = 100000, "6" = 100000, "7" = 100000)` – adds
+  LTB, TCB, and MR (each ~19 miles) to unlock wet-season computation for
+  those segments.
+
+Buffer distances were tuned to produce gradients within ~15\\ FDEP
+potentiometric surface values used in the SAS analysis.
+
+**Distance calculation:** Rather than measuring from the potentiometric
+high to the nearest shoreline point (which can hit an extreme geographic
+corner), the function draws a line from the bay segment centroid to the
+max-head cell. The portion of that line inside the bay polygon is
+subtracted from the total length, giving the distance from the shoreline
+crossing point to the high point along a representative transect.
+
+**Hillsborough Bay (segment 2):** Uses a three-zone weighted gradient
+(Polk County 0.4, Pasco County 0.3, Alafia River 0.3) following the
+original flow net analysis. Sub-zones are constructed from
 [`tbdbasin`](https://tbep-tech.github.io/tbeploads/reference/tbdbasin.md)
-drainage basins:
+drainage basins as in the original SAS code.
 
-- Polk County drainage (weight 0.4): basins 02301000, 02301500
+**Benchmark warning:** After computing gradients, each non-zero segment
+is compared against the 2021 SAS reference values
+(GWld2224_SASCode.txt). A warning is issued for any segment whose
+computed gradient deviates by more than 50\\ reference, indicating a
+potentially anomalous potentiometric surface or a need to revisit the
+`buf_segs` configuration.
 
-- Pasco County / Hillsborough River drainage (weight 0.3): basins
-  02300700, 02301300, 02301750, TBYPASS
+## References
 
-- Alafia River drainage (weight 0.3): basins 02301695, 02303000,
-  02303330, 02304500, 204-2, 205-2, 206-2
+Zarbock, H., A. Janicki, D. Wade, D. Heimbuch, and H. Wilson. 1994.
+Estimates of Total Nitrogen, Total Phosphorus, and Total Suspended
+Solids Loadings to Tampa Bay, Florida. Technical Publication \#04-94.
+Prepared by Coastal Environmental, Inc. Prepared for Tampa Bay National
+Estuary Program. St. Petersburg, FL.
 
 ## Examples
 
 ``` r
-util_gw_grad(contdry)
-#>   bay_seg     grad
-#> 1       1 3.985806
-#> 2       2 2.989021
-#> 3       3 1.463759
-#> 4       4 0.000000
-#> 5       5 0.000000
-#> 6       6 0.000000
-#> 7       7 0.000000
-#> 8      55 0.000000
-util_gw_grad(contwet)
-#>   bay_seg     grad
-#> 1       1 4.330350
-#> 2       2 3.982828
-#> 3       3 2.341348
-#> 4       4 0.000000
-#> 5       5 0.000000
-#> 6       6 0.000000
-#> 7       7 0.000000
-#> 8      55 0.000000
+if (FALSE) { # \dontrun{
+pot_dry <- util_gw_getcontour("dry", 2022)
+util_gw_grad(pot_dry, season = "dry")
+
+pot_wet <- util_gw_getcontour("wet", 2022)
+util_gw_grad(pot_wet, season = "wet")
+} # }
 ```

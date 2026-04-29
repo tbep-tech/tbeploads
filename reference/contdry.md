@@ -1,7 +1,6 @@
-# Upper Floridan Aquifer potentiometric surface contour lines, dry season 2022
+# Upper Floridan Aquifer potentiometric surface raster, dry season 2022
 
-Upper Floridan Aquifer potentiometric surface contour lines, dry season
-2022
+Upper Floridan Aquifer potentiometric surface raster, dry season 2022
 
 ## Usage
 
@@ -11,51 +10,45 @@ contdry
 
 ## Format
 
-A [`sf`](https://r-spatial.github.io/sf/reference/sf.html) object
+A `PackedSpatRaster` (see
+[`wrap`](https://rspatial.github.io/terra/reference/wrap.html))
+representing a 1-mile resolution grid of potentiometric head (ft above
+MSL) for the dry season. Unwrap with `terra::unwrap(contdry)` to obtain
+a
+[`SpatRaster`](https://rspatial.github.io/terra/reference/SpatRaster-class.html).
 
 ## Details
 
-Contour lines representing the potentiometric surface of the Upper
-Floridan Aquifer for the dry season (May 2022), clipped to the Tampa Bay
-watershed
-([`tbfullshed`](https://tbep-tech.github.io/tbeploads/reference/tbfullshed.md)).
-Retrieved from the FDEP / Florida Geological Survey ArcGIS REST service.
-The data includes the following columns.
+Interpolated from Upper Floridan Aquifer potentiometric surface contour
+lines (May 2022) downloaded from the FDEP / Florida Geological Survey
+ArcGIS REST service using
+[`util_gw_getcontour`](https://tbep-tech.github.io/tbeploads/reference/util_gw_getcontour.md).
+The spatial extent covers the Tampa Bay watershed
+([`tbfullshed`](https://tbep-tech.github.io/tbeploads/reference/tbfullshed.md))
+buffered outward by 40 miles. Interpolation used inverse distance
+weighting (IDW, 5-mile radius, power = 2) followed by five passes of a
+3x3 focal mean gap fill. Projection is NAD83(2011) / Florida GDL Albers
+(ftUS), CRS 6443.
 
-- `CONTOUR`: Integer, potentiometric surface elevation in feet above
-  mean sea level (range 10-100 ft for the Tampa Bay area)
-
-- `MONTH_YEAR`: Character, survey date (`"May 2022"`)
-
-- `geometry`: The geometry column (LINESTRING)
-
-Dry season is represented by May observations. Wet season equivalent is
+Wet season equivalent is
 [`contwet`](https://tbep-tech.github.io/tbeploads/reference/contwet.md).
-
-Projection is NAD83(2011) / Florida West (ftUS), CRS 6443.
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-contdry <- util_gw_getcontour("dry", 2022)
+pot_dry <- util_gw_getcontour("dry", 2022)
+contdry <- terra::wrap(pot_dry)
 save(contdry, file = "data/contdry.RData", compress = "xz")
 } # }
-contdry
-#> Simple feature collection with 10 features and 2 fields
-#> Geometry type: GEOMETRY
-#> Dimension:     XY
-#> Bounding box:  xmin: 429863.6 ymin: 1110802 xmax: 680696.3 ymax: 1479759
-#> Projected CRS: NAD83(2011) / Florida West (ftUS)
-#>    CONTOUR MONTH_YEAR                       geometry
-#> 1       80   May 2022 MULTILINESTRING ((618103.4 ...
-#> 2       70   May 2022 MULTILINESTRING ((606930.6 ...
-#> 3       40   May 2022 MULTILINESTRING ((470444.8 ...
-#> 4       50   May 2022 MULTILINESTRING ((470000.7 ...
-#> 5       60   May 2022 LINESTRING (501635.4 140231...
-#> 6       30   May 2022 LINESTRING (460833.8 139053...
-#> 7       20   May 2022 LINESTRING (446484 1389331,...
-#> 8       10   May 2022 MULTILINESTRING ((458262 11...
-#> 11      90   May 2022 MULTILINESTRING ((669432.1 ...
-#> 12     100   May 2022 MULTILINESTRING ((649538.1 ...
+terra::unwrap(contdry)
+#> class       : SpatRaster 
+#> size        : 446, 416, 1  (nrow, ncol, nlyr)
+#> resolution  : 5280, 5280  (x, y)
+#> extent      : -932869.6, 1263610, 108335.4, 2463215  (xmin, xmax, ymin, ymax)
+#> coord. ref. : NAD83(2011) / Florida West (ftUS) (EPSG:6443) 
+#> source(s)   : memory
+#> name        : focal_mean 
+#> min value   :         10 
+#> max value   :        120 
 ```

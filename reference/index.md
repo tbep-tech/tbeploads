@@ -53,12 +53,12 @@ Supporting datasets used by the other functions.
   : Lookup table for FLUCCSCODE conversion to CLUCSID and IMPROVED
 
 - [`contdry`](https://tbep-tech.github.io/tbeploads/reference/contdry.md)
-  : Upper Floridan Aquifer potentiometric surface contour lines, dry
-  season 2022
+  : Upper Floridan Aquifer potentiometric surface raster, dry season
+  2022
 
 - [`contwet`](https://tbep-tech.github.io/tbeploads/reference/contwet.md)
-  : Upper Floridan Aquifer potentiometric surface contour lines, wet
-  season 2022
+  : Upper Floridan Aquifer potentiometric surface raster, wet season
+  2022
 
 - [`dbasing`](https://tbep-tech.github.io/tbeploads/reference/dbasing.md)
   : Basin information for coastal subbasin codes
@@ -126,15 +126,15 @@ Utility functions used by other functions or standalone.
   : Get rainfall data at NOAA NCDC sites for atmospheric deposition and
   non-point source ungaged calculations
 - [`util_gw_getcontour()`](https://tbep-tech.github.io/tbeploads/reference/util_gw_getcontour.md)
-  : Download FDEP Upper Floridan Aquifer potentiometric surface contour
-  lines
+  : Download and rasterize FDEP Upper Floridan Aquifer potentiometric
+  surface
 - [`util_gw_getwq()`](https://tbep-tech.github.io/tbeploads/reference/util_gw_getwq.md)
   : Get groundwater quality concentrations for Floridan aquifer segments
 - [`util_gw_grad()`](https://tbep-tech.github.io/tbeploads/reference/util_gw_grad.md)
-  : Compute hydraulic gradient per bay segment from UFA potentiometric
-  surface contours
+  : Compute hydraulic gradient per bay segment from potentiometric
+  surface raster
 - [`util_gw_showgrad()`](https://tbep-tech.github.io/tbeploads/reference/util_gw_showgrad.md)
-  : Visualise the hydraulic gradient line for a bay segment
+  : Visualise the hydraulic gradient for a bay segment
 - [`util_nps_fillmiswq()`](https://tbep-tech.github.io/tbeploads/reference/util_nps_fillmiswq.md)
   : Fill in missing water quality values for non-point source (NPS) data
 - [`util_nps_getextflow()`](https://tbep-tech.github.io/tbeploads/reference/util_nps_getextflow.md)

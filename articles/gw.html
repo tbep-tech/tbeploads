@@ -74,9 +74,9 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">tbeploads</span><span class="op">)</span></span></code></pre></div>
 <p>Groundwater loads to Tampa Bay are estimated using the three-aquifer
-framework from Zarbock et al. (1994). The <code><a href="../reference/anlz_gw.html">anlz_gw()</a></code>
-function computes monthly TN, TP, and hydrologic loads for all bay
-segments.</p>
+framework from <span class="citation">Zarbock et al. (1994)</span>. The
+<code><a href="../reference/anlz_gw.html">anlz_gw()</a></code> function computes monthly TN, TP, and hydrologic
+loads for all bay segments.</p>
 <div class="section level2">
 <h2 id="methodology">Methodology<a class="anchor" aria-label="anchor" href="#methodology"></a>
 </h2>
@@ -88,15 +88,105 @@ length (miles). Q is in million gallons per day (MGD). Monthly nutrient
 loads (kg/month) are Q x C x 8.342 x 30.5 / 2.2, where C is the TN or TP
 concentration in mg/L. Monthly hydrologic load (m³/month) is Q x 3785 x
 30.5. Transmissivity and flow zone length are fixed constants per
-segment from Zarbock et al. (1994). Hydraulic gradients are
-season-specific: months 1-6 and 11-12 are dry season; months 7-10 are
-wet season. Lower Tampa Bay and Remainder Lower Tampa Bay have zero
-gradient in the dry season and Boca Ciega Bay has zero gradient in both
-seasons.</p>
+segment from <span class="citation">Zarbock et al. (1994)</span>.
+Hydraulic gradients are season-specific: months 1-6 and 11-12 are dry
+season; months 7-10 are wet season.</p>
 <p><strong>Surficial and intermediate aquifers:</strong> Loads are fixed
 monthly constants per segment derived from 1995-1998 (surficial) and
 1999-2003 (intermediate) SWFWMD monitoring data. These values have not
 changed since the original analysis.</p>
+</div>
+<div class="section level2">
+<h2 id="hydraulic-gradient-computation">Hydraulic gradient computation<a class="anchor" aria-label="anchor" href="#hydraulic-gradient-computation"></a>
+</h2>
+<p>Hydraulic gradients are computed from FDEP Upper Floridan Aquifer
+potentiometric surface contour lines using
+<code><a href="../reference/util_gw_getcontour.html">util_gw_getcontour()</a></code> and <code><a href="../reference/util_gw_grad.html">util_gw_grad()</a></code>.</p>
+<div class="section level3">
+<h3 id="downloading-and-rasterizing-contours">Downloading and rasterizing contours<a class="anchor" aria-label="anchor" href="#downloading-and-rasterizing-contours"></a>
+</h3>
+<p><code><a href="../reference/util_gw_getcontour.html">util_gw_getcontour()</a></code> downloads biannual FDEP contour
+lines (May = dry, September = wet) from the Florida Geological Survey
+ArcGIS REST service. Rather than working directly with the vector
+contour lines, the function rasterizes them to a 1-mile grid using
+inverse distance weighting (IDW, 5-mile radius) followed by iterative
+focal gap-filling. The spatial extent of the download covers the Tampa
+Bay watershed (<code>tbfullshed</code>) buffered outward by 40 miles to
+capture the Polk County potentiometric highlands that drive flow toward
+Hillsborough Bay. The IDW radius was deliberately set to 5 miles (rather
+than the contour spacing) to prevent extrapolation into data-sparse
+coastal and northern areas.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pot_dry</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getcontour.html">util_gw_getcontour</a></span><span class="op">(</span><span class="st">"dry"</span>, <span class="fl">2022</span><span class="op">)</span></span>
+<span><span class="va">pot_wet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getcontour.html">util_gw_getcontour</a></span><span class="op">(</span><span class="st">"wet"</span>, <span class="fl">2022</span><span class="op">)</span></span></code></pre></div>
+<p>The package datasets <code>contdry</code> and <code>contwet</code>
+contain pre-computed 2022 rasters stored as
+<code>PackedSpatRaster</code> objects. Unwrap them with
+<code><a href="https://rspatial.github.io/terra/reference/wrap.html" class="external-link">terra::unwrap()</a></code> before use or pass them directly to
+<code><a href="../reference/util_gw_grad.html">util_gw_grad()</a></code> and <code><a href="../reference/util_gw_showgrad.html">util_gw_showgrad()</a></code>, which
+unwrap automatically.</p>
+</div>
+<div class="section level3">
+<h3 id="computing-gradients">Computing gradients<a class="anchor" aria-label="anchor" href="#computing-gradients"></a>
+</h3>
+<p><code><a href="../reference/util_gw_grad.html">util_gw_grad()</a></code> finds the maximum potentiometric head
+within each segment’s search area, then measures the distance from the
+shoreline to that high point using a centroid-based transect:</p>
+<ol style="list-style-type: decimal">
+<li>A line is drawn from the bay segment centroid to the max-head land
+cell.</li>
+<li>The portion of that line inside the bay polygon (from centroid to
+shoreline crossing) is subtracted from the total length.</li>
+<li>The remaining land-side distance is used as the gradient base.</li>
+</ol>
+<p>This approach avoids measuring to an extreme geographic corner of the
+shoreline (e.g., the northeast tip of Middle Tampa Bay), giving a more
+representative transect.</p>
+<p><strong>Search areas</strong> are controlled by the
+<code>buf_segs</code> parameter, which buffers the subwatershed polygon
+outward and removes bay water. Default buffer distances (calibrated
+against 2021 SAS reference values) are applied automatically:</p>
+<ul>
+<li>Dry season: Old Tampa Bay (seg 1) buffered ~19 miles to capture the
+potentiometric high north/northeast of the standard watershed
+boundary.</li>
+<li>Wet season: same as dry, plus Lower Tampa Bay (4), Terra Ceia Bay
+(6), and Manatee River (7) each buffered ~19 miles to unlock wet-season
+dynamic computation.</li>
+</ul>
+<p><strong>Zero-gradient segments</strong> (hardcoded, not computed
+dynamically) reflect deliberate decisions from the original SAS loading
+analysis <span class="citation">(Zarbock et al. 1994)</span>:</p>
+<ul>
+<li>Boca Ciega Bay (segments 5 and 55), both seasons: the heavily
+urbanized coastal watershed has no meaningful Floridan Aquifer recharge
+directed toward the bay.</li>
+<li>Lower Tampa Bay (4), Terra Ceia Bay (6), Manatee River (7), dry
+season only: the potentiometric gradient is negligible during the dry
+season.</li>
+</ul>
+<p><strong>Hillsborough Bay (segment 2)</strong> uses a three-zone
+weighted average (Polk County 0.4, Pasco County 0.3, Alafia River 0.3)
+following the original flow net analysis in the SAS code.</p>
+<p><strong>Benchmark warning:</strong> <code><a href="../reference/util_gw_grad.html">util_gw_grad()</a></code>
+compares computed gradients against 2021 SAS reference values and issues
+a warning for any non-zero segment that deviates by more than 50%,
+making it easy to detect anomalous potentiometric surfaces when running
+future years.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">grad_dry</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_grad.html">util_gw_grad</a></span><span class="op">(</span><span class="va">pot_dry</span>, season <span class="op">=</span> <span class="st">"dry"</span><span class="op">)</span></span>
+<span><span class="va">grad_wet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_grad.html">util_gw_grad</a></span><span class="op">(</span><span class="va">pot_wet</span>, season <span class="op">=</span> <span class="st">"wet"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="visualising-gradients">Visualising gradients<a class="anchor" aria-label="anchor" href="#visualising-gradients"></a>
+</h3>
+<p><code><a href="../reference/util_gw_showgrad.html">util_gw_showgrad()</a></code> produces a map for a single segment
+showing the potentiometric surface within the search area, the
+centroid-to-head transect, and the computed gradient.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/util_gw_showgrad.html">util_gw_showgrad</a></span><span class="op">(</span><span class="va">pot_dry</span>, season <span class="op">=</span> <span class="st">"dry"</span>, seg <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/util_gw_showgrad.html">util_gw_showgrad</a></span><span class="op">(</span><span class="va">pot_wet</span>, season <span class="op">=</span> <span class="st">"wet"</span>, seg <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="floridan-aquifer-concentrations">Floridan aquifer concentrations<a class="anchor" aria-label="anchor" href="#floridan-aquifer-concentrations"></a>
@@ -109,11 +199,9 @@ Floridan aquifer monitoring wells used in the 2022-2024 loading
 analysis. Old Tampa Bay uses the first station mean only and
 Hillsborough Bay uses the arithmetic mean of both station means. The
 rest of the bay segments retain fixed historical values from the
-1995-1998 SWFWMD analysis that have been used unchanged in every loading
-cycle through 2021.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Requires internet access; retrieves Floridan aquifer concentrations</span></span>
-<span><span class="va">wqdat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getwq.html">util_gw_getwq</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+1995-1998 SWFWMD analysis used in every loading cycle through 2021.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">wqdat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getwq.html">util_gw_getwq</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>When <code>wqdat = NULL</code> (the default in
 <code><a href="../reference/anlz_gw.html">anlz_gw()</a></code>), hardcoded concentrations from the 2022-2024
 analysis are used directly.</p>
@@ -121,58 +209,49 @@ analysis are used directly.</p>
 <div class="section level2">
 <h2 id="estimating-groundwater-loads">Estimating groundwater loads<a class="anchor" aria-label="anchor" href="#estimating-groundwater-loads"></a>
 </h2>
-<p><code><a href="../reference/anlz_gw.html">anlz_gw()</a></code> requires only a year range. Hardcoded 2021
-FDEP potentiometric surface gradients are used for all years because
-updated contours were not available when the 2022-2024 analysis was
-run.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gw</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   Year Month source        segment      tn_load     tp_load   hy_load</span></span>
-<span><span class="co">#&gt; 1 2022     1     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span></span>
-<span><span class="co">#&gt; 2 2022     2     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span></span>
-<span><span class="co">#&gt; 3 2022     3     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span></span>
-<span><span class="co">#&gt; 4 2022     4     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span></span>
-<span><span class="co">#&gt; 5 2022     5     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span></span>
-<span><span class="co">#&gt; 6 2022     6     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span></span></code></pre></div>
+<p><code><a href="../reference/anlz_gw.html">anlz_gw()</a></code> takes potentiometric surface rasters for the
+dry and wet seasons as required inputs, along with a year range.
+Gradients are computed once from the supplied rasters via
+<code><a href="../reference/util_gw_grad.html">util_gw_grad()</a></code> and applied to every year in the range.</p>
+<p>The package datasets <code>contdry</code> and <code>contwet</code>
+are pre-computed 2022 rasters stored as <code>PackedSpatRaster</code>
+objects and can be passed directly:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span><span class="va">contdry</span>, <span class="va">contwet</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gw</span><span class="op">)</span></span></code></pre></div>
 <p>Load columns are in tons/month and <code>hy_load</code> is in million
 m³/month.</p>
-<p>To pass concentrations retrieved from the API:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Requires internet access</span></span>
-<span><span class="va">wqdat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getwq.html">util_gw_getwq</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">gw_api</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, wqdat <span class="op">=</span> <span class="va">wqdat</span><span class="op">)</span></span></code></pre></div>
+<p>To run the analysis for a new year, first download updated
+potentiometric surfaces from FDEP, then pass them to
+<code><a href="../reference/anlz_gw.html">anlz_gw()</a></code>:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pot_dry</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getcontour.html">util_gw_getcontour</a></span><span class="op">(</span><span class="st">"dry"</span>, <span class="fl">2025</span><span class="op">)</span></span>
+<span><span class="va">pot_wet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getcontour.html">util_gw_getcontour</a></span><span class="op">(</span><span class="st">"wet"</span>, <span class="fl">2025</span><span class="op">)</span></span>
+<span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span><span class="va">pot_dry</span>, <span class="va">pot_wet</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2025</span>, <span class="fl">2025</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>To pass concentrations retrieved from the Water Atlas API:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">wqdat</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getwq.html">util_gw_getwq</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">gw_api</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span><span class="va">contdry</span>, <span class="va">contwet</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, wqdat <span class="op">=</span> <span class="va">wqdat</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="temporal-summary">Temporal summary<a class="anchor" aria-label="anchor" href="#temporal-summary"></a>
 </h2>
 <p>Setting <code>summtime = 'year'</code> sums monthly loads to annual
 totals. The <code>Month</code> column is dropped.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, summtime <span class="op">=</span> <span class="st">'year'</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    Year source          segment     tn_load    tp_load    hy_load</span></span>
-<span><span class="co">#&gt; 1  2022     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span></span>
-<span><span class="co">#&gt; 2  2023     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span></span>
-<span><span class="co">#&gt; 3  2024     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span></span>
-<span><span class="co">#&gt; 4  2022     GW Hillsborough Bay 20.72632859 2.46652041 73.9028084</span></span>
-<span><span class="co">#&gt; 5  2023     GW Hillsborough Bay 20.72632859 2.46652041 73.9028084</span></span>
-<span><span class="co">#&gt; 6  2024     GW Hillsborough Bay 20.72632859 2.46652041 73.9028084</span></span>
-<span><span class="co">#&gt; 7  2022     GW  Lower Tampa Bay  0.10948950 0.62279120  3.8203550</span></span>
-<span><span class="co">#&gt; 8  2023     GW  Lower Tampa Bay  0.10948950 0.62279120  3.8203550</span></span>
-<span><span class="co">#&gt; 9  2024     GW  Lower Tampa Bay  0.10948950 0.62279120  3.8203550</span></span>
-<span><span class="co">#&gt; 10 2022     GW    Manatee River  0.10249411 0.50923100  3.5031130</span></span>
-<span><span class="co">#&gt; 11 2023     GW    Manatee River  0.10249411 0.50923100  3.5031130</span></span>
-<span><span class="co">#&gt; 12 2024     GW    Manatee River  0.10249411 0.50923100  3.5031130</span></span>
-<span><span class="co">#&gt; 13 2022     GW Middle Tampa Bay  0.28633333 1.62254143  9.9954764</span></span>
-<span><span class="co">#&gt; 14 2023     GW Middle Tampa Bay  0.28633333 1.62254143  9.9954764</span></span>
-<span><span class="co">#&gt; 15 2024     GW Middle Tampa Bay  0.28633333 1.62254143  9.9954764</span></span>
-<span><span class="co">#&gt; 16 2022     GW    Old Tampa Bay  6.58537094 1.95697341 60.1804539</span></span>
-<span><span class="co">#&gt; 17 2023     GW    Old Tampa Bay  6.58537094 1.95697341 60.1804539</span></span>
-<span><span class="co">#&gt; 18 2024     GW    Old Tampa Bay  6.58537094 1.95697341 60.1804539</span></span>
-<span><span class="co">#&gt; 19 2022     GW   Terra Ceia Bay  0.01894529 0.10028212  0.6552311</span></span>
-<span><span class="co">#&gt; 20 2023     GW   Terra Ceia Bay  0.01894529 0.10028212  0.6552311</span></span>
-<span><span class="co">#&gt; 21 2024     GW   Terra Ceia Bay  0.01894529 0.10028212  0.6552311</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span><span class="va">contdry</span>, <span class="va">contwet</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, summtime <span class="op">=</span> <span class="st">'year'</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2 unnumbered">
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-Zarbock1994" class="csl-entry">
+Zarbock, H., A. Janicki, D. Wade, D. Heimbuch, and H. Wilson. 1994.
+<span>“Estimates of Total Nitrogen, Total Phosphorus, and Total
+Suspended Solids Loadings to Tampa Bay, Florida.”</span> 04-94. St.
+Petersburg, FL: Tampa Bay National Estuary Program.
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -49,16 +49,39 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">anlz_gw</span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, wqdat <span class="op">=</span> <span class="cn">NULL</span>, summtime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"month"</span>, <span class="st">"year"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">anlz_gw</span><span class="op">(</span></span>
+<span>  <span class="va">pot_dry</span>,</span>
+<span>  <span class="va">pot_wet</span>,</span>
+<span>  yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>,</span>
+<span>  wqdat <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  summtime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"month"</span>, <span class="st">"year"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-yrrng">yrrng<a class="anchor" aria-label="anchor" href="#arg-yrrng"></a></dt>
-<dd><p>integer vector of length 2, start and end year, e.g.
-<code>c(2022, 2024)</code>.</p></dd>
+<dl><dt id="arg-pot-dry">pot_dry<a class="anchor" aria-label="anchor" href="#arg-pot-dry"></a></dt>
+<dd><p><code><a href="https://rspatial.github.io/terra/reference/SpatRaster-class.html" class="external-link">SpatRaster</a></code> (or <code>PackedSpatRaster</code>)
+of Upper Floridan Aquifer potentiometric head for the dry season, as
+returned by <code><a href="util_gw_getcontour.html">util_gw_getcontour</a></code> with
+<code>season = "dry"</code>. The package dataset <code><a href="contdry.html">contdry</a></code> contains
+a pre-computed 2022 example.</p></dd>
+
+
+<dt id="arg-pot-wet">pot_wet<a class="anchor" aria-label="anchor" href="#arg-pot-wet"></a></dt>
+<dd><p><code><a href="https://rspatial.github.io/terra/reference/SpatRaster-class.html" class="external-link">SpatRaster</a></code> (or <code>PackedSpatRaster</code>)
+of Upper Floridan Aquifer potentiometric head for the wet season, as
+returned by <code><a href="util_gw_getcontour.html">util_gw_getcontour</a></code> with
+<code>season = "wet"</code>. The package dataset <code><a href="contwet.html">contwet</a></code> contains
+a pre-computed 2022 example.</p></dd>
+
+
+<dt id="arg-yrrng">yrrng<a class="anchor" aria-label="anchor" href="#arg-yrrng"></a></dt>
+<dd><p>integer vector of length 2, start and end year for the load
+estimates, e.g. <code>c(2022, 2024)</code>. The same gradients derived from
+<code>pot_dry</code> and <code>pot_wet</code> are applied to every year in the range.</p></dd>
 
 
 <dt id="arg-wqdat">wqdat<a class="anchor" aria-label="anchor" href="#arg-wqdat"></a></dt>
@@ -98,17 +121,12 @@ $$\text{load} = Q \cdot C \cdot 8.342 \cdot 30.5 / 2.2$$
 where \(C\) is the TN or TP concentration (mg/L). Hydrologic load
 (m\(^3\)/month) is \(Q \cdot 3785 \cdot 30.5\).</p>
 <p><strong>Hydraulic gradients:</strong>
-The gradient section below contains a commented-out framework that calls
-<code><a href="util_gw_getcontour.html">util_gw_getcontour</a></code> and <code><a href="util_gw_grad.html">util_gw_grad</a></code> to compute
-gradients dynamically from FDEP potentiometric surface contours. The key
-challenge is that potentiometric high points for some segments (notably Old
-Tampa Bay) lie north of the subwatershed boundary; <code>util_gw_getcontour</code>
-accepts a <code>buf_dist</code> argument and <code>util_gw_grad</code> accepts a
-<code>buf_segs</code> argument to expand the search area for those segments.
-Until the buffer distances are calibrated against known SAS gradients,
-hardcoded gradient values from the 2021 FDEP potentiometric surface map are
-used (the same values applied for 2022-2024 in the original SAS analysis,
-as no updated contours were available at that time).</p>
+Gradients are computed once from <code>pot_dry</code> and <code>pot_wet</code> via
+<code><a href="util_gw_grad.html">util_gw_grad</a></code> and applied to every year in <code>yrrng</code>.
+Update <code>pot_dry</code> and <code>pot_wet</code> with fresh outputs from
+<code><a href="util_gw_getcontour.html">util_gw_getcontour</a></code> when new FDEP potentiometric surface maps
+become available. See <code><a href="util_gw_grad.html">util_gw_grad</a></code> for details on search
+areas, zero-gradient segments, and benchmark warnings.</p>
 <p><strong>Surficial and intermediate aquifers:</strong>
 Loads are fixed constants per segment. Surficial values are from
 <code>gwupdate95-98_final.xls</code> (1995-1998 SWFWMD monitoring data).
@@ -117,11 +135,19 @@ These have not changed since the original analysis.</p>
 <p><strong>Season assignment:</strong>
 Months 1-6 and 11-12 are dry season; months 7-10 are wet season.</p>
     </div>
+    <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>Zarbock, H., A. Janicki, D. Wade, D. Heimbuch, and H. Wilson. 1994.
+Estimates of Total Nitrogen, Total Phosphorus, and Total Suspended Solids
+Loadings to Tampa Bay, Florida. Technical Publication #04-94. Prepared by
+Coastal Environmental, Inc. Prepared for Tampa Bay National Estuary Program.
+St. Petersburg, FL.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># monthly segment loads using hardcoded 2022-2024 gradients and concentrations</span></span></span>
-<span class="r-in"><span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu">anlz_gw</span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># contdry and contwet are pre-computed 2022 package datasets</span></span></span>
+<span class="r-in"><span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu">anlz_gw</span><span class="op">(</span><span class="va">contdry</span>, <span class="va">contwet</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gw</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Year Month source        segment      tn_load     tp_load   hy_load</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 2022     1     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
@@ -132,20 +158,39 @@ Months 1-6 and 11-12 are dry season; months 7-10 are wet season.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6 2022     6     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># annual totals</span></span></span>
-<span class="r-in"><span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu">anlz_gw</span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, summtime <span class="op">=</span> <span class="st">'year'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gw</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Year source          segment     tn_load    tp_load    hy_load</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 2022     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 2023     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 2024     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 2022     GW Hillsborough Bay 20.72632859 2.46652041 73.9028084</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 2023     GW Hillsborough Bay 20.72632859 2.46652041 73.9028084</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 2024     GW Hillsborough Bay 20.72632859 2.46652041 73.9028084</span>
+<span class="r-in"><span><span class="fu">anlz_gw</span><span class="op">(</span><span class="va">contdry</span>, <span class="va">contwet</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, summtime <span class="op">=</span> <span class="st">'year'</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Year source          segment     tn_load    tp_load    hy_load</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  2022     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  2023     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  2024     GW   Boca Ciega Bay  0.00502654 0.04748757  0.1585512</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  2022     GW Hillsborough Bay 19.88198988 2.37177288 70.9236779</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  2023     GW Hillsborough Bay 19.88198988 2.37177288 70.9236779</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  2024     GW Hillsborough Bay 19.88198988 2.37177288 70.9236779</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  2022     GW  Lower Tampa Bay  0.10842020 0.61693145  3.7816227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  2023     GW  Lower Tampa Bay  0.10842020 0.61693145  3.7816227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  2024     GW  Lower Tampa Bay  0.10842020 0.61693145  3.7816227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 2022     GW    Manatee River  0.13199801 0.64376879  4.5718074</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 2023     GW    Manatee River  0.13199801 0.64376879  4.5718074</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12 2024     GW    Manatee River  0.13199801 0.64376879  4.5718074</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 2022     GW Middle Tampa Bay  0.25632137 1.45807586  8.9083788</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 2023     GW Middle Tampa Bay  0.25632137 1.45807586  8.9083788</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 2024     GW Middle Tampa Bay  0.25632137 1.45807586  8.9083788</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 2022     GW    Old Tampa Bay  6.54776566 1.94595506 59.8399180</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 2023     GW    Old Tampa Bay  6.54776566 1.94595506 59.8399180</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 2024     GW    Old Tampa Bay  6.54776566 1.94595506 59.8399180</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 2022     GW   Terra Ceia Bay  0.01797800 0.09544564  0.6201936</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 2023     GW   Terra Ceia Bay  0.01797800 0.09544564  0.6201936</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 2024     GW   Terra Ceia Bay  0.01797800 0.09544564  0.6201936</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co"># update rasters from FDEP for a new year, then compute loads</span></span></span>
+<span class="r-in"><span><span class="va">pot_dry</span> <span class="op">&lt;-</span> <span class="fu"><a href="util_gw_getcontour.html">util_gw_getcontour</a></span><span class="op">(</span><span class="st">"dry"</span>, <span class="fl">2025</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pot_wet</span> <span class="op">&lt;-</span> <span class="fu"><a href="util_gw_getcontour.html">util_gw_getcontour</a></span><span class="op">(</span><span class="st">"wet"</span>, <span class="fl">2025</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu">anlz_gw</span><span class="op">(</span><span class="va">pot_dry</span>, <span class="va">pot_wet</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2025</span>, <span class="fl">2025</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># pass concentrations from the Water Atlas API</span></span></span>
-<span class="r-in"><span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu">anlz_gw</span><span class="op">(</span>yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, wqdat <span class="op">=</span> <span class="fu"><a href="util_gw_getwq.html">util_gw_getwq</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gw</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu">anlz_gw</span><span class="op">(</span><span class="va">pot_dry</span>, <span class="va">pot_wet</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2025</span>, <span class="fl">2025</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>              wqdat <span class="op">=</span> <span class="fu"><a href="util_gw_getwq.html">util_gw_getwq</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
