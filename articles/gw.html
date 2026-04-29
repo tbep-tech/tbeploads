@@ -82,15 +82,28 @@ loads for all bay segments.</p>
 </h2>
 <p>Three aquifer types contribute to each bay segment each month.</p>
 <p><strong>Floridan aquifer:</strong> Flow is estimated with Darcy’s
-Law: Q = 7.4805 x 10^-6 x T x I x L, where T is transmissivity
-(ft²/day), I is the hydraulic gradient (ft/mile), and L is the flow zone
-length (miles). Q is in million gallons per day (MGD). Monthly nutrient
-loads (kg/month) are Q x C x 8.342 x 30.5 / 2.2, where C is the TN or TP
-concentration in mg/L. Monthly hydrologic load (m³/month) is Q x 3785 x
-30.5. Transmissivity and flow zone length are fixed constants per
-segment from <span class="citation">Zarbock et al. (1994)</span>.
-Hydraulic gradients are season-specific: months 1-6 and 11-12 are dry
-season; months 7-10 are wet season.</p>
+Law:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi><mo>=</mo><mn>7.4805</mn><mo>*</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup><mo>*</mo><mi>T</mi><mo>*</mo><mi>I</mi><mo>*</mo><mi>L</mi></mrow><annotation encoding="application/x-tex">
+Q = 7.4805 * 10^{-6} * T * I * L
+</annotation></semantics></math></p>
+<p>where T is transmissivity (ft²/day), I is the hydraulic gradient
+(ft/mile), and L is the flow zone length (miles). Q is in million
+gallons per day (MGD). Transmissivity and flow zone length are fixed
+constants per segment from <span class="citation">Zarbock et al.
+(1994)</span>. Hydraulic gradients are season-specific: months 1-6 and
+11-12 are dry season; months 7-10 are wet season. The
+<code><a href="../reference/util_gw_grad.html">util_gw_grad()</a></code> function computes gradients from FDEP
+potentiometric surface contours for the dry and wet seasons (see
+below).</p>
+<p>Monthly nutrient loads (kg/month) are:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>a</mi><mi>d</mi><mo>=</mo><mi>Q</mi><mo>*</mo><mi>C</mi><mo>*</mo><mn>8.342</mn><mo>*</mo><mn>30.5</mn><mi>/</mi><mn>2.2</mn></mrow><annotation encoding="application/x-tex">
+Load = Q * C * 8.342 * 30.5 / 2.2
+</annotation></semantics></math></p>
+<p>where C is the TN or TP concentration in mg/L.</p>
+<p>Monthly hydrologic load (m³/month) is:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>a</mi><mi>d</mi><mo>=</mo><mi>Q</mi><mo>*</mo><mn>3785</mn><mo>*</mo><mn>30.5</mn></mrow><annotation encoding="application/x-tex">
+Load = Q * 3785 * 30.5
+</annotation></semantics></math></p>
 <p><strong>Surficial and intermediate aquifers:</strong> Loads are fixed
 monthly constants per segment derived from 1995-1998 (surficial) and
 1999-2003 (intermediate) SWFWMD monitoring data. These values have not
@@ -112,13 +125,13 @@ contour lines, the function rasterizes them to a 1-mile grid using
 inverse distance weighting (IDW, 5-mile radius) followed by iterative
 focal gap-filling. The spatial extent of the download covers the Tampa
 Bay watershed (<code>tbfullshed</code>) buffered outward by 40 miles to
-capture the Polk County potentiometric highlands that drive flow toward
-Hillsborough Bay. The IDW radius was deliberately set to 5 miles (rather
-than the contour spacing) to prevent extrapolation into data-sparse
-coastal and northern areas.</p>
+capture high potentiometric values outside of the surficial
+subwatersheds that drive groundwater flow. The IDW radius was
+deliberately set to 5 miles (rather than the contour spacing) to prevent
+extrapolation into data-sparse coastal and northern areas.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pot_dry</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getcontour.html">util_gw_getcontour</a></span><span class="op">(</span><span class="st">"dry"</span>, <span class="fl">2022</span><span class="op">)</span></span>
-<span><span class="va">pot_wet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getcontour.html">util_gw_getcontour</a></span><span class="op">(</span><span class="st">"wet"</span>, <span class="fl">2022</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">contdry</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getcontour.html">util_gw_getcontour</a></span><span class="op">(</span><span class="st">"dry"</span>, <span class="fl">2022</span><span class="op">)</span></span>
+<span><span class="va">contwet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getcontour.html">util_gw_getcontour</a></span><span class="op">(</span><span class="st">"wet"</span>, <span class="fl">2022</span><span class="op">)</span></span></code></pre></div>
 <p>The package datasets <code>contdry</code> and <code>contwet</code>
 contain pre-computed 2022 rasters stored as
 <code>PackedSpatRaster</code> objects. Unwrap them with
@@ -142,10 +155,11 @@ shoreline crossing) is subtracted from the total length.</li>
 <p>This approach avoids measuring to an extreme geographic corner of the
 shoreline (e.g., the northeast tip of Middle Tampa Bay), giving a more
 representative transect.</p>
-<p><strong>Search areas</strong> are controlled by the
-<code>buf_segs</code> parameter, which buffers the subwatershed polygon
-outward and removes bay water. Default buffer distances (calibrated
-against 2021 SAS reference values) are applied automatically:</p>
+<p>Search areas to find the maximum head for each segment are controlled
+by the <code>buf_segs</code> parameter, which buffers the subwatershed
+polygon outward and removes bay water. Default buffer distances
+(calibrated against 2021 SAS reference values) are applied
+automatically:</p>
 <ul>
 <li>Dry season: Old Tampa Bay (seg 1) buffered ~19 miles to capture the
 potentiometric high north/northeast of the standard watershed
@@ -154,9 +168,8 @@ boundary.</li>
 (6), and Manatee River (7) each buffered ~19 miles to unlock wet-season
 dynamic computation.</li>
 </ul>
-<p><strong>Zero-gradient segments</strong> (hardcoded, not computed
-dynamically) reflect deliberate decisions from the original SAS loading
-analysis <span class="citation">(Zarbock et al. 1994)</span>:</p>
+<p>Zero-gradient segments (hardcoded, not computed dynamically) reflect
+deliberate decisions from prior loading analyses <span class="citation">(Zarbock et al. 1994)</span>:</p>
 <ul>
 <li>Boca Ciega Bay (segments 5 and 55), both seasons: the heavily
 urbanized coastal watershed has no meaningful Floridan Aquifer recharge
@@ -174,8 +187,26 @@ a warning for any non-zero segment that deviates by more than 50%,
 making it easy to detect anomalous potentiometric surfaces when running
 future years.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">grad_dry</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_grad.html">util_gw_grad</a></span><span class="op">(</span><span class="va">pot_dry</span>, season <span class="op">=</span> <span class="st">"dry"</span><span class="op">)</span></span>
-<span><span class="va">grad_wet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_grad.html">util_gw_grad</a></span><span class="op">(</span><span class="va">pot_wet</span>, season <span class="op">=</span> <span class="st">"wet"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/util_gw_grad.html">util_gw_grad</a></span><span class="op">(</span><span class="va">contdry</span>, season <span class="op">=</span> <span class="st">"dry"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   bay_seg     grad</span></span>
+<span><span class="co">#&gt; 1       1 3.513075</span></span>
+<span><span class="co">#&gt; 2       2 2.790798</span></span>
+<span><span class="co">#&gt; 3       3 1.249106</span></span>
+<span><span class="co">#&gt; 4       4 0.000000</span></span>
+<span><span class="co">#&gt; 5       5 0.000000</span></span>
+<span><span class="co">#&gt; 6       6 0.000000</span></span>
+<span><span class="co">#&gt; 7       7 0.000000</span></span>
+<span><span class="co">#&gt; 8      55 0.000000</span></span>
+<span><span class="fu"><a href="../reference/util_gw_grad.html">util_gw_grad</a></span><span class="op">(</span><span class="va">contwet</span>, season <span class="op">=</span> <span class="st">"wet"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   bay_seg     grad</span></span>
+<span><span class="co">#&gt; 1       1 4.021441</span></span>
+<span><span class="co">#&gt; 2       2 3.319684</span></span>
+<span><span class="co">#&gt; 3       3 2.006550</span></span>
+<span><span class="co">#&gt; 4       4 1.544803</span></span>
+<span><span class="co">#&gt; 5       5 0.000000</span></span>
+<span><span class="co">#&gt; 6       6 1.386061</span></span>
+<span><span class="co">#&gt; 7       7 1.679699</span></span>
+<span><span class="co">#&gt; 8      55 0.000000</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="visualising-gradients">Visualising gradients<a class="anchor" aria-label="anchor" href="#visualising-gradients"></a>
@@ -184,8 +215,11 @@ future years.</p>
 showing the potentiometric surface within the search area, the
 centroid-to-head transect, and the computed gradient.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/util_gw_showgrad.html">util_gw_showgrad</a></span><span class="op">(</span><span class="va">pot_dry</span>, season <span class="op">=</span> <span class="st">"dry"</span>, seg <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/util_gw_showgrad.html">util_gw_showgrad</a></span><span class="op">(</span><span class="va">pot_wet</span>, season <span class="op">=</span> <span class="st">"wet"</span>, seg <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/util_gw_showgrad.html">util_gw_showgrad</a></span><span class="op">(</span><span class="va">contdry</span>, season <span class="op">=</span> <span class="st">"dry"</span>, seg <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p><img src="gw_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/util_gw_showgrad.html">util_gw_showgrad</a></span><span class="op">(</span><span class="va">contwet</span>, season <span class="op">=</span> <span class="st">"wet"</span>, seg <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span></code></pre></div>
+<p><img src="gw_files/figure-html/unnamed-chunk-5-2.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level2">
@@ -200,7 +234,7 @@ analysis. Old Tampa Bay uses the first station mean only and
 Hillsborough Bay uses the arithmetic mean of both station means. The
 rest of the bay segments retain fixed historical values from the
 1995-1998 SWFWMD analysis used in every loading cycle through 2021.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">wqdat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getwq.html">util_gw_getwq</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>When <code>wqdat = NULL</code> (the default in
 <code><a href="../reference/anlz_gw.html">anlz_gw()</a></code>), hardcoded concentrations from the 2022-2024
@@ -216,20 +250,27 @@ Gradients are computed once from the supplied rasters via
 <p>The package datasets <code>contdry</code> and <code>contwet</code>
 are pre-computed 2022 rasters stored as <code>PackedSpatRaster</code>
 objects and can be passed directly:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span><span class="va">contdry</span>, <span class="va">contwet</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gw</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gw</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   Year Month source        segment      tn_load     tp_load   hy_load</span></span>
+<span><span class="co">#&gt; 1 2022     1     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span></span>
+<span><span class="co">#&gt; 2 2022     2     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span></span>
+<span><span class="co">#&gt; 3 2022     3     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span></span>
+<span><span class="co">#&gt; 4 2022     4     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span></span>
+<span><span class="co">#&gt; 5 2022     5     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span></span>
+<span><span class="co">#&gt; 6 2022     6     GW Boca Ciega Bay 0.0004188783 0.003957298 0.0132126</span></span></code></pre></div>
 <p>Load columns are in tons/month and <code>hy_load</code> is in million
 m³/month.</p>
 <p>To run the analysis for a new year, first download updated
 potentiometric surfaces from FDEP, then pass them to
 <code><a href="../reference/anlz_gw.html">anlz_gw()</a></code>:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pot_dry</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getcontour.html">util_gw_getcontour</a></span><span class="op">(</span><span class="st">"dry"</span>, <span class="fl">2025</span><span class="op">)</span></span>
-<span><span class="va">pot_wet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getcontour.html">util_gw_getcontour</a></span><span class="op">(</span><span class="st">"wet"</span>, <span class="fl">2025</span><span class="op">)</span></span>
-<span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span><span class="va">pot_dry</span>, <span class="va">pot_wet</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2025</span>, <span class="fl">2025</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>To pass concentrations retrieved from the Water Atlas API:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">contdry</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getcontour.html">util_gw_getcontour</a></span><span class="op">(</span><span class="st">"dry"</span>, <span class="fl">2025</span><span class="op">)</span></span>
+<span><span class="va">contwet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getcontour.html">util_gw_getcontour</a></span><span class="op">(</span><span class="st">"wet"</span>, <span class="fl">2025</span><span class="op">)</span></span>
+<span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span><span class="va">contdry</span>, <span class="va">contwet</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2025</span>, <span class="fl">2025</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>To pass concentrations retrieved from the Water Atlas API:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">wqdat</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_gw_getwq.html">util_gw_getwq</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">gw_api</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span><span class="va">contdry</span>, <span class="va">contwet</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, wqdat <span class="op">=</span> <span class="va">wqdat</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -237,8 +278,8 @@ potentiometric surfaces from FDEP, then pass them to
 <h2 id="temporal-summary">Temporal summary<a class="anchor" aria-label="anchor" href="#temporal-summary"></a>
 </h2>
 <p>Setting <code>summtime = 'year'</code> sums monthly loads to annual
-totals. The <code>Month</code> column is dropped.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+totals.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span><span class="va">contdry</span>, <span class="va">contwet</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, summtime <span class="op">=</span> <span class="st">'year'</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2 unnumbered">

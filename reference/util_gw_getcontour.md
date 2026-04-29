@@ -53,9 +53,8 @@ weighting (IDW).
 **Spatial extent:** The API query covers the Tampa Bay watershed
 ([`tbfullshed`](https://tbep-tech.github.io/tbeploads/reference/tbfullshed.md))
 buffered outward by 40 miles (211,200 US Survey Feet), converted to
-WGS84. This wider extent captures the Polk County potentiometric
-highlands that drive groundwater flow to Hillsborough Bay and
-surrounding segments.
+WGS84. This wider extent captures high potentiometric values outside of
+the surficial subwatersheds that drive groundwater flow.
 
 **Interpolation:** Contour line vertices are used as elevation
 observations and interpolated to a 1-mile grid via IDW (5-mile radius,

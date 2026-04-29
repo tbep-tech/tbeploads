@@ -96,9 +96,7 @@ and interpolates them to a 1-mile <code>SpatRaster</code> using inverse distance
 weighting (IDW).</p>
 <p><strong>Spatial extent:</strong> The API query covers the Tampa Bay watershed
 (<code><a href="tbfullshed.html">tbfullshed</a></code>) buffered outward by 40 miles (211,200 US Survey
-Feet), converted to WGS84. This wider extent captures the Polk County
-potentiometric highlands that drive groundwater flow to Hillsborough Bay and
-surrounding segments.</p>
+Feet), converted to WGS84. This wider extent captures high potentiometric values outside of the surficial subwatersheds that drive groundwater flow.</p>
 <p><strong>Interpolation:</strong> Contour line vertices are used as elevation
 observations and interpolated to a 1-mile grid via IDW (5-mile radius,
 power = 2). Cells more than 5 miles from any contour vertex are left
