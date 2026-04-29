@@ -79,6 +79,13 @@
 #' @return A data frame with columns \code{bay_seg} (integer) and \code{grad}
 #'   (numeric, ft/mile; 0 for zero-gradient segments).
 #'
+#' @references
+#' Zarbock, H., A. Janicki, D. Wade, D. Heimbuch, and H. Wilson. 1994.
+#' Estimates of Total Nitrogen, Total Phosphorus, and Total Suspended Solids
+#' Loadings to Tampa Bay, Florida. Technical Publication #04-94. Prepared by
+#' Coastal Environmental, Inc. Prepared for Tampa Bay National Estuary Program.
+#' St. Petersburg, FL.
+#'
 #' @export
 #'
 #' @examples

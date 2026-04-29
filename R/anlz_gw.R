@@ -1,16 +1,24 @@
 #' Calculate groundwater loads to Tampa Bay segments
 #'
-#' @param yrrng integer vector of length 2, start and end year, e.g.
-#'   \code{c(2022, 2024)}.
+#' @param pot_dry \code{\link[terra]{SpatRaster}} (or \code{PackedSpatRaster})
+#'   of Upper Floridan Aquifer potentiometric head for the dry season, as
+#'   returned by \code{\link{util_gw_getcontour}} with
+#'   \code{season = "dry"}. The package dataset \code{\link{contdry}} contains
+#'   a pre-computed 2022 example.
+#' @param pot_wet \code{\link[terra]{SpatRaster}} (or \code{PackedSpatRaster})
+#'   of Upper Floridan Aquifer potentiometric head for the wet season, as
+#'   returned by \code{\link{util_gw_getcontour}} with
+#'   \code{season = "wet"}. The package dataset \code{\link{contwet}} contains
+#'   a pre-computed 2022 example.
+#' @param yrrng integer vector of length 2, start and end year for the load
+#'   estimates, e.g. \code{c(2022, 2024)}. The same gradients derived from
+#'   \code{pot_dry} and \code{pot_wet} are applied to every year in the range.
 #' @param wqdat data frame of Floridan aquifer TN and TP concentrations (mg/L)
 #'   as returned by \code{\link{util_gw_getwq}}, with columns \code{bay_seg},
 #'   \code{tn_mgl}, and \code{tp_mgl}. When \code{NULL} (default), hardcoded
 #'   concentrations from the 2022-2024 loading analysis are used.
 #' @param summtime character, temporal summarization: \code{'month'} (default)
 #'   returns one row per segment per month, \code{'year'} sums to annual totals.
-#' @param verbose logical, if \code{TRUE} (default) progress messages from
-#'   \code{\link{util_gw_getcontour}} are printed during download and
-#'   interpolation.
 #'
 #' @details
 #' Estimates groundwater loads to each Tampa Bay segment for three aquifer
@@ -27,12 +35,12 @@
 #' (m\eqn{^3}/month) is \eqn{Q \cdot 3785 \cdot 30.5}.
 #'
 #' \strong{Hydraulic gradients:}
-#' For each year in \code{yrrng}, dry- and wet-season FDEP potentiometric
-#' surface contours are downloaded via \code{\link{util_gw_getcontour}},
-#' rasterized to a 1-mile grid, and passed to \code{\link{util_gw_grad}} to
-#' compute segment-specific gradients.  This requires an internet connection
-#' and takes a few minutes per year.  See \code{\link{util_gw_grad}} for
-#' details on search areas, zero-gradient segments, and benchmark warnings.
+#' Gradients are computed once from \code{pot_dry} and \code{pot_wet} via
+#' \code{\link{util_gw_grad}} and applied to every year in \code{yrrng}.
+#' Update \code{pot_dry} and \code{pot_wet} with fresh outputs from
+#' \code{\link{util_gw_getcontour}} when new FDEP potentiometric surface maps
+#' become available. See \code{\link{util_gw_grad}} for details on search
+#' areas, zero-gradient segments, and benchmark warnings.
 #'
 #' \strong{Surficial and intermediate aquifers:}
 #' Loads are fixed constants per segment. Surficial values are from
@@ -55,56 +63,52 @@
 #'     million m\eqn{^3}/year)
 #' }
 #'
+#' @references
+#' Zarbock, H., A. Janicki, D. Wade, D. Heimbuch, and H. Wilson. 1994.
+#' Estimates of Total Nitrogen, Total Phosphorus, and Total Suspended Solids
+#' Loadings to Tampa Bay, Florida. Technical Publication #04-94. Prepared by
+#' Coastal Environmental, Inc. Prepared for Tampa Bay National Estuary Program.
+#' St. Petersburg, FL.
+#'
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' # monthly segment loads (requires internet)
-#' gw <- anlz_gw(yrrng = c(2022, 2024))
+#' # contdry and contwet are pre-computed 2022 package datasets
+#' gw <- anlz_gw(contdry, contwet, yrrng = c(2022, 2024))
 #' head(gw)
 #'
 #' # annual totals
-#' anlz_gw(yrrng = c(2022, 2024), summtime = 'year')
+#' anlz_gw(contdry, contwet, yrrng = c(2022, 2024), summtime = 'year')
+#'
+#' \dontrun{
+#' # update rasters from FDEP for a new year, then compute loads
+#' pot_dry <- util_gw_getcontour("dry", 2025)
+#' pot_wet <- util_gw_getcontour("wet", 2025)
+#' gw <- anlz_gw(pot_dry, pot_wet, yrrng = c(2025, 2025))
 #'
 #' # pass concentrations from the Water Atlas API
-#' gw <- anlz_gw(yrrng = c(2022, 2024), wqdat = util_gw_getwq())
-#' head(gw)
+#' gw <- anlz_gw(pot_dry, pot_wet, yrrng = c(2025, 2025),
+#'               wqdat = util_gw_getwq())
 #' }
-anlz_gw <- function(yrrng = c(2022, 2024), wqdat = NULL,
-                    summtime = c('month', 'year'), verbose = TRUE) {
+anlz_gw <- function(pot_dry, pot_wet, yrrng = c(2022, 2024), wqdat = NULL,
+                    summtime = c('month', 'year')) {
 
   summtime <- match.arg(summtime)
 
   # -------------------------------------------------------------------------
-  # 1. Floridan aquifer hydraulic gradient (I, ft/mile) per segment, season, year
-  #    Downloads FDEP UFA potentiometric surface contours for each year,
-  #    rasterizes them, and computes gradients via util_gw_grad().
-  #    Default buf_segs (calibrated against 2021 SAS reference values):
-  #      dry: c("1" = 100000)
-  #      wet: c("1" = 100000, "4" = 100000, "6" = 100000, "7" = 100000)
+  # 1. Floridan aquifer hydraulic gradient (I, ft/mile) per segment and season
+  #    Gradients are derived once from the supplied rasters and applied to all
+  #    years in yrrng.  Pass updated rasters from util_gw_getcontour() when
+  #    new FDEP potentiometric surface maps are available.
   # -------------------------------------------------------------------------
-  years <- seq(yrrng[1], yrrng[2])
+  gd <- util_gw_grad(pot_dry, season = "dry")
+  gw <- util_gw_grad(pot_wet, season = "wet")
 
-  grad_list <- lapply(years, function(yr) {
-
-    pot_dry <- util_gw_getcontour("dry", yr, verbose = verbose)
-    pot_wet <- util_gw_getcontour("wet", yr, verbose = verbose)
-
-    if (is.null(pot_dry) || is.null(pot_wet))
-      stop("Could not retrieve FDEP potentiometric surface for year ", yr,
-           ". Verify that data are available for this year.", call. = FALSE)
-
-    gd <- util_gw_grad(pot_dry, season = "dry")
-    gw <- util_gw_grad(pot_wet, season = "wet")
-
-    rbind(
-      data.frame(Year = yr, season = "dry", gd, stringsAsFactors = FALSE),
-      data.frame(Year = yr, season = "wet", gw, stringsAsFactors = FALSE)
-    )
-  })
-
-  grad_df <- do.call(rbind, grad_list)
-  grad_df  <- grad_df[grad_df$bay_seg %in% 1L:7L, ]
+  grad_df <- rbind(
+    data.frame(season = "dry", gd, stringsAsFactors = FALSE),
+    data.frame(season = "wet", gw, stringsAsFactors = FALSE)
+  )
+  grad_df <- grad_df[grad_df$bay_seg %in% 1L:7L, ]
 
   # -------------------------------------------------------------------------
   # 2. Floridan aquifer TN/TP concentrations (mg/L)
@@ -149,10 +153,10 @@ anlz_gw <- function(yrrng = c(2022, 2024), wqdat = NULL,
   )
 
   # -------------------------------------------------------------------------
-  # 5. Build monthly grid, assign season, join year-specific gradients
+  # 5. Build monthly grid, assign season, join gradients
   # -------------------------------------------------------------------------
   grid <- expand.grid(
-    Year    = years,
+    Year    = seq(yrrng[1], yrrng[2]),
     Month   = 1L:12L,
     bay_seg = 1L:7L,
     stringsAsFactors = FALSE
@@ -160,7 +164,7 @@ anlz_gw <- function(yrrng = c(2022, 2024), wqdat = NULL,
 
   grid$season <- ifelse(grid$Month %in% c(1:6, 11:12), "dry", "wet")
 
-  grid <- merge(grid, grad_df,     by = c("Year", "season", "bay_seg"))
+  grid <- merge(grid, grad_df,     by = c("season", "bay_seg"))
   grid <- merge(grid, wqdat,       by = "bay_seg")
   grid <- merge(grid, fl_params,   by = "bay_seg")
   grid <- merge(grid, fixed_loads, by = "bay_seg")

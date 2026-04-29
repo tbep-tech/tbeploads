@@ -122,7 +122,7 @@ util_gw_showgrad <- function(pot_rast, season = c("dry", "wet"), seg,
                       xlim = c(search_ext$xmin - buf_ft, search_ext$xmax + buf_ft),
                       ylim = c(search_ext$ymin - buf_ft, search_ext$ymax + buf_ft)) +
     ggplot2::labs(
-      title    = sprintf("Seg %d: %s — %s", seg,
+      title    = sprintf("Seg %d: %s - %s", seg,
                          seg_names[as.character(seg)], season_lab),
       subtitle = sprintf("Max head: %.1f ft | Distance: %.1f mi | Gradient: %.3f ft/mi",
                          r$elev, r$dist_mi, r$grad),

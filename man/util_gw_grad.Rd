@@ -109,3 +109,10 @@ pot_wet <- util_gw_getcontour("wet", 2022)
 util_gw_grad(pot_wet, season = "wet")
 }
 }
+\references{
+Zarbock, H., A. Janicki, D. Wade, D. Heimbuch, and H. Wilson. 1994.
+Estimates of Total Nitrogen, Total Phosphorus, and Total Suspended Solids
+Loadings to Tampa Bay, Florida. Technical Publication #04-94. Prepared by
+Coastal Environmental, Inc. Prepared for Tampa Bay National Estuary Program.
+St. Petersburg, FL.
+}

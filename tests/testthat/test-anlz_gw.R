@@ -1,5 +1,5 @@
 test_that("anlz_gw monthly output has correct structure", {
-  out <- anlz_gw(yrrng = c(2022, 2024))
+  out <- anlz_gw(contdry, contwet, yrrng = c(2022, 2024))
 
   expect_s3_class(out, "data.frame")
   expect_equal(nrow(out), 7L * 12L * 3L)  # 7 segs x 12 months x 3 years
@@ -15,7 +15,7 @@ test_that("anlz_gw monthly output has correct structure", {
 })
 
 test_that("anlz_gw dry season sets Floridan gradient to zero for LTB and RALTB", {
-  out <- anlz_gw(yrrng = c(2022, 2022))
+  out <- anlz_gw(contdry, contwet, yrrng = c(2022, 2022))
 
   segs <- c('Lower Tampa Bay', 'Boca Ciega Bay', 'Terra Ceia Bay', 'Manatee River')
   # In dry season (Jan), segs Floridan grad = 0, so loads come only from
@@ -33,7 +33,7 @@ test_that("anlz_gw dry season sets Floridan gradient to zero for LTB and RALTB",
 })
 
 test_that("anlz_gw OTB Jan 2022 matches SAS output within rounding", {
-  out <- anlz_gw(yrrng = c(2022, 2022))
+  out <- anlz_gw(contdry, contwet, yrrng = c(2022, 2022))
   otb  <- out[out$Month == 1L & out$segment == "Old Tampa Bay", ]
 
   # SAS output (integer kg): TN = 498, TP = 148, H2O = 5,015,038 m3
@@ -44,7 +44,7 @@ test_that("anlz_gw OTB Jan 2022 matches SAS output within rounding", {
 })
 
 test_that("anlz_gw LTB Jan 2022 matches SAS output within rounding", {
-  out <- anlz_gw(yrrng = c(2022, 2022))
+  out <- anlz_gw(contdry, contwet, yrrng = c(2022, 2022))
   ltb  <- out[out$Month == 1L & out$segment == 'Hillsborough Bay', ]
 
   expect_equal(ltb$tn_load * 907.1847, 1566, tolerance = 1)
@@ -53,8 +53,8 @@ test_that("anlz_gw LTB Jan 2022 matches SAS output within rounding", {
 })
 
 test_that("anlz_gw annual summtime sums months correctly", {
-  monthly <- anlz_gw(yrrng = c(2022, 2022), summtime = 'month')
-  annual  <- anlz_gw(yrrng = c(2022, 2022), summtime = 'year')
+  monthly <- anlz_gw(contdry, contwet, yrrng = c(2022, 2022), summtime = 'month')
+  annual  <- anlz_gw(contdry, contwet, yrrng = c(2022, 2022), summtime = 'year')
 
   expect_equal(nrow(annual), 7L)
   expect_false("Month" %in% names(annual))
@@ -73,7 +73,7 @@ test_that("anlz_gw annual summtime sums months correctly", {
 })
 
 test_that("anlz_gw custom wqdat changes OTB, HB loads but not others", {
-  default_out <- anlz_gw(yrrng = c(2022, 2022))
+  default_out <- anlz_gw(contdry, contwet, yrrng = c(2022, 2022))
 
   # Double the concentrations for OTB, HB, leave others unchanged
   custom_wq <- data.frame(
@@ -81,7 +81,7 @@ test_that("anlz_gw custom wqdat changes OTB, HB loads but not others", {
     tn_mgl  = c(0.20, 0.51, 0.025, 0.025, 0.022, 0.025, 0.025),
     tp_mgl  = c(0.0586, 0.0576, 0.137, 0.137, 0.118, 0.125, 0.114)
   )
-  custom_out <- anlz_gw(yrrng = c(2022, 2022), wqdat = custom_wq)
+  custom_out <- anlz_gw(contdry, contwet, yrrng = c(2022, 2022), wqdat = custom_wq)
 
   # HB, OTB TN load should increase (doubled Floridan concentration)
   expect_gt(
@@ -105,7 +105,7 @@ test_that("anlz_gw custom wqdat changes OTB, HB loads but not others", {
 })
 
 test_that("anlz_gw all load values are non-negative", {
-  out <- anlz_gw(yrrng = c(2022, 2024))
+  out <- anlz_gw(contdry, contwet, yrrng = c(2022, 2024))
   expect_true(all(out$tn_load >= 0))
   expect_true(all(out$tp_load >= 0))
   expect_true(all(out$hy_load >= 0))

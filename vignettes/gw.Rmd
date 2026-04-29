@@ -1,6 +1,7 @@
 ---
 title: "Groundwater (GW)"
 output: rmarkdown::html_vignette
+bibliography: gw.bib
 vignette: >
   %\VignetteIndexEntry{Groundwater (GW)}
   %\VignetteEngine{knitr::rmarkdown}
@@ -21,13 +22,13 @@ knitr::opts_chunk$set(
 library(tbeploads)
 ```
 
-Groundwater loads to Tampa Bay are estimated using the three-aquifer framework from Zarbock et al. (1994).  The `anlz_gw()` function computes monthly TN, TP, and hydrologic loads for all bay segments.
+Groundwater loads to Tampa Bay are estimated using the three-aquifer framework from @Zarbock1994.  The `anlz_gw()` function computes monthly TN, TP, and hydrologic loads for all bay segments.
 
 ## Methodology
 
 Three aquifer types contribute to each bay segment each month.
 
-**Floridan aquifer:** Flow is estimated with Darcy's Law: Q = 7.4805 x 10^-6 x T x I x L, where T is transmissivity (ft²/day), I is the hydraulic gradient (ft/mile), and L is the flow zone length (miles).  Q is in million gallons per day (MGD).  Monthly nutrient loads (kg/month) are Q x C x 8.342 x 30.5 / 2.2, where C is the TN or TP concentration in mg/L.  Monthly hydrologic load (m³/month) is Q x 3785 x 30.5.  Transmissivity and flow zone length are fixed constants per segment from Zarbock et al. (1994).  Hydraulic gradients are season-specific: months 1-6 and 11-12 are dry season; months 7-10 are wet season.
+**Floridan aquifer:** Flow is estimated with Darcy's Law: Q = 7.4805 x 10^-6 x T x I x L, where T is transmissivity (ft²/day), I is the hydraulic gradient (ft/mile), and L is the flow zone length (miles).  Q is in million gallons per day (MGD).  Monthly nutrient loads (kg/month) are Q x C x 8.342 x 30.5 / 2.2, where C is the TN or TP concentration in mg/L.  Monthly hydrologic load (m³/month) is Q x 3785 x 30.5.  Transmissivity and flow zone length are fixed constants per segment from @Zarbock1994.  Hydraulic gradients are season-specific: months 1-6 and 11-12 are dry season; months 7-10 are wet season.
 
 **Surficial and intermediate aquifers:** Loads are fixed monthly constants per segment derived from 1995-1998 (surficial) and 1999-2003 (intermediate) SWFWMD monitoring data.  These values have not changed since the original analysis.
 
@@ -61,7 +62,7 @@ This approach avoids measuring to an extreme geographic corner of the shoreline 
 - Dry season: Old Tampa Bay (seg 1) buffered ~19 miles to capture the potentiometric high north/northeast of the standard watershed boundary.
 - Wet season: same as dry, plus Lower Tampa Bay (4), Terra Ceia Bay (6), and Manatee River (7) each buffered ~19 miles to unlock wet-season dynamic computation.
 
-**Zero-gradient segments** (hardcoded, not computed dynamically) reflect deliberate decisions from the original SAS loading analysis (Zarbock et al., 1994):
+**Zero-gradient segments** (hardcoded, not computed dynamically) reflect deliberate decisions from the original SAS loading analysis [@Zarbock1994]:
 
 - Boca Ciega Bay (segments 5 and 55), both seasons: the heavily urbanized coastal watershed has no meaningful Floridan Aquifer recharge directed toward the bay.
 - Lower Tampa Bay (4), Terra Ceia Bay (6), Manatee River (7), dry season only: the potentiometric gradient is negligible during the dry season.
@@ -96,28 +97,30 @@ When `wqdat = NULL` (the default in `anlz_gw()`), hardcoded concentrations from 
 
 ## Estimating groundwater loads
 
-`anlz_gw()` requires only a year range.  For each year it downloads dry- and wet-season FDEP potentiometric surface contours, rasterizes them, computes segment gradients via `util_gw_grad()`, and assembles monthly loads.  An internet connection is required; allow a few minutes per year for the API downloads.
+`anlz_gw()` takes potentiometric surface rasters for the dry and wet seasons as required inputs, along with a year range.  Gradients are computed once from the supplied rasters via `util_gw_grad()` and applied to every year in the range.
+
+The package datasets `contdry` and `contwet` are pre-computed 2022 rasters stored as `PackedSpatRaster` objects and can be passed directly:
 
 ```{r, eval = FALSE}
-# Requires internet access
-gw <- anlz_gw(yrrng = c(2022, 2024))
+gw <- anlz_gw(contdry, contwet, yrrng = c(2022, 2024))
 head(gw)
 ```
 
 Load columns are in tons/month and `hy_load` is in million m³/month.
 
-The package datasets `contdry` and `contwet` (pre-computed 2022 rasters) can be used to inspect gradients without downloading:
+To run the analysis for a new year, first download updated potentiometric surfaces from FDEP, then pass them to `anlz_gw()`:
 
-```{r}
-grad_dry <- util_gw_grad(contdry, season = "dry")
-grad_dry
+```{r, eval = FALSE}
+pot_dry <- util_gw_getcontour("dry", 2025)
+pot_wet <- util_gw_getcontour("wet", 2025)
+gw <- anlz_gw(pot_dry, pot_wet, yrrng = c(2025, 2025))
 ```
 
-To pass concentrations retrieved from the API:
+To pass concentrations retrieved from the Water Atlas API:
 
 ```{r, eval = FALSE}
 wqdat  <- util_gw_getwq()
-gw_api <- anlz_gw(yrrng = c(2022, 2024), wqdat = wqdat)
+gw_api <- anlz_gw(contdry, contwet, yrrng = c(2022, 2024), wqdat = wqdat)
 ```
 
 ## Temporal summary
@@ -125,5 +128,7 @@ gw_api <- anlz_gw(yrrng = c(2022, 2024), wqdat = wqdat)
 Setting `summtime = 'year'` sums monthly loads to annual totals.  The `Month` column is dropped.
 
 ```{r, eval = FALSE}
-anlz_gw(yrrng = c(2022, 2024), summtime = 'year')
+anlz_gw(contdry, contwet, yrrng = c(2022, 2024), summtime = 'year')
 ```
+
+## References

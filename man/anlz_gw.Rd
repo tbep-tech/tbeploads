@@ -5,15 +5,29 @@
 \title{Calculate groundwater loads to Tampa Bay segments}
 \usage{
 anlz_gw(
+  pot_dry,
+  pot_wet,
   yrrng = c(2022, 2024),
   wqdat = NULL,
-  summtime = c("month", "year"),
-  verbose = TRUE
+  summtime = c("month", "year")
 )
 }
 \arguments{
-\item{yrrng}{integer vector of length 2, start and end year, e.g.
-\code{c(2022, 2024)}.}
+\item{pot_dry}{\code{\link[terra]{SpatRaster}} (or \code{PackedSpatRaster})
+of Upper Floridan Aquifer potentiometric head for the dry season, as
+returned by \code{\link{util_gw_getcontour}} with
+\code{season = "dry"}. The package dataset \code{\link{contdry}} contains
+a pre-computed 2022 example.}
+
+\item{pot_wet}{\code{\link[terra]{SpatRaster}} (or \code{PackedSpatRaster})
+of Upper Floridan Aquifer potentiometric head for the wet season, as
+returned by \code{\link{util_gw_getcontour}} with
+\code{season = "wet"}. The package dataset \code{\link{contwet}} contains
+a pre-computed 2022 example.}
+
+\item{yrrng}{integer vector of length 2, start and end year for the load
+estimates, e.g. \code{c(2022, 2024)}. The same gradients derived from
+\code{pot_dry} and \code{pot_wet} are applied to every year in the range.}
 
 \item{wqdat}{data frame of Floridan aquifer TN and TP concentrations (mg/L)
 as returned by \code{\link{util_gw_getwq}}, with columns \code{bay_seg},
@@ -22,10 +36,6 @@ concentrations from the 2022-2024 loading analysis are used.}
 
 \item{summtime}{character, temporal summarization: \code{'month'} (default)
 returns one row per segment per month, \code{'year'} sums to annual totals.}
-
-\item{verbose}{logical, if \code{TRUE} (default) progress messages from
-\code{\link{util_gw_getcontour}} are printed during download and
-interpolation.}
 }
 \value{
 A data frame with columns:
@@ -58,12 +68,12 @@ where \eqn{C} is the TN or TP concentration (mg/L). Hydrologic load
 (m\eqn{^3}/month) is \eqn{Q \cdot 3785 \cdot 30.5}.
 
 \strong{Hydraulic gradients:}
-For each year in \code{yrrng}, dry- and wet-season FDEP potentiometric
-surface contours are downloaded via \code{\link{util_gw_getcontour}},
-rasterized to a 1-mile grid, and passed to \code{\link{util_gw_grad}} to
-compute segment-specific gradients.  This requires an internet connection
-and takes a few minutes per year.  See \code{\link{util_gw_grad}} for
-details on search areas, zero-gradient segments, and benchmark warnings.
+Gradients are computed once from \code{pot_dry} and \code{pot_wet} via
+\code{\link{util_gw_grad}} and applied to every year in \code{yrrng}.
+Update \code{pot_dry} and \code{pot_wet} with fresh outputs from
+\code{\link{util_gw_getcontour}} when new FDEP potentiometric surface maps
+become available. See \code{\link{util_gw_grad}} for details on search
+areas, zero-gradient segments, and benchmark warnings.
 
 \strong{Surficial and intermediate aquifers:}
 Loads are fixed constants per segment. Surficial values are from
@@ -75,16 +85,28 @@ These have not changed since the original analysis.
 Months 1-6 and 11-12 are dry season; months 7-10 are wet season.
 }
 \examples{
-\dontrun{
-# monthly segment loads (requires internet)
-gw <- anlz_gw(yrrng = c(2022, 2024))
+# contdry and contwet are pre-computed 2022 package datasets
+gw <- anlz_gw(contdry, contwet, yrrng = c(2022, 2024))
 head(gw)
 
 # annual totals
-anlz_gw(yrrng = c(2022, 2024), summtime = 'year')
+anlz_gw(contdry, contwet, yrrng = c(2022, 2024), summtime = 'year')
+
+\dontrun{
+# update rasters from FDEP for a new year, then compute loads
+pot_dry <- util_gw_getcontour("dry", 2025)
+pot_wet <- util_gw_getcontour("wet", 2025)
+gw <- anlz_gw(pot_dry, pot_wet, yrrng = c(2025, 2025))
 
 # pass concentrations from the Water Atlas API
-gw <- anlz_gw(yrrng = c(2022, 2024), wqdat = util_gw_getwq())
-head(gw)
+gw <- anlz_gw(pot_dry, pot_wet, yrrng = c(2025, 2025),
+              wqdat = util_gw_getwq())
 }
+}
+\references{
+Zarbock, H., A. Janicki, D. Wade, D. Heimbuch, and H. Wilson. 1994.
+Estimates of Total Nitrogen, Total Phosphorus, and Total Suspended Solids
+Loadings to Tampa Bay, Florida. Technical Publication #04-94. Prepared by
+Coastal Environmental, Inc. Prepared for Tampa Bay National Estuary Program.
+St. Petersburg, FL.
 }
