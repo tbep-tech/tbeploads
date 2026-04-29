@@ -4,7 +4,12 @@
 \alias{anlz_gw}
 \title{Calculate groundwater loads to Tampa Bay segments}
 \usage{
-anlz_gw(yrrng = c(2022, 2024), wqdat = NULL, summtime = c("month", "year"))
+anlz_gw(
+  yrrng = c(2022, 2024),
+  wqdat = NULL,
+  summtime = c("month", "year"),
+  verbose = TRUE
+)
 }
 \arguments{
 \item{yrrng}{integer vector of length 2, start and end year, e.g.
@@ -17,6 +22,10 @@ concentrations from the 2022-2024 loading analysis are used.}
 
 \item{summtime}{character, temporal summarization: \code{'month'} (default)
 returns one row per segment per month, \code{'year'} sums to annual totals.}
+
+\item{verbose}{logical, if \code{TRUE} (default) progress messages from
+\code{\link{util_gw_getcontour}} are printed during download and
+interpolation.}
 }
 \value{
 A data frame with columns:
@@ -49,17 +58,12 @@ where \eqn{C} is the TN or TP concentration (mg/L). Hydrologic load
 (m\eqn{^3}/month) is \eqn{Q \cdot 3785 \cdot 30.5}.
 
 \strong{Hydraulic gradients:}
-The gradient section below contains a commented-out framework that calls
-\code{\link{util_gw_getcontour}} and \code{\link{util_gw_grad}} to compute
-gradients dynamically from FDEP potentiometric surface contours. The key
-challenge is that potentiometric high points for some segments (notably Old
-Tampa Bay) lie north of the subwatershed boundary; \code{util_gw_getcontour}
-accepts a \code{buf_dist} argument and \code{util_gw_grad} accepts a
-\code{buf_segs} argument to expand the search area for those segments.
-Until the buffer distances are calibrated against known SAS gradients,
-hardcoded gradient values from the 2021 FDEP potentiometric surface map are
-used (the same values applied for 2022-2024 in the original SAS analysis,
-as no updated contours were available at that time).
+For each year in \code{yrrng}, dry- and wet-season FDEP potentiometric
+surface contours are downloaded via \code{\link{util_gw_getcontour}},
+rasterized to a 1-mile grid, and passed to \code{\link{util_gw_grad}} to
+compute segment-specific gradients.  This requires an internet connection
+and takes a few minutes per year.  See \code{\link{util_gw_grad}} for
+details on search areas, zero-gradient segments, and benchmark warnings.
 
 \strong{Surficial and intermediate aquifers:}
 Loads are fixed constants per segment. Surficial values are from
@@ -71,15 +75,14 @@ These have not changed since the original analysis.
 Months 1-6 and 11-12 are dry season; months 7-10 are wet season.
 }
 \examples{
-# monthly segment loads using hardcoded 2022-2024 gradients and concentrations
+\dontrun{
+# monthly segment loads (requires internet)
 gw <- anlz_gw(yrrng = c(2022, 2024))
 head(gw)
 
 # annual totals
-gw <- anlz_gw(yrrng = c(2022, 2024), summtime = 'year')
-head(gw)
+anlz_gw(yrrng = c(2022, 2024), summtime = 'year')
 
-\dontrun{
 # pass concentrations from the Water Atlas API
 gw <- anlz_gw(yrrng = c(2022, 2024), wqdat = util_gw_getwq())
 head(gw)

@@ -2,70 +2,66 @@
 % Please edit documentation in R/util_gw_getcontour.R
 \name{util_gw_getcontour}
 \alias{util_gw_getcontour}
-\title{Download FDEP Upper Floridan Aquifer potentiometric surface contour lines}
+\title{Download and rasterize FDEP Upper Floridan Aquifer potentiometric surface}
 \usage{
 util_gw_getcontour(
   season = c("dry", "wet"),
   yr,
   max_records = 1000,
-  north_dist = 0,
   verbose = TRUE
 )
 }
 \arguments{
-\item{season}{character, \code{"dry"} or \code{"wet"}}
+\item{season}{character, \code{"dry"} or \code{"wet"}.}
 
 \item{yr}{integer, year for which to retrieve data. Biannual (May/September)
-observations are available from 2010 through 2022.}
+observations are available from approximately 2010 onward.}
 
-\item{max_records}{integer, maximum number of records per paginated request.
-Default is 1000.}
+\item{max_records}{integer, maximum records per paginated API request.
+Default 1000.}
 
-\item{north_dist}{numeric, distance in CRS units (US Survey Feet for EPSG
-6443) to extend the spatial filter and clipping boundary northward beyond
-the Tampa Bay watershed (\code{\link{tbfullshed}}). Use a positive value
-when the potentiometric high point for one or more bay segments lies north
-of the watershed boundary (e.g., Old Tampa Bay). The same value (or larger)
-should be passed as \code{north_dist} in \code{\link{util_gw_grad}} so
-that the returned contours cover the extended search areas. Default 0 (no
-extension).}
-
-\item{verbose}{logical, if \code{TRUE} (default) progress messages are
-printed during download.}
+\item{verbose}{logical, print download and interpolation progress.
+Default \code{TRUE}.}
 }
 \value{
-An \code{\link[sf]{sf}} object of \code{LINESTRING} features with
-columns \code{CONTOUR} (integer, feet MSL) and \code{MONTH_YEAR}
-(character), in the same CRS as \code{\link{tbfullshed}} (EPSG 6443).
-Returns \code{NULL} if no features are found for the requested
-season/year.
+A \code{\link[terra]{SpatRaster}} of potentiometric head (ft above
+MSL) at 1-mile resolution in the CRS of \code{\link{tbfullshed}} (EPSG
+6443). Returns \code{NULL} with a warning if no features are found for the
+requested season/year.
 }
 \description{
-Download FDEP Upper Floridan Aquifer potentiometric surface contour lines
+Download and rasterize FDEP Upper Floridan Aquifer potentiometric surface
 }
 \details{
-Downloads contour lines representing the potentiometric surface of the Upper
-Floridan Aquifer from the Florida Department of Environmental Protection /
-Florida Geological Survey ArcGIS REST service
-(\url{https://ca.dep.state.fl.us/arcgis/rest/services/OpenData/FGS_PUBLIC/MapServer/8}).
+Downloads Upper Floridan Aquifer potentiometric surface contour lines from
+the FDEP / Florida Geological Survey ArcGIS REST service
+(\url{https://ca.dep.state.fl.us/arcgis/rest/services/OpenData/FGS_PUBLIC/MapServer/8})
+and interpolates them to a 1-mile \code{SpatRaster} using inverse distance
+weighting (IDW).
 
-Contours are available biannually: \code{"dry"} season maps to May of
-\code{yr} and \code{"wet"} season maps to September of \code{yr}.
-Results are spatially filtered to the Tampa Bay watershed
-(\code{\link{tbfullshed}}), optionally extended northward by
-\code{north_dist}, and clipped to that boundary before return.
+\strong{Spatial extent:} The API query covers the Tampa Bay watershed
+(\code{\link{tbfullshed}}) buffered outward by 40 miles (211,200 US Survey
+Feet), converted to WGS84. This wider extent captures the Polk County
+potentiometric highlands that drive groundwater flow to Hillsborough Bay and
+surrounding segments.
 
-The \code{CONTOUR} field contains potentiometric surface elevations in feet
-above mean sea level. These are used to compute the hydraulic
-gradient driving Floridan Aquifer discharge to Tampa Bay segments (Darcy's
-Law).
+\strong{Interpolation:} Contour line vertices are used as elevation
+observations and interpolated to a 1-mile grid via IDW (5-mile radius,
+power = 2). Cells more than 5 miles from any contour vertex are left
+\code{NA} to avoid extrapolation into data-sparse regions. Five passes of a
+3x3 focal mean then fill small gaps. The 5-mile radius was chosen to bridge
+typical contour spacing in the Tampa Bay region without extrapolating into
+the panhandle or coastal areas.
+
+\strong{Season mapping:}
+\itemize{
+\item \code{"dry"} maps to May of \code{yr}
+\item \code{"wet"} maps to September of \code{yr}
+}
 }
 \examples{
 \dontrun{
-dry_contours <- util_gw_getcontour("dry", 2022)
-wet_contours <- util_gw_getcontour("wet", 2022)
-
-# extend north by ~28 miles for OTB high-point search
-dry_contours <- util_gw_getcontour("dry", 2022, north_dist = 150000)
+pot_dry <- util_gw_getcontour("dry", 2022)
+pot_wet <- util_gw_getcontour("wet", 2022)
 }
 }

@@ -3,40 +3,36 @@
 \docType{data}
 \name{contwet}
 \alias{contwet}
-\title{Upper Floridan Aquifer potentiometric surface contour lines, wet season 2022}
+\title{Upper Floridan Aquifer potentiometric surface raster, wet season 2022}
 \format{
-A \code{\link[sf]{sf}} object
+A \code{PackedSpatRaster} (see \code{\link[terra]{wrap}})
+representing a 1-mile resolution grid of potentiometric head (ft above
+MSL) for the wet season. Unwrap with \code{terra::unwrap(contwet)} to
+obtain a \code{\link[terra]{SpatRaster}}.
 }
 \usage{
 contwet
 }
 \description{
-Upper Floridan Aquifer potentiometric surface contour lines, wet season 2022
+Upper Floridan Aquifer potentiometric surface raster, wet season 2022
 }
 \details{
-Contour lines representing the potentiometric surface of the Upper
-Floridan Aquifer for the wet season (September 2022), clipped to the Tampa
-Bay watershed (\code{\link{tbfullshed}}). Retrieved from the FDEP / Florida
-Geological Survey ArcGIS REST service. The data includes the following
-columns.
+Interpolated from Upper Floridan Aquifer potentiometric surface contour
+lines (September 2022) downloaded from the FDEP / Florida Geological Survey
+ArcGIS REST service using \code{\link{util_gw_getcontour}}. The spatial
+extent covers the Tampa Bay watershed (\code{\link{tbfullshed}}) buffered
+outward by 40 miles. Interpolation used inverse distance weighting (IDW,
+5-mile radius, power = 2) followed by five passes of a 3x3 focal mean gap
+fill. Projection is NAD83(2011) / Florida GDL Albers (ftUS), CRS 6443.
 
-\itemize{
-\item \code{CONTOUR}: Integer, potentiometric surface elevation in feet
-above mean sea level (range 10-110 ft for the Tampa Bay area)
-\item \code{MONTH_YEAR}: Character, survey date (\code{"September 2022"})
-\item \code{geometry}: The geometry column (LINESTRING)
-}
-
-Wet season is represented by September observations. Dry season equivalent
-is \code{\link{contdry}}.
-
-Projection is NAD83(2011) / Florida West (ftUS), CRS 6443.
+Dry season equivalent is \code{\link{contdry}}.
 }
 \examples{
 \dontrun{
-contwet <- util_gw_getcontour("wet", 2022)
+pot_wet <- util_gw_getcontour("wet", 2022)
+contwet <- terra::wrap(pot_wet)
 save(contwet, file = "data/contwet.RData", compress = "xz")
 }
-contwet
+terra::unwrap(contwet)
 }
 \keyword{datasets}

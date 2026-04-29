@@ -1,45 +1,64 @@
-#' Visualise the hydraulic gradient line for a bay segment
+#' Visualise the hydraulic gradient for a bay segment
 #'
-#' @param contours \code{\link[sf]{sf}} object of Upper Floridan Aquifer contour
-#'   lines as returned by \code{\link{util_gw_getcontour}}.
+#' @param pot_rast \code{\link[terra]{SpatRaster}} (or \code{PackedSpatRaster})
+#'   of Upper Floridan Aquifer potentiometric head (ft above MSL) as returned
+#'   by \code{\link{util_gw_getcontour}}, or the package datasets
+#'   \code{\link{contdry}} / \code{\link{contwet}}.
+#' @param season character, \code{"dry"} or \code{"wet"}.
 #' @param seg integer, bay segment number (1-7).
 #' @param segs \code{\link[sf]{sf}} object of sub-watershed polygons. Defaults
 #'   to \code{\link{tbsubshed}}.
-#' @param shoreline \code{\link[sf]{sf}} object of bay segment polygons used to
-#'   measure distance from the watershed high point to the bay. Defaults to
-#'   \code{\link{tbsegdetail}}.
-#' @param north_segs named numeric vector of northward extension distances (in
-#'   CRS units, US Survey Feet for EPSG 6443), in the same format accepted by
-#'   \code{\link{util_gw_grad}}. Default \code{NULL} (no extension).
-#' @param buf_segs named numeric vector of omnidirectional buffer distances (in
-#'   CRS units, US Survey Feet for EPSG 6443), in the same format accepted by
-#'   \code{\link{util_gw_grad}}. When supplied for the requested segment, the
-#'   search area shown is the buffered subwatershed with all bay water removed.
-#'   Default \code{NULL} (no buffering).
+#' @param shoreline \code{\link[sf]{sf}} object of bay segment polygons.
+#'   Defaults to \code{\link{tbsegdetail}}.
+#' @param buf_segs named numeric vector of buffer distances (US Survey Feet)
+#'   in the same format accepted by \code{\link{util_gw_grad}}. When
+#'   \code{NULL}, season-specific defaults are used (see
+#'   \code{\link{util_gw_grad}} for details).
 #'
 #' @details
-#' Returns a \code{ggplot2} map showing, for the requested segment: the
-#' subwatershed search area (optionally extended or buffered), all clipped
-#' contour lines coloured by elevation, the maximum-elevation contour
-#' highlighted in red, the representative high point used in the gradient
-#' computation, and a dashed line to the nearest bay shoreline point.  The
-#' plot subtitle reports the elevation, straight-line distance (miles), and
-#' computed gradient (ft/mile).
-#'
-#' For segment 2 (Hillsborough Bay) the visualisation shows the single
-#' max-contour approach rather than the weighted three-zone calculation used
-#' in \code{\link{util_gw_grad}}.
+#' Returns a \code{ggplot2} map for the requested segment showing:
+#' \itemize{
+#'   \item The potentiometric surface (ft) within the search area, coloured by
+#'     head value.
+#'   \item The search area boundary (light yellow).
+#'   \item All bay segments (grey background) and the target segment (blue).
+#'   \item A dotted line from the bay centroid to the max-head land cell
+#'     (showing the full transect used in the distance calculation).
+#'   \item A dashed line for the land portion of that transect (the actual
+#'     gradient distance).
+#'   \item The max-head point (red dot).
+#' }
+#' The subtitle reports max head (ft), distance (miles), and gradient (ft/mi).
+#' See \code{\link{util_gw_grad}} for the distance calculation methodology.
 #'
 #' @return A \code{\link[ggplot2]{ggplot}} object.
 #'
 #' @export
 #'
 #' @examples
-#' util_gw_showgrad(contdry, seg = 1, north_segs = c("1" = 150000))
-#' util_gw_showgrad(contwet, seg = 3)
-#' util_gw_showgrad(contwet, seg = 7, buf_segs = c("7" = 100000))
-util_gw_showgrad <- function(contours, seg, segs = tbsubshed, shoreline = tbsegdetail,
-                             north_segs = NULL, buf_segs = NULL) {
+#' \dontrun{
+#' pot_dry <- util_gw_getcontour("dry", 2022)
+#' util_gw_showgrad(pot_dry, season = "dry", seg = 1)
+#' util_gw_showgrad(pot_dry, season = "dry", seg = 3)
+#'
+#' pot_wet <- util_gw_getcontour("wet", 2022)
+#' util_gw_showgrad(pot_wet, season = "wet", seg = 4)
+#' util_gw_showgrad(pot_wet, season = "wet", seg = 7)
+#' }
+util_gw_showgrad <- function(pot_rast, season = c("dry", "wet"), seg,
+                              segs = tbsubshed, shoreline = tbsegdetail,
+                              buf_segs = NULL) {
+
+  season <- match.arg(season)
+
+  if (inherits(pot_rast, "PackedSpatRaster"))
+    pot_rast <- terra::unwrap(pot_rast)
+
+  if (is.null(buf_segs))
+    buf_segs <- if (season == "dry")
+      c("1" = 100000)
+    else
+      c("1" = 100000, "4" = 100000, "6" = 100000, "7" = 100000)
 
   seg_names <- c(
     "1" = "Old Tampa Bay",    "2" = "Hillsborough Bay",
@@ -48,73 +67,66 @@ util_gw_showgrad <- function(contours, seg, segs = tbsubshed, shoreline = tbsegd
     "7" = "Manatee River"
   )
 
-  watershed <- dplyr::filter(segs, .data$bay_seg == seg)
-  seg_key   <- as.character(seg)
-  all_bay   <- sf::st_union(sf::st_geometry(shoreline))
+  bay_water <- terra::rasterize(terra::vect(shoreline), pot_rast, field = 1)
+  land_mask <- terra::ifel(is.na(bay_water), 1, NA)
 
-  if (!is.null(north_segs) && seg_key %in% names(north_segs)) {
-    ws_geom <- sf::st_union(watershed)
-    bb      <- sf::st_bbox(ws_geom)
-    xmin    <- as.numeric(bb["xmin"]); xmax <- as.numeric(bb["xmax"])
-    ymax    <- as.numeric(bb["ymax"])
-    dist    <- north_segs[[seg_key]]
-    north_rect <- sf::st_sfc(
-      sf::st_polygon(list(matrix(c(
-        xmin, ymax, xmax, ymax, xmax, ymax + dist,
-        xmin, ymax + dist, xmin, ymax
-      ), ncol = 2, byrow = TRUE))),
-      crs = sf::st_crs(watershed)
-    )
-    search_area <- sf::st_union(ws_geom, north_rect)
+  search_area <- build_search_area(seg, segs, shoreline, buf_segs)
+  search_v    <- terra::vect(sf::st_as_sf(search_area))
+  zone_mask   <- terra::rasterize(search_v, pot_rast, field = 1)
+  masked      <- pot_rast * zone_mask * land_mask
 
-  } else if (!is.null(buf_segs) && seg_key %in% names(buf_segs)) {
-    ws_geom     <- sf::st_union(watershed)
-    buffered    <- sf::st_buffer(ws_geom, dist = buf_segs[[seg_key]])
-    search_area <- suppressWarnings(sf::st_difference(buffered, all_bay))
+  if (all(is.na(terra::values(masked))))
+    stop("No land cells in search area for segment ", seg)
 
-  } else {
-    search_area <- sf::st_union(watershed)
-  }
+  r <- grad_from_rast(masked, seg, shoreline)
+  if (is.null(r))
+    stop("Could not compute gradient for segment ", seg)
 
-  shore     <- dplyr::filter(shoreline, .data$bay_seg == seg)
-  cont_clip <- suppressWarnings(sf::st_intersection(contours, search_area))
+  # Land portion of the centroid-to-head line (the gradient distance)
+  line_land <- suppressWarnings(
+    sf::st_difference(r$line_sfc, r$shore_uni)
+  )
 
-  if (nrow(cont_clip) == 0L)
-    stop("No contours found within search area for segment ", seg)
+  search_ext <- terra::ext(search_v)
+  buf_ft     <- 52800  # 10-mile context buffer
+  crop_ext   <- terra::ext(
+    search_ext$xmin - buf_ft, search_ext$xmax + buf_ft,
+    search_ext$ymin - buf_ft, search_ext$ymax + buf_ft
+  )
+  rast_df <- as.data.frame(terra::crop(masked, crop_ext), xy = TRUE)
+  names(rast_df)[3] <- "elev"
+  rast_df <- rast_df[!is.na(rast_df$elev), ]
 
-  max_elev <- max(cont_clip$CONTOUR, na.rm = TRUE)
-  max_cont <- dplyr::filter(cont_clip, .data$CONTOUR == max_elev)
-
-  high_pt      <- sf::st_point_on_surface(sf::st_union(sf::st_geometry(max_cont)))
-  shore_union  <- sf::st_union(sf::st_geometry(shore))
-  nearest_line <- sf::st_nearest_points(high_pt, shore_union)
-
-  dist_ft <- as.numeric(sf::st_length(nearest_line))
-  grad    <- max_elev / (dist_ft / 5280)
-
-  search_sf <- sf::st_sf(geometry = search_area)
-  high_sf   <- sf::st_sf(geometry = high_pt)
-  line_sf   <- sf::st_sf(geometry = nearest_line)
-
-  season_lab <- unique(contours$MONTH_YEAR)
+  search_sf  <- sf::st_sf(geometry = sf::st_sfc(search_area,
+                                                 crs = sf::st_crs(shoreline)))
+  shore_sf   <- dplyr::filter(shoreline, .data$bay_seg == seg)
+  season_lab <- if (season == "dry") "Dry season" else "Wet season"
 
   ggplot2::ggplot() +
     ggplot2::geom_sf(data = search_sf, fill = "lightyellow", alpha = 0.6,
                      color = "grey50", linewidth = 0.4) +
-    ggplot2::geom_sf(data = cont_clip,
-                     ggplot2::aes(color = .data$CONTOUR), linewidth = 0.6) +
-    ggplot2::scale_color_viridis_c(name = "Elevation (ft)", option = "plasma") +
-    ggplot2::geom_sf(data = shore, fill = "steelblue", alpha = 0.5, color = NA) +
-    ggplot2::geom_sf(data = max_cont, color = "red", linewidth = 1.3) +
-    ggplot2::geom_sf(data = line_sf, color = "black", linewidth = 1.0,
-                     linetype = "dashed") +
-    ggplot2::geom_sf(data = high_sf, color = "red", size = 3.5, shape = 16) +
+    ggplot2::geom_raster(data = rast_df,
+                         ggplot2::aes(x = x, y = y, fill = elev)) +
+    ggplot2::scale_fill_viridis_c(name = "Head (ft)", option = "plasma",
+                                   na.value = NA) +
+    ggplot2::geom_sf(data = shoreline, fill = "grey80", alpha = 0.3,
+                     color = "grey60", linewidth = 0.2) +
+    ggplot2::geom_sf(data = shore_sf, fill = "steelblue", alpha = 0.6,
+                     color = "steelblue4", linewidth = 0.5) +
+    ggplot2::geom_sf(data = sf::st_sf(geometry = r$line_sfc),
+                     color = "grey40", linewidth = 0.5, linetype = "dotted") +
+    ggplot2::geom_sf(data = sf::st_sf(geometry = line_land),
+                     color = "black", linewidth = 1.0, linetype = "dashed") +
+    ggplot2::geom_sf(data = r$max_sf, color = "red", size = 3.5, shape = 16) +
+    ggplot2::coord_sf(crs = sf::st_crs(shoreline),
+                      xlim = c(search_ext$xmin - buf_ft, search_ext$xmax + buf_ft),
+                      ylim = c(search_ext$ymin - buf_ft, search_ext$ymax + buf_ft)) +
     ggplot2::labs(
-      title    = sprintf("Seg %d: %s — %s", seg, seg_names[seg_key], season_lab),
-      subtitle = sprintf(
-        "Max contour: %d ft | Distance: %.1f mi | Gradient: %.3f ft/mi",
-        max_elev, dist_ft / 5280, grad
-      )
+      title    = sprintf("Seg %d: %s — %s", seg,
+                         seg_names[as.character(seg)], season_lab),
+      subtitle = sprintf("Max head: %.1f ft | Distance: %.1f mi | Gradient: %.3f ft/mi",
+                         r$elev, r$dist_mi, r$grad),
+      x = NULL, y = NULL
     ) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position = "right")

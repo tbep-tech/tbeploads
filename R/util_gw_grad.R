@@ -1,179 +1,137 @@
-#' Compute hydraulic gradient per bay segment from UFA potentiometric surface contours
+#' Compute hydraulic gradient per bay segment from potentiometric surface raster
 #'
-#' @param contours \code{\link[sf]{sf}} object of Upper Floridan Aquifer contour
-#'   lines produced by \code{\link{util_gw_getcontour}}.
+#' @param pot_rast \code{\link[terra]{SpatRaster}} (or \code{PackedSpatRaster})
+#'   of Upper Floridan Aquifer potentiometric head (ft above MSL) as returned
+#'   by \code{\link{util_gw_getcontour}}, or the package datasets
+#'   \code{\link{contdry}} / \code{\link{contwet}}.
+#' @param season character, \code{"dry"} or \code{"wet"}.
 #' @param segs \code{\link[sf]{sf}} object of sub-watershed polygons. Defaults
 #'   to \code{\link{tbsubshed}}.
-#' @param shoreline \code{\link[sf]{sf}} object of bay segment polygons used to
-#'   measure distance from the watershed high point to the bay. Defaults to
+#' @param shoreline \code{\link[sf]{sf}} object of bay segment polygons used
+#'   to derive the bay water mask and measure distances. Defaults to
 #'   \code{\link{tbsegdetail}}.
-#' @param north_segs named numeric vector mapping bay segment IDs to northward
-#'   extension distances (in CRS units, US Survey Feet for EPSG 6443). Segments
-#'   listed here have a rectangular extension appended to the north side of
-#'   their sub-watershed polygon before the contour clipping step, allowing the
-#'   high-point search to reach potentiometric highs that lie north of the
-#'   standard subwatershed boundary.  Use this for segments such as Old Tampa
-#'   Bay (segment 1) where the high point is north of the subwatershed. Names
-#'   must be coercible to the integer bay segment IDs in \code{segs}.  The
-#'   \code{contours} passed to this function must already cover the extended
-#'   area — pass the same distance (or larger) as \code{north_dist} in
-#'   \code{\link{util_gw_getcontour}}.  Default \code{NULL} (no extension).
-#' @param buf_segs named numeric vector mapping bay segment IDs to omnidirectional
-#'   buffer distances (in CRS units, US Survey Feet for EPSG 6443). Segments
-#'   listed here have their sub-watershed polygon buffered outward by the given
-#'   distance, and then all bay water (\code{shoreline}) is removed from that
-#'   buffer with \code{\link[sf]{st_difference}} before contour clipping.  This
-#'   allows the high-point search to extend beyond the subwatershed onto
-#'   surrounding land without accidentally capturing potentiometric contours
-#'   that pass under the open bay.  Segments listed in \code{buf_segs} are
-#'   removed from the default zero-gradient set and computed dynamically.  Use
-#'   this for segments such as Lower Tampa Bay (4), Terra Ceia Bay (6), and
-#'   Manatee River (7) whose wet-season high points lie outside the
-#'   subwatershed.  The \code{contours} passed to this function must already
-#'   cover the buffered area — pass an equivalent or larger value as
-#'   \code{north_dist} in \code{\link{util_gw_getcontour}} if the buffer extends
-#'   north of the watershed.  Default \code{NULL} (no buffering).
+#' @param buf_segs named numeric vector mapping bay segment IDs (as character
+#'   strings) to omnidirectional buffer distances in US Survey Feet (CRS 6443).
+#'   The subwatershed for each listed segment is buffered outward by the given
+#'   distance and bay water is removed before the potentiometric high-point
+#'   search. Listing a segment here also removes it from the default
+#'   zero-gradient set so it is computed dynamically. When \code{NULL},
+#'   season-specific defaults are used (see Details).
 #'
 #' @details
-#' Computes the Floridan aquifer hydraulic gradient \eqn{I} (ft/mile) for each
-#' bay segment using Darcy's Law as applied in the Tampa Bay loading model
-#' (Zarbock et al., 1994):
+#' Computes the Floridan Aquifer hydraulic gradient \eqn{I} (ft/mile) per bay
+#' segment using the Darcy's Law framework of Zarbock et al. (1994):
 #'
 #' \deqn{I = \frac{\text{elevation (ft)}}{\text{distance to shoreline (miles)}}}
 #'
-#' where elevation is the maximum UFA potentiometric surface contour value
-#' within the (optionally extended) segment watershed, and distance is the
-#' straight-line distance from that contour's representative point to the
-#' nearest bay shoreline.
+#' The max potentiometric head within the search area is located in the
+#' interpolated raster and the distance is measured from the nearest shoreline
+#' crossing along the bay centroid-to-head transect (see below).
 #'
-#' The season (dry or wet) is inferred from the \code{MONTH_YEAR} field in
-#' \code{contours} (\code{"May"} = dry, \code{"September"} = wet). Segments
-#' with no reliably computable Floridan aquifer gradient receive a value of 0:
+#' \strong{Zero-gradient segments (hardcoded):}
+#' The following segments always receive a gradient of 0 based on the original
+#' SAS loading analysis (Zarbock et al., 1994; GWld2224_SASCode.txt):
 #' \itemize{
-#'   \item Dry season: segments 4, 5, 6, 7, 55
-#'   \item Wet season: segments 4, 5, 6, 7, 55 — Lower Tampa Bay, Terra Ceia
-#'     Bay, and Manatee River are included by default because the subwatershed
-#'     geometry does not reliably capture the correct potentiometric high point.
-#'     Supply \code{buf_segs} for any of these segments to compute them
-#'     dynamically using a buffered, bay-clipped search area instead.
+#'   \item Boca Ciega Bay (segments 5 and 55), both seasons: the urbanized
+#'     coastal watershed has no meaningful Floridan Aquifer recharge directed
+#'     toward the bay.
+#'   \item Lower Tampa Bay (4), Terra Ceia Bay (6), Manatee River (7), dry
+#'     season only: the potentiometric gradient is negligible during the dry
+#'     season. These segments are computed dynamically in the wet season via
+#'     the default \code{buf_segs}.
 #' }
+#' Any segment listed in \code{buf_segs} is removed from the zero set and
+#' computed dynamically.
 #'
-#' \strong{Search area expansion:}
-#' Two mechanisms are available and may be combined across different segments:
+#' \strong{Default buf_segs (calibrated against 2021 SAS reference values):}
 #' \itemize{
-#'   \item \code{north_segs}: appends a rectangular extension to the north face
-#'     of the subwatershed bounding box.  Best for segments (e.g., OTB) whose
-#'     high point lies directly north of the subwatershed.
-#'   \item \code{buf_segs}: omnidirectional buffer with bay water removed.  Best
-#'     for segments (e.g., LTB, TCB, MR) whose high point lies east or
-#'     southeast of the subwatershed.  Removing the bay polygon prevents the
-#'     algorithm from matching potentiometric contours that pass under open water.
+#'   \item Dry season: \code{c("1" = 100000)} -- Old Tampa Bay subwatershed
+#'     buffered ~19 miles; captures the potentiometric high north/northeast of
+#'     the standard watershed boundary.
+#'   \item Wet season: \code{c("1" = 100000, "4" = 100000, "6" = 100000,
+#'     "7" = 100000)} -- adds LTB, TCB, and MR (each ~19 miles) to unlock
+#'     wet-season computation for those segments.
 #' }
+#' Buffer distances were tuned to produce gradients within ~15\% of the 2021
+#' FDEP potentiometric surface values used in the SAS analysis.
+#'
+#' \strong{Distance calculation:}
+#' Rather than measuring from the potentiometric high to the nearest shoreline
+#' point (which can hit an extreme geographic corner), the function draws a
+#' line from the bay segment centroid to the max-head cell. The portion of that
+#' line inside the bay polygon is subtracted from the total length, giving the
+#' distance from the shoreline crossing point to the high point along a
+#' representative transect.
 #'
 #' \strong{Hillsborough Bay (segment 2):}
-#' Segment 2 uses a weighted average of three sub-zone gradients following the
-#' original flow net analysis. Sub-zones are constructed by unioning
-#' \code{\link{tbdbasin}} drainage basins:
-#' \itemize{
-#'   \item Polk County drainage (weight 0.4): basins 02301000, 02301500
-#'   \item Pasco County / Hillsborough River drainage (weight 0.3): basins
-#'     02300700, 02301300, 02301750, TBYPASS
-#'   \item Alafia River drainage (weight 0.3): basins 02301695, 02303000,
-#'     02303330, 02304500, 204-2, 205-2, 206-2
-#' }
+#' Uses a three-zone weighted gradient (Polk County 0.4, Pasco County 0.3,
+#' Alafia River 0.3) following the original flow net analysis. Sub-zones are
+#' constructed from \code{\link{tbdbasin}} drainage basins as in the original
+#' SAS code.
 #'
-#' @return A data frame with columns:
-#' \itemize{
-#'   \item \code{bay_seg}: integer, bay segment number
-#'   \item \code{grad}: numeric, hydraulic gradient (ft/mile); 0 for segments
-#'     with no reliably computable Floridan aquifer gradient
-#' }
+#' \strong{Benchmark warning:}
+#' After computing gradients, each non-zero segment is compared against the
+#' 2021 SAS reference values (GWld2224_SASCode.txt). A warning is issued for
+#' any segment whose computed gradient deviates by more than 50\% from its
+#' reference, indicating a potentially anomalous potentiometric surface or a
+#' need to revisit the \code{buf_segs} configuration.
+#'
+#' @return A data frame with columns \code{bay_seg} (integer) and \code{grad}
+#'   (numeric, ft/mile; 0 for zero-gradient segments).
 #'
 #' @export
 #'
 #' @examples
-#' util_gw_grad(contdry)
-#' util_gw_grad(contwet)
-util_gw_grad <- function(contours, segs = tbsubshed, shoreline = tbsegdetail,
-                         north_segs = NULL, buf_segs = NULL) {
+#' \dontrun{
+#' pot_dry <- util_gw_getcontour("dry", 2022)
+#' util_gw_grad(pot_dry, season = "dry")
+#'
+#' pot_wet <- util_gw_getcontour("wet", 2022)
+#' util_gw_grad(pot_wet, season = "wet")
+#' }
+util_gw_grad <- function(pot_rast, season = c("dry", "wet"),
+                          segs = tbsubshed, shoreline = tbsegdetail,
+                          buf_segs = NULL) {
 
-  # Infer season from MONTH_YEAR
-  month_year <- unique(contours$MONTH_YEAR)
-  if (length(month_year) != 1)
-    stop("contours must contain a single MONTH_YEAR value; found: ",
-         paste(month_year, collapse = ", "))
-  season <- if (grepl("May", month_year)) "dry" else "wet"
+  season <- match.arg(season)
 
-  # Segments with no reliably computable gradient (set to zero).
-  # LTB (4), TCB (6), and MR (7) are zero in wet season by default because
-  # subwatershed geometry does not reliably locate the correct potentiometric
-  # high point; the 2022-2024 SAS values for those segments were read manually
-  # from the 2021 FDEP map.  Supplying buf_segs for any of these overrides the
-  # zero and computes the gradient using a buffered, bay-clipped search area.
-  zero_segs <- if (season == "dry") c(4L, 5L, 6L, 7L, 55L) else c(4L, 5L, 6L, 7L, 55L)
+  if (inherits(pot_rast, "PackedSpatRaster"))
+    pot_rast <- terra::unwrap(pot_rast)
+
+  if (is.null(buf_segs))
+    buf_segs <- if (season == "dry")
+      c("1" = 100000)
+    else
+      c("1" = 100000, "4" = 100000, "6" = 100000, "7" = 100000)
+
+  zero_segs <- c(4L, 5L, 6L, 7L, 55L)
   if (!is.null(buf_segs))
     zero_segs <- setdiff(zero_segs, as.integer(names(buf_segs)))
 
   active_segs <- setdiff(sort(unique(segs$bay_seg)), zero_segs)
 
-  # Union of all bay polygons used to remove open water from buffered search areas
-  all_bay <- sf::st_union(sf::st_geometry(shoreline))
+  bay_water <- terra::rasterize(terra::vect(shoreline), pot_rast, field = 1)
+  land_mask <- terra::ifel(is.na(bay_water), 1, NA)
 
-  # Basin-to-sub-zone lookup for Hillsborough Bay (segment 2)
   hb_zone_lookup <- data.frame(
     basin  = c("02301000", "02301500",
                "02300700", "02301300", "02301750", "TBYPASS",
                "02301695", "02303000", "02303330", "02304500",
                "204-2", "205-2", "206-2"),
-    zone   = c(rep("polk",   2L),
-               rep("pasco",  4L),
-               rep("alafia", 7L)),
+    zone   = c(rep("polk", 2L), rep("pasco", 4L), rep("alafia", 7L)),
     weight = c(rep(0.4, 2L), rep(0.3, 4L), rep(0.3, 7L)),
     stringsAsFactors = FALSE
   )
 
-  # Gradient for a single clipped contour set toward a bay segment polygon
-  grad_one <- function(cont_clip, shore_poly) {
-    if (nrow(cont_clip) == 0L) return(0)
-    max_elev <- max(cont_clip$CONTOUR, na.rm = TRUE)
-    max_cont <- dplyr::filter(cont_clip, .data$CONTOUR == max_elev)
-    high_pt  <- sf::st_point_on_surface(sf::st_union(sf::st_geometry(max_cont)))
-    dist_ft  <- min(as.numeric(sf::st_distance(high_pt, shore_poly)))
-    max_elev / (dist_ft / 5280)
-  }
-
   results <- lapply(active_segs, function(seg) {
 
-    watershed <- dplyr::filter(segs, .data$bay_seg == seg)
-    seg_key   <- as.character(seg)
-
-    if (!is.null(north_segs) && seg_key %in% names(north_segs)) {
-      ws_geom <- sf::st_union(watershed)
-      bb      <- sf::st_bbox(ws_geom)
-      xmin    <- as.numeric(bb["xmin"]); xmax <- as.numeric(bb["xmax"])
-      ymax    <- as.numeric(bb["ymax"])
-      dist    <- north_segs[[seg_key]]
-      north_rect <- sf::st_sfc(
-        sf::st_polygon(list(matrix(c(
-          xmin, ymax, xmax, ymax, xmax, ymax + dist,
-          xmin, ymax + dist, xmin, ymax
-        ), ncol = 2, byrow = TRUE))),
-        crs = sf::st_crs(watershed)
-      )
-      watershed <- sf::st_union(ws_geom, north_rect)
-
-    } else if (!is.null(buf_segs) && seg_key %in% names(buf_segs)) {
-      ws_geom   <- sf::st_union(watershed)
-      buffered  <- sf::st_buffer(ws_geom, dist = buf_segs[[seg_key]])
-      watershed <- suppressWarnings(sf::st_difference(buffered, all_bay))
-    }
-
-    shore     <- dplyr::filter(shoreline, .data$bay_seg == seg)
-    cont_clip <- suppressWarnings(sf::st_intersection(contours, watershed))
+    search_area <- build_search_area(seg, segs, shoreline, buf_segs)
+    zone_mask   <- terra::rasterize(
+      terra::vect(sf::st_as_sf(search_area)), pot_rast, field = 1
+    )
+    masked <- pot_rast * zone_mask * land_mask
 
     if (seg == 2L) {
-
-      # Union tbdbasin basins into three geographic sub-zones, clip to HB watershed
       zone_unioned <- tbdbasin |>
         dplyr::filter(.data$basin %in% hb_zone_lookup$basin) |>
         dplyr::group_by(.data$basin) |>
@@ -181,27 +139,60 @@ util_gw_grad <- function(contours, segs = tbsubshed, shoreline = tbsegdetail,
         dplyr::inner_join(hb_zone_lookup, by = "basin") |>
         dplyr::group_by(.data$zone, .data$weight) |>
         dplyr::summarise(geometry = sf::st_union(geometry), .groups = "drop")
-
-      zone_sf <- suppressWarnings(sf::st_intersection(zone_unioned, watershed))
-
-      zone_grads <- vapply(seq_len(nrow(zone_sf)), function(i) {
-        zc <- suppressWarnings(sf::st_intersection(cont_clip, zone_sf[i, ]))
-        grad_one(zc, shore)
-      }, numeric(1L))
-
-      grad <- sum(zone_sf$weight * zone_grads) / sum(zone_sf$weight)
-
-    } else {
-      grad <- grad_one(cont_clip, shore)
+      zone_sf <- suppressWarnings(
+        sf::st_intersection(zone_unioned, sf::st_as_sf(search_area))
+      )
+      zone_rows <- lapply(seq_len(nrow(zone_sf)), function(i) {
+        zm <- terra::rasterize(terra::vect(zone_sf[i, ]), pot_rast, field = 1)
+        r  <- grad_from_rast(pot_rast * zone_mask * zm * land_mask, 2L, shoreline)
+        list(weight = zone_sf$weight[i], grad = if (is.null(r)) NA_real_ else r$grad)
+      })
+      weights <- vapply(zone_rows, `[[`, numeric(1), "weight")
+      grads   <- vapply(zone_rows, `[[`, numeric(1), "grad")
+      valid   <- !is.na(grads)
+      grad    <- sum(weights[valid] * grads[valid]) / sum(weights[valid])
+      return(data.frame(bay_seg = 2L, grad = grad))
     }
 
-    data.frame(bay_seg = as.integer(seg), grad = grad)
+    r <- grad_from_rast(masked, seg, shoreline)
+    data.frame(bay_seg = as.integer(seg),
+               grad    = if (is.null(r)) NA_real_ else r$grad)
   })
 
-  dplyr::bind_rows(
+  out <- dplyr::bind_rows(
     results,
     data.frame(bay_seg = as.integer(zero_segs), grad = 0)
-  ) |>
-    dplyr::arrange(.data$bay_seg)
+  ) |> dplyr::arrange(.data$bay_seg)
+
+  # 2021 SAS reference gradients (GWld2224_SASCode.txt) used as benchmarks.
+  # Warn if any computed gradient deviates >50% from its reference value.
+  bench <- if (season == "dry")
+    c("1" = 100 / 27,
+      "2" = (120 / 43) * 0.4 + (100 / 25) * 0.3 + (80 / 31) * 0.3,
+      "3" = 50 / 31)
+  else
+    c("1" = 100 / 27,
+      "2" = (120 / 44) * 0.4 + (100 / 25) * 0.3 + (70 / 26) * 0.3,
+      "3" = 60 / 32,
+      "4" = 50 / 32,
+      "6" = 50 / 34,
+      "7" = 50 / 40)
+
+  for (nm in names(bench)) {
+    computed <- out$grad[out$bay_seg == as.integer(nm)]
+    ref      <- bench[[nm]]
+    if (length(computed) == 1L && !is.na(computed) && ref > 0 &&
+        (computed < 0.5 * ref || computed > 1.5 * ref)) {
+      warning(
+        sprintf(
+          "Segment %s %s-season gradient (%.3f ft/mi) deviates >50%% from the 2021 SAS benchmark (%.3f ft/mi). Check the potentiometric surface or buf_segs.",
+          nm, season, computed, ref
+        ),
+        call. = FALSE
+      )
+    }
+  }
+
+  out
 
 }

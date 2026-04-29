@@ -15,3 +15,4 @@
 ^R/ad_load_calc\.R$
 ^data/ad_rain_2021-2023\.Rdata$
 ^data/ad_loads_2021-2023\.Rdata$
+^\.claude$

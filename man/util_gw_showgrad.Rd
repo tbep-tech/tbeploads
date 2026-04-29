@@ -2,61 +2,68 @@
 % Please edit documentation in R/util_gw_showgrad.R
 \name{util_gw_showgrad}
 \alias{util_gw_showgrad}
-\title{Visualise the hydraulic gradient line for a bay segment}
+\title{Visualise the hydraulic gradient for a bay segment}
 \usage{
 util_gw_showgrad(
-  contours,
+  pot_rast,
+  season = c("dry", "wet"),
   seg,
   segs = tbsubshed,
   shoreline = tbsegdetail,
-  north_segs = NULL,
   buf_segs = NULL
 )
 }
 \arguments{
-\item{contours}{\code{\link[sf]{sf}} object of Upper Floridan Aquifer contour
-lines as returned by \code{\link{util_gw_getcontour}}.}
+\item{pot_rast}{\code{\link[terra]{SpatRaster}} (or \code{PackedSpatRaster})
+of Upper Floridan Aquifer potentiometric head (ft above MSL) as returned
+by \code{\link{util_gw_getcontour}}, or the package datasets
+\code{\link{contdry}} / \code{\link{contwet}}.}
+
+\item{season}{character, \code{"dry"} or \code{"wet"}.}
 
 \item{seg}{integer, bay segment number (1-7).}
 
 \item{segs}{\code{\link[sf]{sf}} object of sub-watershed polygons. Defaults
 to \code{\link{tbsubshed}}.}
 
-\item{shoreline}{\code{\link[sf]{sf}} object of bay segment polygons used to
-measure distance from the watershed high point to the bay. Defaults to
-\code{\link{tbsegdetail}}.}
+\item{shoreline}{\code{\link[sf]{sf}} object of bay segment polygons.
+Defaults to \code{\link{tbsegdetail}}.}
 
-\item{north_segs}{named numeric vector of northward extension distances (in
-CRS units, US Survey Feet for EPSG 6443), in the same format accepted by
-\code{\link{util_gw_grad}}. Default \code{NULL} (no extension).}
-
-\item{buf_segs}{named numeric vector of omnidirectional buffer distances (in
-CRS units, US Survey Feet for EPSG 6443), in the same format accepted by
-\code{\link{util_gw_grad}}. When supplied for the requested segment, the
-search area shown is the buffered subwatershed with all bay water removed.
-Default \code{NULL} (no buffering).}
+\item{buf_segs}{named numeric vector of buffer distances (US Survey Feet)
+in the same format accepted by \code{\link{util_gw_grad}}. When
+\code{NULL}, season-specific defaults are used (see
+\code{\link{util_gw_grad}} for details).}
 }
 \value{
 A \code{\link[ggplot2]{ggplot}} object.
 }
 \description{
-Visualise the hydraulic gradient line for a bay segment
+Visualise the hydraulic gradient for a bay segment
 }
 \details{
-Returns a \code{ggplot2} map showing, for the requested segment: the
-subwatershed search area (optionally extended or buffered), all clipped
-contour lines coloured by elevation, the maximum-elevation contour
-highlighted in red, the representative high point used in the gradient
-computation, and a dashed line to the nearest bay shoreline point.  The
-plot subtitle reports the elevation, straight-line distance (miles), and
-computed gradient (ft/mile).
-
-For segment 2 (Hillsborough Bay) the visualisation shows the single
-max-contour approach rather than the weighted three-zone calculation used
-in \code{\link{util_gw_grad}}.
+Returns a \code{ggplot2} map for the requested segment showing:
+\itemize{
+\item The potentiometric surface (ft) within the search area, coloured by
+head value.
+\item The search area boundary (light yellow).
+\item All bay segments (grey background) and the target segment (blue).
+\item A dotted line from the bay centroid to the max-head land cell
+(showing the full transect used in the distance calculation).
+\item A dashed line for the land portion of that transect (the actual
+gradient distance).
+\item The max-head point (red dot).
+}
+The subtitle reports max head (ft), distance (miles), and gradient (ft/mi).
+See \code{\link{util_gw_grad}} for the distance calculation methodology.
 }
 \examples{
-util_gw_showgrad(contdry, seg = 1, north_segs = c("1" = 150000))
-util_gw_showgrad(contwet, seg = 3)
-util_gw_showgrad(contwet, seg = 7, buf_segs = c("7" = 100000))
+\dontrun{
+pot_dry <- util_gw_getcontour("dry", 2022)
+util_gw_showgrad(pot_dry, season = "dry", seg = 1)
+util_gw_showgrad(pot_dry, season = "dry", seg = 3)
+
+pot_wet <- util_gw_getcontour("wet", 2022)
+util_gw_showgrad(pot_wet, season = "wet", seg = 4)
+util_gw_showgrad(pot_wet, season = "wet", seg = 7)
+}
 }

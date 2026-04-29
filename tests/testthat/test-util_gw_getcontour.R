@@ -9,7 +9,10 @@ create_mock_contour_sf <- function(n_rows = 3, month_year = "May 2022") {
   )
 }
 
-test_that("util_gw_getcontour returns sf with correct columns", {
+# Stub contours_to_raster so tests do not require terra IDW
+mock_raster <- terra::rast(nrows = 2, ncols = 2, vals = 1:4)
+
+test_that("util_gw_getcontour returns SpatRaster", {
   mock_resp <- structure(list(status_code = 200L), class = "response")
   mock_data <- create_mock_contour_sf(3)
 
@@ -23,11 +26,14 @@ test_that("util_gw_getcontour returns sf with correct columns", {
     st_read = mock(mock_data, cycle = TRUE),
     .package = "sf"
   )
+  local_mocked_bindings(
+    contours_to_raster = mock(mock_raster),
+    .package = "tbeploads"
+  )
 
   result <- suppressWarnings(util_gw_getcontour("dry", 2022, verbose = FALSE))
 
-  expect_s3_class(result, "sf")
-  expect_true(all(c("CONTOUR", "MONTH_YEAR") %in% names(result)))
+  expect_true(inherits(result, "SpatRaster"))
 })
 
 test_that("util_gw_getcontour uses correct MONTH_YEAR for dry season", {
@@ -43,6 +49,10 @@ test_that("util_gw_getcontour uses correct MONTH_YEAR for dry season", {
   local_mocked_bindings(
     st_read = mock(create_mock_contour_sf(3), cycle = TRUE),
     .package = "sf"
+  )
+  local_mocked_bindings(
+    contours_to_raster = mock(mock_raster),
+    .package = "tbeploads"
   )
 
   suppressWarnings(util_gw_getcontour("dry", 2022, verbose = FALSE))
@@ -63,6 +73,10 @@ test_that("util_gw_getcontour uses correct MONTH_YEAR for wet season", {
   local_mocked_bindings(
     st_read = mock(create_mock_contour_sf(3, "September 2022"), cycle = TRUE),
     .package = "sf"
+  )
+  local_mocked_bindings(
+    contours_to_raster = mock(mock_raster),
+    .package = "tbeploads"
   )
 
   suppressWarnings(util_gw_getcontour("wet", 2022, verbose = FALSE))
@@ -112,8 +126,8 @@ test_that("util_gw_getcontour warns and returns NULL when no features returned",
 })
 
 test_that("util_gw_getcontour handles pagination", {
-  mock_resp    <- structure(list(status_code = 200L), class = "response")
-  full_batch   <- create_mock_contour_sf(5)
+  mock_resp     <- structure(list(status_code = 200L), class = "response")
+  full_batch    <- create_mock_contour_sf(5)
   partial_batch <- create_mock_contour_sf(3)
 
   local_mocked_bindings(
@@ -126,12 +140,16 @@ test_that("util_gw_getcontour handles pagination", {
     st_read = mock(full_batch, partial_batch),
     .package = "sf"
   )
+  local_mocked_bindings(
+    contours_to_raster = mock(mock_raster),
+    .package = "tbeploads"
+  )
 
   result <- suppressWarnings(
     util_gw_getcontour("dry", 2022, max_records = 5, verbose = FALSE)
   )
 
-  expect_s3_class(result, "sf")
+  expect_true(inherits(result, "SpatRaster"))
 })
 
 test_that("util_gw_getcontour prints progress when verbose = TRUE", {
@@ -147,6 +165,10 @@ test_that("util_gw_getcontour prints progress when verbose = TRUE", {
   local_mocked_bindings(
     st_read = mock(mock_data, cycle = TRUE),
     .package = "sf"
+  )
+  local_mocked_bindings(
+    contours_to_raster = mock(mock_raster),
+    .package = "tbeploads"
   )
 
   expect_output(

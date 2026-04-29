@@ -8,6 +8,9 @@
 #'   concentrations from the 2022-2024 loading analysis are used.
 #' @param summtime character, temporal summarization: \code{'month'} (default)
 #'   returns one row per segment per month, \code{'year'} sums to annual totals.
+#' @param verbose logical, if \code{TRUE} (default) progress messages from
+#'   \code{\link{util_gw_getcontour}} are printed during download and
+#'   interpolation.
 #'
 #' @details
 #' Estimates groundwater loads to each Tampa Bay segment for three aquifer
@@ -24,17 +27,12 @@
 #' (m\eqn{^3}/month) is \eqn{Q \cdot 3785 \cdot 30.5}.
 #'
 #' \strong{Hydraulic gradients:}
-#' The gradient section below contains a commented-out framework that calls
-#' \code{\link{util_gw_getcontour}} and \code{\link{util_gw_grad}} to compute
-#' gradients dynamically from FDEP potentiometric surface contours. The key
-#' challenge is that potentiometric high points for some segments (notably Old
-#' Tampa Bay) lie north of the subwatershed boundary; \code{util_gw_getcontour}
-#' accepts a \code{buf_dist} argument and \code{util_gw_grad} accepts a
-#' \code{buf_segs} argument to expand the search area for those segments.
-#' Until the buffer distances are calibrated against known SAS gradients,
-#' hardcoded gradient values from the 2021 FDEP potentiometric surface map are
-#' used (the same values applied for 2022-2024 in the original SAS analysis,
-#' as no updated contours were available at that time).
+#' For each year in \code{yrrng}, dry- and wet-season FDEP potentiometric
+#' surface contours are downloaded via \code{\link{util_gw_getcontour}},
+#' rasterized to a 1-mile grid, and passed to \code{\link{util_gw_grad}} to
+#' compute segment-specific gradients.  This requires an internet connection
+#' and takes a few minutes per year.  See \code{\link{util_gw_grad}} for
+#' details on search areas, zero-gradient segments, and benchmark warnings.
 #'
 #' \strong{Surficial and intermediate aquifers:}
 #' Loads are fixed constants per segment. Surficial values are from
@@ -60,83 +58,57 @@
 #' @export
 #'
 #' @examples
-#' # monthly segment loads using hardcoded 2022-2024 gradients and concentrations
+#' \dontrun{
+#' # monthly segment loads (requires internet)
 #' gw <- anlz_gw(yrrng = c(2022, 2024))
 #' head(gw)
-#' 
+#'
 #' # annual totals
-#' gw <- anlz_gw(yrrng = c(2022, 2024), summtime = 'year')
-#' head(gw)
-#' 
-#' \dontrun{
+#' anlz_gw(yrrng = c(2022, 2024), summtime = 'year')
+#'
 #' # pass concentrations from the Water Atlas API
 #' gw <- anlz_gw(yrrng = c(2022, 2024), wqdat = util_gw_getwq())
 #' head(gw)
 #' }
 anlz_gw <- function(yrrng = c(2022, 2024), wqdat = NULL,
-                    summtime = c('month', 'year')) {
+                    summtime = c('month', 'year'), verbose = TRUE) {
 
   summtime <- match.arg(summtime)
 
   # -------------------------------------------------------------------------
-  # 1. Floridan aquifer hydraulic gradient (I, ft/mile) per segment and season
+  # 1. Floridan aquifer hydraulic gradient (I, ft/mile) per segment, season, year
+  #    Downloads FDEP UFA potentiometric surface contours for each year,
+  #    rasterizes them, and computes gradients via util_gw_grad().
+  #    Default buf_segs (calibrated against 2021 SAS reference values):
+  #      dry: c("1" = 100000)
+  #      wet: c("1" = 100000, "4" = 100000, "6" = 100000, "7" = 100000)
   # -------------------------------------------------------------------------
-  # Framework for dynamic gradient computation from FDEP potentiometric surface
-  # contours.  Two expansion mechanisms are available and may be combined:
-  #
-  # north_segs: rectangular northward extension for segments whose high point
-  #   lies north of the subwatershed (OTB, seg 1).  north_dist in
-  #   util_gw_getcontour must be >= the north_segs value so the contours cover
-  #   the extended area.
-  #
-  # buf_segs: omnidirectional buffer with all bay water removed via
-  #   st_difference.  Use for segments whose high point lies east or southeast
-  #   of the subwatershed (LTB 4, TCB 6, MR 7 in wet season).  Listing a
-  #   segment in buf_segs removes it from the default zero-gradient set so it
-  #   is computed dynamically.  Tune buffer distances against known SAS values.
-  #
-  # All distances are in US Survey Feet (CRS 6443).
-  #
-  # north_dist <- 150000          # ~28 miles; covers OTB north extension
-  # north_segs <- c("1" = 150000) # OTB northward extension
-  # buf_segs   <- c("4" = 100000, "6" = 100000, "7" = 100000) # starting point
-  #
-  # contdry <- util_gw_getcontour("dry", yr, north_dist = north_dist)
-  # contwet <- util_gw_getcontour("wet", yr, north_dist = north_dist)
-  # grad_dry <- util_gw_grad(contdry, north_segs = north_segs)
-  # grad_wet <- util_gw_grad(contwet, north_segs = north_segs, buf_segs = buf_segs)
+  years <- seq(yrrng[1], yrrng[2])
 
-  # Hardcoded gradients from the 2021 FDEP potentiometric surface map.
-  # Applied unchanged for 2022-2024 because updated contours were not
-  # available when that analysis was run. Source: GWld2224_SASCode.txt.
-  grad_dry <- data.frame(
-    bay_seg = 1L:7L,
-    grad    = c(
-      100 / 27,
-      (120 / 43) * 0.4 + (100 / 25) * 0.3 + (80 / 31) * 0.3,
-      50  / 31,
-      0, 0, 0, 0
+  grad_list <- lapply(years, function(yr) {
+
+    pot_dry <- util_gw_getcontour("dry", yr, verbose = verbose)
+    pot_wet <- util_gw_getcontour("wet", yr, verbose = verbose)
+
+    if (is.null(pot_dry) || is.null(pot_wet))
+      stop("Could not retrieve FDEP potentiometric surface for year ", yr,
+           ". Verify that data are available for this year.", call. = FALSE)
+
+    gd <- util_gw_grad(pot_dry, season = "dry")
+    gw <- util_gw_grad(pot_wet, season = "wet")
+
+    rbind(
+      data.frame(Year = yr, season = "dry", gd, stringsAsFactors = FALSE),
+      data.frame(Year = yr, season = "wet", gw, stringsAsFactors = FALSE)
     )
-  )
-  grad_wet <- data.frame(
-    bay_seg = 1L:7L,
-    grad    = c(
-      100 / 27,
-      (120 / 44) * 0.4 + (100 / 25) * 0.3 + (70 / 26) * 0.3,
-      60  / 32,
-      50  / 32,
-      0,
-      50  / 34,
-      50  / 40
-    )
-  )
+  })
+
+  grad_df <- do.call(rbind, grad_list)
+  grad_df  <- grad_df[grad_df$bay_seg %in% 1L:7L, ]
 
   # -------------------------------------------------------------------------
   # 2. Floridan aquifer TN/TP concentrations (mg/L)
   # -------------------------------------------------------------------------
-  # Framework for API-based concentrations:
-  # wqdat <- util_gw_getwq()
-
   if (is.null(wqdat)) {
     # Hardcoded concentrations from the 2022-2024 analysis.
     # Segments 1-2 updated from Pasco County well data (SWFWMD stations 18340
@@ -177,10 +149,10 @@ anlz_gw <- function(yrrng = c(2022, 2024), wqdat = NULL,
   )
 
   # -------------------------------------------------------------------------
-  # 5. Build monthly grid and assign season
+  # 5. Build monthly grid, assign season, join year-specific gradients
   # -------------------------------------------------------------------------
   grid <- expand.grid(
-    Year    = seq(yrrng[1], yrrng[2]),
+    Year    = years,
     Month   = 1L:12L,
     bay_seg = 1L:7L,
     stringsAsFactors = FALSE
@@ -188,25 +160,16 @@ anlz_gw <- function(yrrng = c(2022, 2024), wqdat = NULL,
 
   grid$season <- ifelse(grid$Month %in% c(1:6, 11:12), "dry", "wet")
 
-  # Join gradient by segment and season
-  grid <- merge(grid, grad_dry, by = "bay_seg", suffixes = c("", "_dry"))
-  names(grid)[names(grid) == "grad"] <- "grad_dry"
-  grid <- merge(grid, grad_wet, by = "bay_seg", suffixes = c("", "_wet"))
-  names(grid)[names(grid) == "grad"] <- "grad_wet"
-  grid$grad    <- ifelse(grid$season == "dry", grid$grad_dry, grid$grad_wet)
-  grid$grad_dry <- NULL
-  grid$grad_wet <- NULL
-
-  # Join remaining parameters
+  grid <- merge(grid, grad_df,     by = c("Year", "season", "bay_seg"))
   grid <- merge(grid, wqdat,       by = "bay_seg")
   grid <- merge(grid, fl_params,   by = "bay_seg")
   grid <- merge(grid, fixed_loads, by = "bay_seg")
 
   # -------------------------------------------------------------------------
   # 6. Darcy's Law: Floridan aquifer flow (MGD) and monthly loads
-  #    Q  (MGD)       = 7.4805e-6 * T * I * L
+  #    Q  (MGD)        = 7.4805e-6 * T * I * L
   #    tn/tpfl (kg/mo) = Q * C(mg/L) * 8.342(lb/gal) * 30.5(d/mo) / 2.2(lb/kg)
-  #    h2ofl (m3/mo)  = Q * 3785(m3/MGal) * 30.5(d/mo)
+  #    h2ofl (m3/mo)   = Q * 3785(m3/MGal) * 30.5(d/mo)
   # -------------------------------------------------------------------------
   grid$q     <- 7.4805e-6 * grid$grad * grid$t * grid$l
   grid$tnfl  <- grid$q * grid$tn_mgl * 8.342 * 30.5 / 2.2
