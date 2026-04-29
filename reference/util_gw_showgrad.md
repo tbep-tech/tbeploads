@@ -90,12 +90,21 @@ for the distance calculation methodology.
 
 ``` r
 if (FALSE) { # \dontrun{
-pot_dry <- util_gw_getcontour("dry", 2022)
-util_gw_showgrad(pot_dry, season = "dry", seg = 1)
-util_gw_showgrad(pot_dry, season = "dry", seg = 3)
-
-pot_wet <- util_gw_getcontour("wet", 2022)
-util_gw_showgrad(pot_wet, season = "wet", seg = 4)
-util_gw_showgrad(pot_wet, season = "wet", seg = 7)
+contdry <- util_gw_getcontour("dry", 2022)
 } # }
+util_gw_showgrad(contdry, season = "dry", seg = 1)
+
+util_gw_showgrad(contdry, season = "dry", seg = 3)
+#> Warning: Raster pixels are placed at uneven horizontal intervals and will be shifted
+#> ℹ Consider using `geom_tile()` instead.
+#> Warning: Raster pixels are placed at uneven horizontal intervals and will be shifted
+#> ℹ Consider using `geom_tile()` instead.
+
+
+if (FALSE) { # \dontrun{
+contwet <- util_gw_getcontour("wet", 2022)
+} # }
+util_gw_showgrad(contwet, season = "wet", seg = 4)
+
+util_gw_showgrad(contwet, season = "wet", seg = 7)
 ```
