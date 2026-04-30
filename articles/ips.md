@@ -1,6 +1,7 @@
 # Industrial Point Source (IPS)
 
 ``` r
+
 library(tbeploads)
 ```
 
@@ -25,6 +26,7 @@ The output is returned as tons per month for TN, TP, TSS, and BOD and
 million cubic meters per month for flow (hy).
 
 ``` r
+
 ipsfls <- list.files(system.file('extdata/', package = 'tbeploads'),
   pattern = 'ps_ind_', full.names = TRUE)
 anlz_ips_facility(ipsfls)
@@ -64,6 +66,7 @@ year for TN, TP, TSS, and BOD and million cubic meters per year for flow
 (hy) if `summtime = 'year'`.
 
 ``` r
+
 # combine by entity and month
 anlz_ips(ipsfls, summ = 'entity', summtime = 'month')
 #> # A tibble: 60 × 10

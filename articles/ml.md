@@ -1,6 +1,7 @@
 # Material Losses (ML)
 
 ``` r
+
 library(tbeploads)
 ```
 
@@ -34,6 +35,7 @@ load, etc.) are also returned for consistency of reporting with other
 loading sources.
 
 ``` r
+
 mlfls <- list.files(system.file('extdata/', package = 'tbeploads'),
   pattern = 'ps_indml', full.names = TRUE)
 anlz_ml_facility(mlfls)
@@ -74,6 +76,7 @@ other point source load calculation functions. Material loss loads are
 often combined with IPS loads for reporting.
 
 ``` r
+
 # combine by entity and month
 anlz_ml(mlfls, summ = 'entity', summtime = 'month')
 #> # A tibble: 60 × 10

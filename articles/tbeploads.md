@@ -8,6 +8,7 @@ source code is available on
 [GitHub](https://github.com/tbep-tech/tbeploads).
 
 ``` r
+
 # Install tbeploads in R:
 install.packages('tbeploads', repos = c('https://tbep-tech.r-universe.dev', 'https://cloud.r-project.org'))
 ```
@@ -15,6 +16,7 @@ install.packages('tbeploads', repos = c('https://tbep-tech.r-universe.dev', 'htt
 Load the package in an R session after installation:
 
 ``` r
+
 library(tbeploads)
 ```
 
@@ -27,12 +29,12 @@ industrial point source (IPS), material losses (ML), nonpoint source
 for each. See the articles below for detailed documentation on each
 loading type.
 
-| Loading type            | Article                                                      |
-|-------------------------|--------------------------------------------------------------|
-| Domestic point source   | [DPS](https://tbep-tech.github.io/tbeploads/articles/dps.md) |
+| Loading type | Article |
+|----|----|
+| Domestic point source | [DPS](https://tbep-tech.github.io/tbeploads/articles/dps.md) |
 | Industrial point source | [IPS](https://tbep-tech.github.io/tbeploads/articles/ips.md) |
-| Material losses         | [ML](https://tbep-tech.github.io/tbeploads/articles/ml.md)   |
-| Atmospheric deposition  | [AD](https://tbep-tech.github.io/tbeploads/articles/ad.md)   |
-| Non-point source        | [NPS](https://tbep-tech.github.io/tbeploads/articles/nps.md) |
-| Springs                 | [SPR](https://tbep-tech.github.io/tbeploads/articles/spr.md) |
-| Groundwater             | [GW](https://tbep-tech.github.io/tbeploads/articles/gw.md)   |
+| Material losses | [ML](https://tbep-tech.github.io/tbeploads/articles/ml.md) |
+| Atmospheric deposition | [AD](https://tbep-tech.github.io/tbeploads/articles/ad.md) |
+| Non-point source | [NPS](https://tbep-tech.github.io/tbeploads/articles/nps.md) |
+| Springs | [SPR](https://tbep-tech.github.io/tbeploads/articles/spr.md) |
+| Groundwater | [GW](https://tbep-tech.github.io/tbeploads/articles/gw.md) |

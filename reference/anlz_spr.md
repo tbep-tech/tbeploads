@@ -123,9 +123,15 @@ concentrations (mg/L) for TN and TP are read from the CSV. These data
 are from FDEP's Impaired Waters Rule dataset available at
 <https://publicfiles.dep.state.fl.us/dear/iwr/>. Annual mean
 concentrations are computed per spring and joined to monthly flow
-estimates. If a year within `yrrng` has no water quality observations
-for a given spring, the grand mean across all available years is
-substituted.
+estimates. A spring-year is considered complete when its samples span
+all four calendar quarters (Jan-Mar, Apr-Jun, Jul-Sep, Oct-Dec).
+Spring-years that are entirely missing or whose samples do not cover all
+four quarters are filled by carrying forward the most recent complete
+year's mean. The file should therefore include data from years prior to
+the focal period so that every spring has at least one complete
+reference year available. If the earliest year in the file is already
+incomplete for a spring, there is no prior year to carry forward and an
+error is raised.
 
 **Water quality data (API, `wqpth = NULL`):** When `wqpth` is `NULL`,
 water quality data are obtained using
@@ -179,16 +185,16 @@ anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024))
 #> # A tibble: 108 × 10
 #>     Year Month source segment   spring tn_load tp_load tss_load bod_load hy_load
 #>    <dbl> <dbl> <chr>  <chr>     <chr>    <dbl>   <dbl>    <dbl>    <dbl>   <dbl>
-#>  1  2022     1 SPR    Hillsbor… Buckh…    1.75  0.0370     3.10        0   0.704
+#>  1  2022     1 SPR    Hillsbor… Buckh…    1.75  0.0370     3.10        0   0.703
 #>  2  2022     2 SPR    Hillsbor… Buckh…    2.01  0.0425     3.56        0   0.807
-#>  3  2022     3 SPR    Hillsbor… Buckh…    1.86  0.0395     3.31        0   0.750
+#>  3  2022     3 SPR    Hillsbor… Buckh…    1.86  0.0395     3.30        0   0.750
 #>  4  2022     4 SPR    Hillsbor… Buckh…    1.84  0.0389     3.26        0   0.739
-#>  5  2022     5 SPR    Hillsbor… Buckh…    1.47  0.0311     2.60        0   0.591
-#>  6  2022     6 SPR    Hillsbor… Buckh…    1.66  0.0351     2.94        0   0.667
-#>  7  2022     7 SPR    Hillsbor… Buckh…    1.73  0.0365     3.06        0   0.694
-#>  8  2022     8 SPR    Hillsbor… Buckh…    1.93  0.0408     3.42        0   0.776
-#>  9  2022     9 SPR    Hillsbor… Buckh…    1.92  0.0406     3.40        0   0.771
-#> 10  2022    10 SPR    Hillsbor… Buckh…    2.45  0.0518     4.34        0   0.984
+#>  5  2022     5 SPR    Hillsbor… Buckh…    1.47  0.0311     2.60        0   0.590
+#>  6  2022     6 SPR    Hillsbor… Buckh…    1.66  0.0351     2.94        0   0.666
+#>  7  2022     7 SPR    Hillsbor… Buckh…    1.72  0.0365     3.06        0   0.694
+#>  8  2022     8 SPR    Hillsbor… Buckh…    1.93  0.0408     3.42        0   0.775
+#>  9  2022     9 SPR    Hillsbor… Buckh…    1.91  0.0405     3.40        0   0.770
+#> 10  2022    10 SPR    Hillsbor… Buckh…    2.44  0.0517     4.33        0   0.983
 #> # ℹ 98 more rows
 
 # annual basin-level totals
@@ -197,12 +203,12 @@ anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
 #> # A tibble: 6 × 9
 #>    Year source segment        majbasin tn_load tp_load tss_load bod_load hy_load
 #>   <dbl> <chr>  <chr>          <chr>      <dbl>   <dbl>    <dbl>    <dbl>   <dbl>
-#> 1  2022 SPR    Hillsborough … Alafia …  129.      3.52    228.         0    51.8
-#> 2  2023 SPR    Hillsborough … Alafia …  122.      3.56    220.         0    49.9
-#> 3  2024 SPR    Hillsborough … Alafia …  131.      3.70    235.         0    53.2
+#> 1  2022 SPR    Hillsborough … Alafia …  129.      3.52    228.         0    51.7
+#> 2  2023 SPR    Hillsborough … Alafia …  122.      3.55    220.         0    49.8
+#> 3  2024 SPR    Hillsborough … Alafia …  130.      3.79    234.         0    53.2
 #> 4  2022 SPR    Hillsborough … Hillsbo…    3.40    1.41     83.3        0    17.2
 #> 5  2023 SPR    Hillsborough … Hillsbo…    1.70    1.66     54.3        0    11.2
-#> 6  2024 SPR    Hillsborough … Hillsbo…    3.32    2.18     98.0        0    20.2
+#> 6  2024 SPR    Hillsborough … Hillsbo…    3.06    3.00     97.9        0    20.2
 
 # monthly segment-level totals
 anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
@@ -212,14 +218,14 @@ anlz_spr(tbwxlpth = tbwxlpth, wqpth = wqpth, yrrng = c(2022, 2024),
 #>    <dbl> <dbl> <chr>  <chr>              <dbl>   <dbl>    <dbl>    <dbl>   <dbl>
 #>  1  2022     1 SPR    Hillsborough Bay   11.2    0.432     27.1        0    5.99
 #>  2  2022     2 SPR    Hillsborough Bay   10.4    0.338     21.7        0    4.84
-#>  3  2022     3 SPR    Hillsborough Bay    8.76   0.237     15.5        0    3.52
-#>  4  2022     4 SPR    Hillsborough Bay    9.72   0.357     22.7        0    5.02
-#>  5  2022     5 SPR    Hillsborough Bay    8.46   0.261     16.7        0    3.76
-#>  6  2022     6 SPR    Hillsborough Bay    9.52   0.295     18.9        0    4.23
+#>  3  2022     3 SPR    Hillsborough Bay    8.75   0.237     15.5        0    3.52
+#>  4  2022     4 SPR    Hillsborough Bay    9.71   0.357     22.7        0    5.02
+#>  5  2022     5 SPR    Hillsborough Bay    8.45   0.261     16.7        0    3.75
+#>  6  2022     6 SPR    Hillsborough Bay    9.51   0.294     18.9        0    4.23
 #>  7  2022     7 SPR    Hillsborough Bay   10.7    0.404     25.4        0    5.62
-#>  8  2022     8 SPR    Hillsborough Bay   11.7    0.479     30.1        0    6.61
-#>  9  2022     9 SPR    Hillsborough Bay   12.2    0.511     31.9        0    7.01
-#> 10  2022    10 SPR    Hillsborough Bay   12.9    0.539     33.9        0    7.45
+#>  8  2022     8 SPR    Hillsborough Bay   11.7    0.479     30.0        0    6.61
+#>  9  2022     9 SPR    Hillsborough Bay   12.1    0.510     31.9        0    7.01
+#> 10  2022    10 SPR    Hillsborough Bay   12.9    0.539     33.9        0    7.44
 #> # ℹ 26 more rows
 
 if (FALSE) { # \dontrun{

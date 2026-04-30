@@ -1,6 +1,7 @@
 # Domestic Point Source (DPS)
 
 ``` r
+
 library(tbeploads)
 ```
 
@@ -29,6 +30,7 @@ output is returned as tons per month for TN, TP, TSS, and BOD and
 million cubic meters per month for flow (hy).
 
 ``` r
+
 dpsfls <- list.files(system.file('extdata/', package = 'tbeploads'),
   pattern = 'ps_dom', full.names = TRUE)
 anlz_dps_facility(dpsfls)
@@ -68,6 +70,7 @@ year for TN, TP, TSS, and BOD and million cubic meters per year for flow
 (hy) if `summtime = 'year'`.
 
 ``` r
+
 # combine by entity and month
 anlz_dps(dpsfls, summ = 'entity', summtime = 'month')
 #> # A tibble: 108 × 10

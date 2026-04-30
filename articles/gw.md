@@ -1,6 +1,7 @@
 # Groundwater (GW)
 
 ``` r
+
 library(tbeploads)
 ```
 
@@ -16,7 +17,9 @@ Three aquifer types contribute to each bay segment each month.
 
 **Floridan aquifer:** Flow is estimated with Darcy’s Law:
 
-$$Q = 7.4805*10^{- 6}*T*I*L$$
+``` math
+Q = 7.4805 * 10^{-6} * T * I * L
+```
 
 where T is transmissivity (ft²/day), I is the hydraulic gradient
 (ft/mile), and L is the flow zone length (miles). Q is in million
@@ -30,13 +33,17 @@ for the dry and wet seasons (see below).
 
 Monthly nutrient loads (kg/month) are:
 
-$$Load = Q*C*8.342*30.5/2.2$$
+``` math
+Load = Q * C * 8.342 * 30.5 / 2.2
+```
 
 where C is the TN or TP concentration in mg/L.
 
 Monthly hydrologic load (m³/month) is:
 
-$$Load = Q*3785*30.5$$
+``` math
+Load = Q * 3785 * 30.5
+```
 
 **Surficial and intermediate aquifers:** Loads are fixed monthly
 constants per segment derived from 1995-1998 (surficial) and 1999-2003
@@ -66,6 +73,7 @@ deliberately set to 5 miles (rather than the contour spacing) to prevent
 extrapolation into data-sparse coastal and northern areas.
 
 ``` r
+
 contdry <- util_gw_getcontour("dry", 2022)
 contwet <- util_gw_getcontour("wet", 2022)
 ```
@@ -129,6 +137,7 @@ making it easy to detect anomalous potentiometric surfaces when running
 future years.
 
 ``` r
+
 util_gw_grad(contdry, season = "dry")
 #>   bay_seg     grad
 #> 1       1 3.513075
@@ -159,12 +168,14 @@ within the search area, the centroid-to-head transect, and the computed
 gradient.
 
 ``` r
+
 util_gw_showgrad(contdry, season = "dry", seg = 1)
 ```
 
 ![](gw_files/figure-html/unnamed-chunk-5-1.png)
 
 ``` r
+
 util_gw_showgrad(contwet, season = "wet", seg = 7)
 ```
 
@@ -184,6 +195,7 @@ values from the 1995-1998 SWFWMD analysis used in every loading cycle
 through 2021.
 
 ``` r
+
 wqdat <- util_gw_getwq()
 ```
 
@@ -204,6 +216,7 @@ The package datasets `contdry` and `contwet` are pre-computed 2022
 rasters stored as `PackedSpatRaster` objects and can be passed directly:
 
 ``` r
+
 gw <- anlz_gw(contdry, contwet, yrrng = c(2022, 2024))
 head(gw)
 #>   Year Month source        segment      tn_load     tp_load   hy_load
@@ -222,6 +235,7 @@ potentiometric surfaces from FDEP, then pass them to
 [`anlz_gw()`](https://tbep-tech.github.io/tbeploads/reference/anlz_gw.md):
 
 ``` r
+
 contdry <- util_gw_getcontour("dry", 2025)
 contwet <- util_gw_getcontour("wet", 2025)
 gw <- anlz_gw(contdry, contwet, yrrng = c(2025, 2025))
@@ -230,6 +244,7 @@ gw <- anlz_gw(contdry, contwet, yrrng = c(2025, 2025))
 To pass concentrations retrieved from the Water Atlas API:
 
 ``` r
+
 wqdat  <- util_gw_getwq()
 gw_api <- anlz_gw(contdry, contwet, yrrng = c(2022, 2024), wqdat = wqdat)
 ```
@@ -239,12 +254,13 @@ gw_api <- anlz_gw(contdry, contwet, yrrng = c(2022, 2024), wqdat = wqdat)
 Setting `summtime = 'year'` sums monthly loads to annual totals.
 
 ``` r
+
 anlz_gw(contdry, contwet, yrrng = c(2022, 2024), summtime = 'year')
 ```
 
 ## References
 
 Zarbock, H., A. Janicki, D. Wade, D. Heimbuch, and H. Wilson. 1994.
-“Estimates of Total Nitrogen, Total Phosphorus, and Total Suspended
-Solids Loadings to Tampa Bay, Florida.” 04-94. St. Petersburg, FL: Tampa
-Bay National Estuary Program.
+*Estimates of Total Nitrogen, Total Phosphorus, and Total Suspended
+Solids Loadings to Tampa Bay, Florida*. Nos. 04-94. Tampa Bay National
+Estuary Program.

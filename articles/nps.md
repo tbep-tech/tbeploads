@@ -1,6 +1,7 @@
 # Non-Point Source (NPS)
 
 ``` r
+
 library(tbeploads)
 ```
 
@@ -86,6 +87,7 @@ for how to get these data). The following example uses combined water
 quality and flow data included with the package for convenience.
 
 ``` r
+
 # external files included with the package
 data(allwq)
 data(allflo)
@@ -152,6 +154,7 @@ function. These data are also stored internally with the package for
 easy retrieval, as are the remaining datasets.
 
 ``` r
+
 tblu2023 <- util_nps_getswfwmd('lulc2023')
 tbsoil <- util_nps_getswfwmd('soil')
 ```
@@ -161,6 +164,7 @@ Then, the combined layer,
 can be created (takes an hour or two).
 
 ``` r
+
 data(tbsubshed)
 data(tbjuris)
 data(tblu2023)
@@ -173,6 +177,7 @@ The
 data object is also included with the package for convenience.
 
 ``` r
+
 head(tbbase)
 #> # A tibble: 6 × 9
 #>   bay_seg basin    drnfeat entity     FLUCCSCODE CLUCSID IMPROVED hydgrp area_ha
@@ -305,6 +310,7 @@ and [`rain`](https://tbep-tech.github.io/tbeploads/reference/rain.md)
 data objects if updated data are needed.
 
 ``` r
+
 # required inputs
 data(tbbase)
 data(rain)
@@ -358,6 +364,7 @@ for how to obtain the file for atmospheric concentration data. See above
 for how to recreate these files if updated data are needed.
 
 ``` r
+
 data(tbbase)
 data(rain)
 data(allwq)
@@ -430,6 +437,7 @@ Loads by land use type (using CLUCSID) can also be returned if
 `aslu = TRUE`. These results only apply to ungaged loading estimates.
 
 ``` r
+
 npslu <- anlz_nps(yrrng = c('2021-01-01', '2023-12-31'), tbbase = tbbase, rain = rain,
                 allwq = allwq, allflo = allflo, vernafl = vernafl, aslu = TRUE)
 #> Estimating ungaged NPS loads...
@@ -491,6 +499,7 @@ representing the combined reduction for segments 55, 6, and 7). Only TN
 is adjusted. TP, TSS, BOD, and hydrologic loads are unchanged.
 
 ``` r
+
 # pre-compute basin-level monthly loads for each source
 ipsfls <- list.files(system.file('extdata/', package = 'tbeploads'),
   pattern = 'ps_ind_', full.names = TRUE)

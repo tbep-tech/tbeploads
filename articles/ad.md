@@ -1,6 +1,7 @@
 # Atmospheric Deposition (AD)
 
 ``` r
+
 library(tbeploads)
 ```
 
@@ -16,6 +17,7 @@ package in the
 object.
 
 ``` r
+
 head(rain)
 #> # A tibble: 6 × 6
 #>   station date        Year Month   Day rainfall
@@ -34,6 +36,7 @@ This file is also included with the package and can be found using
 [`system.file()`](https://rdrr.io/r/base/system.file.html) as follows:
 
 ``` r
+
 vernafl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
 vernafl
 #> [1] "/home/runner/work/_temp/Library/tbeploads/extdata/verna-raw.csv"
@@ -47,9 +50,13 @@ function. Total nitrogen and phosphorus concentrations are estimated
 from ammonium and nitrate concentrations (mg/L) using the following
 relationships:
 
-$$TN = NH_{4}^{+}*0.78 + NO_{3}^{-}*0.23$$
+``` math
+TN = NH_4^+ * 0.78 + NO_3^- * 0.23
+```
 
-$$TP = 0.01262*TN + 0.00110$$
+``` math
+TP = 0.01262 * TN + 0.00110
+```
 
 The first equation corrects for the % of ions in ammonium and nitrate
 that are N, and the second is a regression relationship between TBADS TN
@@ -71,6 +78,7 @@ bay segment. The distance data and bay segment areas are contained in
 the file included with the package.
 
 ``` r
+
 head(ad_distance)
 #>   segment    seg_x   seg_y matchsit  distance     invdist2     area
 #> 1       1 344902.2 3080488      520 26000.117 1.479277e-09 23407.05
@@ -94,6 +102,7 @@ to estimate AD load is done as follows, where
 rain data and `vernafl` is the path to the Verna Wellfield data.
 
 ``` r
+
 anlz_ad(rain, vernafl)
 #> # A tibble: 672 × 7
 #>     Year Month source segment        tn_load tp_load hy_load
