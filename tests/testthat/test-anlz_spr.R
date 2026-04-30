@@ -277,3 +277,32 @@ test_that("anlz_spr wqpth=NULL and wqpth file produce similar TN/TP loads", {
   expect_equal(nrow(api_result), nrow(file_result))
 
 })
+
+# ---------------------------------------------------------------------------
+# Error: no complete prior year to carry forward from
+# ---------------------------------------------------------------------------
+
+test_that("anlz_spr errors when no prior complete year exists for carry-forward", {
+
+  tmp <- tempfile(fileext = ".csv")
+  on.exit(unlink(tmp), add = TRUE)
+
+  # Only Jan-Apr 2024 for Sulphur (incomplete); no Lithia or Buckhorn data at all
+  wq_incomplete <- data.frame(
+    year       = 2024L,
+    month      = 1:4,
+    spring     = "Sulphur",
+    `tn(mg/L)` = 0.15,
+    `tp(mg/L)` = 0.10,
+    check.names = FALSE,
+    stringsAsFactors = FALSE
+  )
+  write.csv(wq_incomplete, tmp, row.names = FALSE)
+
+  expect_error(
+    anlz_spr(tbwxlpth, tmp, yrrng = c(2024, 2024),
+             sulphurflow = mock_sulphurflow),
+    "Water quality concentrations could not be filled"
+  )
+
+})

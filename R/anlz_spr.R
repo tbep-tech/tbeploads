@@ -55,8 +55,14 @@
 #' are read from the CSV. These data are from FDEP's Impaired Waters Rule
 #' dataset available at \url{https://publicfiles.dep.state.fl.us/dear/iwr/}.
 #' Annual mean concentrations are computed per spring and joined to monthly flow
-#' estimates. If a year within \code{yrrng} has no water quality observations for a given
-#' spring, the grand mean across all available years is substituted.
+#' estimates. A spring-year is considered complete when its samples span all four
+#' calendar quarters (Jan-Mar, Apr-Jun, Jul-Sep, Oct-Dec). Spring-years that are
+#' entirely missing or whose samples do not cover all four quarters are filled by
+#' carrying forward the most recent complete year's mean. The file should therefore
+#' include data from years prior to the focal period so that every spring has at
+#' least one complete reference year available.  If the earliest year in the file
+#' is already incomplete for a spring, there is no prior year to carry forward and
+#' an error is raised.
 #'
 #' \strong{Water quality data (API, \code{wqpth = NULL}):}
 #' When \code{wqpth} is \code{NULL}, water quality data are obtained using 
@@ -276,16 +282,23 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
         tp_mgl = `tp(mg/L)`
       ) |>
       dplyr::mutate(
-        tn_mgl = suppressWarnings(as.numeric(tn_mgl)),
-        tp_mgl = suppressWarnings(as.numeric(tp_mgl))
+        tn_mgl  = suppressWarnings(as.numeric(tn_mgl)),
+        tp_mgl  = suppressWarnings(as.numeric(tp_mgl)),
+        quarter = ceiling(month / 3L)
       ) |>
       dplyr::group_by(spring, yr) |>
       dplyr::summarise(
-        tn_mgl = mean(tn_mgl, na.rm = TRUE),
-        tp_mgl = mean(tp_mgl, na.rm = TRUE),
-        .groups = "drop"
+        tn_mgl     = mean(tn_mgl, na.rm = TRUE),
+        tp_mgl     = mean(tp_mgl, na.rm = TRUE),
+        n_quarters = dplyr::n_distinct(quarter),
+        .groups    = "drop"
       ) |>
-      dplyr::mutate(tss_mgl = NA_real_)  # TSS always from fixed lookup for file path
+      dplyr::mutate(
+        tn_mgl = dplyr::if_else(n_quarters < 4L, NA_real_, tn_mgl),
+        tp_mgl = dplyr::if_else(n_quarters < 4L, NA_real_, tp_mgl)
+      ) |>
+      dplyr::select(-n_quarters) |>
+      dplyr::mutate(tss_mgl = NA_real_)
 
   } else {
 
@@ -293,16 +306,31 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
 
   }
 
-  # Fill years within yrrng that have no TN/TP observations with the grand mean.
-  # TSS is intentionally not filled here: NAs fall back to the fixed lookup below.
+  # Fill missing or incomplete spring-years by carrying forward the most recent
+  # complete year's mean. TSS is intentionally not filled: NAs fall back to
+  # fixed site values in the load calculation below.
   wq_filled <- wq_annual |>
     tidyr::complete(spring, yr = yrrng[1]:yrrng[2]) |>
+    dplyr::arrange(spring, yr) |>
     dplyr::group_by(spring) |>
     dplyr::mutate(
-      tn_mgl = dplyr::if_else(is.na(tn_mgl), mean(tn_mgl, na.rm = TRUE), tn_mgl),
-      tp_mgl = dplyr::if_else(is.na(tp_mgl), mean(tp_mgl, na.rm = TRUE), tp_mgl)
+      tn_mgl = zoo::na.locf(tn_mgl, na.rm = FALSE),
+      tp_mgl = zoo::na.locf(tp_mgl, na.rm = FALSE)
     ) |>
     dplyr::ungroup()
+
+  # Error if carry-forward had no complete prior year to draw from
+  na_rows <- wq_filled[is.na(wq_filled$tn_mgl) | is.na(wq_filled$tp_mgl), ]
+  if (nrow(na_rows) > 0L) {
+    bad <- unique(paste(na_rows$spring, na_rows$yr, sep = " "))
+    stop(
+      "Water quality concentrations could not be filled for: ",
+      paste(bad, collapse = ", "), ". ",
+      "Supply data from prior years in the water quality file so that every ",
+      "spring has at least one complete reference year to carry forward from.",
+      call. = FALSE
+    )
+  }
 
   # ---------------------------------------------------------------------------
   # 7. Join flow and WQ; assign TSS; calculate loads
@@ -324,7 +352,7 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
       ),
       segment = 'Hillsborough Bay',
       source  = 'SPR',
-      hy_load = flow_cfs * 86400 * (365 / 12) * 28.32 * 1e-3,
+      hy_load = flow_cfs * 86400 * (365 / 12) * 0.0283,  # convert from cfs to m3/month
       tn_load  = hy_load * tn_mgl  * 1e-3 / 907.1847,  # convert kg to tons
       tp_load  = hy_load * tp_mgl  * 1e-3 / 907.1847,  # convert kg to tons
       tss_load = hy_load * tss_mgl * 1e-3 / 907.1847,  # convert kg to tons

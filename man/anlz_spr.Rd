@@ -98,8 +98,14 @@ When \code{wqpth} is supplied, sample concentrations (mg/L) for TN and TP
 are read from the CSV. These data are from FDEP's Impaired Waters Rule
 dataset available at \url{https://publicfiles.dep.state.fl.us/dear/iwr/}.
 Annual mean concentrations are computed per spring and joined to monthly flow
-estimates. If a year within \code{yrrng} has no water quality observations for a given
-spring, the grand mean across all available years is substituted.
+estimates. A spring-year is considered complete when its samples span all four
+calendar quarters (Jan-Mar, Apr-Jun, Jul-Sep, Oct-Dec). Spring-years that are
+entirely missing or whose samples do not cover all four quarters are filled by
+carrying forward the most recent complete year's mean. The file should therefore
+include data from years prior to the focal period so that every spring has at
+least one complete reference year available.  If the earliest year in the file
+is already incomplete for a spring, there is no prior year to carry forward and
+an error is raised.
 
 \strong{Water quality data (API, \code{wqpth = NULL}):}
 When \code{wqpth} is \code{NULL}, water quality data are obtained using
