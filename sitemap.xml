@@ -16,6 +16,7 @@
 <url><loc>https://tbep-tech.github.io/tbeploads/authors.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/index.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/news/index.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/aa_corrections.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/ad_distance.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/allflo.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/allwq.html</loc></url>
@@ -38,8 +39,12 @@
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/dbasing.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/emc.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/facilities.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/hydro_baseline.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/index.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/nps_allocations.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/nps_distance.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/nps_factors.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/ps_allocations.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/rain.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/rain_historic.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/rcclucsid.html</loc></url>
@@ -52,6 +57,7 @@
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/tbsoil.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/tbsubshed.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/usgsflow.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/util_aa_npsfactors.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/util_getrain.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/util_gw_getcontour.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/util_gw_getwq.html</loc></url>

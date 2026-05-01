@@ -35,6 +35,9 @@ Functions for analyzing data.
 
 Supporting datasets used by the other functions.
 
+- [`aa_corrections`](https://tbep-tech.github.io/tbeploads/reference/aa_corrections.md)
+  : Allocation assessment TN load corrections by bay segment and entity
+
 - [`ad_distance`](https://tbep-tech.github.io/tbeploads/reference/ad_distance.md)
   : Data frame of distances of segment locations to National Weather
   Service (NWS) sites
@@ -70,9 +73,22 @@ Supporting datasets used by the other functions.
   : Domestic and industrial point source facilities, including
   industrial with material losses
 
+- [`hydro_baseline`](https://tbep-tech.github.io/tbeploads/reference/hydro_baseline.md)
+  : Historic 1992-1994 mean total water load baseline by bay segment and
+  basin
+
+- [`nps_allocations`](https://tbep-tech.github.io/tbeploads/reference/nps_allocations.md)
+  : TBNMC TN load allocations for NPS/MS4 entities
+
 - [`nps_distance`](https://tbep-tech.github.io/tbeploads/reference/nps_distance.md)
   : Data frame of distances of drainage basin locations to National
   Weather Service (NWS) sites
+
+- [`nps_factors`](https://tbep-tech.github.io/tbeploads/reference/nps_factors.md)
+  : NPS disaggregation factors for allocation assessment
+
+- [`ps_allocations`](https://tbep-tech.github.io/tbeploads/reference/ps_allocations.md)
+  : TBNMC TN load allocations for IPS point source facilities
 
 - [`rain`](https://tbep-tech.github.io/tbeploads/reference/rain.md) :
   Data frame of daily rainfall data from NOAA NCDC National Weather
@@ -122,6 +138,8 @@ Supporting datasets used by the other functions.
 
 Utility functions used by other functions or standalone.
 
+- [`util_aa_npsfactors()`](https://tbep-tech.github.io/tbeploads/reference/util_aa_npsfactors.md)
+  : Create NPS disaggregation factors for allocation assessment
 - [`util_getrain()`](https://tbep-tech.github.io/tbeploads/reference/util_getrain.md)
   : Get rainfall data at NOAA NCDC sites for atmospheric deposition and
   non-point source ungaged calculations
