@@ -1,0 +1,81 @@
+entity,entity1,type,alloc_pct,bay_seg,alloc_tn_tons
+CHEVAL WEST,Cheval West,MS4,0.18%,1,0.7
+CLEARWATER,City of Clearwater,MS4,2.71%,1,10.6
+HERITAGE HARBOR,Heritage Harbor,MS4,0.15%,1,0.6
+HILLSBOROUGH,Hillsborough County,MS4,23.34%,1,91.6
+LARGO,City of Largo,MS4,1.40%,1,5.5
+MacDill AFB,MacDill Air Force Base,MS4,0.09%,1,0.4
+OLDSMAR,City of Oldsmar,MS4,1.38%,1,5.4
+PALM BAY,Palm Bay,MS4,0.01%,1,0
+PARK PLACE,Park Place,MS4,0.10%,1,0.4
+PASCO,Pasco County,MS4,0.44%,1,1.7
+PINELLAS,Pinellas County,MS4,14.66%,1,57.6
+PINELLAS PARK,City of Pinellas Park,MS4,1.01%,1,4
+SAFETY HARBOR,City of Safety Harbor,MS4,1.27%,1,5
+ST PETERSBURG,City of St. Petersburg,MS4,0.88%,1,3.5
+STONEBRIAR,Stonebriar,MS4,0.05%,1,0.2
+TARPON SPRINGS,City of Tarpon Springs,MS4,0.41%,1,1.6
+Tampa,City of Tampa,MS4,5.30%,1,20.8
+WESTCHASE,Westchase,MS4,0.36%,1,1.4
+WESTCHASE EAST,Westchase East,MS4,0.43%,1,1.7
+All,FDACS (Agriculture),,6.13%,1,24.1
+HILLSBOROUGH,Hillsborough County,MS4,22.60%,2,235.6
+Lakeland,City of Lakeland,MS4,1.05%,2,10.9
+Mulberry,City of Mulberry,MS4,0.20%,2,2.1
+PASCO,Pasco County,MS4,3.69%,2,38.4
+CITY OF PLANT CITY,City of Plant City,MS4,0.88%,2,9.2
+POLK,Polk County,MS4,6.47%,2,67.5
+Tampa,City of Tampa,MS4,4.80%,2,50
+ZEPHYRHILLS,City of Zephyrhills,MS4,0.16%,2,1.6
+ALAFIA PRESERVE,Alafia Preserve,Nonpoint Source/MS4,0.06%,2,0.6
+BLOOMINGDALE,Bloomingdale,Nonpoint Source/MS4,0.00%,2,0
+DONALDSON KNOLL,Donaldson Knoll,Nonpoint Source/MS4,0.01%,2,0.1
+EAGLE RIDGE,Eagle Ridge,Nonpoint Source/MS4,0.07%,2,0.7
+LAKE ST. CHARLES,Lake St. Charles,Nonpoint Source/MS4,0.04%,2,0.4
+LIVE OAK I,Live Oak I,Nonpoint Source/MS4,0.02%,2,0.2
+LIVE OAK II,Live Oak II,Nonpoint Source/MS4,0.01%,2,0.1
+MAGNOLIA PARK,Magnolia Park,Nonpoint Source/MS4,0.00%,2,0.1
+MacDill AFB,MacDill Air Force Base,Nonpoint Source/MS4,0.07%,2,0.7
+PALM RIVER,Palm River,Nonpoint Source/MS4,0.00%,2,0
+PANTHER TRACE,Panther Trace,Nonpoint Source/MS4,0.03%,2,0.3
+PANTHER TRACE II,Panther Trace II,Nonpoint Source/MS4,0.02%,2,0.2
+RIVERCREST,Rivercrest,Nonpoint Source/MS4,0.03%,2,0.3
+SAN ANTONIO,City of San Antonio,Nonpoint Source/MS4,0.03%,2,0.3
+SPRING LAKE,Spring Lake,Nonpoint Source/MS4,0.01%,2,0.1
+ST. LEO,St. Leo,Nonpoint Source/MS4,0.00%,2,0
+STONE CREST,Stone Crest,Nonpoint Source/MS4,0.00%,2,0
+STONE DAIRY CREEK,Stone Dairy Creek,Nonpoint Source/MS4,0.00%,2,0
+STONELAKE RANCH,Stonelake Ranch,Nonpoint Source/MS4,0.00%,2,0
+TEMPLE TERRACE,City of Temple Terrace,Nonpoint Source/MS4,0.20%,2,2.1
+All,FDACS (Agriculture),,25.79%,2,268.8
+HARBOR BAY,Harbor Bay,MS4,0.03%,3,0.2
+HILLSBOROUGH,Hillsborough County,MS4,9.91%,3,70.9
+MacDill AFB,MacDill Air Force Base,MS4,0.97%,3,7
+MANATEE,Manatee County,MS4,3.05%,3,21.8
+PINELLAS,Pinellas County,MS4,0.45%,3,3.2
+PINELLAS PARK,City of Pinellas Park,MS4,0.74%,3,5.3
+ST PETERSBURG,City of St. Petersburg,MS4,6.49%,3,46.5
+All,FDACS (Agriculture),33.41%,239.2,3,143.4
+HILLSBOROUGH,Hillsborough County,MS4,0.01%,4,0
+Lexington,Lexington,MS4,0.04%,4,0.1
+MANATEE,Manatee County,MS4,7.81%,4,26.8
+ST PETERSBURG,City of St. Petersburg,MS4,0.01%,4,0
+All,FDACS (Agriculture),,8.63%,4,29.7
+Bradenton,City of Bradenton,MS4,1.82%,55,10.8
+GULFPORT,City of Gulfport,MS4,0.37%,55,2.2
+Greyhawk Landing,Greyhawk Landing,MS4,0.14%,55,0.8
+Harbourage at Braden River,Harbourage at Braden River,MS4,0.00%,55,0
+Heritage Harbour,Heritage Harbour,MS4,0.14%,55,0.8
+Heritage Harbour Marketplace,Heritage Harbour Marketplace,MS4,0.02%,55,0.1
+Lakewood Ranch,Lakewood Ranch,MS4,1.47%,55,8.7
+Lexington,Lexington,MS4,0.02%,55,0.1
+MANATEE,Manatee County,MS4,21.95%,55,130.2
+PINELLAS,Pinellas County,MS4,0.18%,55,1.1
+Palmetto,City of Palmetto,MS4,0.77%,55,4.6
+SARASOTA,Sarasota County,MS4,1.38%,55,8.2
+ST PETE BEACH,City of St. Petersburg Beach,MS4,0.21%,55,1.2
+ST PETERSBURG,City of St. Petersburg,MS4,1.27%,55,7.5
+Tara,Tara,MS4,0.18%,55,1.1
+University Place,University Place,MS4,0.11%,55,0.6
+Waterlefe,Waterlefe,MS4,0.10%,55,0.6
+All,FDACS (Agriculture),,45.95%,55,272.6

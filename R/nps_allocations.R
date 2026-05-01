@@ -1,0 +1,21 @@
+#' TBNMC TN load allocations for NPS/MS4 entities
+#'
+#' @format A \code{data.frame}
+#'
+#' @details TN load allocations assigned to non-point source and MS4 jurisdictions
+#' under the Tampa Bay Nitrogen Management Consortium (TBNMC) framework.
+#'
+#' \itemize{
+#'   \item \code{bay_seg}: Integer bay segment identifier (1, 2, 3, 4, 55)
+#'   \item \code{entity}: Short entity name used for joining
+#'   \item \code{entity_full}: Full entity name
+#'   \item \code{type}: Allocation type (e.g., MS4, Agriculture, Other)
+#'   \item \code{alloc_pct}: Fractional allocation share (0-1)
+#'   \item \code{alloc_tons}: Allocation in tons TN per year
+#' }
+#'
+#' See "data-raw/nps_allocations.R" for creation.
+#'
+#' @examples
+#' nps_allocations
+"nps_allocations"
