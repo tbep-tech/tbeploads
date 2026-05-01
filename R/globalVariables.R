@@ -33,7 +33,8 @@ globalVariables(c(".", "Facility.Name", "Month", "Outfall.ID", "Permit.Number", 
                   "geometry", "lower", "measuredatetime", "MG", "MONTH_YEAR", "site", "tbsegdetail", 
                   "TN.Unit", "tn(mg/L)", "Total.N", "Total.N.Unit", "Total.P", "Total.P.Unit", "tp", 
                   "tp_fw", "TP.Unit", "tp(mg/L)", "tss", "TSS", "tss_fw", "TSS.Unit", "upper", "val", 
-                  "year", "zero_flow", "elev", "x", "y")
+                  "year", "zero_flow", "elev", "x", "y", "category", "factor_rc", "factor_tn", "month", 
+                  "mult", "n_quarters", "quarter rc", "total_mult")
 )
 
 #' @importFrom utils capture.output read.csv read.table

@@ -24,7 +24,7 @@
 #' }
 #'
 #' @details
-#' These factors are used by \code{\link{anlz_aa}} to disaggregate basin-level
+#' These factors are used internally by \code{\link{anlz_aa}} to disaggregate basin-level
 #' NPS loads to individual MS4 jurisdictions (entities).
 #'
 #' Two factors are required because the disaggregation is a two-step process
