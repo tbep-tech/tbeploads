@@ -50,8 +50,10 @@ A named list with two elements:
 
 ## Details
 
-These factors are used by `anlz_aa` to disaggregate basin-level NPS
-loads to individual MS4 jurisdictions (entities).
+These factors are used internally by
+[`anlz_aa`](https://tbep-tech.github.io/tbeploads/reference/anlz_aa.md)
+to disaggregate basin-level NPS loads to individual MS4 jurisdictions
+(entities).
 
 Two factors are required because the disaggregation is a two-step
 process matching the original SAS workflow:

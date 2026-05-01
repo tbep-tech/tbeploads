@@ -14,7 +14,8 @@ A `data.frame`
 
 ## Details
 
-TN load offsets applied before hydrologic normalization in `anlz_aa`.
+TN load offsets applied before hydrologic normalization in
+[`anlz_aa`](https://tbep-tech.github.io/tbeploads/reference/anlz_aa.md).
 Two correction types are combined per entity: AD (atmospheric
 deposition) load estimates from
 [`anlz_ad`](https://tbep-tech.github.io/tbeploads/reference/anlz_ad.md),

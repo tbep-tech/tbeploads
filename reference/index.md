@@ -4,6 +4,8 @@
 
 Functions for analyzing data.
 
+- [`anlz_aa()`](https://tbep-tech.github.io/tbeploads/reference/anlz_aa.md)
+  : Allocation assessment for NPS/MS4 entities and IPS facilities
 - [`anlz_ad()`](https://tbep-tech.github.io/tbeploads/reference/anlz_ad.md)
   : Calculate AD loads and summarize
 - [`anlz_dps()`](https://tbep-tech.github.io/tbeploads/reference/anlz_dps.md)
@@ -83,9 +85,6 @@ Supporting datasets used by the other functions.
 - [`nps_distance`](https://tbep-tech.github.io/tbeploads/reference/nps_distance.md)
   : Data frame of distances of drainage basin locations to National
   Weather Service (NWS) sites
-
-- [`nps_factors`](https://tbep-tech.github.io/tbeploads/reference/nps_factors.md)
-  : NPS disaggregation factors for allocation assessment
 
 - [`ps_allocations`](https://tbep-tech.github.io/tbeploads/reference/ps_allocations.md)
   : TBNMC TN load allocations for IPS point source facilities
