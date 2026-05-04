@@ -5,7 +5,7 @@
 Functions for analyzing data.
 
 - [`anlz_aa()`](https://tbep-tech.github.io/tbeploads/reference/anlz_aa.md)
-  : Allocation assessment for NPS/MS4 entities and IPS facilities
+  : Allocation assessment for DPS, IPS, and NPS/MS4 entities
 - [`anlz_ad()`](https://tbep-tech.github.io/tbeploads/reference/anlz_ad.md)
   : Calculate AD loads and summarize
 - [`anlz_dps()`](https://tbep-tech.github.io/tbeploads/reference/anlz_dps.md)
@@ -67,6 +67,9 @@ Supporting datasets used by the other functions.
 
 - [`dbasing`](https://tbep-tech.github.io/tbeploads/reference/dbasing.md)
   : Basin information for coastal subbasin codes
+
+- [`dps_allocations`](https://tbep-tech.github.io/tbeploads/reference/dps_allocations.md)
+  : TBNMC TN load allocations for DPS domestic wastewater facilities
 
 - [`emc`](https://tbep-tech.github.io/tbeploads/reference/emc.md) :
   Event Mean Concentration (EMC) data for CLUCSID in Tampa Bay
