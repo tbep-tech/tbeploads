@@ -1,14 +1,17 @@
-#' Allocation assessment for NPS/MS4 entities and IPS facilities
+#' Allocation assessment for DPS, IPS, and NPS/MS4 entities
 #'
-#' @param yrrng Integer vector of years to include, e.g. \code{2022:2024}.
+#' @param yrrng Integer vector of years to include, e.g., \code{2022:2024}.
+#' @param dps_data Data frame from \code{\link{anlz_dps_facility}}. Required
+#'   columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
+#'   \code{coastco}, \code{tn_load}.
+#' @param ips_data Data frame from \code{\link{anlz_ips_facility}}. Required
+#'   columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
+#'   \code{coastco}, \code{tn_load}.
 #' @param nps_data Data frame from \code{\link{anlz_nps}} called with
 #'   \code{summ = 'basin'} and \code{summtime = 'year'}. Required columns:
 #'   \code{Year}, \code{source}, \code{segment}, \code{basin}, \code{tn_load},
 #'   \code{hy_load}.
-#' @param ips_data Data frame from \code{\link{anlz_ips_facility}}. Required
-#'   columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
-#'   \code{coastco}, \code{tn_load}.
-#' @param tbbase data frame containing polygon areas for the combined data 
+#' @param tbbase data frame containing polygon areas for the combined data
 #'   layer of bay segment, basin, jurisdiction, land use data, and soils, see details
 #' @param corrections Data frame with columns \code{bay_seg}, \code{entity},
 #'   \code{ad_tons}, and \code{project_tons}. Use \code{\link{aa_corrections}}
@@ -25,7 +28,8 @@
 #'   \item{facname}{Facility name (IPS rows only)}
 #'   \item{permit}{NPDES permit number (IPS rows only)}
 #'   \item{source}{Allocation type: \code{"MS4"},
-#'     \code{"Nonpoint Source/MS4"}, or \code{"IPS"}}
+#'     \code{"Nonpoint Source/MS4"}, \code{"IPS"},
+#'     \code{"DPS - end of pipe"}, or \code{"DPS - reuse"}}
 #'   \item{alloc_pct}{Fractional TN allocation (0-1)}
 #'   \item{alloc_tons}{Allocation in TN tons per year}
 #'   \item{eff_load_tons}{Mean hydrologically-normalized TN load (tons/yr),
@@ -38,6 +42,30 @@
 #' Entities present in the computed loads but absent from the allocation tables
 #' are retained in the output with \code{NA} allocation fields so that
 #' unmatched entries are visible for troubleshooting.
+#'
+#' \strong{DPS path}
+#'
+#' DPS facility TN loads require no hydrologic normalization. Monthly loads
+#' from \code{dps_data} are summed to annual totals per facility, averaged
+#' over \code{yrrng}, and compared directly against the \code{\link{dps_allocations}}
+#' table. The join key is \code{entity + facname + bay\_seg + source}, where
+#' \code{source} distinguishes direct surface water discharge
+#' (\code{"DPS - end of pipe"}) from reclaimed water reuse
+#' (\code{"DPS - reuse"}). Bay segment 5 (Boca Ciega Bay) is excluded
+#' and bayseg 6/7 are remapped to 55.
+#'
+#' \strong{IPS path}
+#'
+#' Annual IPS facility TN loads are normalized using the ratio:
+#'
+#' \deqn{
+#'   \text{eff\_tn} = \text{tn\_load} \times
+#'   \frac{\text{mean\_h2o\_9294}}{\text{basin\_nps\_h2o}}
+#' }
+#'
+#' where \code{basin\_nps\_h2o} is the annual NPS water load from
+#' \code{nps_data} for the same basin and year. Effective loads are summed
+#' across basins per permit per bay segment, then averaged over \code{yrrng}.
 #'
 #' \strong{NPS/MS4 path}
 #'
@@ -68,23 +96,7 @@
 #' segment 55 (Remaining Lower Tampa Bay) after disaggregation, consistent
 #' with the \code{\link{hydro_baseline}} encoding and TBNMC reporting.
 #' Boca Ciega Bay (segment 5) is excluded from the allocation framework.
-#'
-#' \strong{IPS path}
-#'
-#' Annual IPS facility TN loads are normalized using the same ratio:
-#'
-#' \deqn{
-#'   \text{eff\_tn} = \text{tn\_load} \times
-#'   \frac{\text{mean\_h2o\_9294}}{\text{basin\_nps\_h2o}}
-#' }
-#'
-#' where \code{basin\_nps\_h2o} is the annual NPS water load from
-#' \code{nps_data} for the same basin and year. Effective loads are summed
-#' across basins per permit per bay segment, then averaged over \code{yrrng}.
-#'
-#' DPS (domestic wastewater) facilities are not included; they are outside the
-#' TBNMC allocation framework.
-#'
+#' 
 #' @export
 #'
 #' @examples
@@ -99,12 +111,15 @@
 #'   summ     = "basin",
 #'   summtime = "year"
 #' )
-#' fls <- list.files(system.file("extdata/", package = "tbeploads"),
+#' fls_ips <- list.files(system.file("extdata/", package = "tbeploads"),
 #'   pattern = "ps_ind_", full.names = TRUE)
-#' ips <- anlz_ips_facility(fls)
-#' anlz_aa(2022:2024, nps, ips, tbbase, aa_corrections)
+#' fls_dps <- list.files(system.file("extdata/", package = "tbeploads"),
+#'   pattern = "ps_dom_", full.names = TRUE)
+#' ips <- anlz_ips_facility(fls_ips)
+#' dps <- anlz_dps_facility(fls_dps)
+#' anlz_aa(2022:2024, dps, ips, nps, tbbase, aa_corrections)
 #' }
-anlz_aa <- function(yrrng, nps_data, ips_data, tbbase, corrections) {
+anlz_aa <- function(yrrng, dps_data, ips_data, nps_data, tbbase, corrections) {
 
   # Segment name → bay_seg (Boca Ciega Bay = 5 is excluded from allocation)
   seg_bay <- c(
@@ -326,9 +341,76 @@ anlz_aa <- function(yrrng, nps_data, ips_data, tbbase, corrections) {
       "alloc_pct", "alloc_tons", "eff_load_tons", "pass"
     )
 
+  # ---- DPS path ------------------------------------------------------------
+
+  # Domestic facility lookup: recode source type and remap bay_seg encoding
+  dps_fac <- facilities |>
+    dplyr::filter(grepl("Domestic", .data$source)) |>
+    dplyr::rename(bay_seg = "bayseg") |>
+    dplyr::mutate(
+      bay_seg = as.integer(.data$bay_seg),
+      bay_seg = dplyr::if_else(.data$bay_seg %in% c(6L, 7L), 55L, .data$bay_seg),
+      dps_source = dplyr::case_when(
+        grepl("SW",    .data$source) ~ "DPS - end of pipe",
+        grepl("REUSE", .data$source) ~ "DPS - reuse"
+      )
+    ) |>
+    dplyr::filter(.data$bay_seg != 5L) |>
+    dplyr::select("entity", "facname", "coastco", "bay_seg", "dps_source")
+
+  # Annual DPS TN per entity + coastco + type + year; facname resolved via coastco join
+  dps_annual <- dps_data |>
+    dplyr::filter(.data$Year %in% yrrng) |>
+    dplyr::mutate(
+      dps_source = dplyr::case_when(
+        grepl("^D", .data$source) ~ "DPS - end of pipe",
+        grepl("^R", .data$source) ~ "DPS - reuse"
+      )
+    ) |>
+    dplyr::group_by(.data$Year, .data$entity, .data$coastco, .data$dps_source) |>
+    dplyr::summarise(tn_dps = sum(.data$tn_load, na.rm = TRUE), .groups = "drop") |>
+    dplyr::left_join(dps_fac, by = c("entity", "coastco", "dps_source")) |>
+    dplyr::filter(!is.na(.data$facname)) |>
+    dplyr::group_by(.data$Year, .data$bay_seg, .data$entity, .data$facname, .data$dps_source) |>
+    dplyr::summarise(tn_dps = sum(.data$tn_dps, na.rm = TRUE), .groups = "drop")
+
+  # Average over yrrng → mean annual effective load per facility
+  dps_mean <- dps_annual |>
+    dplyr::group_by(.data$bay_seg, .data$entity, .data$facname, .data$dps_source) |>
+    dplyr::summarise(
+      eff_load_tons = mean(.data$tn_dps, na.rm = TRUE),
+      .groups = "drop"
+    ) |>
+    dplyr::mutate(
+      eff_load_tons = dplyr::if_else(
+        is.nan(.data$eff_load_tons), NA_real_, .data$eff_load_tons
+      )
+    )
+
+  # Full join with DPS allocations; retain unmatched rows on both sides
+  dps_out <- dps_allocations |>
+    dplyr::rename(dps_source = "source") |>
+    dplyr::full_join(dps_mean, by = c("entity", "facname", "bay_seg", "dps_source")) |>
+    dplyr::mutate(
+      segment   = bay_label[as.character(.data$bay_seg)],
+      source    = .data$dps_source,
+      permit    = NA_character_,
+      alloc_pct = NA_real_,
+      pass      = dplyr::if_else(
+        !is.na(.data$alloc_tons) & !is.na(.data$eff_load_tons),
+        .data$eff_load_tons <= .data$alloc_tons,
+        NA
+      )
+    ) |>
+    dplyr::select(
+      "bay_seg", "segment", "entity", "entity_full",
+      "facname", "permit", "source",
+      "alloc_pct", "alloc_tons", "eff_load_tons", "pass"
+    )
+
   # ---- Combine -------------------------------------------------------------
 
-  dplyr::bind_rows(nps_out, ips_out) |>
+  dplyr::bind_rows(nps_out, ips_out, dps_out) |>
     dplyr::arrange(.data$bay_seg, .data$source, .data$entity)
 
 }

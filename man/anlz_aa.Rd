@@ -2,21 +2,25 @@
 % Please edit documentation in R/anlz_aa.R
 \name{anlz_aa}
 \alias{anlz_aa}
-\title{Allocation assessment for NPS/MS4 entities and IPS facilities}
+\title{Allocation assessment for DPS, IPS, and NPS/MS4 entities}
 \usage{
-anlz_aa(yrrng, nps_data, ips_data, tbbase, corrections)
+anlz_aa(yrrng, dps_data, ips_data, nps_data, tbbase, corrections)
 }
 \arguments{
-\item{yrrng}{Integer vector of years to include, e.g. \code{2022:2024}.}
+\item{yrrng}{Integer vector of years to include, e.g., \code{2022:2024}.}
+
+\item{dps_data}{Data frame from \code{\link{anlz_dps_facility}}. Required
+columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
+\code{coastco}, \code{tn_load}.}
+
+\item{ips_data}{Data frame from \code{\link{anlz_ips_facility}}. Required
+columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
+\code{coastco}, \code{tn_load}.}
 
 \item{nps_data}{Data frame from \code{\link{anlz_nps}} called with
 \code{summ = 'basin'} and \code{summtime = 'year'}. Required columns:
 \code{Year}, \code{source}, \code{segment}, \code{basin}, \code{tn_load},
 \code{hy_load}.}
-
-\item{ips_data}{Data frame from \code{\link{anlz_ips_facility}}. Required
-columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
-\code{coastco}, \code{tn_load}.}
 
 \item{tbbase}{data frame containing polygon areas for the combined data
 layer of bay segment, basin, jurisdiction, land use data, and soils, see details}
@@ -37,7 +41,8 @@ per bay segment:
 \item{facname}{Facility name (IPS rows only)}
 \item{permit}{NPDES permit number (IPS rows only)}
 \item{source}{Allocation type: \code{"MS4"},
-\code{"Nonpoint Source/MS4"}, or \code{"IPS"}}
+\code{"Nonpoint Source/MS4"}, \code{"IPS"},
+\code{"DPS - end of pipe"}, or \code{"DPS - reuse"}}
 \item{alloc_pct}{Fractional TN allocation (0-1)}
 \item{alloc_tons}{Allocation in TN tons per year}
 \item{eff_load_tons}{Mean hydrologically-normalized TN load (tons/yr),
@@ -47,12 +52,36 @@ allocation or effective load is missing}
 }
 }
 \description{
-Allocation assessment for NPS/MS4 entities and IPS facilities
+Allocation assessment for DPS, IPS, and NPS/MS4 entities
 }
 \details{
 Entities present in the computed loads but absent from the allocation tables
 are retained in the output with \code{NA} allocation fields so that
 unmatched entries are visible for troubleshooting.
+
+\strong{DPS path}
+
+DPS facility TN loads require no hydrologic normalization. Monthly loads
+from \code{dps_data} are summed to annual totals per facility, averaged
+over \code{yrrng}, and compared directly against the \code{\link{dps_allocations}}
+table. The join key is \code{entity + facname + bay\_seg + source}, where
+\code{source} distinguishes direct surface water discharge
+(\code{"DPS - end of pipe"}) from reclaimed water reuse
+(\code{"DPS - reuse"}). Bay segment 5 (Boca Ciega Bay) is excluded
+and bayseg 6/7 are remapped to 55.
+
+\strong{IPS path}
+
+Annual IPS facility TN loads are normalized using the same ratio:
+
+\deqn{
+  \text{eff\_tn} = \text{tn\_load} \times
+  \frac{\text{mean\_h2o\_9294}}{\text{basin\_nps\_h2o}}
+}
+
+where \code{basin\_nps\_h2o} is the annual NPS water load from
+\code{nps_data} for the same basin and year. Effective loads are summed
+across basins per permit per bay segment, then averaged over \code{yrrng}.
 
 \strong{NPS/MS4 path}
 
@@ -83,22 +112,6 @@ Bay segments Terra Ceia Bay (6) and Manatee River (7) are merged into
 segment 55 (Remaining Lower Tampa Bay) after disaggregation, consistent
 with the \code{\link{hydro_baseline}} encoding and TBNMC reporting.
 Boca Ciega Bay (segment 5) is excluded from the allocation framework.
-
-\strong{IPS path}
-
-Annual IPS facility TN loads are normalized using the same ratio:
-
-\deqn{
-  \text{eff\_tn} = \text{tn\_load} \times
-  \frac{\text{mean\_h2o\_9294}}{\text{basin\_nps\_h2o}}
-}
-
-where \code{basin\_nps\_h2o} is the annual NPS water load from
-\code{nps_data} for the same basin and year. Effective loads are summed
-across basins per permit per bay segment, then averaged over \code{yrrng}.
-
-DPS (domestic wastewater) facilities are not included; they are outside the
-TBNMC allocation framework.
 }
 \examples{
 \dontrun{
@@ -112,9 +125,12 @@ nps <- anlz_nps(
   summ     = "basin",
   summtime = "year"
 )
-fls <- list.files(system.file("extdata/", package = "tbeploads"),
+fls_ips <- list.files(system.file("extdata/", package = "tbeploads"),
   pattern = "ps_ind_", full.names = TRUE)
-ips <- anlz_ips_facility(fls)
-anlz_aa(2022:2024, nps, ips, tbbase, aa_corrections)
+fls_dps <- list.files(system.file("extdata/", package = "tbeploads"),
+  pattern = "ps_dom_", full.names = TRUE)
+ips <- anlz_ips_facility(fls_ips)
+dps <- anlz_dps_facility(fls_dps)
+anlz_aa(2022:2024, dps, ips, nps, tbbase, aa_corrections)
 }
 }
