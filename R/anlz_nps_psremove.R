@@ -11,6 +11,10 @@
 #'   \code{summ = 'basin'} and \code{summtime = 'month'}
 #' @param ad_ap logical, whether to apply fixed monthly AD/AP TN reductions
 #'   from the 2007 RA allocation analysis. Default \code{TRUE}.
+#' @param summ character, one of \code{'segment'} or \code{'basin'}.
+#'   Controls whether output is aggregated to the bay segment level
+#'   (\code{'segment'}, default) or retained at the basin level
+#'   (\code{'basin'}).
 #' @param summtime character, one of \code{'month'} or \code{'year'}.
 #'   Controls whether the output is monthly or annual. Default is \code{'month'}.
 #'
@@ -42,10 +46,10 @@
 #'
 #' @return data frame with columns for \code{Year}, \code{Month} (if
 #'   \code{summtime = 'month'}), \code{source} (always \code{"NPS"}),
-#'   \code{segment}, \code{tn_load}, \code{tp_load}, \code{tss_load},
-#'   \code{bod_load}, and \code{hy_load}.  Loads are in short tons per month or
-#'   year; hydrologic load is in cubic meters per month or year.  Column order
-#'   matches the output of \code{\link{anlz_ips}} and \code{\link{anlz_dps}}.
+#'   \code{segment}, \code{basin} (if \code{summ = 'basin'}), \code{tn_load},
+#'   \code{tp_load}, \code{tss_load}, \code{bod_load}, and \code{hy_load}.
+#'   Loads are in short tons per month or year; hydrologic load is in cubic
+#'   meters per month or year.
 #'
 #' @seealso \code{\link{anlz_nps}}, \code{\link{anlz_ips}}, \code{\link{anlz_dps}}
 #'
@@ -68,9 +72,13 @@
 #' anlz_nps_psremove(nps, ips, dps)
 #' }
 anlz_nps_psremove <- function(nps, ips, dps, ad_ap = TRUE,
-                              summtime = c('month', 'year')) {
+                              summ = c('segment', 'basin'),                             
+                              summtime = c('month', 'year')
+                              ) {
 
+  summ     <- match.arg(summ)
   summtime <- match.arg(summtime)
+
 
   # Gaged basins from the package lookup table
   gaged_basins <- dbasing |>
@@ -110,18 +118,20 @@ anlz_nps_psremove <- function(nps, ips, dps, ad_ap = TRUE,
   combined <- dplyr::bind_rows(nps, ips_gaged, dps_gaged) |>
     dplyr::mutate(basin = reassign_basins(basin))
 
-  # Sum all sources to monthly segment totals
+  # Sum all sources to monthly basin totals
   monthly <- combined |>
     dplyr::summarise(
       dplyr::across(dplyr::contains("load"), ~ sum(.x, na.rm = TRUE)),
-      .by = c(Year, Month, segment)
+      .by = c(Year, Month, basin, segment)
     ) |>
     dplyr::mutate(source = "NPS") |>
-    dplyr::select(Year, Month, source, segment,
+    dplyr::select(Year, Month, source, segment, basin,
                   tn_load, tp_load, tss_load, bod_load, hy_load) |>
     dplyr::arrange(segment, Year, Month)
 
-  # Apply AD/AP monthly TN reductions (short tons/month) if requested
+  # Apply AD/AP monthly TN reductions (short tons/month) if requested.
+  # The correction is a fixed segment-level value distributed proportionally
+  # across basins so that the segment total is reduced by exactly adap_reduction.
   if (ad_ap) {
     adap_tn <- data.frame(
       segment        = c("Old Tampa Bay", "Hillsborough Bay",
@@ -129,19 +139,48 @@ anlz_nps_psremove <- function(nps, ips, dps, ad_ap = TRUE,
       adap_reduction = c(2.41, 4.31, 2.29, 0.36, 2.74),
       stringsAsFactors = FALSE
     )
-    monthly <- monthly |>
+    seg_totals <- monthly |>
+      dplyr::group_by(.data$Year, .data$Month, .data$segment) |>
+      dplyr::summarise(seg_tn = sum(.data$tn_load, na.rm = TRUE), .groups = "drop") |>
       dplyr::left_join(adap_tn, by = "segment") |>
       dplyr::mutate(
-        tn_load        = tn_load - dplyr::coalesce(adap_reduction, 0),
-        adap_reduction = NULL
+        seg_tn_adj = .data$seg_tn - dplyr::coalesce(.data$adap_reduction, 0)
+      )
+    monthly <- monthly |>
+      dplyr::left_join(
+        seg_totals |> dplyr::select("Year", "Month", "segment", "seg_tn", "seg_tn_adj"),
+        by = c("Year", "Month", "segment")
+      ) |>
+      dplyr::mutate(
+        tn_load = dplyr::if_else(
+          .data$seg_tn != 0,
+          .data$tn_load * (.data$seg_tn_adj / .data$seg_tn),
+          .data$tn_load
+        ),
+        seg_tn     = NULL,
+        seg_tn_adj = NULL
       )
   }
 
+  # Collapse to segment level if requested (basin-level computation is always done
+  # internally so AD/AP distribution is correct before any aggregation)
+  if (summ == 'segment') {
+    monthly <- monthly |>
+      dplyr::summarise(
+        dplyr::across(dplyr::contains("load"), ~ sum(.x, na.rm = TRUE)),
+        .by = c(Year, Month, source, segment)
+      ) |>
+      dplyr::select(Year, Month, source, segment,
+                    tn_load, tp_load, tss_load, bod_load, hy_load) |>
+      dplyr::arrange(segment, Year, Month)
+  }
+
   if (summtime == 'year') {
+    grp_vars <- if (summ == 'basin') c("Year", "source", "basin", "segment") else c("Year", "source", "segment")
     out <- monthly |>
       dplyr::summarise(
         dplyr::across(dplyr::contains("load"), ~ sum(.x, na.rm = TRUE)),
-        .by = c(Year, source, segment)
+        .by = dplyr::all_of(grp_vars)
       ) |>
       dplyr::arrange(segment, Year)
   } else {

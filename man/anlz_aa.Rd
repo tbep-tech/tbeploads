@@ -72,7 +72,7 @@ and bayseg 6/7 are remapped to 55.
 
 \strong{IPS path}
 
-Annual IPS facility TN loads are normalized using the same ratio:
+Annual IPS facility TN loads are normalized using the ratio:
 
 \deqn{
   \text{eff\_tn} = \text{tn\_load} \times

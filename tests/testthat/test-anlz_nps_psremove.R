@@ -38,22 +38,42 @@ res_month_adap <- anlz_nps_psremove(nps_all, ips_all, dps_empty,
                                     ad_ap = TRUE, summtime = 'month')
 res_year  <- anlz_nps_psremove(nps_all, ips_all, dps_empty,
                                 ad_ap = FALSE, summtime = 'year')
+res_month_basin <- anlz_nps_psremove(nps_all, ips_all, dps_empty,
+                                     ad_ap = FALSE, summ = 'basin',
+                                     summtime = 'month'
+                                     )
+res_year_basin  <- anlz_nps_psremove(nps_all, ips_all, dps_empty,
+                                     ad_ap = FALSE, summ = 'basin',
+                                     summtime = 'year'
+                                     )
 
 # --- Output structure --------------------------------------------------------
 
-test_that("Monthly output has expected columns in correct order", {
+test_that("Monthly output has expected columns in correct order (segment)", {
   expected <- c("Year", "Month", "source", "segment",
                 "tn_load", "tp_load", "tss_load", "bod_load", "hy_load")
   expect_equal(names(res_month), expected)
+})
+
+test_that("Monthly basin output includes basin column after segment", {
+  expected <- c("Year", "Month", "source", "segment", "basin",
+                "tn_load", "tp_load", "tss_load", "bod_load", "hy_load")
+  expect_equal(names(res_month_basin), expected)
 })
 
 test_that("source is always 'NPS'", {
   expect_true(all(res_month$source == "NPS"))
 })
 
-test_that("Annual output has Year, source, segment but no Month", {
+test_that("Annual segment output has Year, source, segment but no Month or basin", {
   expect_true(all(c("Year", "source", "segment", "tn_load") %in% names(res_year)))
   expect_false("Month" %in% names(res_year))
+  expect_false("basin" %in% names(res_year))
+})
+
+test_that("Annual basin output includes basin column and no Month", {
+  expect_true(all(c("Year", "source", "segment", "basin", "tn_load") %in% names(res_year_basin)))
+  expect_false("Month" %in% names(res_year_basin))
 })
 
 test_that("One row per segment per month for monthly output", {
@@ -113,6 +133,22 @@ test_that("Annual TN is 12x monthly TN (no AD/AP, constant monthly loads)", {
   hb_yr <- res_year[res_year$segment == "Hillsborough Bay", ]
   # 12 months × 8 tons/month = 96 tons/year
   expect_equal(hb_yr$tn_load, 96, tolerance = 1e-9)
+})
+
+# --- summ = 'basin' -----------------------------------------------------------
+
+test_that("summ basin retains basin column with correct values matching segment output", {
+  # One basin per segment in fixtures: basin values should equal segment values
+  hb_seg   <- res_month[res_month$segment == "Hillsborough Bay", ]
+  hb_basin <- res_month_basin[res_month_basin$segment == "Hillsborough Bay", ]
+  expect_equal(hb_basin$tn_load, hb_seg$tn_load)
+  expect_equal(unique(hb_basin$basin), "02301500")
+})
+
+test_that("summ basin annual tn equals 12x monthly tn", {
+  hb_yr <- res_year_basin[res_year_basin$segment == "Hillsborough Bay", ]
+  expect_equal(hb_yr$tn_load, 96, tolerance = 1e-9)
+  expect_equal(hb_yr$basin, "02301500")
 })
 
 # --- Nested basin reassignment -----------------------------------------------

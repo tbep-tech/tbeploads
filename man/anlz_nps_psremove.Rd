@@ -4,7 +4,14 @@
 \alias{anlz_nps_psremove}
 \title{Remove point source loads from non-point source load estimates}
 \usage{
-anlz_nps_psremove(nps, ips, dps, ad_ap = TRUE, summtime = c("month", "year"))
+anlz_nps_psremove(
+  nps,
+  ips,
+  dps,
+  ad_ap = TRUE,
+  summ = c("segment", "basin"),
+  summtime = c("month", "year")
+)
 }
 \arguments{
 \item{nps}{data frame of NPS loads from \code{\link{anlz_nps}} with
@@ -19,16 +26,21 @@ anlz_nps_psremove(nps, ips, dps, ad_ap = TRUE, summtime = c("month", "year"))
 \item{ad_ap}{logical, whether to apply fixed monthly AD/AP TN reductions
 from the 2007 RA allocation analysis. Default \code{TRUE}.}
 
+\item{summ}{character, one of \code{'segment'} or \code{'basin'}.
+Controls whether output is aggregated to the bay segment level
+(\code{'segment'}, default) or retained at the basin level
+(\code{'basin'}).}
+
 \item{summtime}{character, one of \code{'month'} or \code{'year'}.
 Controls whether the output is monthly or annual. Default is \code{'month'}.}
 }
 \value{
 data frame with columns for \code{Year}, \code{Month} (if
 \code{summtime = 'month'}), \code{source} (always \code{"NPS"}),
-\code{segment}, \code{tn_load}, \code{tp_load}, \code{tss_load},
-\code{bod_load}, and \code{hy_load}.  Loads are in short tons per month or
-year; hydrologic load is in cubic meters per month or year.  Column order
-matches the output of \code{\link{anlz_ips}} and \code{\link{anlz_dps}}.
+\code{segment}, \code{basin} (if \code{summ = 'basin'}), \code{tn_load},
+\code{tp_load}, \code{tss_load}, \code{bod_load}, and \code{hy_load}.
+Loads are in short tons per month or year; hydrologic load is in cubic
+meters per month or year.
 }
 \description{
 Subtract gaged industrial and domestic point source loads from NPS model
