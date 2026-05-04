@@ -6,7 +6,14 @@ output to isolate true non-point source loads.
 ## Usage
 
 ``` r
-anlz_nps_psremove(nps, ips, dps, ad_ap = TRUE, summtime = c("month", "year"))
+anlz_nps_psremove(
+  nps,
+  ips,
+  dps,
+  ad_ap = TRUE,
+  summ = c("segment", "basin"),
+  summtime = c("month", "year")
+)
 ```
 
 ## Arguments
@@ -34,6 +41,12 @@ anlz_nps_psremove(nps, ips, dps, ad_ap = TRUE, summtime = c("month", "year"))
   logical, whether to apply fixed monthly AD/AP TN reductions from the
   2007 RA allocation analysis. Default `TRUE`.
 
+- summ:
+
+  character, one of `'segment'` or `'basin'`. Controls whether output is
+  aggregated to the bay segment level (`'segment'`, default) or retained
+  at the basin level (`'basin'`).
+
 - summtime:
 
   character, one of `'month'` or `'year'`. Controls whether the output
@@ -42,13 +55,10 @@ anlz_nps_psremove(nps, ips, dps, ad_ap = TRUE, summtime = c("month", "year"))
 ## Value
 
 data frame with columns for `Year`, `Month` (if `summtime = 'month'`),
-`source` (always `"NPS"`), `segment`, `tn_load`, `tp_load`, `tss_load`,
-`bod_load`, and `hy_load`. Loads are in short tons per month or year;
-hydrologic load is in cubic meters per month or year. Column order
-matches the output of
-[`anlz_ips`](https://tbep-tech.github.io/tbeploads/reference/anlz_ips.md)
-and
-[`anlz_dps`](https://tbep-tech.github.io/tbeploads/reference/anlz_dps.md).
+`source` (always `"NPS"`), `segment`, `basin` (if `summ = 'basin'`),
+`tn_load`, `tp_load`, `tss_load`, `bod_load`, and `hy_load`. Loads are
+in short tons per month or year; hydrologic load is in cubic meters per
+month or year.
 
 ## Details
 

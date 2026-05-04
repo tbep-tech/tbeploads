@@ -122,7 +122,7 @@ to 55.
 
 **IPS path**
 
-Annual IPS facility TN loads are normalized using the same ratio:
+Annual IPS facility TN loads are normalized using the ratio:
 
 \$\$ \text{eff\\tn} = \text{tn\\load} \times
 \frac{\text{mean\\h2o\\9294}}{\text{basin\\nps\\h2o}} \$\$
