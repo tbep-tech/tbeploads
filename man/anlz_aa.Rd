@@ -4,7 +4,7 @@
 \alias{anlz_aa}
 \title{Allocation assessment for DPS, IPS, and NPS/MS4 entities}
 \usage{
-anlz_aa(yrrng, dps_data, ips_data, nps_data, tbbase, corrections, ml_data)
+anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, corrections)
 }
 \arguments{
 \item{yrrng}{Integer vector of years to include, e.g., \code{2022:2024}.}
@@ -17,6 +17,10 @@ columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
 columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
 \code{coastco}, \code{tn_load}.}
 
+\item{ml_data}{Data frame from \code{\link{anlz_ml_facility}}. Required
+columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
+\code{tn_load}.}
+
 \item{nps_data}{Data frame from \code{\link{anlz_nps}} called with
 \code{summ = 'basin'} and \code{summtime = 'year'}. Required columns:
 \code{Year}, \code{source}, \code{segment}, \code{basin}, \code{tn_load},
@@ -28,10 +32,6 @@ layer of bay segment, basin, jurisdiction, land use data, and soils, see details
 \item{corrections}{Data frame with columns \code{bay_seg}, \code{entity},
 \code{ad_tons}, and \code{project_tons}. Use \code{\link{aa_corrections}}
 as a zero-row placeholder when actual corrections are not yet available.}
-
-\item{ml_data}{Data frame from \code{\link{anlz_ml_facility}}. Required
-columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
-\code{tn_load}.}
 }
 \value{
 A data frame with one row per entity (NPS/MS4) or facility (IPS)
@@ -63,17 +63,6 @@ Entities present in the computed loads but absent from the allocation tables
 are retained in the output with \code{NA} allocation fields so that
 unmatched entries are visible for troubleshooting.
 
-\strong{ML path}
-
-Material loss TN loads require no hydrologic normalization. Monthly loads
-from \code{ml_data} are summed to annual totals per facility, averaged
-over \code{yrrng}, and compared against the \code{\link{ml_allocations}}
-table. Facilities with \code{ishared = FALSE} are assessed individually on
-entity + facname + bay segment. Facilities with \code{ishared = TRUE}
-(currently the three Mosaic facilities in Hillsborough Bay) have their
-loads summed to an entity + bay segment total before comparison to the
-single shared allocation.
-
 \strong{DPS path}
 
 DPS facility TN loads require no hydrologic normalization. Monthly loads
@@ -97,6 +86,17 @@ Annual IPS facility TN loads are normalized using the ratio:
 where \code{basin\_nps\_h2o} is the annual NPS water load from
 \code{nps_data} for the same basin and year. Effective loads are summed
 across basins per permit per bay segment, then averaged over \code{yrrng}.
+
+\strong{ML path}
+
+Material loss TN loads require no hydrologic normalization. Monthly loads
+from \code{ml_data} are summed to annual totals per facility, averaged
+over \code{yrrng}, and compared against the \code{\link{ml_allocations}}
+table. Facilities with \code{ishared = FALSE} are assessed individually on
+entity + facname + bay segment. Facilities with \code{ishared = TRUE}
+(currently the three Mosaic facilities in Hillsborough Bay) have their
+loads summed to an entity + bay segment total before comparison to the
+single shared allocation.
 
 \strong{NPS/MS4 path}
 
@@ -130,6 +130,15 @@ Boca Ciega Bay (segment 5) is excluded from the allocation framework.
 }
 \examples{
 \dontrun{
+fls_dps <- list.files(system.file("extdata/", package = "tbeploads"),
+  pattern = "ps_dom_", full.names = TRUE)
+dps <- anlz_dps_facility(fls_dps)
+fls_ips <- list.files(system.file("extdata/", package = "tbeploads"),
+  pattern = "ps_ind_", full.names = TRUE)
+ips <- anlz_ips_facility(fls_ips)
+fls_ml <- list.files(system.file("extdata/", package = "tbeploads"),
+  pattern = "ps_indml", full.names = TRUE)
+ml <- anlz_ml_facility(fls_ml)
 nps <- anlz_nps(
   yrrng  = c("2022-01-01", "2024-12-31"),
   tbbase = tbbase,
@@ -140,15 +149,7 @@ nps <- anlz_nps(
   summ     = "basin",
   summtime = "year"
 )
-fls_ips <- list.files(system.file("extdata/", package = "tbeploads"),
-  pattern = "ps_ind_", full.names = TRUE)
-fls_dps <- list.files(system.file("extdata/", package = "tbeploads"),
-  pattern = "ps_dom_", full.names = TRUE)
-ips <- anlz_ips_facility(fls_ips)
-dps <- anlz_dps_facility(fls_dps)
-fls_ml <- list.files(system.file("extdata/", package = "tbeploads"),
-  pattern = "ps_indml", full.names = TRUE)
-ml <- anlz_ml_facility(fls_ml)
-anlz_aa(2022:2024, dps, ips, nps, tbbase, aa_corrections, ml)
+
+anlz_aa(2022:2024, dps, ips, ml, nps, tbbase, aa_corrections)
 }
 }

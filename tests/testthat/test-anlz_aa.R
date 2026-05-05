@@ -14,13 +14,6 @@ make_ips_empty <- function() {
   )
 }
 
-make_nps_empty <- function() {
-  data.frame(
-    Year = integer(), source = character(), segment = character(),
-    basin = character(), tn_load = numeric(), hy_load = numeric()
-  )
-}
-
 make_ml_empty <- function() {
   data.frame(
     Year = integer(), Month = integer(), entity = character(),
@@ -34,6 +27,13 @@ ml_tampaplex <- function(tn_tonsyr = 5.0, yr = 2023L) {
     Year = yr, Month = 1:12, entity = "Kinder Morgan",
     facility = "Kinder Morgan Tampaplex",
     tn_load = tn_tonsyr / 12
+  )
+}
+
+make_nps_empty <- function() {
+  data.frame(
+    Year = integer(), source = character(), segment = character(),
+    basin = character(), tn_load = numeric(), hy_load = numeric()
   )
 }
 
@@ -66,7 +66,7 @@ dps_bradenton_sw <- function(tn = 20.0, yr = 2023L) {
 # ---- Output structure --------------------------------------------------------
 
 test_that("anlz_aa returns a data frame with expected columns", {
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_nps_empty(), tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), make_nps_empty(), tbbase, aa_corrections)
 
   expect_s3_class(result, "data.frame")
   expected_cols <- c(
@@ -77,7 +77,7 @@ test_that("anlz_aa returns a data frame with expected columns", {
 })
 
 test_that("bay_seg is integer and pass is logical", {
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_nps_empty(), tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(),  make_ml_empty(), make_nps_empty(), tbbase, aa_corrections)
 
   expect_type(result$bay_seg, "integer")
   expect_type(result$pass, "logical")
@@ -86,7 +86,7 @@ test_that("bay_seg is integer and pass is logical", {
 # ---- Full join: all allocation rows retained ---------------------------------
 
 test_that("every nps_allocations bay_seg+entity key appears in output with empty NPS input", {
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_nps_empty(), tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), make_nps_empty(), tbbase, aa_corrections)
 
   alloc_keys <- paste(nps_allocations$bay_seg, nps_allocations$entity)
   out_keys   <- paste(result$bay_seg, result$entity)
@@ -94,13 +94,13 @@ test_that("every nps_allocations bay_seg+entity key appears in output with empty
 })
 
 test_that("every ps_allocations permit appears in output with empty IPS input", {
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_nps_empty(), tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), make_nps_empty(), tbbase, aa_corrections)
 
   expect_true(all(ps_allocations$permit %in% result$permit))
 })
 
 test_that("every dps_allocations row appears in output with empty DPS input", {
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_nps_empty(), tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), make_nps_empty(), tbbase, aa_corrections)
 
   alloc_keys <- paste(dps_allocations$bay_seg, dps_allocations$entity,
                       dps_allocations$facname, dps_allocations$source)
@@ -111,13 +111,13 @@ test_that("every dps_allocations row appears in output with empty DPS input", {
 # ---- pass column logic -------------------------------------------------------
 
 test_that("pass is NA for all rows when no load data is supplied", {
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_nps_empty(), tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), make_nps_empty(), tbbase, aa_corrections)
 
   expect_true(all(is.na(result$pass)))
 })
 
 test_that("pass equals eff_load_tons <= alloc_tons wherever both are non-NA", {
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), nps_206_1(), tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_206_1(), tbbase, aa_corrections)
 
   rows_both <- result[!is.na(result$alloc_tons) & !is.na(result$eff_load_tons), ]
   if (nrow(rows_both) > 0) {
@@ -130,7 +130,7 @@ test_that("pass equals eff_load_tons <= alloc_tons wherever both are non-NA", {
 test_that("entity eff_load_tons sums to tn_load when normalization ratio equals 1", {
   # When hy_load == mean_h2o_9294 the ratio cancels and eff_tn == tn_entity.
   # factor_tn and factor_rc both sum to 1, so summed entity loads equal basin tn_load.
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), nps_206_1(tn = 50.0), tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_206_1(tn = 50.0), tbbase, aa_corrections)
 
   nps_seg1_loaded <- result[result$bay_seg == 1 & !is.na(result$eff_load_tons), ]
   expect_equal(sum(nps_seg1_loaded$eff_load_tons), 50.0, tolerance = 1e-6)
@@ -139,13 +139,13 @@ test_that("entity eff_load_tons sums to tn_load when normalization ratio equals 
 # ---- Corrections reduce effective load ---------------------------------------
 
 test_that("ad_tons correction reduces CLEARWATER eff_load_tons", {
-  base_result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), nps_206_1(), tbbase, aa_corrections, make_ml_empty())
+  base_result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_206_1(), tbbase, aa_corrections)
 
   corr <- data.frame(
     bay_seg = 1L, entity = "CLEARWATER",
     ad_tons = 5.0, project_tons = 0.0
   )
-  corr_result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), nps_206_1(), tbbase, corr, make_ml_empty())
+  corr_result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_206_1(), tbbase, corr)
 
   cw_base <- base_result$eff_load_tons[
     base_result$entity == "CLEARWATER" & base_result$bay_seg == 1
@@ -167,8 +167,8 @@ test_that("loads outside yrrng do not contribute to the average eff_load_tons", 
   nps_two <- rbind(nps_206_1(tn = 50.0, yr = 2022L),
                    nps_206_1(tn = 100.0, yr = 2023L))
 
-  result_2022 <- anlz_aa(2022L, make_dps_empty(), make_ips_empty(), nps_two, tbbase, aa_corrections, make_ml_empty())
-  result_both <- anlz_aa(2022:2023, make_dps_empty(), make_ips_empty(), nps_two, tbbase, aa_corrections, make_ml_empty())
+  result_2022 <- anlz_aa(2022L, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_two, tbbase, aa_corrections)
+  result_both <- anlz_aa(2022:2023, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_two, tbbase, aa_corrections)
 
   cw_2022 <- result_2022$eff_load_tons[
     result_2022$entity == "CLEARWATER" & result_2022$bay_seg == 1
@@ -186,7 +186,7 @@ test_that("loads outside yrrng do not contribute to the average eff_load_tons", 
 # ---- IPS path ----------------------------------------------------------------
 
 test_that("IPS rows all carry source equal to IPS", {
-  result <- anlz_aa(2020L, make_dps_empty(), ips, make_nps_empty(), tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2020L, make_dps_empty(), ips, make_ml_empty(), make_nps_empty(), tbbase, aa_corrections)
 
   ips_rows <- result[!is.na(result$source) & result$source == "IPS", ]
   expect_true(nrow(ips_rows) > 0)
@@ -201,7 +201,7 @@ test_that("IPS eff_load_tons is finite and positive when NPS water data covers t
     basin = "02304500", tn_load = 100.0, hy_load = 200.0
   )
 
-  result <- anlz_aa(2020L, make_dps_empty(), ips, nps_hb, tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2020L, make_dps_empty(), ips, make_ml_empty(), nps_hb, tbbase, aa_corrections)
 
   bg <- result[!is.na(result$facname) & result$facname == "Busch Gardens", ]
   expect_true(nrow(bg) >= 1)
@@ -212,7 +212,7 @@ test_that("IPS eff_load_tons is finite and positive when NPS water data covers t
 # ---- DPS path ----------------------------------------------------------------
 
 test_that("DPS rows carry source of DPS - end of pipe or DPS - reuse", {
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_nps_empty(), tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), make_nps_empty(), tbbase, aa_corrections)
 
   dps_rows <- result[!is.na(result$source) & grepl("^DPS", result$source), ]
   expect_true(nrow(dps_rows) > 0)
@@ -220,8 +220,8 @@ test_that("DPS rows carry source of DPS - end of pipe or DPS - reuse", {
 })
 
 test_that("DPS eff_load_tons is finite and positive when dps_data covers the facility", {
-  result <- anlz_aa(2023L, dps_bradenton_sw(tn = 20.0), make_ips_empty(), make_nps_empty(), 
-                    tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2023L, dps_bradenton_sw(tn = 20.0), make_ips_empty(), make_ml_empty(), make_nps_empty(), 
+                    tbbase, aa_corrections)
 
   brd <- result[
     !is.na(result$facname) & result$facname == "City of Bradenton WRF" &
@@ -234,8 +234,8 @@ test_that("DPS eff_load_tons is finite and positive when dps_data covers the fac
 
 test_that("DPS pass is FALSE when eff_load_tons exceeds alloc_tons", {
   # Use a very large tn_load to force a fail
-  result <- anlz_aa(2023L, dps_bradenton_sw(tn = 1e6), make_ips_empty(), make_nps_empty(), 
-                    tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2023L, dps_bradenton_sw(tn = 1e6), make_ips_empty(), make_ml_empty(), make_nps_empty(), 
+                    tbbase, aa_corrections)
 
   brd <- result[
     !is.na(result$facname) & result$facname == "City of Bradenton WRF" &
@@ -251,8 +251,8 @@ test_that("DPS year range filtering averages only over yrrng years", {
     dps_bradenton_sw(tn = 90.0, yr = 2023L)
   )
 
-  result_2022 <- anlz_aa(2022L,  dps_two, make_ips_empty(), make_nps_empty(), tbbase, aa_corrections, make_ml_empty())
-  result_both <- anlz_aa(2022:2023,  dps_two, make_ips_empty(), make_nps_empty(), tbbase, aa_corrections, make_ml_empty())
+  result_2022 <- anlz_aa(2022L,  dps_two, make_ips_empty(), make_ml_empty(), make_nps_empty(), tbbase, aa_corrections)
+  result_both <- anlz_aa(2022:2023,  dps_two, make_ips_empty(), make_ml_empty(), make_nps_empty(), tbbase, aa_corrections)
 
   brd_2022 <- result_2022$eff_load_tons[
     !is.na(result_2022$facname) & result_2022$facname == "City of Bradenton WRF" &
@@ -272,8 +272,8 @@ test_that("DPS year range filtering averages only over yrrng years", {
 # ---- ML path ----------------------------------------------------------------
 
 test_that("every ml_allocations non-shared row appears in output with empty ML input", {
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_nps_empty(),
-                    tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(),make_nps_empty(),
+                    tbbase, aa_corrections)
 
   ns_keys <- paste(
     ml_allocations$bay_seg[!ml_allocations$ishared],
@@ -285,8 +285,8 @@ test_that("every ml_allocations non-shared row appears in output with empty ML i
 })
 
 test_that("shared ML allocation row appears in output with empty ML input", {
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_nps_empty(),
-                    tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), make_nps_empty(),
+                    tbbase, aa_corrections)
 
   shared_row <- result[
     !is.na(result$source) & result$source == "ML" &
@@ -297,8 +297,8 @@ test_that("shared ML allocation row appears in output with empty ML input", {
 })
 
 test_that("ML rows carry source equal to ML", {
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_nps_empty(),
-                    tbbase, aa_corrections, make_ml_empty())
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), make_nps_empty(),
+                    tbbase, aa_corrections)
 
   ml_rows <- result[!is.na(result$source) & result$source == "ML", ]
   expect_true(nrow(ml_rows) > 0)
@@ -306,8 +306,8 @@ test_that("ML rows carry source equal to ML", {
 })
 
 test_that("ML eff_load_tons is finite and positive for non-shared facility", {
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_nps_empty(),
-                    tbbase, aa_corrections, ml_tampaplex(tn_tonsyr = 5.0))
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), ml_tampaplex(tn_tonsyr = 5.0), make_nps_empty(),
+                    tbbase, aa_corrections)
 
   km_tp <- result[
     !is.na(result$facname) & result$facname == "Kinder Morgan Tampaplex" &
@@ -323,8 +323,8 @@ test_that("ML shared eff_load_tons equals sum of individual Mosaic facility load
     Year = 2023L, Month = 1:12, entity = "Mosaic",
     facility = "Riverview", tn_load = 1.0 / 12
   )
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_nps_empty(),
-                    tbbase, aa_corrections, ml_riverview)
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), ml_riverview, make_nps_empty(),
+                    tbbase, aa_corrections)
 
   shared_row <- result[
     !is.na(result$source) & result$source == "ML" &
@@ -340,10 +340,10 @@ test_that("ML year range filtering averages only over yrrng years", {
     ml_tampaplex(tn_tonsyr = 90.0, yr = 2023L)
   )
 
-  result_2022 <- anlz_aa(2022L, make_dps_empty(), make_ips_empty(), make_nps_empty(),
-                          tbbase, aa_corrections, ml_two)
-  result_both <- anlz_aa(2022:2023, make_dps_empty(), make_ips_empty(), make_nps_empty(),
-                          tbbase, aa_corrections, ml_two)
+  result_2022 <- anlz_aa(2022L, make_dps_empty(), make_ips_empty(), ml_two, make_nps_empty(),
+                          tbbase, aa_corrections)
+  result_both <- anlz_aa(2022:2023, make_dps_empty(), make_ips_empty(), ml_two, make_nps_empty(),
+                          tbbase, aa_corrections)
 
   km_2022 <- result_2022$eff_load_tons[
     !is.na(result_2022$facname) & result_2022$facname == "Kinder Morgan Tampaplex" &

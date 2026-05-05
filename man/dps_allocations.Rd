@@ -39,8 +39,6 @@ TECO Big Bend and Tropicana are not included: TECO is an industrial reuse
 customer rather than a direct discharger, and Tropicana is classified as an
 industrial point source in the \code{\link{facilities}} table. Neither can
 be matched to DPS load data from \code{\link{anlz_dps_facility}}.
-
-See \code{"data-raw/dps_allocations.R"} for creation.
 }
 \examples{
 dps_allocations

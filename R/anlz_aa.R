@@ -7,6 +7,9 @@
 #' @param ips_data Data frame from \code{\link{anlz_ips_facility}}. Required
 #'   columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
 #'   \code{coastco}, \code{tn_load}.
+#' @param ml_data Data frame from \code{\link{anlz_ml_facility}}. Required
+#'   columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
+#'   \code{tn_load}.
 #' @param nps_data Data frame from \code{\link{anlz_nps}} called with
 #'   \code{summ = 'basin'} and \code{summtime = 'year'}. Required columns:
 #'   \code{Year}, \code{source}, \code{segment}, \code{basin}, \code{tn_load},
@@ -16,9 +19,6 @@
 #' @param corrections Data frame with columns \code{bay_seg}, \code{entity},
 #'   \code{ad_tons}, and \code{project_tons}. Use \code{\link{aa_corrections}}
 #'   as a zero-row placeholder when actual corrections are not yet available.
-#' @param ml_data Data frame from \code{\link{anlz_ml_facility}}. Required
-#'   columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
-#'   \code{tn_load}.
 #'
 #' @returns A data frame with one row per entity (NPS/MS4) or facility (IPS)
 #'   per bay segment:
@@ -46,17 +46,6 @@
 #' are retained in the output with \code{NA} allocation fields so that
 #' unmatched entries are visible for troubleshooting.
 #'
-#' \strong{ML path}
-#'
-#' Material loss TN loads require no hydrologic normalization. Monthly loads
-#' from \code{ml_data} are summed to annual totals per facility, averaged
-#' over \code{yrrng}, and compared against the \code{\link{ml_allocations}}
-#' table. Facilities with \code{ishared = FALSE} are assessed individually on
-#' entity + facname + bay segment. Facilities with \code{ishared = TRUE}
-#' (currently the three Mosaic facilities in Hillsborough Bay) have their
-#' loads summed to an entity + bay segment total before comparison to the
-#' single shared allocation.
-#'
 #' \strong{DPS path}
 #'
 #' DPS facility TN loads require no hydrologic normalization. Monthly loads
@@ -81,6 +70,17 @@
 #' \code{nps_data} for the same basin and year. Effective loads are summed
 #' across basins per permit per bay segment, then averaged over \code{yrrng}.
 #'
+#' \strong{ML path}
+#'
+#' Material loss TN loads require no hydrologic normalization. Monthly loads
+#' from \code{ml_data} are summed to annual totals per facility, averaged
+#' over \code{yrrng}, and compared against the \code{\link{ml_allocations}}
+#' table. Facilities with \code{ishared = FALSE} are assessed individually on
+#' entity + facname + bay segment. Facilities with \code{ishared = TRUE}
+#' (currently the three Mosaic facilities in Hillsborough Bay) have their
+#' loads summed to an entity + bay segment total before comparison to the
+#' single shared allocation.
+#' 
 #' \strong{NPS/MS4 path}
 #'
 #' Basin-level NPS loads from \code{nps_data} are disaggregated to individual
@@ -115,6 +115,15 @@
 #'
 #' @examples
 #' \dontrun{
+#' fls_dps <- list.files(system.file("extdata/", package = "tbeploads"),
+#'   pattern = "ps_dom_", full.names = TRUE)
+#' dps <- anlz_dps_facility(fls_dps)
+#' fls_ips <- list.files(system.file("extdata/", package = "tbeploads"),
+#'   pattern = "ps_ind_", full.names = TRUE)
+#' ips <- anlz_ips_facility(fls_ips)
+#' fls_ml <- list.files(system.file("extdata/", package = "tbeploads"),
+#'   pattern = "ps_indml", full.names = TRUE)
+#' ml <- anlz_ml_facility(fls_ml)
 #' nps <- anlz_nps(
 #'   yrrng  = c("2022-01-01", "2024-12-31"),
 #'   tbbase = tbbase,
@@ -125,18 +134,10 @@
 #'   summ     = "basin",
 #'   summtime = "year"
 #' )
-#' fls_ips <- list.files(system.file("extdata/", package = "tbeploads"),
-#'   pattern = "ps_ind_", full.names = TRUE)
-#' fls_dps <- list.files(system.file("extdata/", package = "tbeploads"),
-#'   pattern = "ps_dom_", full.names = TRUE)
-#' ips <- anlz_ips_facility(fls_ips)
-#' dps <- anlz_dps_facility(fls_dps)
-#' fls_ml <- list.files(system.file("extdata/", package = "tbeploads"),
-#'   pattern = "ps_indml", full.names = TRUE)
-#' ml <- anlz_ml_facility(fls_ml)
-#' anlz_aa(2022:2024, dps, ips, nps, tbbase, aa_corrections, ml)
+#' 
+#' anlz_aa(2022:2024, dps, ips, ml, nps, tbbase, aa_corrections)
 #' }
-anlz_aa <- function(yrrng, dps_data, ips_data, nps_data, tbbase, corrections, ml_data) {
+anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, corrections) {
 
   # Segment name → bay_seg (Boca Ciega Bay = 5 is excluded from allocation)
   seg_bay <- c(

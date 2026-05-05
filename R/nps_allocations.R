@@ -14,8 +14,6 @@
 #'   \item \code{alloc_tons}: Allocation in tons TN per year
 #' }
 #'
-#' See "data-raw/nps_allocations.R" for creation.
-#'
 #' @examples
 #' nps_allocations
 "nps_allocations"

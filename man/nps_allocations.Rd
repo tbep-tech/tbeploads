@@ -25,8 +25,6 @@ under the Tampa Bay Nitrogen Management Consortium (TBNMC) framework.
 \item \code{alloc_pct}: Fractional allocation share (0-1)
 \item \code{alloc_tons}: Allocation in tons TN per year
 }
-
-See "data-raw/nps_allocations.R" for creation.
 }
 \examples{
 nps_allocations
