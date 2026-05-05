@@ -114,6 +114,10 @@ Supporting datasets used by the other functions.
   : Historic 1992-1994 mean total water load baseline by bay segment and
   basin
 
+- [`ml_allocations`](https://tbep-tech.github.io/tbeploads/reference/ml_allocations.md)
+  : TBNMC TN load allocations for industrial material loss (ML)
+  facilities
+
 - [`nps_allocations`](https://tbep-tech.github.io/tbeploads/reference/nps_allocations.md)
   : TBNMC TN load allocations for NPS/MS4 entities
 

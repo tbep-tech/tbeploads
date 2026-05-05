@@ -5,7 +5,7 @@ Allocation assessment for DPS, IPS, and NPS/MS4 entities
 ## Usage
 
 ``` r
-anlz_aa(yrrng, dps_data, ips_data, nps_data, tbbase, corrections)
+anlz_aa(yrrng, dps_data, ips_data, nps_data, tbbase, corrections, ml_data)
 ```
 
 ## Arguments
@@ -48,6 +48,12 @@ anlz_aa(yrrng, dps_data, ips_data, nps_data, tbbase, corrections)
   as a zero-row placeholder when actual corrections are not yet
   available.
 
+- ml_data:
+
+  Data frame from
+  [`anlz_ml_facility`](https://tbep-tech.github.io/tbeploads/reference/anlz_ml_facility.md).
+  Required columns: `Year`, `Month`, `entity`, `facility`, `tn_load`.
+
 ## Value
 
 A data frame with one row per entity (NPS/MS4) or facility (IPS) per bay
@@ -82,7 +88,7 @@ segment:
 - source:
 
   Allocation type: `"MS4"`, `"Nonpoint Source/MS4"`, `"IPS"`,
-  `"DPS - end of pipe"`, or `"DPS - reuse"`
+  `"DPS - end of pipe"`, `"DPS - reuse"`, or `"ML"`
 
 - alloc_pct:
 
@@ -107,6 +113,18 @@ segment:
 Entities present in the computed loads but absent from the allocation
 tables are retained in the output with `NA` allocation fields so that
 unmatched entries are visible for troubleshooting.
+
+**ML path**
+
+Material loss TN loads require no hydrologic normalization. Monthly
+loads from `ml_data` are summed to annual totals per facility, averaged
+over `yrrng`, and compared against the
+[`ml_allocations`](https://tbep-tech.github.io/tbeploads/reference/ml_allocations.md)
+table. Facilities with `ishared = FALSE` are assessed individually on
+entity + facname + bay segment. Facilities with `ishared = TRUE`
+(currently the three Mosaic facilities in Hillsborough Bay) have their
+loads summed to an entity + bay segment total before comparison to the
+single shared allocation.
 
 **DPS path**
 
@@ -184,6 +202,9 @@ fls_dps <- list.files(system.file("extdata/", package = "tbeploads"),
   pattern = "ps_dom_", full.names = TRUE)
 ips <- anlz_ips_facility(fls_ips)
 dps <- anlz_dps_facility(fls_dps)
-anlz_aa(2022:2024, dps, ips, nps, tbbase, aa_corrections)
+fls_ml <- list.files(system.file("extdata/", package = "tbeploads"),
+  pattern = "ps_indml", full.names = TRUE)
+ml <- anlz_ml_facility(fls_ml)
+anlz_aa(2022:2024, dps, ips, nps, tbbase, aa_corrections, ml)
 } # }
 ```
