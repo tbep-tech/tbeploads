@@ -29,8 +29,6 @@ under the Tampa Bay Nitrogen Management Consortium (TBNMC) framework.
 
 - `alloc_tons`: Allocation in tons TN per year
 
-See "data-raw/nps_allocations.R" for creation.
-
 ## Examples
 
 ``` r

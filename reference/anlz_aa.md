@@ -5,7 +5,7 @@ Allocation assessment for DPS, IPS, and NPS/MS4 entities
 ## Usage
 
 ``` r
-anlz_aa(yrrng, dps_data, ips_data, nps_data, tbbase, corrections, ml_data)
+anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, corrections)
 ```
 
 ## Arguments
@@ -28,6 +28,12 @@ anlz_aa(yrrng, dps_data, ips_data, nps_data, tbbase, corrections, ml_data)
   Required columns: `Year`, `Month`, `entity`, `facility`, `coastco`,
   `tn_load`.
 
+- ml_data:
+
+  Data frame from
+  [`anlz_ml_facility`](https://tbep-tech.github.io/tbeploads/reference/anlz_ml_facility.md).
+  Required columns: `Year`, `Month`, `entity`, `facility`, `tn_load`.
+
 - nps_data:
 
   Data frame from
@@ -47,12 +53,6 @@ anlz_aa(yrrng, dps_data, ips_data, nps_data, tbbase, corrections, ml_data)
   [`aa_corrections`](https://tbep-tech.github.io/tbeploads/reference/aa_corrections.md)
   as a zero-row placeholder when actual corrections are not yet
   available.
-
-- ml_data:
-
-  Data frame from
-  [`anlz_ml_facility`](https://tbep-tech.github.io/tbeploads/reference/anlz_ml_facility.md).
-  Required columns: `Year`, `Month`, `entity`, `facility`, `tn_load`.
 
 ## Value
 
@@ -114,18 +114,6 @@ Entities present in the computed loads but absent from the allocation
 tables are retained in the output with `NA` allocation fields so that
 unmatched entries are visible for troubleshooting.
 
-**ML path**
-
-Material loss TN loads require no hydrologic normalization. Monthly
-loads from `ml_data` are summed to annual totals per facility, averaged
-over `yrrng`, and compared against the
-[`ml_allocations`](https://tbep-tech.github.io/tbeploads/reference/ml_allocations.md)
-table. Facilities with `ishared = FALSE` are assessed individually on
-entity + facname + bay segment. Facilities with `ishared = TRUE`
-(currently the three Mosaic facilities in Hillsborough Bay) have their
-loads summed to an entity + bay segment total before comparison to the
-single shared allocation.
-
 **DPS path**
 
 DPS facility TN loads require no hydrologic normalization. Monthly loads
@@ -148,6 +136,18 @@ Annual IPS facility TN loads are normalized using the ratio:
 where `basin\_nps\_h2o` is the annual NPS water load from `nps_data` for
 the same basin and year. Effective loads are summed across basins per
 permit per bay segment, then averaged over `yrrng`.
+
+**ML path**
+
+Material loss TN loads require no hydrologic normalization. Monthly
+loads from `ml_data` are summed to annual totals per facility, averaged
+over `yrrng`, and compared against the
+[`ml_allocations`](https://tbep-tech.github.io/tbeploads/reference/ml_allocations.md)
+table. Facilities with `ishared = FALSE` are assessed individually on
+entity + facname + bay segment. Facilities with `ishared = TRUE`
+(currently the three Mosaic facilities in Hillsborough Bay) have their
+loads summed to an entity + bay segment total before comparison to the
+single shared allocation.
 
 **NPS/MS4 path**
 
@@ -186,6 +186,15 @@ from the allocation framework.
 
 ``` r
 if (FALSE) { # \dontrun{
+fls_dps <- list.files(system.file("extdata/", package = "tbeploads"),
+  pattern = "ps_dom_", full.names = TRUE)
+dps <- anlz_dps_facility(fls_dps)
+fls_ips <- list.files(system.file("extdata/", package = "tbeploads"),
+  pattern = "ps_ind_", full.names = TRUE)
+ips <- anlz_ips_facility(fls_ips)
+fls_ml <- list.files(system.file("extdata/", package = "tbeploads"),
+  pattern = "ps_indml", full.names = TRUE)
+ml <- anlz_ml_facility(fls_ml)
 nps <- anlz_nps(
   yrrng  = c("2022-01-01", "2024-12-31"),
   tbbase = tbbase,
@@ -196,15 +205,7 @@ nps <- anlz_nps(
   summ     = "basin",
   summtime = "year"
 )
-fls_ips <- list.files(system.file("extdata/", package = "tbeploads"),
-  pattern = "ps_ind_", full.names = TRUE)
-fls_dps <- list.files(system.file("extdata/", package = "tbeploads"),
-  pattern = "ps_dom_", full.names = TRUE)
-ips <- anlz_ips_facility(fls_ips)
-dps <- anlz_dps_facility(fls_dps)
-fls_ml <- list.files(system.file("extdata/", package = "tbeploads"),
-  pattern = "ps_indml", full.names = TRUE)
-ml <- anlz_ml_facility(fls_ml)
-anlz_aa(2022:2024, dps, ips, nps, tbbase, aa_corrections, ml)
+
+anlz_aa(2022:2024, dps, ips, ml, nps, tbbase, aa_corrections)
 } # }
 ```

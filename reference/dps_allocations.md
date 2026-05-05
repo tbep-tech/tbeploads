@@ -45,8 +45,6 @@ classified as an industrial point source in the
 table. Neither can be matched to DPS load data from
 [`anlz_dps_facility`](https://tbep-tech.github.io/tbeploads/reference/anlz_dps_facility.md).
 
-See `"data-raw/dps_allocations.R"` for creation.
-
 ## Examples
 
 ``` r

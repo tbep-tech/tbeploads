@@ -29,8 +29,6 @@ framework.
 
 - `alloc_tons`: Allocation in tons TN per year
 
-See "data-raw/ps_allocations.R" for creation.
-
 ## Examples
 
 ``` r
