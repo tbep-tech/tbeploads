@@ -16,6 +16,9 @@
 #' @param corrections Data frame with columns \code{bay_seg}, \code{entity},
 #'   \code{ad_tons}, and \code{project_tons}. Use \code{\link{aa_corrections}}
 #'   as a zero-row placeholder when actual corrections are not yet available.
+#' @param ml_data Data frame from \code{\link{anlz_ml_facility}}. Required
+#'   columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
+#'   \code{tn_load}.
 #'
 #' @returns A data frame with one row per entity (NPS/MS4) or facility (IPS)
 #'   per bay segment:
@@ -29,7 +32,7 @@
 #'   \item{permit}{NPDES permit number (IPS rows only)}
 #'   \item{source}{Allocation type: \code{"MS4"},
 #'     \code{"Nonpoint Source/MS4"}, \code{"IPS"},
-#'     \code{"DPS - end of pipe"}, or \code{"DPS - reuse"}}
+#'     \code{"DPS - end of pipe"}, \code{"DPS - reuse"}, or \code{"ML"}}
 #'   \item{alloc_pct}{Fractional TN allocation (0-1)}
 #'   \item{alloc_tons}{Allocation in TN tons per year}
 #'   \item{eff_load_tons}{Mean hydrologically-normalized TN load (tons/yr),
@@ -42,6 +45,17 @@
 #' Entities present in the computed loads but absent from the allocation tables
 #' are retained in the output with \code{NA} allocation fields so that
 #' unmatched entries are visible for troubleshooting.
+#'
+#' \strong{ML path}
+#'
+#' Material loss TN loads require no hydrologic normalization. Monthly loads
+#' from \code{ml_data} are summed to annual totals per facility, averaged
+#' over \code{yrrng}, and compared against the \code{\link{ml_allocations}}
+#' table. Facilities with \code{ishared = FALSE} are assessed individually on
+#' entity + facname + bay segment. Facilities with \code{ishared = TRUE}
+#' (currently the three Mosaic facilities in Hillsborough Bay) have their
+#' loads summed to an entity + bay segment total before comparison to the
+#' single shared allocation.
 #'
 #' \strong{DPS path}
 #'
@@ -117,9 +131,12 @@
 #'   pattern = "ps_dom_", full.names = TRUE)
 #' ips <- anlz_ips_facility(fls_ips)
 #' dps <- anlz_dps_facility(fls_dps)
-#' anlz_aa(2022:2024, dps, ips, nps, tbbase, aa_corrections)
+#' fls_ml <- list.files(system.file("extdata/", package = "tbeploads"),
+#'   pattern = "ps_indml", full.names = TRUE)
+#' ml <- anlz_ml_facility(fls_ml)
+#' anlz_aa(2022:2024, dps, ips, nps, tbbase, aa_corrections, ml)
 #' }
-anlz_aa <- function(yrrng, dps_data, ips_data, nps_data, tbbase, corrections) {
+anlz_aa <- function(yrrng, dps_data, ips_data, nps_data, tbbase, corrections, ml_data) {
 
   # Segment name → bay_seg (Boca Ciega Bay = 5 is excluded from allocation)
   seg_bay <- c(
@@ -408,9 +425,108 @@ anlz_aa <- function(yrrng, dps_data, ips_data, nps_data, tbbase, corrections) {
       "alloc_pct", "alloc_tons", "eff_load_tons", "pass"
     )
 
+  # ---- ML path ------------------------------------------------------------
+
+  # Material loss facility lookup: entity + facname → bay_seg (no basin or coastco)
+  ml_fac <- facilities |>
+    dplyr::filter(grepl("Material", .data$source)) |>
+    dplyr::rename(bay_seg = "bayseg") |>
+    dplyr::mutate(bay_seg = as.integer(.data$bay_seg)) |>
+    dplyr::select("entity", "facname", "bay_seg")
+
+  # Annual ML TN loads joined to facility metadata via entity + facname
+  ml_annual <- ml_data |>
+    dplyr::filter(.data$Year %in% yrrng) |>
+    dplyr::group_by(.data$Year, .data$entity, .data$facility) |>
+    dplyr::summarise(tn_ml = sum(.data$tn_load, na.rm = TRUE), .groups = "drop") |>
+    dplyr::left_join(ml_fac, by = c("entity", "facility" = "facname")) |>
+    dplyr::filter(!is.na(.data$bay_seg)) |>
+    dplyr::rename(facname = "facility")
+
+  # Average over yrrng → mean annual load per entity + facname + bay_seg
+  ml_mean <- ml_annual |>
+    dplyr::group_by(.data$bay_seg, .data$entity, .data$facname) |>
+    dplyr::summarise(
+      eff_load_tons = mean(.data$tn_ml, na.rm = TRUE),
+      .groups = "drop"
+    ) |>
+    dplyr::mutate(
+      eff_load_tons = dplyr::if_else(
+        is.nan(.data$eff_load_tons), NA_real_, .data$eff_load_tons
+      )
+    )
+
+  # Non-shared: one output row per facility; full join on entity + facname + bay_seg
+  ml_out_ns <- ml_allocations |>
+    dplyr::filter(!.data$ishared) |>
+    dplyr::select(-"ishared") |>
+    dplyr::full_join(ml_mean, by = c("entity", "facname", "bay_seg")) |>
+    dplyr::mutate(
+      segment     = bay_label[as.character(.data$bay_seg)],
+      source      = "ML",
+      entity_full = NA_character_,
+      permit      = NA_character_,
+      alloc_pct   = NA_real_,
+      pass        = dplyr::if_else(
+        !is.na(.data$alloc_tons) & !is.na(.data$eff_load_tons),
+        .data$eff_load_tons <= .data$alloc_tons,
+        NA
+      )
+    ) |>
+    dplyr::select(
+      "bay_seg", "segment", "entity", "entity_full",
+      "facname", "permit", "source",
+      "alloc_pct", "alloc_tons", "eff_load_tons", "pass"
+    )
+
+  # Shared: sum loads across all facilities in the shared group (entity + bay_seg),
+  # then compare to the single combined allocation
+  shared_keys <- ml_allocations |>
+    dplyr::filter(.data$ishared) |>
+    dplyr::select("entity", "bay_seg") |>
+    dplyr::distinct()
+
+  ml_mean_shared <- ml_mean |>
+    dplyr::semi_join(shared_keys, by = c("entity", "bay_seg")) |>
+    dplyr::group_by(.data$bay_seg, .data$entity) |>
+    dplyr::summarise(
+      eff_load_tons = sum(.data$eff_load_tons, na.rm = TRUE),
+      .groups = "drop"
+    ) |>
+    dplyr::mutate(
+      eff_load_tons = dplyr::if_else(
+        is.nan(.data$eff_load_tons), NA_real_, .data$eff_load_tons
+      )
+    )
+
+  ml_out_shared <- ml_allocations |>
+    dplyr::filter(.data$ishared) |>
+    dplyr::select(-"ishared", -"facname") |>
+    dplyr::full_join(ml_mean_shared, by = c("entity", "bay_seg")) |>
+    dplyr::mutate(
+      segment     = bay_label[as.character(.data$bay_seg)],
+      source      = "ML",
+      entity_full = NA_character_,
+      facname     = NA_character_,
+      permit      = NA_character_,
+      alloc_pct   = NA_real_,
+      pass        = dplyr::if_else(
+        !is.na(.data$alloc_tons) & !is.na(.data$eff_load_tons),
+        .data$eff_load_tons <= .data$alloc_tons,
+        NA
+      )
+    ) |>
+    dplyr::select(
+      "bay_seg", "segment", "entity", "entity_full",
+      "facname", "permit", "source",
+      "alloc_pct", "alloc_tons", "eff_load_tons", "pass"
+    )
+
+  ml_out <- dplyr::bind_rows(ml_out_ns, ml_out_shared)
+
   # ---- Combine -------------------------------------------------------------
 
-  dplyr::bind_rows(nps_out, ips_out, dps_out) |>
+  dplyr::bind_rows(nps_out, ips_out, dps_out, ml_out) |>
     dplyr::arrange(.data$bay_seg, .data$source, .data$entity)
 
 }

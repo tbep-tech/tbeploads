@@ -4,7 +4,7 @@
 \alias{anlz_aa}
 \title{Allocation assessment for DPS, IPS, and NPS/MS4 entities}
 \usage{
-anlz_aa(yrrng, dps_data, ips_data, nps_data, tbbase, corrections)
+anlz_aa(yrrng, dps_data, ips_data, nps_data, tbbase, corrections, ml_data)
 }
 \arguments{
 \item{yrrng}{Integer vector of years to include, e.g., \code{2022:2024}.}
@@ -28,6 +28,10 @@ layer of bay segment, basin, jurisdiction, land use data, and soils, see details
 \item{corrections}{Data frame with columns \code{bay_seg}, \code{entity},
 \code{ad_tons}, and \code{project_tons}. Use \code{\link{aa_corrections}}
 as a zero-row placeholder when actual corrections are not yet available.}
+
+\item{ml_data}{Data frame from \code{\link{anlz_ml_facility}}. Required
+columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
+\code{tn_load}.}
 }
 \value{
 A data frame with one row per entity (NPS/MS4) or facility (IPS)
@@ -42,7 +46,7 @@ per bay segment:
 \item{permit}{NPDES permit number (IPS rows only)}
 \item{source}{Allocation type: \code{"MS4"},
 \code{"Nonpoint Source/MS4"}, \code{"IPS"},
-\code{"DPS - end of pipe"}, or \code{"DPS - reuse"}}
+\code{"DPS - end of pipe"}, \code{"DPS - reuse"}, or \code{"ML"}}
 \item{alloc_pct}{Fractional TN allocation (0-1)}
 \item{alloc_tons}{Allocation in TN tons per year}
 \item{eff_load_tons}{Mean hydrologically-normalized TN load (tons/yr),
@@ -58,6 +62,17 @@ Allocation assessment for DPS, IPS, and NPS/MS4 entities
 Entities present in the computed loads but absent from the allocation tables
 are retained in the output with \code{NA} allocation fields so that
 unmatched entries are visible for troubleshooting.
+
+\strong{ML path}
+
+Material loss TN loads require no hydrologic normalization. Monthly loads
+from \code{ml_data} are summed to annual totals per facility, averaged
+over \code{yrrng}, and compared against the \code{\link{ml_allocations}}
+table. Facilities with \code{ishared = FALSE} are assessed individually on
+entity + facname + bay segment. Facilities with \code{ishared = TRUE}
+(currently the three Mosaic facilities in Hillsborough Bay) have their
+loads summed to an entity + bay segment total before comparison to the
+single shared allocation.
 
 \strong{DPS path}
 
@@ -131,6 +146,9 @@ fls_dps <- list.files(system.file("extdata/", package = "tbeploads"),
   pattern = "ps_dom_", full.names = TRUE)
 ips <- anlz_ips_facility(fls_ips)
 dps <- anlz_dps_facility(fls_dps)
-anlz_aa(2022:2024, dps, ips, nps, tbbase, aa_corrections)
+fls_ml <- list.files(system.file("extdata/", package = "tbeploads"),
+  pattern = "ps_indml", full.names = TRUE)
+ml <- anlz_ml_facility(fls_ml)
+anlz_aa(2022:2024, dps, ips, nps, tbbase, aa_corrections, ml)
 }
 }
