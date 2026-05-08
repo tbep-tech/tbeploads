@@ -131,7 +131,12 @@ per bay segment:</p><dl><dt>bay_seg</dt>
 
 <dt>eff_load_tons</dt>
 <dd><p>Mean hydrologically-normalized TN load (tons/yr),
-averaged over <code>yrrng</code></p></dd>
+averaged over <code>yrrng</code>; equals <code>load_tons</code> for DPS and ML
+(no normalization applied)</p></dd>
+
+<dt>load_tons</dt>
+<dd><p>Mean annual TN load (tons/yr) without hydrologic
+normalization, averaged over <code>yrrng</code></p></dd>
 
 <dt>pass</dt>
 <dd><p>Logical: <code>eff_load_tons &lt;= alloc_tons</code>; <code>NA</code> when

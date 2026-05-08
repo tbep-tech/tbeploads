@@ -101,7 +101,12 @@ segment:
 - eff_load_tons:
 
   Mean hydrologically-normalized TN load (tons/yr), averaged over
-  `yrrng`
+  `yrrng`; equals `load_tons` for DPS and ML (no normalization applied)
+
+- load_tons:
+
+  Mean annual TN load (tons/yr) without hydrologic normalization,
+  averaged over `yrrng`
 
 - pass:
 

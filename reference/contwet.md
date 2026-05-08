@@ -42,13 +42,13 @@ contwet <- terra::wrap(pot_wet)
 save(contwet, file = "data/contwet.RData", compress = "xz")
 } # }
 terra::unwrap(contwet)
-#> class       : SpatRaster 
+#> class       : SpatRaster
 #> size        : 415, 420, 1  (nrow, ncol, nlyr)
 #> resolution  : 5280, 5280  (x, y)
 #> extent      : -927768.1, 1289832, 268821.5, 2460022  (xmin, xmax, ymin, ymax)
-#> coord. ref. : NAD83(2011) / Florida West (ftUS) (EPSG:6443) 
+#> coord. ref. : NAD83(2011) / Florida West (ftUS) (EPSG:6443)
 #> source(s)   : memory
-#> name        : focal_mean 
-#> min value   :         10 
-#> max value   :        130 
+#> name        : focal_mean
+#> min value   :         10
+#> max value   :        130
 ```

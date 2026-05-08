@@ -42,13 +42,13 @@ contdry <- terra::wrap(pot_dry)
 save(contdry, file = "data/contdry.RData", compress = "xz")
 } # }
 terra::unwrap(contdry)
-#> class       : SpatRaster 
+#> class       : SpatRaster
 #> size        : 446, 416, 1  (nrow, ncol, nlyr)
 #> resolution  : 5280, 5280  (x, y)
 #> extent      : -932869.6, 1263610, 108335.4, 2463215  (xmin, xmax, ymin, ymax)
-#> coord. ref. : NAD83(2011) / Florida West (ftUS) (EPSG:6443) 
+#> coord. ref. : NAD83(2011) / Florida West (ftUS) (EPSG:6443)
 #> source(s)   : memory
-#> name        : focal_mean 
-#> min value   :         10 
-#> max value   :        120 
+#> name        : focal_mean
+#> min value   :         10
+#> max value   :        120
 ```
