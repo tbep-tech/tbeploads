@@ -36,7 +36,10 @@
 #'   \item{alloc_pct}{Fractional TN allocation (0-1)}
 #'   \item{alloc_tons}{Allocation in TN tons per year}
 #'   \item{eff_load_tons}{Mean hydrologically-normalized TN load (tons/yr),
-#'     averaged over \code{yrrng}}
+#'     averaged over \code{yrrng}; equals \code{load_tons} for DPS and ML
+#'     (no normalization applied)}
+#'   \item{load_tons}{Mean annual TN load (tons/yr) without hydrologic
+#'     normalization, averaged over \code{yrrng}}
 #'   \item{pass}{Logical: \code{eff_load_tons <= alloc_tons}; \code{NA} when
 #'     allocation or effective load is missing}
 #' }
@@ -248,17 +251,17 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, correc
       )
     )
 
-  # Average effective TN over years
+  # Average effective TN and un-normalized TN over years
   nps_mean <- nps_normalized |>
     dplyr::group_by(.data$bay_seg, .data$entity) |>
     dplyr::summarise(
-      eff_load_tons = mean(.data$eff_tn, na.rm = TRUE),
+      eff_load_tons = mean(.data$eff_tn,       na.rm = TRUE),
+      load_tons     = mean(.data$tn_corrected, na.rm = TRUE),
       .groups = "drop"
     ) |>
     dplyr::mutate(
-      eff_load_tons = dplyr::if_else(
-        is.nan(.data$eff_load_tons), NA_real_, .data$eff_load_tons
-      )
+      eff_load_tons = dplyr::if_else(is.nan(.data$eff_load_tons), NA_real_, .data$eff_load_tons),
+      load_tons     = dplyr::if_else(is.nan(.data$load_tons),     NA_real_, .data$load_tons)
     )
 
   # Full join with allocations; retain unmatched rows on both sides
@@ -278,7 +281,7 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, correc
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "pass"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "pass"
     )
 
   # ---- IPS path ------------------------------------------------------------
@@ -322,16 +325,20 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, correc
   # Sum across basins per permit × entity × facname × bay_seg × year, then average
   ips_mean <- ips_normalized |>
     dplyr::group_by(.data$bay_seg, .data$entity, .data$facname, .data$permit, .data$Year) |>
-    dplyr::summarise(eff_tn = sum(.data$eff_tn, na.rm = TRUE), .groups = "drop") |>
+    dplyr::summarise(
+      eff_tn = sum(.data$eff_tn, na.rm = TRUE),
+      tn_ips = sum(.data$tn_ips, na.rm = TRUE),
+      .groups = "drop"
+    ) |>
     dplyr::group_by(.data$bay_seg, .data$entity, .data$facname, .data$permit) |>
     dplyr::summarise(
       eff_load_tons = mean(.data$eff_tn, na.rm = TRUE),
+      load_tons     = mean(.data$tn_ips, na.rm = TRUE),
       .groups = "drop"
     ) |>
     dplyr::mutate(
-      eff_load_tons = dplyr::if_else(
-        is.nan(.data$eff_load_tons), NA_real_, .data$eff_load_tons
-      )
+      eff_load_tons = dplyr::if_else(is.nan(.data$eff_load_tons), NA_real_, .data$eff_load_tons),
+      load_tons     = dplyr::if_else(is.nan(.data$load_tons),     NA_real_, .data$load_tons)
     )
 
   # Full join with allocations on permit; retain unmatched on both sides
@@ -356,7 +363,7 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, correc
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "pass"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "pass"
     )
 
   # ---- DPS path ------------------------------------------------------------
@@ -414,6 +421,7 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, correc
       source    = .data$dps_source,
       permit    = NA_character_,
       alloc_pct = NA_real_,
+      load_tons = .data$eff_load_tons,
       pass      = dplyr::if_else(
         !is.na(.data$alloc_tons) & !is.na(.data$eff_load_tons),
         .data$eff_load_tons <= .data$alloc_tons,
@@ -423,7 +431,7 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, correc
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "pass"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "pass"
     )
 
   # ---- ML path ------------------------------------------------------------
@@ -468,6 +476,7 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, correc
       entity_full = NA_character_,
       permit      = NA_character_,
       alloc_pct   = NA_real_,
+      load_tons   = .data$eff_load_tons,
       pass        = dplyr::if_else(
         !is.na(.data$alloc_tons) & !is.na(.data$eff_load_tons),
         .data$eff_load_tons <= .data$alloc_tons,
@@ -477,7 +486,7 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, correc
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "pass"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "pass"
     )
 
   # Shared: sum loads across all facilities in the shared group (entity + bay_seg),
@@ -511,6 +520,7 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, correc
       facname     = NA_character_,
       permit      = NA_character_,
       alloc_pct   = NA_real_,
+      load_tons   = .data$eff_load_tons,
       pass        = dplyr::if_else(
         !is.na(.data$alloc_tons) & !is.na(.data$eff_load_tons),
         .data$eff_load_tons <= .data$alloc_tons,
@@ -520,7 +530,7 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, correc
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "pass"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "pass"
     )
 
   ml_out <- dplyr::bind_rows(ml_out_ns, ml_out_shared)

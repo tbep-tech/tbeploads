@@ -71,7 +71,7 @@ test_that("anlz_aa returns a data frame with expected columns", {
   expect_s3_class(result, "data.frame")
   expected_cols <- c(
     "bay_seg", "segment", "entity", "entity_full", "facname",
-    "permit", "source", "alloc_pct", "alloc_tons", "eff_load_tons", "pass"
+    "permit", "source", "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "pass"
   )
   expect_true(all(expected_cols %in% names(result)))
 })
@@ -122,6 +122,35 @@ test_that("pass equals eff_load_tons <= alloc_tons wherever both are non-NA", {
   rows_both <- result[!is.na(result$alloc_tons) & !is.na(result$eff_load_tons), ]
   if (nrow(rows_both) > 0) {
     expect_equal(rows_both$pass, rows_both$eff_load_tons <= rows_both$alloc_tons)
+  }
+})
+
+# ---- load_tons column -------------------------------------------------------
+
+test_that("load_tons equals eff_load_tons for NPS when normalization ratio equals 1", {
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_206_1(), tbbase, aa_corrections)
+
+  nps_rows <- result[result$bay_seg == 1 & !is.na(result$eff_load_tons), ]
+  expect_equal(nps_rows$load_tons, nps_rows$eff_load_tons, tolerance = 1e-6)
+})
+
+test_that("load_tons differs from eff_load_tons for NPS when normalization ratio != 1", {
+  # Set hy_load to double mean_h2o_9294 so normalized load is half the raw load.
+  nps_wet <- nps_206_1()
+  nps_wet$hy_load <- nps_wet$hy_load * 2
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_wet, tbbase, aa_corrections)
+
+  cw <- result[result$entity == "CLEARWATER" & result$bay_seg == 1, ]
+  expect_false(is.na(cw$load_tons))
+  expect_true(cw$load_tons > cw$eff_load_tons)
+})
+
+test_that("load_tons equals eff_load_tons for DPS (no normalization)", {
+  result <- anlz_aa(2023L, dps_bradenton_sw(), make_ips_empty(), make_ml_empty(), make_nps_empty(), tbbase, aa_corrections)
+
+  dps_rows <- result[grepl("^DPS", result$source) & !is.na(result$eff_load_tons), ]
+  if (nrow(dps_rows) > 0) {
+    expect_equal(dps_rows$load_tons, dps_rows$eff_load_tons)
   }
 })
 

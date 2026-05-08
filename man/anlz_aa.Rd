@@ -50,7 +50,10 @@ per bay segment:
 \item{alloc_pct}{Fractional TN allocation (0-1)}
 \item{alloc_tons}{Allocation in TN tons per year}
 \item{eff_load_tons}{Mean hydrologically-normalized TN load (tons/yr),
-averaged over \code{yrrng}}
+averaged over \code{yrrng}; equals \code{load_tons} for DPS and ML
+(no normalization applied)}
+\item{load_tons}{Mean annual TN load (tons/yr) without hydrologic
+normalization, averaged over \code{yrrng}}
 \item{pass}{Logical: \code{eff_load_tons <= alloc_tons}; \code{NA} when
 allocation or effective load is missing}
 }
