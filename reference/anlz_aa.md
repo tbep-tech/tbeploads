@@ -130,9 +130,10 @@ Annual IPS facility TN loads are normalized using the ratio:
 \$\$ \text{eff\\tn} = \text{tn\\load} \times
 \frac{\text{mean\\h2o\\9294}}{\text{basin\\nps\\h2o}} \$\$
 
-where `basin\_nps\_h2o` is the annual NPS water load from `nps_data` for
-the same basin and year. Effective loads are summed across basins per
-permit per bay segment, then averaged over `yrrng`.
+where `basin\_total\_h2o` is the annual total water load (NPS + DPS +
+IPS) for the same basin and year, matching the SAS `ratio1\_2224`
+denominator. Effective loads are summed across basins per permit per bay
+segment, then averaged over `yrrng`.
 
 **ML path**
 
@@ -164,6 +165,9 @@ into:
 
 Agricultural land use (category `"Agriculture"`) is attributed to the
 aggregate entity `"All"` regardless of the underlying MS4 jurisdiction.
+Conservation land use (category `"Conservation"`, set when `tbbase` was
+built with a `tbconserv` overlay) is attributed to the aggregate entity
+`"Conserv"` regardless of the underlying MS4 jurisdiction.
 
 After disaggregation, loads and 1992-1994 baseline water volumes are
 summed across basins to the segment level. TN corrections from

@@ -52,6 +52,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_nps_tbbase</span><span class="op">(</span></span>
 <span>  <span class="va">tblu</span>,</span>
 <span>  <span class="va">tbsoil</span>,</span>
+<span>  tbconserv <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  gdal_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  chunk_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cast <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -69,6 +70,13 @@
 
 <dt id="arg-tbsoil">tbsoil<a class="anchor" aria-label="anchor" href="#arg-tbsoil"></a></dt>
 <dd><p>sf object <code>link{tbsoil}</code> of soil data in the Tampa Bay watershed</p></dd>
+
+
+<dt id="arg-tbconserv">tbconserv<a class="anchor" aria-label="anchor" href="#arg-tbconserv"></a></dt>
+<dd><p>Optional sf object of conservation lands polygons (e.g., FNAI Conservation Lands).
+When provided, each row in the output gains a logical <code>conservation</code> column indicating whether
+that land area falls within a conservation boundary. If <code>NULL</code> (default), the output omits the
+<code>conservation</code> column and all areas are treated as non-conservation.</p></dd>
 
 
 <dt id="arg-gdal-path">gdal_path<a class="anchor" aria-label="anchor" href="#arg-gdal-path"></a></dt>
@@ -89,7 +97,7 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A summarized data frame containing the union of all inputs showing major bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED, hydrologic group (hydgrp), and area in hectures.  These represent all relevant spatial combinations in the Tampa Bay watershed.</p>
+    <p>A summarized data frame containing the union of all inputs showing major bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED, hydrologic group (hydgrp), area in hectares, and optionally <code>conservation</code> (logical). These represent all relevant spatial combinations in the Tampa Bay watershed.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

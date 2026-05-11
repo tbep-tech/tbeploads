@@ -41,6 +41,13 @@ agriculture entries (`entity = "All"`) carry irrigation AP reductions
 only (`ad_tons = 0`). Negative `project_tons` values reflect project
 credits that increase the allowable load.
 
+Updating these numbers to account for additional changes in atomospheric
+deposition concentrations (i.e., large changes that have occurred at
+Bayside and Apollo Beach power plants) and the many projects completed
+since the late 2000s should be done for future package updates. Numbers
+herein have been used to date for the allocation assessment tables. They
+likely do not represent current conditions.
+
 See `data-raw/aa_corrections.R` for construction.
 
 ## Examples

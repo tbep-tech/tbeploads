@@ -9,6 +9,7 @@ estimation in the Tampa Bay watershed
 util_nps_tbbase(
   tblu,
   tbsoil,
+  tbconserv = NULL,
   gdal_path = NULL,
   chunk_size = NULL,
   cast = FALSE,
@@ -26,6 +27,15 @@ util_nps_tbbase(
 - tbsoil:
 
   sf object `link{tbsoil}` of soil data in the Tampa Bay watershed
+
+- tbconserv:
+
+  Optional sf object of conservation lands polygons (e.g., FNAI
+  Conservation Lands). When provided, each row in the output gains a
+  logical `conservation` column indicating whether that land area falls
+  within a conservation boundary. If `NULL` (default), the output omits
+  the `conservation` column and all areas are treated as
+  non-conservation.
 
 - gdal_path:
 
@@ -53,8 +63,9 @@ util_nps_tbbase(
 A summarized data frame containing the union of all inputs showing major
 bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction
 (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED,
-hydrologic group (hydgrp), and area in hectures. These represent all
-relevant spatial combinations in the Tampa Bay watershed.
+hydrologic group (hydgrp), area in hectares, and optionally
+`conservation` (logical). These represent all relevant spatial
+combinations in the Tampa Bay watershed.
 
 ## Details
 

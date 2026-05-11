@@ -158,9 +158,10 @@ and bayseg 6/7 are remapped to 55.</p>
   \text{eff\_tn} = \text{tn\_load} \times
   \frac{\text{mean\_h2o\_9294}}{\text{basin\_nps\_h2o}}
 $$</p>
-<p>where <code>basin\_nps\_h2o</code> is the annual NPS water load from
-<code>nps_data</code> for the same basin and year. Effective loads are summed
-across basins per permit per bay segment, then averaged over <code>yrrng</code>.</p>
+<p>where <code>basin\_total\_h2o</code> is the annual total water load (NPS + DPS + IPS)
+for the same basin and year, matching the SAS <code>ratio1\_2224</code> denominator.
+Effective loads are summed across basins per permit per bay segment, then
+averaged over <code>yrrng</code>.</p>
 <p><strong>ML path</strong></p>
 <p>Material loss TN loads require no hydrologic normalization. Monthly loads
 from <code>ml_data</code> are summed to annual totals per facility, averaged
@@ -179,7 +180,10 @@ into:</p>
 <li><p><code>factor_rc</code> distributes each land use class's load among
 entities proportional to area × runoff coefficient.</p></li>
 </ol><p>Agricultural land use (category <code>"Agriculture"</code>) is attributed to the
-aggregate entity <code>"All"</code> regardless of the underlying MS4 jurisdiction.</p>
+aggregate entity <code>"All"</code> regardless of the underlying MS4 jurisdiction.
+Conservation land use (category <code>"Conservation"</code>, set when <code>tbbase</code>
+was built with a <code>tbconserv</code> overlay) is attributed to the aggregate
+entity <code>"Conserv"</code> regardless of the underlying MS4 jurisdiction.</p>
 <p>After disaggregation, loads and 1992-1994 baseline water volumes are summed
 across basins to the segment level. TN corrections from <code><a href="aa_corrections.html">aa_corrections</a></code>
 (<code>ad_tons</code> + <code>project_tons</code>) are subtracted before hydrologic normalization:</p>
