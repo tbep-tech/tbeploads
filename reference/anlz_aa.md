@@ -12,7 +12,7 @@ anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, corrections)
 
 - yrrng:
 
-  Integer vector of years to include, e.g., `2022:2024`.
+  Integer vector of length 2, start and end year, e.g., `c(2022, 2024)`.
 
 - dps_data:
 
@@ -211,6 +211,6 @@ nps <- anlz_nps(
   summtime = "year"
 )
 
-anlz_aa(2022:2024, dps, ips, ml, nps, tbbase, aa_corrections)
+anlz_aa(c(2022, 2024), dps, ips, ml, nps, tbbase, aa_corrections)
 } # }
 ```
