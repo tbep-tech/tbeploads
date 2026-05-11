@@ -54,27 +54,51 @@
 
     <div class="section level2">
     <h2 id="format">Format<a class="anchor" aria-label="anchor" href="#format"></a></h2>
-    <p>A <code>data.frame</code></p>
-    </div>
+    <p>A <code>data.frame</code> with 43 rows and 4 columns:</p><dl><dt>bay_seg</dt>
+<dd><p>Integer bay segment identifier</p></dd>
+
+<dt>entity</dt>
+<dd><p>MS4 jurisdiction or entity name</p></dd>
+
+<dt>ad_tons</dt>
+<dd><p>Atmospheric deposition TN offset (tons/yr)</p></dd>
+
+<dt>project_tons</dt>
+<dd><p>Net permitted project TN offset (tons/yr); negative
+values indicate a load credit</p></dd>
+
+
+</dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>TN load offsets applied before hydrologic normalization in
-<code><a href="anlz_aa.html">anlz_aa</a></code>. Two correction types are combined per entity: AD
-(atmospheric deposition) load estimates from <code><a href="anlz_ad.html">anlz_ad</a></code>, and
-permitted project load credits. The current object is a zero-row placeholder;
-it should be replaced with actual values when available.</p>
-<ul><li><p><code>bay_seg</code>: Integer bay segment identifier</p></li>
-<li><p><code>entity</code>: MS4 jurisdiction or entity name</p></li>
-<li><p><code>ad_tons</code>: Atmospheric deposition TN offset (tons/yr)</p></li>
-<li><p><code>project_tons</code>: Permitted project TN offset (tons/yr)</p></li>
-</ul><p>See "data-raw/aa_corrections.R" for creation.</p>
+<code><a href="anlz_aa.html">anlz_aa</a></code> for the 2022-2024 TBNMC assessment period. Values are
+sourced from the SAS script <code>7_Basin_assessment2224.sas</code> and cover two
+correction types: atmospheric deposition (AD) loads apportioned to each
+entity jurisdiction, and net permitted project (AP) load credits. FDACS
+agriculture entries (<code>entity = "All"</code>) carry irrigation AP reductions
+only (<code>ad_tons = 0</code>). Negative <code>project_tons</code> values reflect
+project credits that increase the allowable load.</p>
+<p>See <code>data-raw/aa_corrections.R</code> for construction.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">aa_corrections</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 0 × 4</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 4 variables: bay_seg &lt;int&gt;, entity &lt;chr&gt;, ad_tons &lt;dbl&gt;, project_tons &lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 42 × 4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    bay_seg entity        ad_tons project_tons</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>       1 CLEARWATER       1.36         6.15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>       1 HILLSBOROUGH     8.8          0   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>       1 LARGO            0.51         0.03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>       1 MacDill AFB      0.03         0   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>       1 OLDSMAR          0.5          0   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>       1 PINELLAS         5.34         1.65</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>       1 PINELLAS PARK    0.41         0   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>       1 SAFETY HARBOR    0.5          0.88</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>       1 ST PETERSBURG    0.45         0   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>       1 Tampa            1.96         0.11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 32 more rows</span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -5,7 +5,7 @@ Allocation assessment for DPS, IPS, and NPS/MS4 entities
 ## Usage
 
 ``` r
-anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, corrections)
+anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase)
 ```
 
 ## Arguments
@@ -45,14 +45,6 @@ anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, corrections)
 
   data frame containing polygon areas for the combined data layer of bay
   segment, basin, jurisdiction, land use data, and soils, see details
-
-- corrections:
-
-  Data frame with columns `bay_seg`, `entity`, `ad_tons`, and
-  `project_tons`. Use
-  [`aa_corrections`](https://tbep-tech.github.io/tbeploads/reference/aa_corrections.md)
-  as a zero-row placeholder when actual corrections are not yet
-  available.
 
 ## Value
 
@@ -174,8 +166,10 @@ Agricultural land use (category `"Agriculture"`) is attributed to the
 aggregate entity `"All"` regardless of the underlying MS4 jurisdiction.
 
 After disaggregation, loads and 1992-1994 baseline water volumes are
-summed across basins to the segment level. TN corrections (`ad_tons` +
-`project_tons`) are subtracted before hydrologic normalization:
+summed across basins to the segment level. TN corrections from
+[`aa_corrections`](https://tbep-tech.github.io/tbeploads/reference/aa_corrections.md)
+(`ad_tons` + `project_tons`) are subtracted before hydrologic
+normalization:
 
 \$\$ \text{eff\\tn} = (\text{tn\\entity} - \text{corr\\tons}) \times
 \frac{\text{mean\\h2o\\9294}}{\text{h2o\\entity}} \$\$
@@ -211,6 +205,6 @@ nps <- anlz_nps(
   summtime = "year"
 )
 
-anlz_aa(c(2022, 2024), dps, ips, ml, nps, tbbase, aa_corrections)
+anlz_aa(c(2022, 2024), dps, ips, ml, nps, tbbase)
 } # }
 ```
