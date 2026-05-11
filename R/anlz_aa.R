@@ -16,10 +16,6 @@
 #'   \code{hy_load}.
 #' @param tbbase data frame containing polygon areas for the combined data
 #'   layer of bay segment, basin, jurisdiction, land use data, and soils, see details
-#' @param corrections Data frame with columns \code{bay_seg}, \code{entity},
-#'   \code{ad_tons}, and \code{project_tons}. Use \code{\link{aa_corrections}}
-#'   as a zero-row placeholder when actual corrections are not yet available.
-#'
 #' @returns A data frame with one row per entity (NPS/MS4) or facility (IPS)
 #'   per bay segment:
 #' \describe{
@@ -101,8 +97,8 @@
 #' aggregate entity \code{"All"} regardless of the underlying MS4 jurisdiction.
 #'
 #' After disaggregation, loads and 1992-1994 baseline water volumes are summed
-#' across basins to the segment level. TN corrections (\code{ad_tons} +
-#' \code{project_tons}) are subtracted before hydrologic normalization:
+#' across basins to the segment level. TN corrections from \code{\link{aa_corrections}}
+#' (\code{ad_tons} + \code{project_tons}) are subtracted before hydrologic normalization:
 #'
 #' \deqn{
 #'   \text{eff\_tn} = (\text{tn\_entity} - \text{corr\_tons}) \times
@@ -138,9 +134,9 @@
 #'   summtime = "year"
 #' )
 #' 
-#' anlz_aa(c(2022, 2024), dps, ips, ml, nps, tbbase, aa_corrections)
+#' anlz_aa(c(2022, 2024), dps, ips, ml, nps, tbbase)
 #' }
-anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, corrections) {
+anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
 
   yrrng <- seq(min(yrrng), max(yrrng))
 
@@ -195,8 +191,10 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, correc
   # normalization denominator for all entities in that basin, matching the SAS
   # approach where ratio1_2224 basin water overwrites any entity-level water.
   entity_clucsid <- nps_annual |>
-    dplyr::left_join(nps_factors$tn, by = c("bay_seg", "basin")) |>
-    dplyr::left_join(nps_factors$rc, by = c("bay_seg", "basin", "clucsid")) |>
+    dplyr::left_join(nps_factors$tn, by = c("bay_seg", "basin"),
+                     relationship = "many-to-many") |>
+    dplyr::left_join(nps_factors$rc, by = c("bay_seg", "basin", "clucsid"),
+                     relationship = "many-to-many") |>
     dplyr::mutate(
       entity    = dplyr::if_else(
         !is.na(.data$category) & .data$category == "Agriculture",
@@ -233,7 +231,7 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, correc
     )
 
   # Sum corrections per bay_seg × entity (ad + project; 0 when absent)
-  corr_summ <- corrections |>
+  corr_summ <- aa_corrections |>
     dplyr::group_by(.data$bay_seg, .data$entity) |>
     dplyr::summarise(
       corr_tons = sum(.data$ad_tons + .data$project_tons, na.rm = TRUE),
@@ -242,7 +240,8 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, correc
 
   # Apply corrections, then normalize: eff_tn = tn_corrected × (mean9294 / basin_h2o)
   nps_normalized <- entity_seg_yr |>
-    dplyr::left_join(corr_summ, by = c("bay_seg", "entity")) |>
+    dplyr::left_join(corr_summ, by = c("bay_seg", "entity"),
+                     relationship = "many-to-one") |>
     dplyr::mutate(
       corr_tons    = dplyr::coalesce(.data$corr_tons, 0),
       tn_corrected = .data$tn_entity - .data$corr_tons,

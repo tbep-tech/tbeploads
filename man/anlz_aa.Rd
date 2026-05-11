@@ -4,7 +4,7 @@
 \alias{anlz_aa}
 \title{Allocation assessment for DPS, IPS, and NPS/MS4 entities}
 \usage{
-anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, corrections)
+anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase)
 }
 \arguments{
 \item{yrrng}{Integer vector of length 2, start and end year, e.g., \code{c(2022, 2024)}.}
@@ -28,10 +28,6 @@ columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
 
 \item{tbbase}{data frame containing polygon areas for the combined data
 layer of bay segment, basin, jurisdiction, land use data, and soils, see details}
-
-\item{corrections}{Data frame with columns \code{bay_seg}, \code{entity},
-\code{ad_tons}, and \code{project_tons}. Use \code{\link{aa_corrections}}
-as a zero-row placeholder when actual corrections are not yet available.}
 }
 \value{
 A data frame with one row per entity (NPS/MS4) or facility (IPS)
@@ -118,8 +114,8 @@ Agricultural land use (category \code{"Agriculture"}) is attributed to the
 aggregate entity \code{"All"} regardless of the underlying MS4 jurisdiction.
 
 After disaggregation, loads and 1992-1994 baseline water volumes are summed
-across basins to the segment level. TN corrections (\code{ad_tons} +
-\code{project_tons}) are subtracted before hydrologic normalization:
+across basins to the segment level. TN corrections from \code{\link{aa_corrections}}
+(\code{ad_tons} + \code{project_tons}) are subtracted before hydrologic normalization:
 
 \deqn{
   \text{eff\_tn} = (\text{tn\_entity} - \text{corr\_tons}) \times
@@ -153,6 +149,6 @@ nps <- anlz_nps(
   summtime = "year"
 )
 
-anlz_aa(c(2022, 2024), dps, ips, ml, nps, tbbase, aa_corrections)
+anlz_aa(c(2022, 2024), dps, ips, ml, nps, tbbase)
 }
 }

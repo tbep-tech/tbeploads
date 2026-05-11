@@ -5,7 +5,14 @@
 \alias{aa_corrections}
 \title{Allocation assessment TN load corrections by bay segment and entity}
 \format{
-A \code{data.frame}
+A \code{data.frame} with 43 rows and 4 columns:
+\describe{
+\item{bay_seg}{Integer bay segment identifier}
+\item{entity}{MS4 jurisdiction or entity name}
+\item{ad_tons}{Atmospheric deposition TN offset (tons/yr)}
+\item{project_tons}{Net permitted project TN offset (tons/yr); negative
+values indicate a load credit}
+}
 }
 \usage{
 aa_corrections
@@ -15,19 +22,15 @@ Allocation assessment TN load corrections by bay segment and entity
 }
 \details{
 TN load offsets applied before hydrologic normalization in
-\code{\link{anlz_aa}}. Two correction types are combined per entity: AD
-(atmospheric deposition) load estimates from \code{\link{anlz_ad}}, and
-permitted project load credits. The current object is a zero-row placeholder;
-it should be replaced with actual values when available.
+\code{\link{anlz_aa}} for the 2022-2024 TBNMC assessment period. Values are
+sourced from the SAS script \code{7_Basin_assessment2224.sas} and cover two
+correction types: atmospheric deposition (AD) loads apportioned to each
+entity jurisdiction, and net permitted project (AP) load credits. FDACS
+agriculture entries (\code{entity = "All"}) carry irrigation AP reductions
+only (\code{ad_tons = 0}). Negative \code{project_tons} values reflect
+project credits that increase the allowable load.
 
-\itemize{
-\item \code{bay_seg}: Integer bay segment identifier
-\item \code{entity}: MS4 jurisdiction or entity name
-\item \code{ad_tons}: Atmospheric deposition TN offset (tons/yr)
-\item \code{project_tons}: Permitted project TN offset (tons/yr)
-}
-
-See "data-raw/aa_corrections.R" for creation.
+See \code{data-raw/aa_corrections.R} for construction.
 }
 \examples{
 aa_corrections
