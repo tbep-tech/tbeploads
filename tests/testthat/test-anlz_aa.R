@@ -197,7 +197,7 @@ test_that("loads outside yrrng do not contribute to the average eff_load_tons", 
                    nps_206_1(tn = 100.0, yr = 2023L))
 
   result_2022 <- anlz_aa(2022L, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_two, tbbase, aa_corrections)
-  result_both <- anlz_aa(2022:2023, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_two, tbbase, aa_corrections)
+  result_both <- anlz_aa(c(2022, 2023), make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_two, tbbase, aa_corrections)
 
   cw_2022 <- result_2022$eff_load_tons[
     result_2022$entity == "CLEARWATER" & result_2022$bay_seg == 1
@@ -281,7 +281,7 @@ test_that("DPS year range filtering averages only over yrrng years", {
   )
 
   result_2022 <- anlz_aa(2022L,  dps_two, make_ips_empty(), make_ml_empty(), make_nps_empty(), tbbase, aa_corrections)
-  result_both <- anlz_aa(2022:2023,  dps_two, make_ips_empty(), make_ml_empty(), make_nps_empty(), tbbase, aa_corrections)
+  result_both <- anlz_aa(c(2022, 2023),  dps_two, make_ips_empty(), make_ml_empty(), make_nps_empty(), tbbase, aa_corrections)
 
   brd_2022 <- result_2022$eff_load_tons[
     !is.na(result_2022$facname) & result_2022$facname == "City of Bradenton WRF" &
@@ -371,7 +371,7 @@ test_that("ML year range filtering averages only over yrrng years", {
 
   result_2022 <- anlz_aa(2022L, make_dps_empty(), make_ips_empty(), ml_two, make_nps_empty(),
                           tbbase, aa_corrections)
-  result_both <- anlz_aa(2022:2023, make_dps_empty(), make_ips_empty(), ml_two, make_nps_empty(),
+  result_both <- anlz_aa(c(2022, 2023), make_dps_empty(), make_ips_empty(), ml_two, make_nps_empty(),
                           tbbase, aa_corrections)
 
   km_2022 <- result_2022$eff_load_tons[

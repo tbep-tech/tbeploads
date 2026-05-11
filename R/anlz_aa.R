@@ -1,6 +1,6 @@
 #' Allocation assessment for DPS, IPS, and NPS/MS4 entities
 #'
-#' @param yrrng Integer vector of years to include, e.g., \code{2022:2024}.
+#' @param yrrng Integer vector of length 2, start and end year, e.g., \code{c(2022, 2024)}.
 #' @param dps_data Data frame from \code{\link{anlz_dps_facility}}. Required
 #'   columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
 #'   \code{coastco}, \code{tn_load}.
@@ -138,9 +138,11 @@
 #'   summtime = "year"
 #' )
 #' 
-#' anlz_aa(2022:2024, dps, ips, ml, nps, tbbase, aa_corrections)
+#' anlz_aa(c(2022, 2024), dps, ips, ml, nps, tbbase, aa_corrections)
 #' }
 anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, corrections) {
+
+  yrrng <- seq(min(yrrng), max(yrrng))
 
   # Segment name → bay_seg (Boca Ciega Bay = 5 is excluded from allocation)
   seg_bay <- c(
@@ -381,7 +383,8 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, correc
       )
     ) |>
     dplyr::filter(.data$bay_seg != 5L) |>
-    dplyr::select("entity", "facname", "coastco", "bay_seg", "dps_source")
+    dplyr::select("entity", "facname", "coastco", "bay_seg", "dps_source") |> 
+    dplyr::distinct()
 
   # Annual DPS TN per entity + coastco + type + year; facname resolved via coastco join
   dps_annual <- dps_data |>

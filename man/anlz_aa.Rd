@@ -7,7 +7,7 @@
 anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, corrections)
 }
 \arguments{
-\item{yrrng}{Integer vector of years to include, e.g., \code{2022:2024}.}
+\item{yrrng}{Integer vector of length 2, start and end year, e.g., \code{c(2022, 2024)}.}
 
 \item{dps_data}{Data frame from \code{\link{anlz_dps_facility}}. Required
 columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
@@ -153,6 +153,6 @@ nps <- anlz_nps(
   summtime = "year"
 )
 
-anlz_aa(2022:2024, dps, ips, ml, nps, tbbase, aa_corrections)
+anlz_aa(c(2022, 2024), dps, ips, ml, nps, tbbase, aa_corrections)
 }
 }
