@@ -3,14 +3,15 @@ make_dps_empty <- function() {
   data.frame(
     Year = integer(), Month = integer(), entity = character(),
     facility = character(), coastco = character(), source = character(),
-    tn_load = numeric()
+    tn_load = numeric(), hy_load = numeric()
   )
 }
 
 make_ips_empty <- function() {
   data.frame(
     Year = integer(), Month = integer(), entity = character(),
-    facility = character(), coastco = character(), tn_load = numeric()
+    facility = character(), coastco = character(), tn_load = numeric(),
+    hy_load = numeric()
   )
 }
 
@@ -59,7 +60,8 @@ dps_bradenton_sw <- function(tn = 20.0, yr = 2023L) {
     facility = "City of Bradenton WRF",
     coastco = coastco[1],
     source = "D-001",
-    tn_load = tn
+    tn_load = tn,
+    hy_load = 0.01
   )
 }
 
@@ -177,6 +179,27 @@ test_that("loads outside yrrng do not contribute to the average eff_load_tons", 
   expect_false(is.na(cw_both))
   # Two-year avg (tn = 75) should be larger than single-year avg (tn = 50)
   expect_true(cw_2022 < cw_both)
+})
+
+# ---- Conservation entity handling -------------------------------------------
+
+test_that("conservation land is attributed to Conserv entity when tbbase has conservation column", {
+  # Build a minimal tbbase with one basin entirely flagged as conservation
+  # Use Old Tampa Bay basin 206-1 (which has a known mean_h2o_9294) so
+  # hydro_baseline joins succeed.
+  tb_conserv <- tbbase[tbbase$bay_seg == "1" & tbbase$basin == "206-1", ]
+  tb_conserv$conservation <- TRUE
+
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(),
+                    nps_206_1(tn = 50.0), tb_conserv)
+
+  # "Conserv" should appear among bay_seg = 1 rows (source is NA since it has no allocation)
+  expect_true("Conserv" %in% result$entity[result$bay_seg == 1])
+
+  # Conserv row should have a finite, positive eff_load_tons
+  conserv_row <- result[result$bay_seg == 1 & !is.na(result$entity) & result$entity == "Conserv", ]
+  expect_true(nrow(conserv_row) >= 1)
+  expect_true(is.finite(conserv_row$eff_load_tons[1]) && conserv_row$eff_load_tons[1] > 0)
 })
 
 # ---- IPS path ----------------------------------------------------------------

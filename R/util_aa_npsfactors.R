@@ -93,6 +93,10 @@ util_aa_npsfactors <- function(tbbase, rcclucsid, emc) {
     )) |>
     remap_basins()
 
+  # Add conservation = FALSE when tbbase was built without a conservation overlay
+  if (!"conservation" %in% names(base_clean))
+    base_clean <- dplyr::mutate(base_clean, conservation = FALSE)
+
   # ---- RC factors -------------------------------------------------------
   # factor_rc = entity's share of (area x RC) for each basin x clucsid.
   # Jurisdiction is required: each entity owns a fraction of each land use
@@ -104,7 +108,7 @@ util_aa_npsfactors <- function(tbbase, rcclucsid, emc) {
     dplyr::select(clucsid, hydgrp, rc)
 
   landbase <- base_clean |>
-    dplyr::group_by(bay_seg, basin, entity, clucsid, hydgrp) |>
+    dplyr::group_by(bay_seg, basin, entity, clucsid, hydgrp, conservation) |>
     dplyr::summarise(area_ha = sum(area_ha, na.rm = TRUE), .groups = "drop") |>
     dplyr::left_join(rc_lookup, by = c("clucsid", "hydgrp")) |>
     dplyr::mutate(mult = area_ha * rc)
@@ -118,6 +122,7 @@ util_aa_npsfactors <- function(tbbase, rcclucsid, emc) {
     dplyr::mutate(
       factor_rc = dplyr::if_else(total_mult > 0, mult / total_mult, 0),
       category  = dplyr::case_when(
+        .data$conservation                               ~ "Conservation",
         clucsid %in% c(8L, 10L, 11L, 12L, 13L, 14L)    ~ "Agriculture",
         clucsid %in% c(6L, 9L, 15L, 16L, 18L, 19L, 20L) ~ "Other",
         TRUE                                              ~ NA_character_

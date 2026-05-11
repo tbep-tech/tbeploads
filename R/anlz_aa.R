@@ -65,9 +65,10 @@
 #'   \frac{\text{mean\_h2o\_9294}}{\text{basin\_nps\_h2o}}
 #' }
 #'
-#' where \code{basin\_nps\_h2o} is the annual NPS water load from
-#' \code{nps_data} for the same basin and year. Effective loads are summed
-#' across basins per permit per bay segment, then averaged over \code{yrrng}.
+#' where \code{basin\_total\_h2o} is the annual total water load (NPS + DPS + IPS)
+#' for the same basin and year, matching the SAS \code{ratio1\_2224} denominator.
+#' Effective loads are summed across basins per permit per bay segment, then
+#' averaged over \code{yrrng}.
 #'
 #' \strong{ML path}
 #'
@@ -95,6 +96,9 @@
 #'
 #' Agricultural land use (category \code{"Agriculture"}) is attributed to the
 #' aggregate entity \code{"All"} regardless of the underlying MS4 jurisdiction.
+#' Conservation land use (category \code{"Conservation"}, set when \code{tbbase}
+#' was built with a \code{tbconserv} overlay) is attributed to the aggregate
+#' entity \code{"Conserv"} regardless of the underlying MS4 jurisdiction.
 #'
 #' After disaggregation, loads and 1992-1994 baseline water volumes are summed
 #' across basins to the segment level. TN corrections from \code{\link{aa_corrections}}
@@ -169,6 +173,32 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
     )
   }
 
+  # ---- Shared: facility-to-basin lookups for total H2O normalization ------
+  # SAS ratio1_2224 (the normalization denominator) sums NPS + DPS + IPS water
+  # for each basin and year. Reproduce that here.
+
+  ips_fac_h2o <- facilities |>
+    dplyr::filter(grepl("Industrial", .data$source)) |>
+    dplyr::rename(bay_seg = "bayseg") |>
+    dplyr::mutate(
+      bay_seg = as.integer(.data$bay_seg),
+      basin   = remap_basins(.data$basin)
+    ) |>
+    dplyr::filter(!is.na(.data$basin), !is.na(.data$coastco)) |>
+    dplyr::select("entity", "coastco", "bay_seg", "basin") |>
+    dplyr::distinct()
+
+  dps_fac_h2o <- facilities |>
+    dplyr::filter(grepl("Domestic", .data$source)) |>
+    dplyr::rename(bay_seg = "bayseg") |>
+    dplyr::mutate(
+      bay_seg = as.integer(.data$bay_seg),
+      basin   = remap_basins(.data$basin)
+    ) |>
+    dplyr::filter(!is.na(.data$basin), !is.na(.data$coastco), .data$bay_seg != 5L) |>
+    dplyr::select("entity", "coastco", "bay_seg", "basin") |>
+    dplyr::distinct()
+
   # ---- Shared: annual NPS basin loads (used by both paths) -----------------
 
   nps_annual <- nps_data |>
@@ -182,34 +212,65 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
       .groups = "drop"
     )
 
+  # IPS basin H2O (million m3/yr)
+  ips_basin_h2o <- ips_data |>
+    dplyr::filter(.data$Year %in% yrrng) |>
+    dplyr::group_by(.data$Year, .data$entity, .data$coastco) |>
+    dplyr::summarise(hy_load_ips = sum(.data$hy_load, na.rm = TRUE), .groups = "drop") |>
+    dplyr::left_join(ips_fac_h2o, by = c("entity", "coastco")) |>
+    dplyr::filter(!is.na(.data$basin)) |>
+    dplyr::group_by(.data$bay_seg, .data$basin, .data$Year) |>
+    dplyr::summarise(hy_load_ips = sum(.data$hy_load_ips, na.rm = TRUE), .groups = "drop")
+
+  # DPS basin H2O (million m3/yr; reuse already attenuated by anlz_dps_facility)
+  dps_basin_h2o <- dps_data |>
+    dplyr::filter(.data$Year %in% yrrng) |>
+    dplyr::group_by(.data$Year, .data$entity, .data$coastco) |>
+    dplyr::summarise(hy_load_dps = sum(.data$hy_load, na.rm = TRUE), .groups = "drop") |>
+    dplyr::left_join(dps_fac_h2o, by = c("entity", "coastco")) |>
+    dplyr::filter(!is.na(.data$basin)) |>
+    dplyr::group_by(.data$bay_seg, .data$basin, .data$Year) |>
+    dplyr::summarise(hy_load_dps = sum(.data$hy_load_dps, na.rm = TRUE), .groups = "drop")
+
+  # Total basin H2O = NPS + IPS + DPS (matches SAS ratio1_2224 construction)
+  nps_annual <- nps_annual |>
+    dplyr::left_join(ips_basin_h2o, by = c("bay_seg", "basin", "Year")) |>
+    dplyr::left_join(dps_basin_h2o, by = c("bay_seg", "basin", "Year")) |>
+    dplyr::mutate(
+      total_h2o = .data$hy_load +
+        dplyr::coalesce(.data$hy_load_ips, 0) +
+        dplyr::coalesce(.data$hy_load_dps, 0)
+    ) |>
+    dplyr::select(-dplyr::any_of(c("hy_load_ips", "hy_load_dps")))
+
   # ---- NPS path ------------------------------------------------------------
 
   nps_factors <- util_aa_npsfactors(tbbase, rcclucsid, emc)
 
   # Disaggregate basin TN to entity × clucsid × year.
-  # hy_load (full basin NPS water) is carried forward unchanged — it is the
+  # total_h2o (NPS+DPS+IPS basin water) is carried forward — it is the
   # normalization denominator for all entities in that basin, matching the SAS
-  # approach where ratio1_2224 basin water overwrites any entity-level water.
+  # ratio1_2224 construction (script 6) which sums all source water per basin.
   entity_clucsid <- nps_annual |>
     dplyr::left_join(nps_factors$tn, by = c("bay_seg", "basin"),
                      relationship = "many-to-many") |>
     dplyr::left_join(nps_factors$rc, by = c("bay_seg", "basin", "clucsid"),
                      relationship = "many-to-many") |>
     dplyr::mutate(
-      entity    = dplyr::if_else(
-        !is.na(.data$category) & .data$category == "Agriculture",
-        "All",
-        .data$entity
+      entity    = dplyr::case_when(
+        !is.na(.data$category) & .data$category == "Conservation" ~ "Conserv",
+        !is.na(.data$category) & .data$category == "Agriculture"  ~ "All",
+        TRUE ~ .data$entity
       ),
       tn_entity = .data$tn_load * .data$factor_tn * .data$factor_rc
     )
 
-  # Sum TN over clucsids; carry one copy of basin hy_load per entity-basin-year
+  # Sum TN over clucsids; carry one copy of basin total_h2o per entity-basin-year
   entity_basin_yr <- entity_clucsid |>
     dplyr::group_by(.data$bay_seg, .data$basin, .data$entity, .data$Year) |>
     dplyr::summarise(
       tn_entity = sum(.data$tn_entity, na.rm = TRUE),
-      hy_load   = dplyr::first(.data$hy_load),
+      total_h2o = dplyr::first(.data$total_h2o),
       .groups = "drop"
     ) |>
     # Terra Ceia (6) and Manatee River (7) merge into 55 to match hydro_baseline
@@ -218,14 +279,14 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
     )
 
   # Attach 1992-1994 baseline water; sum across basins → bay_seg × entity × year.
-  # Both hy_load and mean_h2o_9294 are summed as basin totals — the ratio of
+  # Both total_h2o and mean_h2o_9294 are summed as basin totals — the ratio of
   # their sums is the hydrologic normalization factor applied to entity TN.
   entity_seg_yr <- entity_basin_yr |>
     dplyr::left_join(hydro_baseline, by = c("bay_seg", "basin")) |>
     dplyr::group_by(.data$bay_seg, .data$entity, .data$Year) |>
     dplyr::summarise(
       tn_entity     = sum(.data$tn_entity,     na.rm = TRUE),
-      hy_load       = sum(.data$hy_load,       na.rm = TRUE),
+      total_h2o     = sum(.data$total_h2o,     na.rm = TRUE),
       mean_h2o_9294 = sum(.data$mean_h2o_9294, na.rm = TRUE),
       .groups = "drop"
     )
@@ -238,7 +299,7 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
       .groups = "drop"
     )
 
-  # Apply corrections, then normalize: eff_tn = tn_corrected × (mean9294 / basin_h2o)
+  # Apply corrections, then normalize: eff_tn = tn_corrected × (mean9294 / total_h2o)
   nps_normalized <- entity_seg_yr |>
     dplyr::left_join(corr_summ, by = c("bay_seg", "entity"),
                      relationship = "many-to-one") |>
@@ -246,23 +307,19 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
       corr_tons    = dplyr::coalesce(.data$corr_tons, 0),
       tn_corrected = .data$tn_entity - .data$corr_tons,
       eff_tn       = dplyr::if_else(
-        .data$hy_load > 0,
-        .data$tn_corrected * (.data$mean_h2o_9294 / .data$hy_load),
+        .data$total_h2o > 0,
+        .data$tn_corrected * (.data$mean_h2o_9294 / .data$total_h2o),
         NA_real_
       )
     )
 
-  # Average effective TN and un-normalized TN over years
+  # Sum over years then divide by length(yrrng); missing years contribute zero
   nps_mean <- nps_normalized |>
     dplyr::group_by(.data$bay_seg, .data$entity) |>
     dplyr::summarise(
-      eff_load_tons = mean(.data$eff_tn,       na.rm = TRUE),
-      load_tons     = mean(.data$tn_corrected, na.rm = TRUE),
+      eff_load_tons = sum(.data$eff_tn,       na.rm = TRUE) / length(yrrng),
+      load_tons     = sum(.data$tn_corrected, na.rm = TRUE) / length(yrrng),
       .groups = "drop"
-    ) |>
-    dplyr::mutate(
-      eff_load_tons = dplyr::if_else(is.nan(.data$eff_load_tons), NA_real_, .data$eff_load_tons),
-      load_tons     = dplyr::if_else(is.nan(.data$load_tons),     NA_real_, .data$load_tons)
     )
 
   # Full join with allocations; retain unmatched rows on both sides
@@ -307,11 +364,11 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
     dplyr::filter(!is.na(.data$basin)) |>
     dplyr::select(-"facility")
 
-  # Normalize per facility-basin-year using NPS basin water loads
+  # Normalize per facility-basin-year using total basin water loads (NPS+IPS+DPS)
   ips_normalized <- ips_annual |>
     dplyr::left_join(
       nps_annual |>
-        dplyr::select("bay_seg", "basin", "Year", nps_h2o = "hy_load"),
+        dplyr::select("bay_seg", "basin", "Year", nps_h2o = "total_h2o"),
       by = c("bay_seg", "basin", "Year")
     ) |>
     dplyr::left_join(hydro_baseline, by = c("bay_seg", "basin")) |>
@@ -323,7 +380,8 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
       )
     )
 
-  # Sum across basins per permit × entity × facname × bay_seg × year, then average
+  # Sum across basins per permit × entity × facname × bay_seg × year, then divide
+  # by length(yrrng) so missing years contribute zero
   ips_mean <- ips_normalized |>
     dplyr::group_by(.data$bay_seg, .data$entity, .data$facname, .data$permit, .data$Year) |>
     dplyr::summarise(
@@ -333,13 +391,9 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
     ) |>
     dplyr::group_by(.data$bay_seg, .data$entity, .data$facname, .data$permit) |>
     dplyr::summarise(
-      eff_load_tons = mean(.data$eff_tn, na.rm = TRUE),
-      load_tons     = mean(.data$tn_ips, na.rm = TRUE),
+      eff_load_tons = sum(.data$eff_tn, na.rm = TRUE) / length(yrrng),
+      load_tons     = sum(.data$tn_ips, na.rm = TRUE) / length(yrrng),
       .groups = "drop"
-    ) |>
-    dplyr::mutate(
-      eff_load_tons = dplyr::if_else(is.nan(.data$eff_load_tons), NA_real_, .data$eff_load_tons),
-      load_tons     = dplyr::if_else(is.nan(.data$load_tons),     NA_real_, .data$load_tons)
     )
 
   # Full join with allocations on permit; retain unmatched on both sides
@@ -401,17 +455,12 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
     dplyr::group_by(.data$Year, .data$bay_seg, .data$entity, .data$facname, .data$dps_source) |>
     dplyr::summarise(tn_dps = sum(.data$tn_dps, na.rm = TRUE), .groups = "drop")
 
-  # Average over yrrng → mean annual effective load per facility
+  # Sum over years then divide by length(yrrng); missing years contribute zero
   dps_mean <- dps_annual |>
     dplyr::group_by(.data$bay_seg, .data$entity, .data$facname, .data$dps_source) |>
     dplyr::summarise(
-      eff_load_tons = mean(.data$tn_dps, na.rm = TRUE),
+      eff_load_tons = sum(.data$tn_dps, na.rm = TRUE) / length(yrrng),
       .groups = "drop"
-    ) |>
-    dplyr::mutate(
-      eff_load_tons = dplyr::if_else(
-        is.nan(.data$eff_load_tons), NA_real_, .data$eff_load_tons
-      )
     )
 
   # Full join with DPS allocations; retain unmatched rows on both sides
@@ -454,17 +503,12 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
     dplyr::filter(!is.na(.data$bay_seg)) |>
     dplyr::rename(facname = "facility")
 
-  # Average over yrrng → mean annual load per entity + facname + bay_seg
+  # Sum over years then divide by length(yrrng); missing years contribute zero
   ml_mean <- ml_annual |>
     dplyr::group_by(.data$bay_seg, .data$entity, .data$facname) |>
     dplyr::summarise(
-      eff_load_tons = mean(.data$tn_ml, na.rm = TRUE),
+      eff_load_tons = sum(.data$tn_ml, na.rm = TRUE) / length(yrrng),
       .groups = "drop"
-    ) |>
-    dplyr::mutate(
-      eff_load_tons = dplyr::if_else(
-        is.nan(.data$eff_load_tons), NA_real_, .data$eff_load_tons
-      )
     )
 
   # Non-shared: one output row per facility; full join on entity + facname + bay_seg
@@ -504,11 +548,6 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
     dplyr::summarise(
       eff_load_tons = sum(.data$eff_load_tons, na.rm = TRUE),
       .groups = "drop"
-    ) |>
-    dplyr::mutate(
-      eff_load_tons = dplyr::if_else(
-        is.nan(.data$eff_load_tons), NA_real_, .data$eff_load_tons
-      )
     )
 
   ml_out_shared <- ml_allocations |>
