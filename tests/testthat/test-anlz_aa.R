@@ -157,6 +157,20 @@ test_that("load_tons equals eff_load_tons for DPS (no normalization)", {
   }
 })
 
+test_that("NPS load_tons is unaffected by DPS TN loads (nps_data is not PS-corrected)", {
+  # nps_data TN loads come solely from anlz_nps and carry no PS correction.
+  # Adding DPS data (even with an enormous TN load) must not change NPS load_tons.
+  nps_input <- nps_206_1(tn = 50.0)
+  result_no_dps   <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_input, tbbase)
+  result_with_dps <- anlz_aa(2023L, dps_bradenton_sw(tn = 1e6), make_ips_empty(), make_ml_empty(), nps_input, tbbase)
+
+  cw_no_dps   <- result_no_dps$load_tons[result_no_dps$entity   == "CLEARWATER" & result_no_dps$bay_seg   == 1]
+  cw_with_dps <- result_with_dps$load_tons[result_with_dps$entity == "CLEARWATER" & result_with_dps$bay_seg == 1]
+
+  expect_false(is.na(cw_no_dps))
+  expect_equal(cw_no_dps, cw_with_dps)
+})
+
 # ---- Year range filtering ----------------------------------------------------
 
 test_that("loads outside yrrng do not contribute to the average eff_load_tons", {

@@ -13,7 +13,8 @@
 #' @param nps_data Data frame from \code{\link{anlz_nps}} called with
 #'   \code{summ = 'basin'} and \code{summtime = 'year'}. Required columns:
 #'   \code{Year}, \code{source}, \code{segment}, \code{basin}, \code{tn_load},
-#'   \code{hy_load}.
+#'   \code{hy_load}. TN loads represent NPS contributions only and are not
+#'   corrected for point-source loads.
 #' @param tbbase data frame containing polygon areas for the combined data
 #'   layer of bay segment, basin, jurisdiction, land use data, and soils, see details
 #' @returns A data frame with one row per entity (NPS/MS4) or facility (IPS)
@@ -83,8 +84,10 @@
 #' 
 #' \strong{NPS/MS4 path}
 #'
-#' Basin-level NPS loads from \code{nps_data} are disaggregated to individual
-#' MS4 entities using the output (created internally) from \code{\link{util_aa_npsfactors}}
+#' TN loads in \code{nps_data} are NPS-only; no point-source correction is
+#' applied to the input loads. Basin-level NPS loads are disaggregated to
+#' individual MS4 entities using the output (created internally) from
+#' \code{\link{util_aa_npsfactors}}
 #' that combines \code{\link{tbbase}}, \code{\link{rcclucsid}}, and \code{\link{emc}}
 #' into:
 #' 
