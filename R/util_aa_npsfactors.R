@@ -93,10 +93,6 @@ util_aa_npsfactors <- function(tbbase, rcclucsid, emc) {
     )) |>
     remap_basins()
 
-  # Add conservation = FALSE when tbbase was built without a conservation overlay
-  if (!"conservation" %in% names(base_clean))
-    base_clean <- dplyr::mutate(base_clean, conservation = FALSE)
-
   # ---- RC factors -------------------------------------------------------
   # factor_rc = entity's share of (area x RC) for each basin x clucsid.
   # Jurisdiction is required: each entity owns a fraction of each land use
