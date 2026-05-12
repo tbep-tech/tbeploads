@@ -40,6 +40,8 @@ anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase)
   [`anlz_nps`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps.md)
   called with `summ = 'basin'` and `summtime = 'year'`. Required
   columns: `Year`, `source`, `segment`, `basin`, `tn_load`, `hy_load`.
+  TN loads represent NPS contributions only and are not corrected for
+  point-source loads.
 
 - tbbase:
 
@@ -149,8 +151,9 @@ single shared allocation.
 
 **NPS/MS4 path**
 
-Basin-level NPS loads from `nps_data` are disaggregated to individual
-MS4 entities using the output (created internally) from
+TN loads in `nps_data` are NPS-only; no point-source correction is
+applied to the input loads. Basin-level NPS loads are disaggregated to
+individual MS4 entities using the output (created internally) from
 [`util_aa_npsfactors`](https://tbep-tech.github.io/tbeploads/reference/util_aa_npsfactors.md)
 that combines
 [`tbbase`](https://tbep-tech.github.io/tbeploads/reference/tbbase.md),
