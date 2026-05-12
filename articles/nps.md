@@ -179,15 +179,16 @@ data object is also included with the package for convenience.
 ``` r
 
 head(tbbase)
-#> # A tibble: 6 × 9
-#>   bay_seg basin    drnfeat entity     FLUCCSCODE CLUCSID IMPROVED hydgrp area_ha
-#>     <dbl> <chr>    <chr>   <chr>           <dbl>   <dbl>    <int> <chr>    <dbl>
-#> 1       1 02304500 LAKE    HILLSBORO…       1100       1        1 A      0.00253
-#> 2       1 02304500 LAKE    HILLSBORO…       1100       1        1 A/D    0.00653
-#> 3       1 02304500 LAKE    HILLSBORO…       1200       2        1 A      0.0321 
-#> 4       1 02304500 LAKE    HILLSBORO…       1200       2        1 A/D    0.0126 
-#> 5       1 02304500 LAKE    HILLSBORO…       1400       4        1 A      0.00969
-#> 6       1 02304500 LAKE    HILLSBORO…       1400       4        1 A/D    0.00779
+#> # A tibble: 6 × 10
+#>   bay_seg basin   drnfeat entity FLUCCSCODE CLUCSID IMPROVED hydgrp conservation
+#>     <dbl> <chr>   <chr>   <chr>       <dbl>   <dbl>    <int> <chr>  <lgl>       
+#> 1       1 023070… CANAL   HILLS…       1900       8        0 A      FALSE       
+#> 2       1 023070… CANAL   HILLS…       1900       8        0 B/D    FALSE       
+#> 3       1 023070… CANAL   HILLS…       4340      15        0 A      FALSE       
+#> 4       1 023070… CANAL   HILLS…       4340      15        0 A/D    FALSE       
+#> 5       1 023070… CANAL   HILLS…       4340      15        0 B/D    FALSE       
+#> 6       1 023070… CANAL   HILLS…       8300       7        1 A      FALSE       
+#> # ℹ 1 more variable: area_ha <dbl>
 ```
 
 Next, rainfall data must be obtained for the watershed. These data can
@@ -323,15 +324,15 @@ nps_ungaged <- anlz_nps_ungaged(yrrng = c('2021-01-01', '2023-12-31'), tbbase = 
 
 head(nps_ungaged)
 #> # A tibble: 6 × 12
-#>   bay_seg basin     yr    mo clucsid h2oload tnload tpload tssload bodload  area
-#>     <dbl> <chr>  <dbl> <dbl>   <dbl>   <dbl>  <dbl>  <dbl>   <dbl>   <dbl> <dbl>
-#> 1       1 02306…  2021     1       1   7661.   14.6   2.40    137.    33.7  210.
-#> 2       1 02306…  2021     1       2  59344.  133.   20.2    2156.   439.   971.
-#> 3       1 02306…  2021     1       3 108271.  225.   39.9    6912.  1191.  1267.
-#> 4       1 02306…  2021     1       4  81852.  159.   22.9    6766.  1408.   481.
-#> 5       1 02306…  2021     1       5  58995.   96.6  15.8    5542.   566.   371.
-#> 6       1 02306…  2021     1       7  27446.   32.4   4.12    549.   225.   281.
-#> # ℹ 1 more variable: bas_area <dbl>
+#>   bay_seg basin       yr    mo clucsid h2oload  tnload tpload tssload bodload
+#>     <dbl> <chr>    <dbl> <dbl>   <dbl>   <dbl>   <dbl>  <dbl>   <dbl>   <dbl>
+#> 1       1 02306647    NA    NA      NA     0    0      0        0       0    
+#> 2       1 02307000  2021     1       1  6540.  12.4    2.05   117.     28.8  
+#> 3       1 02307000  2021     1       2 10710.  23.9    3.65   389.     79.3  
+#> 4       1 02307000  2021     1       7  5631.   6.64   0.845  113.     46.2  
+#> 5       1 02307000  2021     1       8 38233.  47.4    0.382  421.     55.4  
+#> 6       1 02307000  2021     1      10    26.3  0.0699 0.0213   0.226   0.134
+#> # ℹ 2 more variables: area <dbl>, bas_area <dbl>
 ```
 
 A data frame is returned with columns for bay segment, basin, year,
@@ -382,12 +383,12 @@ head(nps)
 #> # A tibble: 6 × 10
 #>    Year Month source segment     basin tn_load tp_load tss_load bod_load hy_load
 #>   <dbl> <dbl> <chr>  <chr>       <chr>   <dbl>   <dbl>    <dbl>    <dbl>   <dbl>
-#> 1  2021     1 NPS    Boca Ciega… 207-5    2.42   0.404     80.8    14.5    1.22 
-#> 2  2021     2 NPS    Boca Ciega… 207-5    1.65   0.276     55.3     9.94   0.834
-#> 3  2021     3 NPS    Boca Ciega… 207-5    1.37   0.228     45.6     8.21   0.689
-#> 4  2021     4 NPS    Boca Ciega… 207-5    1.58   0.263     52.6     9.46   0.794
-#> 5  2021     5 NPS    Boca Ciega… 207-5    1.21   0.200     40.1     7.20   0.604
-#> 6  2021     6 NPS    Boca Ciega… 207-5    2.64   0.441     88.4    15.9    1.33
+#> 1  2021     1 NPS    Boca Ciega… 207-5 3.60e-4 1.43e-4  0.00560 0.00165  1.06e-3
+#> 2  2021     2 NPS    Boca Ciega… 207-5 2.13e-4 8.66e-5  0.00340 0.00100  6.40e-4
+#> 3  2021     3 NPS    Boca Ciega… 207-5 2.61e-4 7.20e-5  0.00282 0.000833 5.32e-4
+#> 4  2021     4 NPS    Boca Ciega… 207-5 2.84e-4 8.17e-5  0.00320 0.000946 6.04e-4
+#> 5  2021     5 NPS    Boca Ciega… 207-5 2.89e-4 6.56e-5  0.00257 0.000759 4.85e-4
+#> 6  2021     6 NPS    Boca Ciega… 207-5 3.16e-4 1.17e-4  0.00459 0.00136  8.66e-4
 ```
 
 Unlike the individual gaged and ungaged functions,
@@ -448,12 +449,12 @@ head(npslu)
 #> # A tibble: 6 × 11
 #>    Year Month source segment       basin lu    tn_load tp_load tss_load bod_load
 #>   <dbl> <dbl> <chr>  <chr>         <chr> <chr>   <dbl>   <dbl>    <dbl>    <dbl>
-#> 1  2021     1 NPS    Boca Ciega B… 207-5 Barr… 7.11e-5 5.74e-7 0.000631  8.32e-5
-#> 2  2021     2 NPS    Boca Ciega B… 207-5 Barr… 4.86e-5 3.92e-7 0.000431  5.69e-5
-#> 3  2021     3 NPS    Boca Ciega B… 207-5 Barr… 4.02e-5 3.24e-7 0.000356  4.70e-5
-#> 4  2021     4 NPS    Boca Ciega B… 207-5 Barr… 4.63e-5 3.73e-7 0.000411  5.41e-5
-#> 5  2021     5 NPS    Boca Ciega B… 207-5 Barr… 3.52e-5 2.84e-7 0.000313  4.12e-5
-#> 6  2021     6 NPS    Boca Ciega B… 207-5 Barr… 7.78e-5 6.27e-7 0.000690  9.10e-5
+#> 1  2021     1 NPS    Boca Ciega B… 207-5 Comm… 1.32e-5 1.89e-6 0.000559  1.16e-4
+#> 2  2021     2 NPS    Boca Ciega B… 207-5 Comm… 7.98e-6 1.15e-6 0.000339  7.05e-5
+#> 3  2021     3 NPS    Boca Ciega B… 207-5 Comm… 6.63e-6 9.54e-7 0.000282  5.86e-5
+#> 4  2021     4 NPS    Boca Ciega B… 207-5 Comm… 7.53e-6 1.08e-6 0.000320  6.65e-5
+#> 5  2021     5 NPS    Boca Ciega B… 207-5 Comm… 6.04e-6 8.69e-7 0.000256  5.34e-5
+#> 6  2021     6 NPS    Boca Ciega B… 207-5 Comm… 1.08e-5 1.55e-6 0.000458  9.53e-5
 #> # ℹ 1 more variable: hy_load <dbl>
 ```
 
@@ -521,14 +522,14 @@ nps_psremoved <- anlz_nps_psremove(nps_basin, ips_basin, dps_basin)
 
 head(nps_psremoved)
 #> # A tibble: 6 × 9
-#>    Year Month source segment        tn_load tp_load tss_load bod_load hy_load
-#>   <dbl> <dbl> <chr>  <chr>            <dbl>   <dbl>    <dbl>    <dbl>   <dbl>
-#> 1  2021     1 NPS    Boca Ciega Bay    2.42   0.404     80.8    14.5    1.22 
-#> 2  2021     2 NPS    Boca Ciega Bay    1.65   0.276     55.3     9.94   0.834
-#> 3  2021     3 NPS    Boca Ciega Bay    1.37   0.228     45.6     8.21   0.689
-#> 4  2021     4 NPS    Boca Ciega Bay    1.58   0.263     52.6     9.46   0.794
-#> 5  2021     5 NPS    Boca Ciega Bay    1.21   0.200     40.1     7.20   0.604
-#> 6  2021     6 NPS    Boca Ciega Bay    2.64   0.441     88.4    15.9    1.33
+#>    Year Month source segment         tn_load   tp_load tss_load bod_load hy_load
+#>   <dbl> <dbl> <chr>  <chr>             <dbl>     <dbl>    <dbl>    <dbl>   <dbl>
+#> 1  2021     1 NPS    Boca Ciega Bay 0.000360 0.000143   0.00560 0.00165  1.06e-3
+#> 2  2021     2 NPS    Boca Ciega Bay 0.000213 0.0000866  0.00340 0.00100  6.40e-4
+#> 3  2021     3 NPS    Boca Ciega Bay 0.000261 0.0000720  0.00282 0.000833 5.32e-4
+#> 4  2021     4 NPS    Boca Ciega Bay 0.000284 0.0000817  0.00320 0.000946 6.04e-4
+#> 5  2021     5 NPS    Boca Ciega Bay 0.000289 0.0000656  0.00257 0.000759 4.85e-4
+#> 6  2021     6 NPS    Boca Ciega Bay 0.000316 0.000117   0.00459 0.00136  8.66e-4
 ```
 
 Results are returned at the segment/month level with the same column

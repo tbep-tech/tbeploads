@@ -9,7 +9,7 @@ estimation in the Tampa Bay watershed
 util_nps_tbbase(
   tblu,
   tbsoil,
-  tbconserv = NULL,
+  tbconserv,
   gdal_path = NULL,
   chunk_size = NULL,
   cast = FALSE,
@@ -30,12 +30,11 @@ util_nps_tbbase(
 
 - tbconserv:
 
-  Optional sf object of conservation lands polygons (e.g., FNAI
-  Conservation Lands). When provided, each row in the output gains a
-  logical `conservation` column indicating whether that land area falls
-  within a conservation boundary. If `NULL` (default), the output omits
-  the `conservation` column and all areas are treated as
-  non-conservation.
+  An `sf` object of conservation lands polygons (e.g.,
+  [`flma`](https://tbep-tech.github.io/tbeploads/reference/flma.md)).
+  Each row in the output gains a logical `conservation` column
+  indicating whether that land area falls within a conservation
+  boundary.
 
 - gdal_path:
 
@@ -63,9 +62,9 @@ util_nps_tbbase(
 A summarized data frame containing the union of all inputs showing major
 bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction
 (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED,
-hydrologic group (hydgrp), area in hectares, and optionally
-`conservation` (logical). These represent all relevant spatial
-combinations in the Tampa Bay watershed.
+hydrologic group (hydgrp), area in hectares, and `conservation`
+(logical). These represent all relevant spatial combinations in the
+Tampa Bay watershed.
 
 ## Details
 
@@ -81,6 +80,7 @@ if (FALSE) { # \dontrun{
 # Load required data
 data(tblu2023)
 data(tbsoil)
-result <- util_nps_tbbase(tblu2023, tbsoil, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
+data(flma)
+result <- util_nps_tbbase(tblu2023, tbsoil, flma, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
 } # }
 ```

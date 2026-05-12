@@ -52,7 +52,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_nps_tbbase</span><span class="op">(</span></span>
 <span>  <span class="va">tblu</span>,</span>
 <span>  <span class="va">tbsoil</span>,</span>
-<span>  tbconserv <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">tbconserv</span>,</span>
 <span>  gdal_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  chunk_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cast <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -73,10 +73,9 @@
 
 
 <dt id="arg-tbconserv">tbconserv<a class="anchor" aria-label="anchor" href="#arg-tbconserv"></a></dt>
-<dd><p>Optional sf object of conservation lands polygons (e.g., FNAI Conservation Lands).
-When provided, each row in the output gains a logical <code>conservation</code> column indicating whether
-that land area falls within a conservation boundary. If <code>NULL</code> (default), the output omits the
-<code>conservation</code> column and all areas are treated as non-conservation.</p></dd>
+<dd><p>An <code>sf</code> object of conservation lands polygons (e.g., <code><a href="flma.html">flma</a></code>).
+Each row in the output gains a logical <code>conservation</code> column indicating whether
+that land area falls within a conservation boundary.</p></dd>
 
 
 <dt id="arg-gdal-path">gdal_path<a class="anchor" aria-label="anchor" href="#arg-gdal-path"></a></dt>
@@ -97,7 +96,7 @@ that land area falls within a conservation boundary. If <code>NULL</code> (defau
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A summarized data frame containing the union of all inputs showing major bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED, hydrologic group (hydgrp), area in hectares, and optionally <code>conservation</code> (logical). These represent all relevant spatial combinations in the Tampa Bay watershed.</p>
+    <p>A summarized data frame containing the union of all inputs showing major bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED, hydrologic group (hydgrp), area in hectares, and <code>conservation</code> (logical). These represent all relevant spatial combinations in the Tampa Bay watershed.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -110,7 +109,8 @@ that land area falls within a conservation boundary. If <code>NULL</code> (defau
 <span class="r-in"><span><span class="co"># Load required data</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tblu2023</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbsoil</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">util_nps_tbbase</span><span class="op">(</span><span class="va">tblu2023</span>, <span class="va">tbsoil</span>, gdal_path <span class="op">=</span> <span class="st">"C:/OSGeo4W/bin"</span>, chunk_size <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">flma</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">util_nps_tbbase</span><span class="op">(</span><span class="va">tblu2023</span>, <span class="va">tbsoil</span>, <span class="va">flma</span>, gdal_path <span class="op">=</span> <span class="st">"C:/OSGeo4W/bin"</span>, chunk_size <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

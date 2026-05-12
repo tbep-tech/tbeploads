@@ -23,18 +23,19 @@ See "data-raw/tbbase.R" for creation.
 
 ``` r
 tbbase
-#> # A tibble: 21,122 × 9
-#>    bay_seg basin    drnfeat entity    FLUCCSCODE CLUCSID IMPROVED hydgrp area_ha
-#>      <dbl> <chr>    <chr>   <chr>          <dbl>   <dbl>    <int> <chr>    <dbl>
-#>  1       1 02304500 LAKE    HILLSBOR…       1100       1        1 A      2.53e-3
-#>  2       1 02304500 LAKE    HILLSBOR…       1100       1        1 A/D    6.53e-3
-#>  3       1 02304500 LAKE    HILLSBOR…       1200       2        1 A      3.21e-2
-#>  4       1 02304500 LAKE    HILLSBOR…       1200       2        1 A/D    1.26e-2
-#>  5       1 02304500 LAKE    HILLSBOR…       1400       4        1 A      9.69e-3
-#>  6       1 02304500 LAKE    HILLSBOR…       1400       4        1 A/D    7.79e-3
-#>  7       1 02304500 LAKE    HILLSBOR…       1700       7        1 A/D    1.55e-4
-#>  8       1 02304500 LAKE    HILLSBOR…       1900       8        0 A      5.45e-3
-#>  9       1 02304500 LAKE    HILLSBOR…       1900       8        0 A/D    5.74e-3
-#> 10       1 02304500 LAKE    HILLSBOR…       2600       8        0 A      2.28e-3
-#> # ℹ 21,112 more rows
+#> # A tibble: 5,182 × 10
+#>    bay_seg basin  drnfeat entity FLUCCSCODE CLUCSID IMPROVED hydgrp conservation
+#>      <dbl> <chr>  <chr>   <chr>       <dbl>   <dbl>    <int> <chr>  <lgl>       
+#>  1       1 02307… CANAL   HILLS…       1900       8        0 A      FALSE       
+#>  2       1 02307… CANAL   HILLS…       1900       8        0 B/D    FALSE       
+#>  3       1 02307… CANAL   HILLS…       4340      15        0 A      FALSE       
+#>  4       1 02307… CANAL   HILLS…       4340      15        0 A/D    FALSE       
+#>  5       1 02307… CANAL   HILLS…       4340      15        0 B/D    FALSE       
+#>  6       1 02307… CANAL   HILLS…       8300       7        1 A      FALSE       
+#>  7       1 02307… CANAL   HILLS…       8300       7        1 B/D    FALSE       
+#>  8       1 02307… LAKE    HILLS…       1100       1        1 A/D    FALSE       
+#>  9       1 02307… LAKE    HILLS…       6150      18        0 A/D    FALSE       
+#> 10       1 02307… LAKE    HILLS…       6300      18        0 A/D    FALSE       
+#> # ℹ 5,172 more rows
+#> # ℹ 1 more variable: area_ha <dbl>
 ```
