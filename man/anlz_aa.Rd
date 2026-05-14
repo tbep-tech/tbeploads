@@ -116,9 +116,6 @@ entities proportional to area × runoff coefficient.
 
 Agricultural land use (category \code{"Agriculture"}) is attributed to the
 aggregate entity \code{"All"} regardless of the underlying MS4 jurisdiction.
-Conservation land use (category \code{"Conservation"}, set when \code{tbbase}
-was built with a \code{tbconserv} overlay) is attributed to the aggregate
-entity \code{"Conserv"} regardless of the underlying MS4 jurisdiction.
 
 After disaggregation, loads and 1992-1994 baseline water volumes are summed
 across basins to the segment level. TN corrections from \code{\link{aa_corrections}}

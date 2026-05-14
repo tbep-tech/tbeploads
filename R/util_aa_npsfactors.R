@@ -104,7 +104,7 @@ util_aa_npsfactors <- function(tbbase, rcclucsid, emc) {
     dplyr::select(clucsid, hydgrp, rc)
 
   landbase <- base_clean |>
-    dplyr::group_by(bay_seg, basin, entity, clucsid, hydgrp, conservation) |>
+    dplyr::group_by(bay_seg, basin, entity, clucsid, hydgrp) |>
     dplyr::summarise(area_ha = sum(area_ha, na.rm = TRUE), .groups = "drop") |>
     dplyr::left_join(rc_lookup, by = c("clucsid", "hydgrp")) |>
     dplyr::mutate(mult = area_ha * rc)
@@ -118,7 +118,6 @@ util_aa_npsfactors <- function(tbbase, rcclucsid, emc) {
     dplyr::mutate(
       factor_rc = dplyr::if_else(total_mult > 0, mult / total_mult, 0),
       category  = dplyr::case_when(
-        .data$conservation                               ~ "Conservation",
         clucsid %in% c(8L, 10L, 11L, 12L, 13L, 14L)    ~ "Agriculture",
         clucsid %in% c(6L, 9L, 15L, 16L, 18L, 19L, 20L) ~ "Other",
         TRUE                                              ~ NA_character_

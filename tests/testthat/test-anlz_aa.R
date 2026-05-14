@@ -195,27 +195,6 @@ test_that("loads outside yrrng do not contribute to the average eff_load_tons", 
   expect_true(cw_2022 < cw_both)
 })
 
-# ---- Conservation entity handling -------------------------------------------
-
-test_that("conservation land is attributed to Conserv entity when tbbase has conservation column", {
-  # Build a minimal tbbase with one basin entirely flagged as conservation
-  # Use Old Tampa Bay basin 206-1 (which has a known mean_h2o_9294) so
-  # hydro_baseline joins succeed.
-  tb_conserv <- tbbase[tbbase$bay_seg == "1" & tbbase$basin == "206-1", ]
-  tb_conserv$conservation <- TRUE
-
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(),
-                    nps_206_1(tn = 50.0), tb_conserv)
-
-  # "Conserv" should appear among bay_seg = 1 rows (source is NA since it has no allocation)
-  expect_true("Conserv" %in% result$entity[result$bay_seg == 1])
-
-  # Conserv row should have a finite, positive eff_load_tons
-  conserv_row <- result[result$bay_seg == 1 & !is.na(result$entity) & result$entity == "Conserv", ]
-  expect_true(nrow(conserv_row) >= 1)
-  expect_true(is.finite(conserv_row$eff_load_tons[1]) && conserv_row$eff_load_tons[1] > 0)
-})
-
 # ---- IPS path ----------------------------------------------------------------
 
 test_that("IPS rows all carry source equal to IPS", {

@@ -167,27 +167,3 @@ test_that("all Agriculture clucsids get Agriculture category", {
   expect_true(all(result$rc$category == "Agriculture"))
 })
 
-test_that("conservation = TRUE overrides Agriculture and Other category assignments", {
-  tb <- data.frame(
-    bay_seg = "1", basin = "99999", drnfeat = "CON", entity = "EntityA",
-    CLUCSID = c(1L, 8L, 15L),
-    hydgrp  = "A",
-    area_ha = 10,
-    conservation = TRUE,
-    stringsAsFactors = FALSE
-  )
-  rc3  <- data.frame(clucsid = c(1L, 8L, 15L), hsg = "A", dry_rc = 0.3, wet_rc = 0.5)
-  emc3 <- data.frame(clucsid = c(1L, 8L, 15L), mean_tn = 1.5)
-  result <- util_aa_npsfactors(tb, rc3, emc3)
-  expect_true(all(result$rc$category == "Conservation"))
-})
-
-test_that("tbbase without conservation column behaves as if conservation = FALSE", {
-  tb_no_conserv <- make_syn(clucsid = 1L)
-  tb_with_false <- make_syn(clucsid = 1L)
-  tb_with_false$conservation <- FALSE
-  r1 <- util_aa_npsfactors(tb_no_conserv, syn_rc, syn_emc)
-  r2 <- util_aa_npsfactors(tb_with_false, syn_rc, syn_emc)
-  expect_equal(r1$rc$category, r2$rc$category)
-  expect_equal(r1$rc$factor_rc, r2$rc$factor_rc)
-})

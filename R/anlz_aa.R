@@ -99,9 +99,6 @@
 #'
 #' Agricultural land use (category \code{"Agriculture"}) is attributed to the
 #' aggregate entity \code{"All"} regardless of the underlying MS4 jurisdiction.
-#' Conservation land use (category \code{"Conservation"}, set when \code{tbbase}
-#' was built with a \code{tbconserv} overlay) is attributed to the aggregate
-#' entity \code{"Conserv"} regardless of the underlying MS4 jurisdiction.
 #'
 #' After disaggregation, loads and 1992-1994 baseline water volumes are summed
 #' across basins to the segment level. TN corrections from \code{\link{aa_corrections}}
@@ -261,7 +258,6 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
                      relationship = "many-to-many") |>
     dplyr::mutate(
       entity    = dplyr::case_when(
-        !is.na(.data$category) & .data$category == "Conservation" ~ "Conserv",
         !is.na(.data$category) & .data$category == "Agriculture"  ~ "All",
         TRUE ~ .data$entity
       ),

@@ -7,7 +7,6 @@
 util_nps_tbbase(
   tblu,
   tbsoil,
-  tbconserv,
   gdal_path = NULL,
   chunk_size = NULL,
   cast = FALSE,
@@ -19,10 +18,6 @@ util_nps_tbbase(
 
 \item{tbsoil}{sf object \code{link{tbsoil}} of soil data in the Tampa Bay watershed}
 
-\item{tbconserv}{An \code{sf} object of conservation lands polygons (e.g., \code{\link{flma}}).
-Each row in the output gains a logical \code{conservation} column indicating whether
-that land area falls within a conservation boundary.}
-
 \item{gdal_path}{Character string specifying the path to GDAL binaries (e.g., "C:/OSGeo4W/bin"). If NULL (default), assumes GDAL is in system PATH.}
 
 \item{chunk_size}{Integer. For large datasets, process in chunks of this many features. Set to NULL (default) to process all at once.  This applies only to the final union with the soils data.}
@@ -32,7 +27,7 @@ that land area falls within a conservation boundary.}
 \item{verbose}{Logical. If TRUE, will print progress messages. Default is TRUE.}
 }
 \value{
-A summarized data frame containing the union of all inputs showing major bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED, hydrologic group (hydgrp), area in hectares, and \code{conservation} (logical). These represent all relevant spatial combinations in the Tampa Bay watershed.
+A summarized data frame containing the union of all inputs showing major bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED, hydrologic group (hydgrp), and area in hectares. These represent all relevant spatial combinations in the Tampa Bay watershed.
 }
 \description{
 Create unioned base layer for non-point source (NPS) ungaged load estimation in the Tampa Bay watershed
@@ -45,7 +40,6 @@ Relies heavily on \code{\link{util_nps_union}} to perform the union operations e
 # Load required data
 data(tblu2023)
 data(tbsoil)
-data(flma)
-result <- util_nps_tbbase(tblu2023, tbsoil, flma, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
+result <- util_nps_tbbase(tblu2023, tbsoil, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
 }
 }
