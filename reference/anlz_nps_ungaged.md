@@ -231,13 +231,13 @@ nps_ungaged <- anlz_nps_ungaged(
 
 head(nps_ungaged)
 #> # A tibble: 6 × 12
-#>   bay_seg basin       yr    mo clucsid h2oload  tnload tpload tssload bodload
-#>     <dbl> <chr>    <dbl> <dbl>   <dbl>   <dbl>   <dbl>  <dbl>   <dbl>   <dbl>
-#> 1       1 02306647    NA    NA      NA     0    0      0        0       0    
-#> 2       1 02307000  2021     1       1  6540.  12.4    2.05   117.     28.8  
-#> 3       1 02307000  2021     1       2 10710.  23.9    3.65   389.     79.3  
-#> 4       1 02307000  2021     1       7  5631.   6.64   0.845  113.     46.2  
-#> 5       1 02307000  2021     1       8 38233.  47.4    0.382  421.     55.4  
-#> 6       1 02307000  2021     1      10    26.3  0.0699 0.0213   0.226   0.134
-#> # ℹ 2 more variables: area <dbl>, bas_area <dbl>
+#>   bay_seg basin     yr    mo clucsid h2oload tnload tpload tssload bodload  area
+#>     <dbl> <chr>  <dbl> <dbl>   <dbl>   <dbl>  <dbl>  <dbl>   <dbl>   <dbl> <dbl>
+#> 1       1 02306…  2021     1       1   7661.   14.6   2.40    137.    33.7  210.
+#> 2       1 02306…  2021     1       2  59344.  133.   20.2    2156.   439.   971.
+#> 3       1 02306…  2021     1       3 108271.  225.   39.9    6912.  1191.  1267.
+#> 4       1 02306…  2021     1       4  81852.  159.   22.9    6766.  1408.   481.
+#> 5       1 02306…  2021     1       5  58995.   96.6  15.8    5542.   566.   371.
+#> 6       1 02306…  2021     1       7  27446.   32.4   4.12    549.   225.   281.
+#> # ℹ 1 more variable: bas_area <dbl>
 ```

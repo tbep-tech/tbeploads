@@ -168,9 +168,6 @@ into:
 
 Agricultural land use (category `"Agriculture"`) is attributed to the
 aggregate entity `"All"` regardless of the underlying MS4 jurisdiction.
-Conservation land use (category `"Conservation"`, set when `tbbase` was
-built with a `tbconserv` overlay) is attributed to the aggregate entity
-`"Conserv"` regardless of the underlying MS4 jurisdiction.
 
 After disaggregation, loads and 1992-1994 baseline water volumes are
 summed across basins to the segment level. TN corrections from

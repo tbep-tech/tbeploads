@@ -78,10 +78,6 @@ Supporting datasets used by the other functions.
   : Domestic and industrial point source facilities, including
   industrial with material losses
 
-- [`flma`](https://tbep-tech.github.io/tbeploads/reference/flma.md) :
-  Simple features polygons of FNAI Florida Conservation Lands clipped to
-  the Tampa Bay watershed
-
 - [`hydro_baseline`](https://tbep-tech.github.io/tbeploads/reference/hydro_baseline.md)
   : Historic 1992-1994 mean total water load baseline by bay segment and
   basin
@@ -167,8 +163,6 @@ Utility functions used by other functions or standalone.
   : Fill in missing water quality values for non-point source (NPS) data
 - [`util_nps_getextflow()`](https://tbep-tech.github.io/tbeploads/reference/util_nps_getextflow.md)
   : Get external flow data not from USGS for NPS calculations
-- [`util_nps_getflma()`](https://tbep-tech.github.io/tbeploads/reference/util_nps_getflma.md)
-  : Download and clip an FNAI FLMA zipped GDB to the Tampa Bay watershed
 - [`util_nps_getflow()`](https://tbep-tech.github.io/tbeploads/reference/util_nps_getflow.md)
   : Get flow data from for NPS calculations at gaged sites
 - [`util_nps_getswfwmd()`](https://tbep-tech.github.io/tbeploads/reference/util_nps_getswfwmd.md)
