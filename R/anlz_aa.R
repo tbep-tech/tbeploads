@@ -264,6 +264,21 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
       tn_entity = .data$tn_load * .data$factor_tn * .data$factor_rc
     )
 
+  # Scale down MS4 entity TN by the conservation land fraction for each
+  # basin x clucsid. Agriculture rows (entity = "All") are left unchanged.
+  # conserv_correction rows with no matching basin/clucsid join as NA and
+  # are skipped (coalesce to the unscaled value).
+  entity_clucsid <- entity_clucsid |>
+    dplyr::left_join(conserv_correction, by = c("bay_seg", "basin", "entity", "clucsid")) |>
+    dplyr::mutate(
+      tn_entity = dplyr::if_else(
+        !is.na(.data$conserv_frac),
+        .data$tn_entity * (1 - .data$conserv_frac),
+        .data$tn_entity
+      )
+    ) |>
+    dplyr::select(-"conserv_frac")
+
   # Sum TN over clucsids; carry one copy of basin total_h2o per entity-basin-year
   entity_basin_yr <- entity_clucsid |>
     dplyr::group_by(.data$bay_seg, .data$basin, .data$entity, .data$Year) |>

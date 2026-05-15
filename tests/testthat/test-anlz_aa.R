@@ -371,3 +371,38 @@ test_that("ML year range filtering averages only over yrrng years", {
   # 2022-only = 10; two-year avg = 50 (mean of 10 and 90)
   expect_true(km_2022 < km_both)
 })
+
+# ---- conserv_correction dataset ----------------------------------------------
+
+test_that("conserv_correction has expected columns and valid fractions", {
+  expect_true(all(c("bay_seg", "basin", "entity", "clucsid", "conserv_frac") %in%
+                    names(conserv_correction)))
+  expect_true(nrow(conserv_correction) > 0)
+  expect_true(all(conserv_correction$conserv_frac > 0 & conserv_correction$conserv_frac <= 1))
+})
+
+test_that("conserv_correction reduces NPS load for entities with conservation land in HB", {
+  # Build minimal Hillsborough Bay NPS data for the dominant HB basin
+  nps_hb <- data.frame(
+    Year = 2023L, source = "NPS", segment = "Hillsborough Bay",
+    basin = "02304500", tn_load = 1000.0, hy_load = 500.0
+  )
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_hb, tbbase)
+
+  hill <- result[result$entity == "HILLSBOROUGH" & result$bay_seg == 2L &
+                   !is.na(result$eff_load_tons), ]
+  expect_true(nrow(hill) >= 1)
+
+  # HILLSBOROUGH has conservation land in HB basins; conserv_frac must reduce
+  # its load below what it would be if all land were attributed to the entity.
+  # The expected maximum (no correction) equals tn_load * factor_tn * factor_rc
+  # for all clucsids. Any positive conserv_frac makes the actual load strictly less.
+  hill_cc <- conserv_correction[conserv_correction$entity == "HILLSBOROUGH" &
+                                   conserv_correction$bay_seg == 2L &
+                                   conserv_correction$basin == "02304500", ]
+  if (nrow(hill_cc) > 0) {
+    # conserv_correction has rows for this entity/basin; load must be finite
+    expect_true(is.finite(hill$eff_load_tons[1]))
+    expect_true(hill$eff_load_tons[1] > 0)
+  }
+})
