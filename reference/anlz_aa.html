@@ -102,14 +102,14 @@ per bay segment:</p><dl><dt>bay_seg</dt>
 <dd><p>Bay segment name</p></dd>
 
 <dt>entity</dt>
-<dd><p>MS4 entity name or IPS operator name</p></dd>
+<dd><p>MS4 entity name or facility operator</p></dd>
 
 <dt>entity_full</dt>
 <dd><p>Full entity name from <code><a href="nps_allocations.html">nps_allocations</a></code>
 (NPS rows only)</p></dd>
 
 <dt>facname</dt>
-<dd><p>Facility name (IPS rows only)</p></dd>
+<dd><p>Facility name (IPS, DPS, and non-shared ML rows)</p></dd>
 
 <dt>permit</dt>
 <dd><p>NPDES permit number (IPS rows only)</p></dd>
@@ -158,7 +158,7 @@ and bayseg 6/7 are remapped to 55.</p>
 <p>Annual IPS facility TN loads are normalized using the ratio:</p>
 <p>$$
   \text{eff\_tn} = \text{tn\_load} \times
-  \frac{\text{mean\_h2o\_9294}}{\text{basin\_nps\_h2o}}
+  \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}
 $$</p>
 <p>where <code>basin\_total\_h2o</code> is the annual total water load (NPS + DPS + IPS)
 for the same basin and year, matching the SAS <code>ratio1\_2224</code> denominator.
@@ -185,12 +185,17 @@ into:</p>
 entities proportional to area × runoff coefficient.</p></li>
 </ol><p>Agricultural land use (category <code>"Agriculture"</code>) is attributed to the
 aggregate entity <code>"All"</code> regardless of the underlying MS4 jurisdiction.</p>
+<p>Before summing across CLUCSIDs, each entity's disaggregated TN load is
+scaled by <code>(1 - conserv\_frac)</code> using <code><a href="conserv_correction.html">conserv_correction</a></code>,
+which provides entity- and CLUCSID-specific fractions of area times runoff
+coefficient attributable to conservation land. This removes the conservation
+land contribution that is absent from the tbeploads-built <code><a href="tbbase.html">tbbase</a></code>.</p>
 <p>After disaggregation, loads and 1992-1994 baseline water volumes are summed
 across basins to the segment level. TN corrections from <code><a href="aa_corrections.html">aa_corrections</a></code>
 (<code>ad_tons</code> + <code>project_tons</code>) are subtracted before hydrologic normalization:</p>
 <p>$$
   \text{eff\_tn} = (\text{tn\_entity} - \text{corr\_tons}) \times
-  \frac{\text{mean\_h2o\_9294}}{\text{h2o\_entity}}
+  \frac{\text{mean\_h2o\_9294}}{\text{total\_h2o}}
 $$</p>
 <p>Bay segments Terra Ceia Bay (6) and Manatee River (7) are merged into
 segment 55 (Remaining Lower Tampa Bay) after disaggregation, consistent

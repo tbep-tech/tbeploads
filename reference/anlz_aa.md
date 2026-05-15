@@ -63,7 +63,7 @@ segment:
 
 - entity:
 
-  MS4 entity name or IPS operator name
+  MS4 entity name or facility operator
 
 - entity_full:
 
@@ -73,7 +73,7 @@ segment:
 
 - facname:
 
-  Facility name (IPS rows only)
+  Facility name (IPS, DPS, and non-shared ML rows)
 
 - permit:
 
@@ -130,7 +130,7 @@ to 55.
 Annual IPS facility TN loads are normalized using the ratio:
 
 \$\$ \text{eff\\tn} = \text{tn\\load} \times
-\frac{\text{mean\\h2o\\9294}}{\text{basin\\nps\\h2o}} \$\$
+\frac{\text{mean\\h2o\\9294}}{\text{basin\\total\\h2o}} \$\$
 
 where `basin\_total\_h2o` is the annual total water load (NPS + DPS +
 IPS) for the same basin and year, matching the SAS `ratio1\_2224`
@@ -169,6 +169,14 @@ into:
 Agricultural land use (category `"Agriculture"`) is attributed to the
 aggregate entity `"All"` regardless of the underlying MS4 jurisdiction.
 
+Before summing across CLUCSIDs, each entity's disaggregated TN load is
+scaled by `(1 - conserv\_frac)` using
+[`conserv_correction`](https://tbep-tech.github.io/tbeploads/reference/conserv_correction.md),
+which provides entity- and CLUCSID-specific fractions of area times
+runoff coefficient attributable to conservation land. This removes the
+conservation land contribution that is absent from the tbeploads-built
+[`tbbase`](https://tbep-tech.github.io/tbeploads/reference/tbbase.md).
+
 After disaggregation, loads and 1992-1994 baseline water volumes are
 summed across basins to the segment level. TN corrections from
 [`aa_corrections`](https://tbep-tech.github.io/tbeploads/reference/aa_corrections.md)
@@ -176,7 +184,7 @@ summed across basins to the segment level. TN corrections from
 normalization:
 
 \$\$ \text{eff\\tn} = (\text{tn\\entity} - \text{corr\\tons}) \times
-\frac{\text{mean\\h2o\\9294}}{\text{h2o\\entity}} \$\$
+\frac{\text{mean\\h2o\\9294}}{\text{total\\h2o}} \$\$
 
 Bay segments Terra Ceia Bay (6) and Manatee River (7) are merged into
 segment 55 (Remaining Lower Tampa Bay) after disaggregation, consistent
