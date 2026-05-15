@@ -89,6 +89,10 @@ Supporting datasets used by the other functions.
 - [`clucsid`](https://tbep-tech.github.io/tbeploads/reference/clucsid.md)
   : Lookup table for FLUCCSCODE conversion to CLUCSID and IMPROVED
 
+- [`conserv_correction`](https://tbep-tech.github.io/tbeploads/reference/conserv_correction.md)
+  : Conservation land correction fractions for NPS/MS4 allocation
+  assessment
+
 - [`contdry`](https://tbep-tech.github.io/tbeploads/reference/contdry.md)
   : Upper Floridan Aquifer potentiometric surface raster, dry season
   2022
