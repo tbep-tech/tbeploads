@@ -21,3 +21,5 @@
   (SPR)](https://tbep-tech.github.io/tbeploads/articles/spr.md):
 - [Groundwater
   (GW)](https://tbep-tech.github.io/tbeploads/articles/gw.md):
+- [Allocation
+  Assessment](https://tbep-tech.github.io/tbeploads/articles/aa.md):
