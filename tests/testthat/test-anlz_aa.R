@@ -281,6 +281,38 @@ test_that("DPS year range filtering averages only over yrrng years", {
   expect_true(brd_2022 < brd_both)
 })
 
+# Helper: minimal St Pete DPS data covering all 8 redistributed coastcos
+dps_stpete_reuse <- function(tn_per_coastco = 1.0, yr = 2023L) {
+  stpete_coastcos <- c('508', '544', '566', '573', '580', '586', '588', '594')
+  do.call(rbind, lapply(stpete_coastcos, function(cc) {
+    data.frame(
+      Year = yr, Month = 1L, entity = 'St. Petersburg',
+      facility = 'St Pete Facilities', coastco = cc,
+      source = 'R-001', tn_load = tn_per_coastco, hy_load = 0.01
+    )
+  }))
+}
+
+test_that("St Pete Facilities DPS loads appear in anlz_aa output for bay_segs 1, 3, and 55", {
+  h2o_otb <- hydro_baseline$mean_h2o_9294[
+    hydro_baseline$bay_seg == 1 & hydro_baseline$basin == "206-1"
+  ]
+  nps_input <- data.frame(
+    Year = 2023L, source = "NPS", segment = "Old Tampa Bay",
+    basin = "206-1", tn_load = 0.0, hy_load = h2o_otb
+  )
+
+  result <- anlz_aa(2023L, dps_stpete_reuse(), make_ips_empty(), make_ml_empty(), nps_input, tbbase)
+
+  sp <- result[!is.na(result$entity) & result$entity == "St. Petersburg" &
+                 !is.na(result$source) & result$source == "DPS - reuse", ]
+
+  expect_true(nrow(sp) >= 3)
+  expect_setequal(sp$bay_seg, c(1L, 3L, 55L))
+  expect_true(all(is.finite(sp$eff_load_tons)))
+  expect_true(all(sp$eff_load_tons > 0))
+})
+
 # ---- ML path ----------------------------------------------------------------
 
 test_that("every ml_allocations non-shared row appears in output with empty ML input", {

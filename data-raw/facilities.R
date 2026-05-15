@@ -322,11 +322,16 @@ dpsfac <- read_sas(here('data-raw/dps1721monthentbas.sas7bdat')) |>
   )
 
 # add dps st pete facilities
+# these 3 rows are used by util_ps_facinfo to map ne/nw/sw raw data files to
+# the correct coastid, which triggers the redistribution in anlz_dps_facility.
+# bayseg values here do not affect the output of anlz_dps_facility (coastid is
+# what matters), but must be consistent with stpetecc below so that distinct()
+# in anlz_aa deduplicates correctly.
 stpete <- tribble(
   ~bayseg, ~basin, ~entity, ~facname, ~source, ~entityshr, ~facnameshr, ~permit, ~facid,
-  1,   '206-1',  'St. Petersburg',  'City of St. Petersburg Northeast WRF',  'PS - Domestic - REUSE',  'stpete',  'ne',  'FLA128856',  'PC159',
-  5,   '207-5',  'St. Petersburg',  'City of St. Petersburg Northwest WRF',  'PS - Domestic - REUSE',  'stpete',  'nw',  'FLA128821',  'PC156',
-  55,  '207-5',  'St. Petersburg',  'City of St. Petersburg Southwest WRF',  'PS - Domestic - REUSE',  'stpete',  'sw',  'FLA128848',  'PC158'
+  3,   '206-3W', 'St. Petersburg',  'St Pete Facilities',  'PS - Domestic - REUSE',  'stpete',  'ne',  'FLA128856',  'PC159',
+  5,   '207-5',  'St. Petersburg',  'St Pete Facilities',  'PS - Domestic - REUSE',  'stpete',  'nw',  'FLA128821',  'PC156',
+  55,  '207-5',  'St. Petersburg',  'St Pete Facilities',  'PS - Domestic - REUSE',  'stpete',  'sw',  'FLA128848',  'PC158'
 )
 
 # combine dps
@@ -414,6 +419,24 @@ dpsfac <- dpsfac |>
       T ~ NA_character_ # only pasco reuse and st pete facilities have no coast id, which is fine
     )
   )
+
+# add st pete explicit coastal subbasin codes from anlz_dps_facility redistribution
+# anlz_dps_facility sums NE+NW+SW loads and splits them across these 8 coastcos
+# with permit STPETE; bay_seg and basin from dbasing
+stpetecc <- tribble(
+  ~bayseg, ~basin, ~entity, ~facname, ~source, ~entityshr, ~facnameshr, ~permit, ~facid, ~coastid, ~coastco,
+  1,  '206-1',  'St. Petersburg', 'St Pete Facilities', 'PS - Domestic - REUSE', 'stpete', 'stpet', 'STPETE', 'STPET', NA_character_, '508',
+  3,  '206-3W', 'St. Petersburg', 'St Pete Facilities', 'PS - Domestic - REUSE', 'stpete', 'stpet', 'STPETE', 'STPET', NA_character_, '544',
+  3,  '206-3W', 'St. Petersburg', 'St Pete Facilities', 'PS - Domestic - REUSE', 'stpete', 'stpet', 'STPETE', 'STPET', NA_character_, '566',
+  3,  '206-3W', 'St. Petersburg', 'St Pete Facilities', 'PS - Domestic - REUSE', 'stpete', 'stpet', 'STPETE', 'STPET', NA_character_, '573',
+  55, '207-5',  'St. Petersburg', 'St Pete Facilities', 'PS - Domestic - REUSE', 'stpete', 'stpet', 'STPETE', 'STPET', NA_character_, '580',
+  3,  '206-3W', 'St. Petersburg', 'St Pete Facilities', 'PS - Domestic - REUSE', 'stpete', 'stpet', 'STPETE', 'STPET', NA_character_, '586',
+  3,  '206-3W', 'St. Petersburg', 'St Pete Facilities', 'PS - Domestic - REUSE', 'stpete', 'stpet', 'STPETE', 'STPET', NA_character_, '588',
+  3,  '206-3W', 'St. Petersburg', 'St Pete Facilities', 'PS - Domestic - REUSE', 'stpete', 'stpet', 'STPETE', 'STPET', NA_character_, '594'
+)
+
+dpsfac <- dpsfac |>
+  bind_rows(stpetecc)
 
 # add ips material loss
 ipsmat <- tribble(

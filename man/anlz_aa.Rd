@@ -36,10 +36,10 @@ per bay segment:
 \describe{
 \item{bay_seg}{Integer bay segment identifier}
 \item{segment}{Bay segment name}
-\item{entity}{MS4 entity name or IPS operator name}
+\item{entity}{MS4 entity name or facility operator}
 \item{entity_full}{Full entity name from \code{\link{nps_allocations}}
 (NPS rows only)}
-\item{facname}{Facility name (IPS rows only)}
+\item{facname}{Facility name (IPS, DPS, and non-shared ML rows)}
 \item{permit}{NPDES permit number (IPS rows only)}
 \item{source}{Allocation type: \code{"MS4"},
 \code{"Nonpoint Source/MS4"}, \code{"IPS"},
@@ -80,7 +80,7 @@ Annual IPS facility TN loads are normalized using the ratio:
 
 \deqn{
   \text{eff\_tn} = \text{tn\_load} \times
-  \frac{\text{mean\_h2o\_9294}}{\text{basin\_nps\_h2o}}
+  \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}
 }
 
 where \code{basin\_total\_h2o} is the annual total water load (NPS + DPS + IPS)
@@ -117,13 +117,19 @@ entities proportional to area × runoff coefficient.
 Agricultural land use (category \code{"Agriculture"}) is attributed to the
 aggregate entity \code{"All"} regardless of the underlying MS4 jurisdiction.
 
+Before summing across CLUCSIDs, each entity's disaggregated TN load is
+scaled by \code{(1 - conserv\_frac)} using \code{\link{conserv_correction}},
+which provides entity- and CLUCSID-specific fractions of area times runoff
+coefficient attributable to conservation land. This removes the conservation
+land contribution that is absent from the tbeploads-built \code{\link{tbbase}}.
+
 After disaggregation, loads and 1992-1994 baseline water volumes are summed
 across basins to the segment level. TN corrections from \code{\link{aa_corrections}}
 (\code{ad_tons} + \code{project_tons}) are subtracted before hydrologic normalization:
 
 \deqn{
   \text{eff\_tn} = (\text{tn\_entity} - \text{corr\_tons}) \times
-  \frac{\text{mean\_h2o\_9294}}{\text{h2o\_entity}}
+  \frac{\text{mean\_h2o\_9294}}{\text{total\_h2o}}
 }
 
 Bay segments Terra Ceia Bay (6) and Manatee River (7) are merged into
