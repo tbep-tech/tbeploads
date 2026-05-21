@@ -438,6 +438,17 @@ stpetecc <- tribble(
 dpsfac <- dpsfac |>
   bind_rows(stpetecc)
 
+# Pasco Reuse gets coastcos 189 and 193 at runtime (anlz_dps_facility lines 59-74).
+# Add explicit rows so anlz_aa's coastco join works and hy_load enters ratio1_2224.
+pascocc <- tribble(
+  ~bayseg, ~basin,       ~entity,     ~facname,      ~source,                  ~entityshr, ~facnameshr,   ~permit,      ~facid,  ~coastid,      ~coastco,
+  2L,      '02304500',   'Pasco Co.', 'Pasco Reuse', 'PS - Domestic - REUSE',  'pasco',    NA_character_, 'PascoReuse', 'Pasco', NA_character_, '189',
+  2L,      '02304500',   'Pasco Co.', 'Pasco Reuse', 'PS - Domestic - REUSE',  'pasco',    NA_character_, 'PascoReuse', 'Pasco', NA_character_, '193'
+)
+
+dpsfac <- dpsfac |>
+  bind_rows(pascocc)
+
 # add ips material loss
 ipsmat <- tribble(
   ~bayseg, ~basin, ~entity, ~facname, ~source, ~entityshr, ~facnameshr, ~permit, ~facid,

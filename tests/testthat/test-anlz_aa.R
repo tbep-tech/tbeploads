@@ -313,6 +313,28 @@ test_that("St Pete Facilities DPS loads appear in anlz_aa output for bay_segs 1,
   expect_true(all(sp$eff_load_tons > 0))
 })
 
+# Helper: Pasco Reuse DPS data with the two coastcos anlz_dps_facility assigns
+dps_pasco_reuse <- function(tn_per_coastco = 1.0, yr = 2023L) {
+  do.call(rbind, lapply(c('189', '193'), function(cc) {
+    data.frame(
+      Year = yr, Month = 1L, entity = 'Pasco Co.',
+      facility = 'Pasco Reuse', coastco = cc,
+      source = 'R-001', tn_load = tn_per_coastco, hy_load = 0.01
+    )
+  }))
+}
+
+test_that("Pasco Reuse DPS loads appear in anlz_aa output with finite positive eff_load_tons", {
+  result <- anlz_aa(2023L, dps_pasco_reuse(tn_per_coastco = 2.0), make_ips_empty(),
+                    make_ml_empty(), make_nps_empty(), tbbase)
+
+  pr <- result[!is.na(result$facname) & result$facname == "Pasco Reuse" &
+                 !is.na(result$source) & result$source == "DPS - reuse", ]
+  expect_true(nrow(pr) >= 1)
+  expect_true(all(is.finite(pr$eff_load_tons)))
+  expect_true(all(pr$eff_load_tons > 0))
+})
+
 # ---- ML path ----------------------------------------------------------------
 
 test_that("every ml_allocations non-shared row appears in output with empty ML input", {
