@@ -11,12 +11,11 @@
 #'   for facility FL0029653.  See Details for instructions on generating this
 #'   file.
 #' @param pdf_dir character or NULL.  Directory in which to save the downloaded
-#'   PDFs.  Defaults to a temporary directory.  Ignored when
-#'   `keep_pdfs = FALSE` (the default).
+#'   PDFs.  If `NULL` (default), a temporary directory is used and all PDFs
+#'   are deleted when the function exits.  If a path is supplied, PDFs are
+#'   retained there.
 #' @param out_file character or NULL.  If provided, the results data frame is
 #'   written to this path as an `.xlsx` workbook.
-#' @param keep_pdfs logical.  If `FALSE` (default) the downloaded PDFs are
-#'   deleted after parsing.  Set to `TRUE` to retain them in `pdf_dir`.
 #' @param quiet logical.  Suppress progress messages (default `FALSE`).
 #'
 #' @details
@@ -66,12 +65,11 @@
 #' solids (TSS) have not been recorded at this facility in recent years and are
 #' not included in the output.
 #' 
-#' ## Verying results
-#' 
-#' In practice, always use `keep_pdfs = TRUE` for the initial run to verify that the 
-#' downloaded PDFs are correct and being parsed as expected.  Always inspect the output 
-#' data frame to confirm that the monitoring months, flow values, and TN concentrations 
-#' match those in the PDFs.
+#' ## Verifying results
+#'
+#' On the initial run, supply a `pdf_dir` path so the downloaded PDFs are
+#' retained for inspection.  Verify that the monitoring months, flow values,
+#' and TN concentrations in the output data frame match those in the PDFs.
 #'
 #' @return A data frame with one row per available monitoring month, sorted by
 #'   month.  Calendar months for which no Part A document was found are omitted
@@ -100,12 +98,11 @@
 #'   yr          = 2025,
 #'   search_xlsx = "AOC_OCULUSSearchData_2025.xlsx",
 #'   pdf_dir     = "~/Desktop/AOC_DMR_2025",
-#'   out_file    = "~/Desktop/AOC_DMR_2025_results.xlsx",
-#'   keep_pdfs   = TRUE
+#'   out_file    = "~/Desktop/AOC_DMR_2025_results.xlsx"
 #' )
 #' }
 util_ps_getaoc <- function(yr, search_xlsx, pdf_dir = NULL,
-                             out_file = NULL, keep_pdfs = FALSE, quiet = FALSE) {
+                             out_file = NULL, quiet = FALSE) {
 
   stopifnot(
     is.numeric(yr) || is.integer(yr), length(yr) == 1L,
@@ -113,7 +110,8 @@ util_ps_getaoc <- function(yr, search_xlsx, pdf_dir = NULL,
     file.exists(search_xlsx)
   )
 
-  if (is.null(pdf_dir))
+  user_pdf_dir <- !is.null(pdf_dir)
+  if (!user_pdf_dir)
     pdf_dir <- file.path(tempdir(), paste0("aoc_dmr_", yr))
   dir.create(pdf_dir, showWarnings = FALSE, recursive = TRUE)
 
@@ -191,7 +189,7 @@ util_ps_getaoc <- function(yr, search_xlsx, pdf_dir = NULL,
   }
 
   # ---- Step 6: Cleanup ------------------------------------------------------
-  if (!keep_pdfs) {
+  if (!user_pdf_dir) {
     pdfs <- list.files(pdf_dir, pattern = "\\.pdf$", full.names = TRUE)
     invisible(file.remove(pdfs))
   } else if (!quiet) {

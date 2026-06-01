@@ -4,14 +4,7 @@
 \alias{util_ps_getaoc}
 \title{Get AOC LLC discharge monitoring report data from FDEP OCULUS}
 \usage{
-util_ps_getaoc(
-  yr,
-  search_xlsx,
-  pdf_dir = NULL,
-  out_file = NULL,
-  keep_pdfs = FALSE,
-  quiet = FALSE
-)
+util_ps_getaoc(yr, search_xlsx, pdf_dir = NULL, out_file = NULL, quiet = FALSE)
 }
 \arguments{
 \item{yr}{numeric (length 1), the monitoring year to retrieve (e.g., 2025).}
@@ -21,14 +14,12 @@ for facility FL0029653.  See Details for instructions on generating this
 file.}
 
 \item{pdf_dir}{character or NULL.  Directory in which to save the downloaded
-PDFs.  Defaults to a temporary directory.  Ignored when
-\code{keep_pdfs = FALSE} (the default).}
+PDFs.  If \code{NULL} (default), a temporary directory is used and all PDFs
+are deleted when the function exits.  If a path is supplied, PDFs are
+retained there.}
 
 \item{out_file}{character or NULL.  If provided, the results data frame is
 written to this path as an \code{.xlsx} workbook.}
-
-\item{keep_pdfs}{logical.  If \code{FALSE} (default) the downloaded PDFs are
-deleted after parsing.  Set to \code{TRUE} to retain them in \code{pdf_dir}.}
 
 \item{quiet}{logical.  Suppress progress messages (default \code{FALSE}).}
 }
@@ -105,12 +96,11 @@ solids (TSS) have not been recorded at this facility in recent years and are
 not included in the output.
 }
 
-\subsection{Verying results}{
+\subsection{Verifying results}{
 
-In practice, always use \code{keep_pdfs = TRUE} for the initial run to verify that the
-downloaded PDFs are correct and being parsed as expected.  Always inspect the output
-data frame to confirm that the monitoring months, flow values, and TN concentrations
-match those in the PDFs.
+On the initial run, supply a \code{pdf_dir} path so the downloaded PDFs are
+retained for inspection.  Verify that the monitoring months, flow values,
+and TN concentrations in the output data frame match those in the PDFs.
 }
 }
 \examples{
@@ -127,8 +117,7 @@ df <- util_ps_getaoc(
   yr          = 2025,
   search_xlsx = "AOC_OCULUSSearchData_2025.xlsx",
   pdf_dir     = "~/Desktop/AOC_DMR_2025",
-  out_file    = "~/Desktop/AOC_DMR_2025_results.xlsx",
-  keep_pdfs   = TRUE
+  out_file    = "~/Desktop/AOC_DMR_2025_results.xlsx"
 )
 }
 }
