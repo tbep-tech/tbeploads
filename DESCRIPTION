@@ -37,6 +37,8 @@ Imports:
   httr2,
   jsonlite,
   lubridate,
+  openxlsx,
+  pdftools,
   purrr,
   readxl,
   sf,
