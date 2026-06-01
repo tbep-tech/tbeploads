@@ -62,14 +62,7 @@ and Total Nitrogen concentration for each available monitoring month.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_ps_getaoc</span><span class="op">(</span></span>
-<span>  <span class="va">yr</span>,</span>
-<span>  <span class="va">search_xlsx</span>,</span>
-<span>  pdf_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  out_file <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  keep_pdfs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  quiet <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_ps_getaoc</span><span class="op">(</span><span class="va">yr</span>, <span class="va">search_xlsx</span>, pdf_dir <span class="op">=</span> <span class="cn">NULL</span>, out_file <span class="op">=</span> <span class="cn">NULL</span>, quiet <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -88,18 +81,14 @@ file.</p></dd>
 
 <dt id="arg-pdf-dir">pdf_dir<a class="anchor" aria-label="anchor" href="#arg-pdf-dir"></a></dt>
 <dd><p>character or NULL.  Directory in which to save the downloaded
-PDFs.  Defaults to a temporary directory.  Ignored when
-<code>keep_pdfs = FALSE</code> (the default).</p></dd>
+PDFs.  If <code>NULL</code> (default), a temporary directory is used and all PDFs
+are deleted when the function exits.  If a path is supplied, PDFs are
+retained there.</p></dd>
 
 
 <dt id="arg-out-file">out_file<a class="anchor" aria-label="anchor" href="#arg-out-file"></a></dt>
 <dd><p>character or NULL.  If provided, the results data frame is
 written to this path as an <code>.xlsx</code> workbook.</p></dd>
-
-
-<dt id="arg-keep-pdfs">keep_pdfs<a class="anchor" aria-label="anchor" href="#arg-keep-pdfs"></a></dt>
-<dd><p>logical.  If <code>FALSE</code> (default) the downloaded PDFs are
-deleted after parsing.  Set to <code>TRUE</code> to retain them in <code>pdf_dir</code>.</p></dd>
 
 
 <dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
@@ -173,13 +162,12 @@ not included in the output.</p>
 </div>
 
 <div class="section">
-<h3 id="verying-results">Verying results<a class="anchor" aria-label="anchor" href="#verying-results"></a></h3>
+<h3 id="verifying-results">Verifying results<a class="anchor" aria-label="anchor" href="#verifying-results"></a></h3>
 
 
-<p>In practice, always use <code>keep_pdfs = TRUE</code> for the initial run to verify that the
-downloaded PDFs are correct and being parsed as expected.  Always inspect the output
-data frame to confirm that the monitoring months, flow values, and TN concentrations
-match those in the PDFs.</p>
+<p>On the initial run, supply a <code>pdf_dir</code> path so the downloaded PDFs are
+retained for inspection.  Verify that the monitoring months, flow values,
+and TN concentrations in the output data frame match those in the PDFs.</p>
 </div>
 
     </div>
@@ -199,8 +187,7 @@ match those in the PDFs.</p>
 <span class="r-in"><span>  yr          <span class="op">=</span> <span class="fl">2025</span>,</span></span>
 <span class="r-in"><span>  search_xlsx <span class="op">=</span> <span class="st">"AOC_OCULUSSearchData_2025.xlsx"</span>,</span></span>
 <span class="r-in"><span>  pdf_dir     <span class="op">=</span> <span class="st">"~/Desktop/AOC_DMR_2025"</span>,</span></span>
-<span class="r-in"><span>  out_file    <span class="op">=</span> <span class="st">"~/Desktop/AOC_DMR_2025_results.xlsx"</span>,</span></span>
-<span class="r-in"><span>  keep_pdfs   <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  out_file    <span class="op">=</span> <span class="st">"~/Desktop/AOC_DMR_2025_results.xlsx"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>

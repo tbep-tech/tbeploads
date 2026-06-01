@@ -1,5 +1,6 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://tbep-tech.github.io/tbeploads/404.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/CLAUDE.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/CODE_OF_CONDUCT.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/CONTRIBUTING.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/LICENSE-text.html</loc></url>
@@ -91,6 +92,7 @@
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_fillmis.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_fixoutfall.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_getaoc.html</loc></url>
+<url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_getmacdill.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_misc.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_mosaic.html</loc></url>
 <url><loc>https://tbep-tech.github.io/tbeploads/reference/util_ps_pascoreuse.html</loc></url>
