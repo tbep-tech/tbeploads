@@ -126,6 +126,13 @@ Total phosphorus (TP), biochemical oxygen demand (BOD), and total
 suspended solids (TSS) have not been recorded at this facility in recent
 years and are not included in the output.
 
+### Verying results
+
+In practice, always use `keep_pdfs = TRUE` for the initial run to verify
+that the downloaded PDFs are correct and being parsed as expected.
+Always inspect the output data frame to confirm that the monitoring
+months, flow values, and TN concentrations match those in the PDFs.
+
 ## Examples
 
 ``` r
