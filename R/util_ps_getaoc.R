@@ -65,6 +65,13 @@
 #' Total phosphorus (TP), biochemical oxygen demand (BOD), and total suspended
 #' solids (TSS) have not been recorded at this facility in recent years and are
 #' not included in the output.
+#' 
+#' ## Verying results
+#' 
+#' In practice, always use `keep_pdfs = TRUE` for the initial run to verify that the 
+#' downloaded PDFs are correct and being parsed as expected.  Always inspect the output 
+#' data frame to confirm that the monitoring months, flow values, and TN concentrations 
+#' match those in the PDFs.
 #'
 #' @return A data frame with one row per available monitoring month, sorted by
 #'   month.  Calendar months for which no Part A document was found are omitted
