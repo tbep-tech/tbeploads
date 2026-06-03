@@ -26,19 +26,21 @@ globalVariables(c(".", "Facility.Name", "Month", "Outfall.ID", "Permit.Number", 
                   "tbsubshed", "tkn_mgl", "tn_mgl", "tnload", "tnload_a", "tnload_b", "tot_area",
                   "tp_mgl", "tpcp", "tpload", "tpload_a", "tpload_b", "tss_mgl", "tssload", "urb",
                   "wd_cfs", "wet", "wet_rc", "DAILY AVG", "RECORDED DATE", "monitoring_location_id",
-                  "agency_cd", "qualifier", "time", "DESCRIPTION", "lu", "bod_mgl_avg5", "max_yr", 
-                  "min_yr", "tss_mgl_avg5", "tp_mgl_avg5", "tn_mgl_avg5", "parameter", "spring", 
-                  "subspring", ".data", "adap_reduction", "Average.Daily.Flow..ADF...mgd.", 
-                  "bod", "bod_fw", "BOD.Unit", "cf_fw", "check_flow", "CONTOUR", "deviceid", 
-                  "geometry", "lower", "measuredatetime", "MG", "MONTH_YEAR", "site", "tbsegdetail", 
-                  "TN.Unit", "tn(mg/L)", "Total.N", "Total.N.Unit", "Total.P", "Total.P.Unit", "tp", 
-                  "tp_fw", "TP.Unit", "tp(mg/L)", "tss", "TSS", "tss_fw", "TSS.Unit", "upper", "val", 
-                  "year", "zero_flow", "elev", "x", "y", "category", "factor_rc", "factor_tn", "month", 
-                  "mult", "n_quarters", "quarter rc", "total_mult")
+                  "agency_cd", "qualifier", "time", "DESCRIPTION", "lu", "bod_mgl_avg5", "max_yr",
+                  "min_yr", "tss_mgl_avg5", "tp_mgl_avg5", "tn_mgl_avg5", "parameter", "spring",
+                  "subspring", ".data", "adap_reduction", "Average.Daily.Flow..ADF...mgd.",
+                  "bod", "bod_fw", "BOD.Unit", "cf_fw", "check_flow", "CONTOUR", "deviceid",
+                  "geometry", "lower", "measuredatetime", "MG", "MONTH_YEAR", "site", "tbsegdetail",
+                  "TN.Unit", "tn(mg/L)", "Total.N", "Total.N.Unit", "Total.P", "Total.P.Unit", "tp",
+                  "tp_fw", "TP.Unit", "tp(mg/L)", "tss", "TSS", "tss_fw", "TSS.Unit", "upper", "val",
+                  "year", "zero_flow", "elev", "x", "y", "category", "factor_rc", "factor_tn", "month",
+                  "mult", "n_quarters", "quarter", "rc", "total_mult",
+                  "aa_corrections", "conserv_correction", "day", "dps_allocations",
+                  "hydro_baseline", "ml_allocations", "nps_allocations", "ps_allocations")
 )
 
 #' @importFrom utils capture.output read.csv read.table
 NULL
 
-#' @importFrom stats aggregate na.omit weighted.mean
+#' @importFrom stats aggregate na.omit setNames weighted.mean
 NULL

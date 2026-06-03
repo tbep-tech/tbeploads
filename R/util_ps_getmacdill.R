@@ -1,4 +1,4 @@
-#' Get MacDill AFB WWTP discharge monitoring report data from FDEP OCULUS
+﻿#' Get MacDill AFB WWTP discharge monitoring report data from FDEP OCULUS
 #'
 #' Downloads and parses monthly Discharge Monitoring Report (DMR) PDFs for the
 #' MacDill Air Force Base wastewater treatment plant (NPDES permit FLA012124,
@@ -44,9 +44,9 @@
 #' All monthly (`MO`) documents for the requested year are downloaded and
 #' inspected.  Each PDF is then classified by its actual content:
 #'
-#' - **Part A** (monthly summary) — contains the official permit-limit table
+#' - **Part A** (monthly summary) -- contains the official permit-limit table
 #'   with pre-computed monthly averages and permit compliance results.
-#' - **Part B** (daily sample results) — contains a day-by-day table of flow
+#' - **Part B** (daily sample results) -- contains a day-by-day table of flow
 #'   and effluent quality measurements for a given month.
 #'
 #' The OCULUS document labels ("Part A", "Part B") are not always reliable for
@@ -64,7 +64,7 @@
 #' Where a Part B daily table is available for a given calendar month, BOD and
 #' TSS are computed as the mean of all observed daily values using the
 #' substitution rules `<1 \u{2192} 0.5` and `<2 \u{2192} 1.0` (consistent with the
-#' 2022–2024 reporting methodology).  Monthly average flow is also derived from
+#' 2022--2024 reporting methodology).  Monthly average flow is also derived from
 #' Part B daily readings when available.  For months with no Part B, Part A
 #' monthly-summary values are used for BOD, TSS, and flow.
 #'
@@ -91,7 +91,7 @@
 #'   | Column | Type | Description |
 #'   |--------|------|-------------|
 #'   | `yr` | integer | Monitoring year (from the PDF monitoring period). |
-#'   | `mo` | integer | Calendar month (1–12). |
+#'   | `mo` | integer | Calendar month (1--12). |
 #'   | `outfall` | character | Outfall ID: `"R-001"`, `"R-002"`, or `"R-003"`. |
 #'   | `flow_mgd` | numeric | Average Daily Flow (MGD). `0` when NOD. |
 #'   | `bod_mgl` | numeric | BOD (mg/L). `NA` when ANC or not collected. |
@@ -181,7 +181,7 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
       unclass_path <- file.path(pdf_dir,
                                 paste0("macdill_unclassified_", safe_subj, ".pdf"))
       if (file.exists(dest)) file.rename(dest, unclass_path)
-      if (!quiet) cat(sprintf(" [unclassifiable — saved as %s]\n",
+      if (!quiet) cat(sprintf(" [unclassifiable -- saved as %s]\n",
                               basename(unclass_path)))
       next
     }
@@ -199,7 +199,7 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
       type  = info$type,
       month = info$month,
       year  = info$year,
-      row   = doc_index$row[i]   # original row in XLSX — higher = filed later
+      row   = doc_index$row[i]   # original row in XLSX -- higher = filed later
     )
   }
 
@@ -562,8 +562,8 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
 # Walks backward from the Requirement line matching `timing_pat` to find
 # the nearest line matching `param_pat`, then extracts the value token.
 # Two layout variants are handled:
-#   Case A — values on the same line as the parameter name
-#   Case B — parameter name + "Sample" on the same line; values on next line
+#   Case A -- values on the same line as the parameter name
+#   Case B -- parameter name + "Sample" on the same line; values on next line
 .macdill_extract_val <- function(lines, param_pat, timing_pat, value_index = 1L) {
   req_idx <- which(grepl("Requirement", lines) &
                      grepl(timing_pat, lines, perl = TRUE))
@@ -618,30 +618,27 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
 #
 # Part B spans two pages with different column layouts:
 #
-# Page 1 — identified by a "Mon. Site" (Site) header row:
-#   FLW-01  x≈108 — total plant R-001 flow (skip; use CAL-01 for R-001 ADF)
-#   CAL-01  x≈153 — R-001 applied (effluent) flow
-#   FLW-02  x≈194 — R-002 flow
-#   FLW-03  x≈235 — R-003 flow
-#   EFA-01[1] x≈280 — BOD R-001
-#   EFA-02[1] x≈327 — BOD R-002 & R-003 (shared monitoring site)
-#   EFB-01[1] x≈376 — Turbidity (skip)
-#   EFB-01[2] x≈425 — TSS R-001 & R-003 (shared monitoring site)
-#   EFA-02[2] x≈473 — TSS R-002
-#   EFA-01[2] x≈521 — Chlorine (skip)
+# Page 1 -- identified by a "Mon. Site" (Site) header row:
+#   FLW-01  x~108 -- total plant R-001 flow (skip; use CAL-01 for R-001 ADF)
+#   CAL-01  x~153 -- R-001 applied (effluent) flow
+#   FLW-02  x~194 -- R-002 flow
+#   FLW-03  x~235 -- R-003 flow
+#   EFA-01[1] x~280 -- BOD R-001
+#   EFA-02[1] x~327 -- BOD R-002 & R-003 (shared monitoring site)
+#   EFB-01[1] x~376 -- Turbidity (skip)
+#   EFB-01[2] x~425 -- TSS R-001 & R-003 (shared monitoring site)
+#   EFA-02[2] x~473 -- TSS R-002
+#   EFA-01[2] x~521 -- Chlorine (skip)
 #
-# Page 2 — identified by a "Code" header row containing PARM codes:
-#   00620  x≈420 — Nitrate-N (TN) for R-003  ← extracted here
-#   (other columns are chlorine, coliforms, pH, BOD, TSS — not used)
+# Page 2 -- identified by a "Code" header row containing PARM codes:
+#   00620  x~420 -- Nitrate-N (TN) for R-003  <- extracted here
+#   (other columns are chlorine, coliforms, pH, BOD, TSS -- not used)
 #
 # Page 1 is processed first to get flow/BOD/TSS. Page 2 is processed
 # separately to get per-day TN values, then the two are merged by day.
 
-.macdill_parse_part_b <- function(pdf_path) {
+.macdill_parse_part_b <- function(pdf_path, debug = FALSE) {
   all_pages <- pdftools::pdf_data(pdf_path)
-
-  p1_rows <- list()   # page 1: flow, BOD, TSS
-  tn_rows <- list()   # page 2: TN (00620)
 
   get_val <- function(row_words, target_x, tol = 28L) {
     if (is.na(target_x) || nrow(row_words) == 0L) return(NA_character_)
@@ -657,7 +654,13 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
     dw[!is.na(day_ints) & day_ints >= 1L & day_ints <= 31L, ]
   }
 
-  for (pg in all_pages) {
+  p1_rows <- list()
+  tn_vals <- character(0)
+
+  for (pg_num in seq_along(all_pages)) {
+    pg <- all_pages[[pg_num]]
+
+    if (debug) cat(sprintf("\n--- PDF page %d  (%d words) ---\n", pg_num, nrow(pg)))
 
     # ---- Page 1: "Mon. Site" header row (flow, BOD, TSS) -------------------
     site_idx <- which(pg$text == "Site")
@@ -698,24 +701,38 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
     }
 
     # ---- Page 2: "Code" header row; extract TN column (00620) -------------
+    # Use Voronoi column boundaries (midpoints between adjacent column headers)
+    # rather than a fixed pixel tolerance, so the TN column is always cleanly
+    # separated from its neighbours regardless of exact value alignment.
     code_idx <- which(pg$text == "Code")
+    if (debug) cat(sprintf("  'Code' occurrences: %d  |  'Site' occurrences: %d\n",
+                            length(code_idx), length(site_idx)))
     if (length(code_idx) > 0L) {
       code_y   <- pg$y[code_idx[1L]]
       code_row <- pg[abs(pg$y - code_y) <= 3L, ]
-      tn_xs    <- code_row$x[code_row$text == "00620"]
-      tn_x     <- if (length(tn_xs) > 0L) tn_xs[1L] else NA_real_
 
-      if (!is.na(tn_x)) {
-        dw <- day_words_from(pg)
-        for (k in seq_len(nrow(dw))) {
-          dy <- as.integer(dw$text[k])
-          rw <- pg[abs(pg$y - dw$y[k]) <= 3L & pg$x >= 80L, ]
-          tn_rows[[length(tn_rows) + 1L]] <- data.frame(
-            day   = dy,
-            tn_r3 = get_val(rw, tn_x),
-            stringsAsFactors = FALSE
-          )
-        }
+      # All parm-code column x-positions (exclude the "Code" row label at x<80)
+      col_xs <- sort(unique(code_row$x[code_row$x > 80L]))
+      tn_x   <- code_row$x[code_row$text == "00620"][1L]
+
+      if (debug) cat(sprintf("  code_y=%d  tn_x=%s  col_xs=[%s]\n",
+                              code_y, tn_x, paste(col_xs, collapse=",")))
+
+      if (!is.na(tn_x) && length(col_xs) >= 1L) {
+        pos      <- which(col_xs == tn_x)[1L]
+        tn_left  <- if (pos > 1L) (col_xs[pos - 1L] + col_xs[pos]) / 2 else tn_x - 28L
+        tn_right <- if (pos < length(col_xs)) (col_xs[pos] + col_xs[pos + 1L]) / 2 else tn_x + 28L
+
+        if (debug) cat(sprintf("  tn column boundary: [%.1f, %.1f)\n", tn_left, tn_right))
+
+        below_hdr  <- pg[pg$y > code_y + 5L, ]
+        in_col     <- below_hdr$x >= tn_left & below_hdr$x < tn_right
+        candidates <- below_hdr$text[in_col & grepl("^[<>]?[0-9]", below_hdr$text)]
+
+        if (debug) cat(sprintf("  candidates in TN column: [%s]\n",
+                                paste(candidates, collapse=", ")))
+
+        tn_vals <- c(tn_vals, candidates)
       }
     }
   }
@@ -730,20 +747,15 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
     dplyr::arrange(day) |>
     dplyr::distinct(day, .keep_all = TRUE)
 
-  # Merge TN from page 2 (biweekly, so many days will be NA)
-  if (length(tn_rows) > 0L) {
-    daily_tn <- dplyr::bind_rows(tn_rows) |>
-      dplyr::arrange(day) |>
-      dplyr::distinct(day, .keep_all = TRUE)
-    daily <- dplyr::left_join(daily, daily_tn, by = "day")
-  } else {
-    daily$tn_r3 <- NA_character_
-  }
-
-  for (col in c("r1_flow","r2_flow","r3_flow","bod_r1","bod_r23","tss_r13","tss_r2","tn_r3"))
+  for (col in c("r1_flow","r2_flow","r3_flow","bod_r1","bod_r23","tss_r13","tss_r2"))
     daily[[col]] <- .macdill_apply_sub(daily[[col]])
 
-  avg_f <- function(x) mean(x, na.rm = TRUE)          # zeros count as days of no discharge
+  # TN: average all values found in the 00620 column (biweekly measurements)
+  tn_numeric <- .macdill_apply_sub(tn_vals)
+  tn_numeric <- tn_numeric[!is.na(tn_numeric)]
+  tn_mean    <- if (length(tn_numeric) > 0L) mean(tn_numeric) else NA_real_
+
+  avg_f <- function(x) mean(x, na.rm = TRUE)
   avg_c <- function(x) { x <- x[!is.na(x)]; if (!length(x)) NA_real_ else mean(x) }
 
   data.frame(
@@ -751,8 +763,7 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
     flow_mgd = c(avg_f(daily$r1_flow), avg_f(daily$r2_flow), avg_f(daily$r3_flow)),
     bod_mgl  = c(avg_c(daily$bod_r1),  avg_c(daily$bod_r23), avg_c(daily$bod_r23)),
     tss_mgl  = c(avg_c(daily$tss_r13), avg_c(daily$tss_r2),  avg_c(daily$tss_r13)),
-    # TN from page 2 (00620 column, R-003 only; R-001 and R-002 do not report TN)
-    tn_mgl   = c(NA_real_, NA_real_, avg_c(daily$tn_r3)),
+    tn_mgl   = c(NA_real_, NA_real_, tn_mean),
     stringsAsFactors = FALSE
   )
 }
