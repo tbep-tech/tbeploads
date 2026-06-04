@@ -68,8 +68,9 @@
 #' Part B daily readings when available.  For months with no Part B, Part A
 #' monthly-summary values are used for BOD, TSS, and flow.
 #'
-#' Total nitrogen (`tn_mgl`) is always sourced from Part A because Part B
-#' tables do not include a TN column.
+#' Total nitrogen (`tn_mgl`) is sourced from Part B page 2 (column 00620,
+#' biweekly readings averaged) when available, falling back to the Part A
+#' monthly maximum when no Part B is present.
 #'
 #' ## Monitoring period vs. OCULUS label
 #'
@@ -96,7 +97,7 @@
 #'   | `flow_mgd` | numeric | Average Daily Flow (MGD). `0` when NOD. |
 #'   | `bod_mgl` | numeric | BOD (mg/L). `NA` when ANC or not collected. |
 #'   | `tss_mgl` | numeric | TSS (mg/L). `NA` when ANC or not collected. |
-#'   | `tn_mgl` | numeric | Total nitrogen as NO3-N (mg/L), R-003 only. `NA` for R-001 and R-002. |
+#'   | `tn_mgl` | numeric | Total nitrogen as NO3-N (mg/L), R-003 only; mean of biweekly Part B readings when available, Part A monthly maximum otherwise. `NA` for R-001 and R-002. |
 #'   | `verify` | logical | `TRUE` when one or more concentration values (TSS for R-001/R-003, TN for R-003) are single-day **maximums** from Part A rather than monthly averages. This occurs when no machine-readable Part B was available. Cross-check these values against the original PDF. |
 #'
 #' @export
@@ -116,8 +117,7 @@
 #'   yr          = 2025,
 #'   search_xlsx = "MacDill_OCULUSSearchData_2025.xlsx",
 #'   pdf_dir     = "~/Desktop/MacDill_DMR_2025",
-#'   out_file    = "~/Desktop/MacDill_DMR_2025_results.xlsx",
-#'   keep_pdfs   = TRUE
+#'   out_file    = "~/Desktop/MacDill_DMR_2025_results.xlsx"
 #' )
 #' }
 util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
@@ -254,9 +254,10 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
       tryCatch(.macdill_parse_part_b(best_b$file), error = function(e) NULL)
     else NULL
 
-    # Hybrid merge: start with Part A values, then override BOD, TSS, and flow
-    # with Part B daily averages (<1->0.5, <2->1 substitution) when available.
-    # Part A always provides TN (not reported in Part B tables).
+    # Hybrid merge: start with Part A values, then override flow, BOD, TSS, and
+    # TN with Part B values when available.  Part B page 2 (column 00620)
+    # provides biweekly TN readings whose mean is preferred over the Part A
+    # single-day maximum.
     if (!is.null(parta_data)) {
       merged <- parta_data
       if (!is.null(partb_data)) {
@@ -267,10 +268,11 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
           if (!is.na(partb_data$flow_mgd[pb])) merged$flow_mgd[pa] <- partb_data$flow_mgd[pb]
           if (!is.na(partb_data$bod_mgl[pb]))  merged$bod_mgl[pa]  <- partb_data$bod_mgl[pb]
           if (!is.na(partb_data$tss_mgl[pb]))  merged$tss_mgl[pa]  <- partb_data$tss_mgl[pb]
+          if (!is.na(partb_data$tn_mgl[pb]))   merged$tn_mgl[pa]   <- partb_data$tn_mgl[pb]
         }
       }
     } else if (!is.null(partb_data)) {
-      merged <- partb_data   # TN will be NA (not available in Part B)
+      merged <- partb_data
     } else {
       next
     }
@@ -572,7 +574,7 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
   get_toks <- function(ln) {
     tok <- strsplit(trimws(ln), "\\s+")[[1]]
     tok <- tok[nchar(tok) > 0L]
-    vt  <- tok[grepl("^[<>]?\\d", tok) | tok %in% c("NOD","ANC")]
+    vt  <- tok[grepl("^[<>]?\\.?\\d", tok) | tok %in% c("NOD","ANC")]
     while (length(vt) > 1L && vt[length(vt)] %in% c("0","1","2","3","4","5"))
       vt <- vt[-length(vt)]
     vt
@@ -672,31 +674,47 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
       find_xs <- function(code) sort(site_row$x[site_row$text == code])
 
       cal01_x   <- find_xs("CAL-01")[1L]
-      flw02_x   <- find_xs("FLW-02")[1L]
-      flw03_x   <- find_xs("FLW-03")[1L]
-      efa01_xs  <- find_xs("EFA-01")
-      efa02_xs  <- find_xs("EFA-02")
-      efb01_xs  <- find_xs("EFB-01")
-      bod_r1_x  <- efa01_xs[1L]
-      bod_r23_x <- efa02_xs[1L]
-      tss_r13_x <- efb01_xs[2L]
-      tss_r2_x  <- efa02_xs[2L]
 
-      dw <- day_words_from(pg)
-      for (k in seq_len(nrow(dw))) {
-        dy  <- as.integer(dw$text[k])
-        rw  <- pg[abs(pg$y - dw$y[k]) <= 3L & pg$x >= 80L, ]
-        p1_rows[[length(p1_rows) + 1L]] <- data.frame(
-          day     = dy,
-          r1_flow = get_val(rw, cal01_x),
-          r2_flow = get_val(rw, flw02_x),
-          r3_flow = get_val(rw, flw03_x),
-          bod_r1  = get_val(rw, bod_r1_x),
-          bod_r23 = get_val(rw, bod_r23_x),
-          tss_r13 = get_val(rw, tss_r13_x),
-          tss_r2  = get_val(rw, tss_r2_x),
-          stringsAsFactors = FALSE
-        )
+      # CAL-01 is only a column header on the real Mon. Site (flow/BOD/TSS) page.
+      # On page 2 of the Part B PDF the "Site" keyword appears again as the label
+      # for the monitoring-site row column, but CAL-01 does not; skipping that
+      # page prevents the row-label x-positions from being misread as column
+      # positions and corrupting the daily averages.
+      if (!is.na(cal01_x)) {
+        flw02_x   <- find_xs("FLW-02")[1L]
+        flw03_x   <- find_xs("FLW-03")[1L]
+        efa01_xs  <- find_xs("EFA-01")
+        efa02_xs  <- find_xs("EFA-02")
+        efb01_xs  <- find_xs("EFB-01")
+        bod_r1_x  <- efa01_xs[1L]
+        bod_r23_x <- efa02_xs[1L]
+        tss_r13_x <- efb01_xs[2L]
+        tss_r2_x  <- efa02_xs[2L]
+
+        if (debug) cat(sprintf(
+          "  Site row at y=%d  bod_r1_x=%s  bod_r23_x=%s  tss_r13_x=%s  tss_r2_x=%s\n",
+          ms_y, bod_r1_x, bod_r23_x, tss_r13_x, tss_r2_x))
+
+        dw <- day_words_from(pg)
+        for (k in seq_len(nrow(dw))) {
+          dy  <- as.integer(dw$text[k])
+          rw  <- pg[abs(pg$y - dw$y[k]) <= 3L & pg$x >= 80L, ]
+          row <- data.frame(
+            day     = dy,
+            r1_flow = get_val(rw, cal01_x),
+            r2_flow = get_val(rw, flw02_x),
+            r3_flow = get_val(rw, flw03_x),
+            bod_r1  = get_val(rw, bod_r1_x),
+            bod_r23 = get_val(rw, bod_r23_x),
+            tss_r13 = get_val(rw, tss_r13_x),
+            tss_r2  = get_val(rw, tss_r2_x),
+            stringsAsFactors = FALSE
+          )
+          if (debug) cat(sprintf(
+            "    day=%02d  r1_flow=%-6s  bod_r1=%-6s  bod_r23=%-6s  tss_r13=%-6s  tss_r2=%-6s\n",
+            dy, row$r1_flow, row$bod_r1, row$bod_r23, row$tss_r13, row$tss_r2))
+          p1_rows[[length(p1_rows) + 1L]] <- row
+        }
       }
     }
 
@@ -727,7 +745,7 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
 
         below_hdr  <- pg[pg$y > code_y + 5L, ]
         in_col     <- below_hdr$x >= tn_left & below_hdr$x < tn_right
-        candidates <- below_hdr$text[in_col & grepl("^[<>]?[0-9]", below_hdr$text)]
+        candidates <- below_hdr$text[in_col & grepl("^[<>]?\\.?[0-9]", below_hdr$text)]
 
         if (debug) cat(sprintf("  candidates in TN column: [%s]\n",
                                 paste(candidates, collapse=", ")))
@@ -755,12 +773,11 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
   tn_numeric <- tn_numeric[!is.na(tn_numeric)]
   tn_mean    <- if (length(tn_numeric) > 0L) mean(tn_numeric) else NA_real_
 
-  avg_f <- function(x) mean(x, na.rm = TRUE)
   avg_c <- function(x) { x <- x[!is.na(x)]; if (!length(x)) NA_real_ else mean(x) }
 
   data.frame(
     outfall  = c("R-001","R-002","R-003"),
-    flow_mgd = c(avg_f(daily$r1_flow), avg_f(daily$r2_flow), avg_f(daily$r3_flow)),
+    flow_mgd = c(avg_c(daily$r1_flow), avg_c(daily$r2_flow), avg_c(daily$r3_flow)),
     bod_mgl  = c(avg_c(daily$bod_r1),  avg_c(daily$bod_r23), avg_c(daily$bod_r23)),
     tss_mgl  = c(avg_c(daily$tss_r13), avg_c(daily$tss_r2),  avg_c(daily$tss_r13)),
     tn_mgl   = c(NA_real_, NA_real_, tn_mean),
@@ -768,13 +785,15 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
   )
 }
 
-# Apply <1->0.5 and <2->1.0 substitution for below-detection measurements.
+# Apply half-MDL substitution for below-detection Part B daily readings.
+# Any <X token is substituted with X/2 (e.g. <2 -> 1.0, <1 -> 0.5).
+# NOTE: .macdill_parse_tok (used for Part A summary values) does NOT halve
+# <X tokens -- in Part A the detection limit IS the reported value.  The
+# difference is intentional and should not be "unified".
 .macdill_apply_sub <- function(vals) {
   sapply(vals, function(v) {
     if (is.na(v) || !nzchar(v) || v %in% c("NA","ANC","NOD")) return(NA_real_)
     v <- trimws(v)
-    if (v %in% c("<1","<1.0")) return(0.5)
-    if (v %in% c("<2","<2.0")) return(1.0)
     if (startsWith(v, "<")) {
       n <- suppressWarnings(as.numeric(sub("^<", "", v)))
       return(if (!is.na(n)) n / 2 else NA_real_)

@@ -37,12 +37,12 @@ usable document was found are omitted (a message is printed when
 \code{quiet = FALSE}).  Columns:\tabular{lll}{
    Column \tab Type \tab Description \cr
    \code{yr} \tab integer \tab Monitoring year (from the PDF monitoring period). \cr
-   \code{mo} \tab integer \tab Calendar month (1–12). \cr
+   \code{mo} \tab integer \tab Calendar month (1--12). \cr
    \code{outfall} \tab character \tab Outfall ID: \code{"R-001"}, \code{"R-002"}, or \code{"R-003"}. \cr
    \code{flow_mgd} \tab numeric \tab Average Daily Flow (MGD). \code{0} when NOD. \cr
    \code{bod_mgl} \tab numeric \tab BOD (mg/L). \code{NA} when ANC or not collected. \cr
    \code{tss_mgl} \tab numeric \tab TSS (mg/L). \code{NA} when ANC or not collected. \cr
-   \code{tn_mgl} \tab numeric \tab Total nitrogen as NO3-N (mg/L), R-003 only. \code{NA} for R-001 and R-002. \cr
+   \code{tn_mgl} \tab numeric \tab Total nitrogen as NO3-N (mg/L), R-003 only; mean of biweekly Part B readings when available, Part A monthly maximum otherwise. \code{NA} for R-001 and R-002. \cr
    \code{verify} \tab logical \tab \code{TRUE} when one or more concentration values (TSS for R-001/R-003, TN for R-003) are single-day \strong{maximums} from Part A rather than monthly averages. This occurs when no machine-readable Part B was available. Cross-check these values against the original PDF. \cr
 }
 }
@@ -82,9 +82,9 @@ OCULUS search export.
 All monthly (\code{MO}) documents for the requested year are downloaded and
 inspected.  Each PDF is then classified by its actual content:
 \itemize{
-\item \strong{Part A} (monthly summary) — contains the official permit-limit table
+\item \strong{Part A} (monthly summary) -- contains the official permit-limit table
 with pre-computed monthly averages and permit compliance results.
-\item \strong{Part B} (daily sample results) — contains a day-by-day table of flow
+\item \strong{Part B} (daily sample results) -- contains a day-by-day table of flow
 and effluent quality measurements for a given month.
 }
 
@@ -104,12 +104,13 @@ line and enter the values manually if needed.
 Where a Part B daily table is available for a given calendar month, BOD and
 TSS are computed as the mean of all observed daily values using the
 substitution rules \verb{<1 \\u\{2192\} 0.5} and \verb{<2 \\u\{2192\} 1.0} (consistent with the
-2022–2024 reporting methodology).  Monthly average flow is also derived from
+2022--2024 reporting methodology).  Monthly average flow is also derived from
 Part B daily readings when available.  For months with no Part B, Part A
 monthly-summary values are used for BOD, TSS, and flow.
 
-Total nitrogen (\code{tn_mgl}) is always sourced from Part A because Part B
-tables do not include a TN column.
+Total nitrogen (\code{tn_mgl}) is sourced from Part B page 2 (column 00620,
+biweekly readings averaged) when available, falling back to the Part A
+monthly maximum when no Part B is present.
 }
 
 \subsection{Monitoring period vs. OCULUS label}{
@@ -139,8 +140,7 @@ df <- util_ps_getmacdill(
   yr          = 2025,
   search_xlsx = "MacDill_OCULUSSearchData_2025.xlsx",
   pdf_dir     = "~/Desktop/MacDill_DMR_2025",
-  out_file    = "~/Desktop/MacDill_DMR_2025_results.xlsx",
-  keep_pdfs   = TRUE
+  out_file    = "~/Desktop/MacDill_DMR_2025_results.xlsx"
 )
 }
 }

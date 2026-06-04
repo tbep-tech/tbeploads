@@ -167,6 +167,16 @@ parse_partb_from_guid <- function(path) {
              stringsAsFactors = FALSE)
 }
 
+# Part B fixture that includes a non-NA TN for R-003 (biweekly average).
+parse_partb_with_tn_from_guid <- function(path) {
+  data.frame(outfall  = c("R-001","R-002","R-003"),
+             flow_mgd = c(0.25, 0.015, 0.55),
+             bod_mgl  = c(1.8,  2.5,   2.5),
+             tss_mgl  = c(1.2,  1.0,   1.2),
+             tn_mgl   = c(NA_real_, NA_real_, 2.7),
+             stringsAsFactors = FALSE)
+}
+
 # ===========================================================================
 # .macdill_extract_guids
 # ===========================================================================
@@ -383,6 +393,10 @@ test_that(".macdill_apply_sub handles decimal variants <1.0 and <2.0", {
   expect_equal(tbeploads:::.macdill_apply_sub(c("<1.0", "<2.0")), c(0.5, 1.0))
 })
 
+test_that(".macdill_apply_sub applies half-MDL for arbitrary <X values", {
+  expect_equal(tbeploads:::.macdill_apply_sub(c("<4", "<0.5")), c(2.0, 0.25))
+})
+
 # ===========================================================================
 # .macdill_parse_part_b
 # ===========================================================================
@@ -467,6 +481,90 @@ test_that(".macdill_parse_part_b extracts TN from page 2 for R-003", {
   expect_true(is.na(result[result$outfall == "R-002", "tn_mgl"]))
 })
 
+test_that(".macdill_parse_part_b captures TN values without a leading zero (.10 style)", {
+  # Regression: values like '.10' were excluded by the '^[<>]?[0-9]' filter
+  # because they start with '.' not a digit.  Fixed to '^[<>]?\\.?[0-9]'.
+  tmp <- tempfile(fileext = ".pdf")
+  on.exit(unlink(tmp), add = TRUE)
+  writeBin(raw(1L), tmp)
+
+  daily <- list(
+    day     = c(1L, 2L, 7L, 14L),
+    r1_flow = c("0.3","0.3","0.3","0.3"),
+    r2_flow = c("0.02","0.02","0.02","0.02"),
+    r3_flow = c("0.5","0.5","0.5","0.5"),
+    tn_r3   = c(NA, NA, ".10", "1.8")   # mean(0.10, 1.80) = 0.95
+  )
+
+  local_mocked_bindings(
+    pdf_data = function(pdf, ...) make_part_b_page(daily),
+    .package = "pdftools"
+  )
+
+  result <- tbeploads:::.macdill_parse_part_b(tmp)
+
+  expect_equal(result[result$outfall == "R-003", "tn_mgl"], 0.95)
+})
+
+test_that(".macdill_parse_part_b page-2 Site keyword without CAL-01 does not corrupt page-1 values", {
+  # Regression: page 2 of the Part B PDF contains 'Site' as a column label,
+  # causing the Mon. Site parser to run on page 2 with wrong x-positions
+  # (monitoring-site row labels misread as column headers).  Days present only
+  # on page 2 received spurious values from those wrong positions.
+  # Fixed by requiring CAL-01 in the Site header row before processing.
+  tmp <- tempfile(fileext = ".pdf")
+  on.exit(unlink(tmp), add = TRUE)
+  writeBin(raw(1L), tmp)
+
+  make_word <- function(text, x, y)
+    data.frame(text = as.character(text), x = as.integer(x), y = as.integer(y),
+               space = FALSE, width = 10L, height = 9L, stringsAsFactors = FALSE)
+
+  # Page 1: days 1-2 with known BOD R-001 = 2.0
+  hdr1 <- rbind(
+    make_word("DAILY SAMPLE RESULTS - PART B", 200L, 50L),
+    make_word("Site",   82L, 172L), make_word("CAL-01", 153L, 172L),
+    make_word("FLW-02", 194L, 172L), make_word("FLW-03", 235L, 172L),
+    make_word("EFA-01", 280L, 172L), make_word("EFA-02", 327L, 172L),
+    make_word("EFB-01", 376L, 172L), make_word("EFB-01", 425L, 172L),
+    make_word("EFA-02", 473L, 172L)
+  )
+  p1_rows <- rbind(
+    make_word(1L, 72L, 184L), make_word("0.3", 154L, 184L), make_word("2.0", 281L, 184L),
+    make_word(2L, 72L, 195L), make_word("0.3", 154L, 195L), make_word("2.0", 281L, 195L)
+  )
+  page1 <- rbind(hdr1, p1_rows)
+
+  # Page 2: has "Site" + "EFA-01" at wrong x but no "CAL-01".
+  # Day 3 appears ONLY here with a spurious value (9.9) at the wrong EFA-01 position.
+  # Without the CAL-01 guard this day would be added to p1_rows with bod_r1=9.9,
+  # corrupting the mean from 2.0 to mean(2.0, 2.0, 9.9) = 4.63.
+  hdr2 <- rbind(
+    make_word("Code",  77L, 173L), make_word("00620", 420L, 173L),
+    make_word("Site",  82L, 184L), make_word("EFA-01", 197L, 184L),
+    make_word("EFA-02", 110L, 184L)
+  )
+  p2_rows <- rbind(
+    make_word(3L,    72L, 206L),
+    make_word("9.9", 198L, 206L),   # near wrong EFA-01 x=197; corrupts if guard fails
+    make_word("1.5", 421L, 206L)    # TN value in 00620 column
+  )
+  page2 <- rbind(hdr2, p2_rows)
+
+  local_mocked_bindings(
+    pdf_data = function(pdf, ...) list(page1, page2),
+    .package = "pdftools"
+  )
+
+  result <- tbeploads:::.macdill_parse_part_b(tmp)
+
+  r1 <- result[result$outfall == "R-001", ]
+  # BOD R-001 must be 2.0 (days 1-2 only); 9.9 from page 2 must be ignored
+  expect_equal(r1$bod_mgl, 2.0)
+  # TN is still extracted from page 2 Code block (independent of Site guard)
+  expect_equal(result[result$outfall == "R-003", "tn_mgl"], 1.5)
+})
+
 # ===========================================================================
 # util_ps_getmacdill (integration)
 # ===========================================================================
@@ -520,15 +618,16 @@ test_that("util_ps_getmacdill Part B overrides Part A BOD, TSS, and flow when bo
 
   expect_equal(nrow(result), 3L)
   r1 <- result[result$outfall == "R-001", ]
+  r3 <- result[result$outfall == "R-003", ]
   # Part B daily averages override Part A for BOD, TSS, flow
   expect_equal(r1$bod_mgl,  parse_partb_from_guid(NULL)$bod_mgl[1])
   expect_equal(r1$tss_mgl,  parse_partb_from_guid(NULL)$tss_mgl[1])
   expect_equal(r1$flow_mgd, parse_partb_from_guid(NULL)$flow_mgd[1])
-  # Part A still provides TN (not in Part B)
-  expect_equal(r1$tn_mgl,   parse_parta_from_guid(NULL)$tn_mgl[1])
-  # R-001: TSS from Part B daily average → verify = FALSE
+  # Part B fixture has NA TN; Part A TN is used as fallback for R-003
+  expect_equal(r3$tn_mgl, parse_parta_from_guid(NULL)$tn_mgl[3])   # 4.5
+  # R-001: TSS from Part B → verify = FALSE
   expect_false(result[result$outfall == "R-001", "verify"])
-  # R-003: TSS from Part B, but TN still from Part A Maximum (Part B has no TN) → verify = TRUE
+  # R-003: TSS from Part B but TN falls back to Part A maximum → verify = TRUE
   expect_true(result[result$outfall == "R-003", "verify"])
 })
 
@@ -613,6 +712,36 @@ test_that("util_ps_getmacdill falls back to Part B when no Part A exists", {
   r1 <- result[result$outfall == "R-001", ]
   expect_equal(r1$bod_mgl, parse_partb_from_guid(NULL)$bod_mgl[1])
   expect_true(is.na(r1$tn_mgl))   # TN always NA from Part B
+})
+
+test_that("util_ps_getmacdill Part B TN overrides Part A TN when Part B provides TN", {
+  skip_if(!nzchar(macdill_xlsx), "macdill2025search.xlsx fixture not installed")
+
+  doc_list <- data.frame(guid    = c("guid_a","guid_b"), row = c(1L, 2L),
+                          subject = c("DMR 2025 JUN MO PART A","DMR 2025 JUN MO PART B"),
+                          stringsAsFactors = FALSE)
+
+  classify_mock <- function(path) {
+    if (grepl("guid_a", path)) list(type="partA", month=6L, year=2025L)
+    else                        list(type="partB", month=6L, year=2025L)
+  }
+
+  stub(util_ps_getmacdill, ".macdill_extract_guids", function(...) doc_list)
+  stub(util_ps_getmacdill, ".macdill_oculus_login",  function() NULL)
+  stub(util_ps_getmacdill, ".macdill_download_pdf",
+       function(guid, dest_path, session_handle) TRUE)
+  stub(util_ps_getmacdill, ".macdill_classify_pdf",  classify_mock)
+  stub(util_ps_getmacdill, ".macdill_parse_part_a",  parse_parta_from_guid)
+  stub(util_ps_getmacdill, ".macdill_parse_part_b",  parse_partb_with_tn_from_guid)
+
+  result <- util_ps_getmacdill(yr = 2025, search_xlsx = macdill_xlsx, quiet = TRUE)
+
+  r3 <- result[result$outfall == "R-003", ]
+  # Part B biweekly average (2.7) must take precedence over Part A maximum (4.5)
+  expect_equal(r3$tn_mgl, parse_partb_with_tn_from_guid(NULL)$tn_mgl[3])
+  expect_false(r3$tn_mgl == parse_parta_from_guid(NULL)$tn_mgl[3])
+  # Both TSS and TN came from Part B → verify = FALSE
+  expect_false(r3$verify)
 })
 
 test_that("util_ps_getmacdill retains sensibly-named PDFs when pdf_dir is supplied", {
