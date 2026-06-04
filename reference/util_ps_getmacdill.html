@@ -104,7 +104,7 @@ written to this path as an <code>.xlsx</code> workbook.</p></dd>
     <p>A data frame with three rows per available monitoring month (one per
 outfall), sorted by month then outfall.  Calendar months for which no
 usable document was found are omitted (a message is printed when
-<code>quiet = FALSE</code>).  Columns:</p><table class="table table"><tr><td>Column</td><td>Type</td><td>Description</td></tr><tr><td><code>yr</code></td><td>integer</td><td>Monitoring year (from the PDF monitoring period).</td></tr><tr><td><code>mo</code></td><td>integer</td><td>Calendar month (1–12).</td></tr><tr><td><code>outfall</code></td><td>character</td><td>Outfall ID: <code>"R-001"</code>, <code>"R-002"</code>, or <code>"R-003"</code>.</td></tr><tr><td><code>flow_mgd</code></td><td>numeric</td><td>Average Daily Flow (MGD). <code>0</code> when NOD.</td></tr><tr><td><code>bod_mgl</code></td><td>numeric</td><td>BOD (mg/L). <code>NA</code> when ANC or not collected.</td></tr><tr><td><code>tss_mgl</code></td><td>numeric</td><td>TSS (mg/L). <code>NA</code> when ANC or not collected.</td></tr><tr><td><code>tn_mgl</code></td><td>numeric</td><td>Total nitrogen as NO3-N (mg/L), R-003 only. <code>NA</code> for R-001 and R-002.</td></tr><tr><td><code>verify</code></td><td>logical</td><td><code>TRUE</code> when one or more concentration values (TSS for R-001/R-003, TN for R-003) are single-day <strong>maximums</strong> from Part A rather than monthly averages. This occurs when no machine-readable Part B was available. Cross-check these values against the original PDF.</td></tr></table></div>
+<code>quiet = FALSE</code>).  Columns:</p><table class="table table"><tr><td>Column</td><td>Type</td><td>Description</td></tr><tr><td><code>yr</code></td><td>integer</td><td>Monitoring year (from the PDF monitoring period).</td></tr><tr><td><code>mo</code></td><td>integer</td><td>Calendar month (1–12).</td></tr><tr><td><code>outfall</code></td><td>character</td><td>Outfall ID: <code>"R-001"</code>, <code>"R-002"</code>, or <code>"R-003"</code>.</td></tr><tr><td><code>flow_mgd</code></td><td>numeric</td><td>Average Daily Flow (MGD). <code>0</code> when NOD.</td></tr><tr><td><code>bod_mgl</code></td><td>numeric</td><td>BOD (mg/L). <code>NA</code> when ANC or not collected.</td></tr><tr><td><code>tss_mgl</code></td><td>numeric</td><td>TSS (mg/L). <code>NA</code> when ANC or not collected.</td></tr><tr><td><code>tn_mgl</code></td><td>numeric</td><td>Total nitrogen as NO3-N (mg/L), R-003 only; mean of biweekly Part B readings when available, Part A monthly maximum otherwise. <code>NA</code> for R-001 and R-002.</td></tr><tr><td><code>verify</code></td><td>logical</td><td><code>TRUE</code> when one or more concentration values (TSS for R-001/R-003, TN for R-003) are single-day <strong>maximums</strong> from Part A rather than monthly averages. This occurs when no machine-readable Part B was available. Cross-check these values against the original PDF.</td></tr></table></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
@@ -133,9 +133,9 @@ OCULUS search export.</p>
 
 
 <p>All monthly (<code>MO</code>) documents for the requested year are downloaded and
-inspected.  Each PDF is then classified by its actual content:</p><ul><li><p><strong>Part A</strong> (monthly summary) — contains the official permit-limit table
+inspected.  Each PDF is then classified by its actual content:</p><ul><li><p><strong>Part A</strong> (monthly summary) – contains the official permit-limit table
 with pre-computed monthly averages and permit compliance results.</p></li>
-<li><p><strong>Part B</strong> (daily sample results) — contains a day-by-day table of flow
+<li><p><strong>Part B</strong> (daily sample results) – contains a day-by-day table of flow
 and effluent quality measurements for a given month.</p></li>
 </ul><p>The OCULUS document labels ("Part A", "Part B") are not always reliable for
 this facility, so the function detects content type from the PDF text.  Annual
@@ -157,8 +157,9 @@ substitution rules <code>&lt;1 \u{2192} 0.5</code> and <code>&lt;2 \u{2192} 1.0<
 2022–2024 reporting methodology).  Monthly average flow is also derived from
 Part B daily readings when available.  For months with no Part B, Part A
 monthly-summary values are used for BOD, TSS, and flow.</p>
-<p>Total nitrogen (<code>tn_mgl</code>) is always sourced from Part A because Part B
-tables do not include a TN column.</p>
+<p>Total nitrogen (<code>tn_mgl</code>) is sourced from Part B page 2 (column 00620,
+biweekly readings averaged) when available, falling back to the Part A
+monthly maximum when no Part B is present.</p>
 </div>
 
 <div class="section">
@@ -199,8 +200,7 @@ concentration.  <code>ANC</code> (Acceptable Not Collected) is treated as <code>
 <span class="r-in"><span>  yr          <span class="op">=</span> <span class="fl">2025</span>,</span></span>
 <span class="r-in"><span>  search_xlsx <span class="op">=</span> <span class="st">"MacDill_OCULUSSearchData_2025.xlsx"</span>,</span></span>
 <span class="r-in"><span>  pdf_dir     <span class="op">=</span> <span class="st">"~/Desktop/MacDill_DMR_2025"</span>,</span></span>
-<span class="r-in"><span>  out_file    <span class="op">=</span> <span class="st">"~/Desktop/MacDill_DMR_2025_results.xlsx"</span>,</span></span>
-<span class="r-in"><span>  keep_pdfs   <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  out_file    <span class="op">=</span> <span class="st">"~/Desktop/MacDill_DMR_2025_results.xlsx"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>

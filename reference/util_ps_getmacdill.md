@@ -62,7 +62,7 @@ usable document was found are omitted (a message is printed when
 | `flow_mgd` | numeric | Average Daily Flow (MGD). `0` when NOD. |
 | `bod_mgl` | numeric | BOD (mg/L). `NA` when ANC or not collected. |
 | `tss_mgl` | numeric | TSS (mg/L). `NA` when ANC or not collected. |
-| `tn_mgl` | numeric | Total nitrogen as NO3-N (mg/L), R-003 only. `NA` for R-001 and R-002. |
+| `tn_mgl` | numeric | Total nitrogen as NO3-N (mg/L), R-003 only; mean of biweekly Part B readings when available, Part A monthly maximum otherwise. `NA` for R-001 and R-002. |
 | `verify` | logical | `TRUE` when one or more concentration values (TSS for R-001/R-003, TN for R-003) are single-day **maximums** from Part A rather than monthly averages. This occurs when no machine-readable Part B was available. Cross-check these values against the original PDF. |
 
 ## Details
@@ -103,11 +103,11 @@ standard OCULUS search export.
 All monthly (`MO`) documents for the requested year are downloaded and
 inspected. Each PDF is then classified by its actual content:
 
-- **Part A** (monthly summary) — contains the official permit-limit
+- **Part A** (monthly summary) – contains the official permit-limit
   table with pre-computed monthly averages and permit compliance
   results.
 
-- **Part B** (daily sample results) — contains a day-by-day table of
+- **Part B** (daily sample results) – contains a day-by-day table of
   flow and effluent quality measurements for a given month.
 
 The OCULUS document labels ("Part A", "Part B") are not always reliable
@@ -129,8 +129,9 @@ with the 2022–2024 reporting methodology). Monthly average flow is also
 derived from Part B daily readings when available. For months with no
 Part B, Part A monthly-summary values are used for BOD, TSS, and flow.
 
-Total nitrogen (`tn_mgl`) is always sourced from Part A because Part B
-tables do not include a TN column.
+Total nitrogen (`tn_mgl`) is sourced from Part B page 2 (column 00620,
+biweekly readings averaged) when available, falling back to the Part A
+monthly maximum when no Part B is present.
 
 ### Monitoring period vs. OCULUS label
 
@@ -164,8 +165,7 @@ df <- util_ps_getmacdill(
   yr          = 2025,
   search_xlsx = "MacDill_OCULUSSearchData_2025.xlsx",
   pdf_dir     = "~/Desktop/MacDill_DMR_2025",
-  out_file    = "~/Desktop/MacDill_DMR_2025_results.xlsx",
-  keep_pdfs   = TRUE
+  out_file    = "~/Desktop/MacDill_DMR_2025_results.xlsx"
 )
 } # }
 ```
