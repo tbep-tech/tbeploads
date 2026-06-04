@@ -743,7 +743,16 @@ util_ps_getmacdill <- function(yr, search_xlsx, pdf_dir = NULL,
 
         if (debug) cat(sprintf("  tn column boundary: [%.1f, %.1f)\n", tn_left, tn_right))
 
-        below_hdr  <- pg[pg$y > code_y + 5L, ]
+        # Restrict to data rows only: find the last day-number row on this page
+        # (day integers 1-31 at x < 80) and ignore everything below it.  This
+        # prevents the PLANT STAFFING section at the bottom of the page from
+        # contributing certification numbers that happen to fall inside the TN
+        # column's x-range.
+        dw_p2     <- day_words_from(pg)
+        data_ymax <- if (nrow(dw_p2) > 0L) max(dw_p2$y) + 10L else Inf
+        if (debug) cat(sprintf("  data_ymax=%s\n", data_ymax))
+
+        below_hdr  <- pg[pg$y > code_y + 5L & pg$y <= data_ymax, ]
         in_col     <- below_hdr$x >= tn_left & below_hdr$x < tn_right
         candidates <- below_hdr$text[in_col & grepl("^[<>]?\\.?[0-9]", below_hdr$text)]
 

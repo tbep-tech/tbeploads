@@ -481,6 +481,69 @@ test_that(".macdill_parse_part_b extracts TN from page 2 for R-003", {
   expect_true(is.na(result[result$outfall == "R-002", "tn_mgl"]))
 })
 
+test_that(".macdill_parse_part_b ignores PLANT STAFFING certification numbers in TN column", {
+  # Regression: certification numbers (23476, 24878, etc.) in the PLANT STAFFING
+  # section at the bottom of page 2 can fall within the 00620 TN column's
+  # Voronoi x-range and were incorrectly averaged as TN values.
+  # Fixed by restricting the candidate search to rows at or above the last
+  # day-number row on page 2.
+  tmp <- tempfile(fileext = ".pdf")
+  on.exit(unlink(tmp), add = TRUE)
+  writeBin(raw(1L), tmp)
+
+  make_word <- function(text, x, y)
+    data.frame(text = as.character(text), x = as.integer(x), y = as.integer(y),
+               space = FALSE, width = 10L, height = 9L, stringsAsFactors = FALSE)
+
+  TN_X <- 329L
+
+  # Page 1: minimal with flow only
+  hdr1 <- rbind(
+    make_word("DAILY SAMPLE RESULTS - PART B", 200L, 50L),
+    make_word("Site",   82L, 172L), make_word("CAL-01", 153L, 172L),
+    make_word("FLW-02", 194L, 172L), make_word("FLW-03", 235L, 172L),
+    make_word("EFA-01", 280L, 172L), make_word("EFA-02", 327L, 172L),
+    make_word("EFB-01", 376L, 172L), make_word("EFB-01", 425L, 172L),
+    make_word("EFA-02", 473L, 172L)
+  )
+  p1_rows <- rbind(
+    make_word(1L, 72L, 184L), make_word("0.3", 154L, 184L),
+    make_word(2L, 72L, 195L), make_word("0.3", 154L, 195L)
+  )
+  page1 <- rbind(hdr1, p1_rows)
+
+  # Page 2: TN (00620) column at x=329; real TN value only on day 19 (2.0).
+  # Certification numbers in the PLANT STAFFING block appear below day 30.
+  hdr2 <- rbind(
+    make_word("Code",  77L, 174L),
+    make_word("00620", TN_X, 174L)
+  )
+  day_rows <- do.call(rbind, lapply(1:30, function(d) {
+    row_y <- 190L + d * 10L
+    w <- make_word(d, 72L, row_y)
+    if (d == 19L) rbind(w, make_word("2.0", TN_X + 2L, row_y)) else w
+  }))
+  staffing_y0 <- 190L + 30L * 10L + 30L
+  staffing <- rbind(
+    make_word("23476", TN_X + 1L, staffing_y0),
+    make_word("24878", TN_X + 1L, staffing_y0 + 12L),
+    make_word("8426",  TN_X + 1L, staffing_y0 + 24L),
+    make_word("28101", TN_X + 1L, staffing_y0 + 36L)
+  )
+  page2 <- rbind(hdr2, day_rows, staffing)
+
+  local_mocked_bindings(
+    pdf_data = function(pdf, ...) list(page1, page2),
+    .package = "pdftools"
+  )
+
+  result <- tbeploads:::.macdill_parse_part_b(tmp)
+
+  r3 <- result[result$outfall == "R-003", ]
+  # Only day 19's value (2.0) averaged; certification numbers must be excluded
+  expect_equal(r3$tn_mgl, 2.0)
+})
+
 test_that(".macdill_parse_part_b captures TN values without a leading zero (.10 style)", {
   # Regression: values like '.10' were excluded by the '^[<>]?[0-9]' filter
   # because they start with '.' not a digit.  Fixed to '^[<>]?\\.?[0-9]'.
