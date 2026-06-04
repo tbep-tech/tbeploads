@@ -811,3 +811,95 @@ test_that("util_ps_getmacdill stops with error for missing search_xlsx", {
     util_ps_getmacdill(yr = 2025, search_xlsx = "nonexistent.xlsx")
   )
 })
+
+test_that("util_ps_getmacdill returns empty data frame when no PDFs download successfully", {
+  skip_if(!nzchar(macdill_xlsx), "macdill2025search.xlsx fixture not installed")
+
+  stub(util_ps_getmacdill, ".macdill_oculus_login", function() NULL)
+  stub(util_ps_getmacdill, ".macdill_download_pdf",
+       function(guid, dest_path, session_handle) FALSE)   # all downloads fail
+
+  result <- util_ps_getmacdill(yr = 2025, search_xlsx = macdill_xlsx, quiet = TRUE)
+
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 0L)
+  expect_equal(names(result), c("yr","mo","outfall","flow_mgd","bod_mgl","tss_mgl","tn_mgl","verify"))
+})
+
+test_that("util_ps_getmacdill skips PDFs whose year does not match requested year", {
+  skip_if(!nzchar(macdill_xlsx), "macdill2025search.xlsx fixture not installed")
+
+  # Two docs in the index: one matches 2025, one is classified as 2024 (wrong year).
+  doc_list <- data.frame(
+    guid    = c("guid_a", "guid_b"), row = c(1L, 2L),
+    subject = c("DMR 2025 JUN MO PART A", "DMR 2025 JUL MO PART A"),
+    stringsAsFactors = FALSE
+  )
+
+  call_n <- 0L
+  classify_mock <- function(path) {
+    call_n <<- call_n + 1L
+    if (call_n == 1L) list(type = "partA", month = 6L, year = 2025L)
+    else              list(type = "partA", month = 7L, year = 2024L)  # wrong year
+  }
+
+  stub(util_ps_getmacdill, ".macdill_extract_guids", function(...) doc_list)
+  stub(util_ps_getmacdill, ".macdill_oculus_login",  function() NULL)
+  stub(util_ps_getmacdill, ".macdill_download_pdf",
+       function(guid, dest_path, session_handle) TRUE)
+  stub(util_ps_getmacdill, ".macdill_classify_pdf",  classify_mock)
+  stub(util_ps_getmacdill, ".macdill_parse_part_a",  parse_parta_from_guid)
+
+  result <- util_ps_getmacdill(yr = 2025, search_xlsx = macdill_xlsx, quiet = TRUE)
+
+  # Only June (year 2025) should be in the output; July (year 2024) skipped
+  expect_equal(sort(unique(result$mo)), 6L)
+  expect_equal(nrow(result), 3L)
+})
+
+test_that("util_ps_getmacdill skips a month and continues when download fails", {
+  skip_if(!nzchar(macdill_xlsx), "macdill2025search.xlsx fixture not installed")
+
+  doc_list <- data.frame(
+    guid    = c("guid_a", "guid_b"), row = c(1L, 2L),
+    subject = c("DMR 2025 JUN MO PART A", "DMR 2025 JUL MO PART A"),
+    stringsAsFactors = FALSE
+  )
+
+  call_n <- 0L
+  stub(util_ps_getmacdill, ".macdill_extract_guids", function(...) doc_list)
+  stub(util_ps_getmacdill, ".macdill_oculus_login",  function() NULL)
+  stub(util_ps_getmacdill, ".macdill_download_pdf",
+       function(guid, dest_path, session_handle) {
+         call_n <<- call_n + 1L
+         call_n > 1L   # first download fails, second succeeds
+       })
+  stub(util_ps_getmacdill, ".macdill_classify_pdf",
+       function(path) list(type = "partA", month = 7L, year = 2025L))
+  stub(util_ps_getmacdill, ".macdill_parse_part_a", parse_parta_from_guid)
+
+  result <- util_ps_getmacdill(yr = 2025, search_xlsx = macdill_xlsx, quiet = TRUE)
+
+  # Only July (second download, which succeeded) should appear
+  expect_equal(sort(unique(result$mo)), 7L)
+  expect_equal(nrow(result), 3L)
+})
+
+test_that("util_ps_getmacdill prints progress messages when quiet = FALSE", {
+  skip_if(!nzchar(macdill_xlsx), "macdill2025search.xlsx fixture not installed")
+
+  call_n <- 0L
+  stub(util_ps_getmacdill, ".macdill_oculus_login", function() NULL)
+  stub(util_ps_getmacdill, ".macdill_download_pdf",
+       function(guid, dest_path, session_handle) TRUE)
+  stub(util_ps_getmacdill, ".macdill_classify_pdf", function(path) {
+    call_n <<- call_n + 1L
+    list(type = "partA", month = call_n, year = 2025L)
+  })
+  stub(util_ps_getmacdill, ".macdill_parse_part_a", parse_parta_from_guid)
+
+  expect_output(
+    util_ps_getmacdill(yr = 2025, search_xlsx = macdill_xlsx, quiet = FALSE),
+    "candidate monthly"
+  )
+})

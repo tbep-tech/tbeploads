@@ -262,3 +262,77 @@ test_that("util_ps_getaoc stops with an error for a missing search_xlsx path", {
     util_ps_getaoc(yr = 2025, search_xlsx = "nonexistent_file.xlsx")
   )
 })
+
+test_that("util_ps_getaoc skips a month and warns when download fails", {
+  skip_if(!nzchar(aoc_xlsx), "aoc2024search.xlsx fixture not installed")
+
+  # Make download fail for January (first doc) only; all others succeed.
+  call_n <- 0L
+  stub(util_ps_getaoc, ".aoc_oculus_login", function() NULL)
+  stub(util_ps_getaoc, ".aoc_download_pdf", function(guid, dest_path, session_handle) {
+    call_n <<- call_n + 1L
+    call_n > 1L   # FALSE (fail) for the first call, TRUE (ok) for the rest
+  })
+  stub(util_ps_getaoc, ".aoc_parse_pdf", parse_pdf_from_filename)
+
+  result <- suppressWarnings(
+    util_ps_getaoc(yr = 2024, search_xlsx = aoc_xlsx, quiet = TRUE)
+  )
+  # One month was skipped; 11 rows expected
+  expect_equal(nrow(result), 11L)
+})
+
+test_that("util_ps_getaoc skips a month and warns when parse fails", {
+  skip_if(!nzchar(aoc_xlsx), "aoc2024search.xlsx fixture not installed")
+
+  call_n <- 0L
+  stub(util_ps_getaoc, ".aoc_oculus_login", function() NULL)
+  stub(util_ps_getaoc, ".aoc_download_pdf",
+       function(guid, dest_path, session_handle) TRUE)
+  stub(util_ps_getaoc, ".aoc_parse_pdf", function(path) {
+    call_n <<- call_n + 1L
+    if (call_n == 1L) stop("simulated parse error")
+    parse_pdf_from_filename(path)
+  })
+
+  expect_warning(
+    result <- util_ps_getaoc(yr = 2024, search_xlsx = aoc_xlsx, quiet = TRUE),
+    "simulated parse error"
+  )
+  expect_equal(nrow(result), 11L)
+})
+
+test_that("util_ps_getaoc retains PDFs when pdf_dir is supplied", {
+  skip_if(!nzchar(aoc_xlsx), "aoc2024search.xlsx fixture not installed")
+
+  tmp_dir <- tempfile()
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+
+  stub(util_ps_getaoc, ".aoc_oculus_login", function() NULL)
+  stub(util_ps_getaoc, ".aoc_download_pdf",
+       function(guid, dest_path, session_handle) {
+         writeBin(raw(1L), dest_path)
+         TRUE
+       })
+  stub(util_ps_getaoc, ".aoc_parse_pdf", parse_pdf_from_filename)
+
+  util_ps_getaoc(yr = 2024, search_xlsx = aoc_xlsx,
+                 pdf_dir = tmp_dir, quiet = TRUE)
+
+  expect_gt(length(list.files(tmp_dir, pattern = "\\.pdf$")), 0L)
+})
+
+test_that("util_ps_getaoc prints progress messages when quiet = FALSE", {
+  skip_if(!nzchar(aoc_xlsx), "aoc2024search.xlsx fixture not installed")
+
+  stub(util_ps_getaoc, ".aoc_oculus_login", function() NULL)
+  stub(util_ps_getaoc, ".aoc_download_pdf",
+       function(guid, dest_path, session_handle) TRUE)
+  stub(util_ps_getaoc, ".aoc_parse_pdf", parse_pdf_from_filename)
+
+  expect_output(
+    util_ps_getaoc(yr = 2024, search_xlsx = aoc_xlsx, quiet = FALSE),
+    "monthly Part A"
+  )
+})
