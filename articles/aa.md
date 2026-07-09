@@ -205,11 +205,20 @@ subtracted before hydrologic normalization:
 \text{eff\_tn} = (\text{tn\_entity} - \text{corr\_tons}) \times \frac{\text{mean\_h2o\_9294}}{\text{total\_h2o}}
 ```
 
-`total_h2o` is the annual NPS + IPS + DPS water load for that basin
-(matching the SAS `ratio1_2224` denominator). `mean_h2o_9294` is the
-1992-1994 baseline total basin water volume from `hydro_baseline`.
-Effective loads are averaged over `yrrng` as `sum / length(yrrng)`, so
-missing years contribute zero rather than being excluded.
+`total_h2o` is the annual total basin water load for that basin, gated
+by whether the basin is gaged (per `dbasing$gagetype`): for gaged
+basins, NPS water is estimated from a stream gauge and so already
+reflects any upstream IPS + DPS discharge, so `total_h2o` is the NPS
+water alone; for ungaged basins, the modeled NPS-only water excludes
+point-source discharge entirely, so IPS and DPS water are added to it.
+This matches the SAS `ratio1_2224` construction, which sums all three
+sources for the same basin/year regardless of gage status — the gating
+is needed because tbeploads’ own gaged-basin NPS water estimate is a
+measured total (already inclusive of point sources), not a pure NPS
+estimate. `mean_h2o_9294` is the 1992-1994 baseline total basin water
+volume from `hydro_baseline`. Effective loads are averaged over `yrrng`
+as `sum / length(yrrng)`, so missing years contribute zero rather than
+being excluded.
 
 Bay segments Terra Ceia Bay (6) and Manatee River (7) are merged into
 segment 55 (Remaining Lower Tampa Bay) after disaggregation, consistent
@@ -234,8 +243,8 @@ facility uses its raw (unnormalized) load. For flagged facilities:
 \text{eff\_tn} = \text{tn\_load} \times \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}
 ```
 
-where `basin_total_h2o` is the same total basin water load (NPS + IPS +
-DPS) used in the NPS path, matching the SAS `ratio1_2224` construction.
+where `basin_total_h2o` is the same gaged/ungaged-gated basin water
+quantity described in the NPS path above.
 
 ### DPS
 

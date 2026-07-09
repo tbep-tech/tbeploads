@@ -295,8 +295,17 @@ bay segment level. Corrections from <code>aa_corrections</code>
 from the 2007 RA analysis) are subtracted before hydrologic
 normalization:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">eff_tn</mtext><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">tn_entity</mtext><mo>−</mo><mtext mathvariant="normal">corr_tons</mtext><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mfrac><mtext mathvariant="normal">mean_h2o_9294</mtext><mtext mathvariant="normal">total_h2o</mtext></mfrac></mrow><annotation encoding="application/x-tex">\text{eff\_tn} = (\text{tn\_entity} - \text{corr\_tons}) \times \frac{\text{mean\_h2o\_9294}}{\text{total\_h2o}}</annotation></semantics></math></p>
-<p><code>total_h2o</code> is the annual NPS + IPS + DPS water load for
-that basin (matching the SAS <code>ratio1_2224</code> denominator).
+<p><code>total_h2o</code> is the annual total basin water load for that
+basin, gated by whether the basin is gaged (per
+<code>dbasing$gagetype</code>): for gaged basins, NPS water is estimated
+from a stream gauge and so already reflects any upstream IPS + DPS
+discharge, so <code>total_h2o</code> is the NPS water alone; for ungaged
+basins, the modeled NPS-only water excludes point-source discharge
+entirely, so IPS and DPS water are added to it. This matches the SAS
+<code>ratio1_2224</code> construction, which sums all three sources for
+the same basin/year regardless of gage status — the gating is needed
+because tbeploads’ own gaged-basin NPS water estimate is a measured
+total (already inclusive of point sources), not a pure NPS estimate.
 <code>mean_h2o_9294</code> is the 1992-1994 baseline total basin water
 volume from <code>hydro_baseline</code>. Effective loads are averaged
 over <code>yrrng</code> as <code>sum / length(yrrng)</code>, so missing
@@ -322,9 +331,8 @@ Mosaic mining operations) with a “Hydrologically Affected” row label;
 every other IPS facility uses its raw (unnormalized) load. For flagged
 facilities:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">eff_tn</mtext><mo>=</mo><mtext mathvariant="normal">tn_load</mtext><mo>×</mo><mfrac><mtext mathvariant="normal">mean_h2o_9294</mtext><mtext mathvariant="normal">basin_total_h2o</mtext></mfrac></mrow><annotation encoding="application/x-tex">\text{eff\_tn} = \text{tn\_load} \times \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}</annotation></semantics></math></p>
-<p>where <code>basin_total_h2o</code> is the same total basin water load
-(NPS + IPS + DPS) used in the NPS path, matching the SAS
-<code>ratio1_2224</code> construction.</p>
+<p>where <code>basin_total_h2o</code> is the same gaged/ungaged-gated
+basin water quantity described in the NPS path above.</p>
 </div>
 <div class="section level3">
 <h3 id="dps">DPS<a class="anchor" aria-label="anchor" href="#dps"></a>

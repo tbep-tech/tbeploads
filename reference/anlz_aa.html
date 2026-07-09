@@ -169,10 +169,17 @@ leave the rest unnormalized. For <code>hydro_affected</code> permits:</p>
   \text{eff\_tn} = \text{tn\_load} \times
   \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}
 $$</p>
-<p>where <code>basin\_total\_h2o</code> is the annual total water load (NPS + DPS +
-IPS) for the same basin and year, matching the SAS <code>ratio1\_2224</code>
-denominator. All other IPS facilities, and any facility with no
-<code>ps_allocations</code> match, use the raw (unnormalized) load.</p>
+<p>where <code>basin\_total\_h2o</code> is the annual total basin water load for
+the same basin and year, computed differently depending on whether the
+basin is gaged (per <code><a href="dbasing.html">dbasing</a></code>): for gaged basins, NPS water is
+estimated from a stream gauge and so already reflects any upstream IPS +
+DPS discharge, so <code>basin\_total\_h2o</code> is the NPS water alone; for
+ungaged basins, the modeled NPS-only water excludes point-source
+discharge entirely, so IPS and DPS water are added to it (matching the
+SAS <code>ratio1\_2224</code> construction, which sums all three sources for
+the same basin/year regardless of gage status). All other IPS facilities,
+and any facility with no <code>ps_allocations</code> match, use the raw
+(unnormalized) load.</p>
 <p><strong>ML path</strong></p>
 <p>Material loss TN loads require no hydrologic normalization. Monthly loads
 from <code>ml_data</code> are summed to annual totals per facility, averaged
@@ -206,6 +213,9 @@ across basins to the segment level. TN corrections from <code><a href="aa_correc
   \text{eff\_tn} = (\text{tn\_entity} - \text{corr\_tons}) \times
   \frac{\text{mean\_h2o\_9294}}{\text{total\_h2o}}
 $$</p>
+<p><code>total_h2o</code> is the same gaged/ungaged-gated basin water quantity
+described in the IPS path below (NPS water alone for gaged basins; NPS +
+IPS + DPS for ungaged basins).</p>
 <p>Bay segments Terra Ceia Bay (6) and Manatee River (7) are merged into
 segment 55 (Remaining Lower Tampa Bay) after disaggregation, consistent
 with the <code><a href="hydro_baseline.html">hydro_baseline</a></code> encoding and TBNMC reporting.
