@@ -151,7 +151,7 @@ Bay segments Terra Ceia Bay (6) and Manatee River (7) are merged into segment 55
 
 Raw facility loads are joined to facility metadata on entity + facility name rather than coastal segment (`coastco`), since several distinct NPDES permits share a single coastco. Monthly loads are summed to annual totals per permit and bay segment, averaged over `yrrng`, and compared against `ps_allocations`.
 
-Hydrologic normalization is applied only to permits flagged `hydro_affected` in `ps_allocations` — RP's own draft TN-loading tables mark a specific subset of IPS facilities (mostly Mosaic mining operations) with a "Hydrologically Affected" row label; every other IPS facility uses its raw (unnormalized) load. For flagged facilities:
+Hydrologic normalization is applied only to permits flagged `hydro_affected` in `ps_allocations` (mostly Mosaic mining operations); every other IPS facility uses its raw (unnormalized) load. For flagged facilities:
 
 $$\text{eff\_tn} = \text{tn\_load} \times \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}$$
 

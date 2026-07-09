@@ -64,11 +64,11 @@
 #' Raw facility loads are joined to facility metadata on \code{entity +
 #' facname} (not \code{coastco}), since several distinct permits share a
 #' single coastco. Monthly loads are summed to annual totals per permit per
-#' bay segment and averaged over \code{yrrng}, matching RP's own draft
-#' TN-loading tables, which apply hydrologic normalization to only a subset
-#' of IPS facilities (mostly Mosaic mining operations, flagged via the
-#' \code{hydro_affected} column added to \code{\link{ps_allocations}}) and
-#' leave the rest unnormalized. For \code{hydro_affected} permits:
+#' bay segment and averaged over \code{yrrng}. Hydrologic normalization is
+#' applied only to IPS facilities flagged \code{hydro_affected} in
+#' \code{\link{ps_allocations}} (mostly Mosaic mining operations); all other
+#' facilities use their raw (unnormalized) load. For \code{hydro_affected}
+#' permits:
 #'
 #' \deqn{
 #'   \text{eff\_tn} = \text{tn\_load} \times
@@ -431,10 +431,9 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
 
   # Normalize per facility-basin-year using total basin water loads (gated by
   # gagetype, see the shared nps_annual$total_h2o construction above).
-  # Applied only to permits flagged hydro_affected in ps_allocations below —
-  # RP's own draft loading tables mark a specific subset of IPS facilities
-  # with a "Hydrologically Affected" row label; every other facility (and
-  # any with no ps_allocations match) is left unnormalized.
+  # Applied only to permits flagged hydro_affected in ps_allocations below;
+  # every other facility (and any with no ps_allocations match) is left
+  # unnormalized.
   ips_normalized <- ips_annual |>
     dplyr::left_join(
       nps_annual |>

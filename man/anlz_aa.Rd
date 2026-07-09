@@ -81,11 +81,11 @@ and bayseg 6/7 are remapped to 55.
 Raw facility loads are joined to facility metadata on \code{entity +
 facname} (not \code{coastco}), since several distinct permits share a
 single coastco. Monthly loads are summed to annual totals per permit per
-bay segment and averaged over \code{yrrng}, matching RP's own draft
-TN-loading tables, which apply hydrologic normalization to only a subset
-of IPS facilities (mostly Mosaic mining operations, flagged via the
-\code{hydro_affected} column added to \code{\link{ps_allocations}}) and
-leave the rest unnormalized. For \code{hydro_affected} permits:
+bay segment and averaged over \code{yrrng}. Hydrologic normalization is
+applied only to IPS facilities flagged \code{hydro_affected} in
+\code{\link{ps_allocations}} (mostly Mosaic mining operations); all other
+facilities use their raw (unnormalized) load. For \code{hydro_affected}
+permits:
 
 \deqn{
   \text{eff\_tn} = \text{tn\_load} \times

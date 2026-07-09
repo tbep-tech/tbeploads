@@ -11,10 +11,8 @@
 #'   \item \code{permit}: NPDES permit number
 #'   \item \code{alloc_pct}: Fractional allocation share (0-1)
 #'   \item \code{alloc_tons}: Allocation in tons TN per year
-#'   \item \code{hydro_affected}: Logical; \code{TRUE} for permits RP's draft
-#'     TN-loading tables mark with a "Hydrologically Affected" row label,
-#'     meaning \code{\link{anlz_aa}} applies hydrologic normalization to that
-#'     facility's IPS load
+#'   \item \code{hydro_affected}: Logical; \code{TRUE} for permits whose IPS
+#'     load \code{\link{anlz_aa}} hydrologically normalizes
 #' }
 #'
 #' @examples
