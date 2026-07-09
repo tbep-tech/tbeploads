@@ -75,10 +75,17 @@
 #'   \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}
 #' }
 #'
-#' where \code{basin\_total\_h2o} is the annual total water load (NPS + DPS +
-#' IPS) for the same basin and year, matching the SAS \code{ratio1\_2224}
-#' denominator. All other IPS facilities, and any facility with no
-#' \code{ps_allocations} match, use the raw (unnormalized) load.
+#' where \code{basin\_total\_h2o} is the annual total basin water load for
+#' the same basin and year, computed differently depending on whether the
+#' basin is gaged (per \code{\link{dbasing}}): for gaged basins, NPS water is
+#' estimated from a stream gauge and so already reflects any upstream IPS +
+#' DPS discharge, so \code{basin\_total\_h2o} is the NPS water alone; for
+#' ungaged basins, the modeled NPS-only water excludes point-source
+#' discharge entirely, so IPS and DPS water are added to it (matching the
+#' SAS \code{ratio1\_2224} construction, which sums all three sources for
+#' the same basin/year regardless of gage status). All other IPS facilities,
+#' and any facility with no \code{ps_allocations} match, use the raw
+#' (unnormalized) load.
 #'
 #' \strong{ML path}
 #'
@@ -123,6 +130,10 @@
 #'   \text{eff\_tn} = (\text{tn\_entity} - \text{corr\_tons}) \times
 #'   \frac{\text{mean\_h2o\_9294}}{\text{total\_h2o}}
 #' }
+#'
+#' \code{total_h2o} is the same gaged/ungaged-gated basin water quantity
+#' described in the IPS path below (NPS water alone for gaged basins; NPS +
+#' IPS + DPS for ungaged basins).
 #'
 #' Bay segments Terra Ceia Bay (6) and Manatee River (7) are merged into
 #' segment 55 (Remaining Lower Tampa Bay) after disaggregation, consistent
@@ -214,6 +225,18 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
     dplyr::select("entity", "coastco", "bay_seg", "basin") |>
     dplyr::distinct()
 
+  # Gaged/ungaged basin classification from dbasing. Gaged basins' NPS water
+  # is estimated from a stream gauge and so already reflects any upstream IPS
+  # + DPS discharge; adding ips_basin_h2o/dps_basin_h2o on top would
+  # double-count that water. Ungaged basins' NPS water is a modeled estimate
+  # that excludes point-source discharge entirely, so it must be added back
+  # in to reconstruct total basin water (see anlz_nps_psremove(), which
+  # performs the mirror-image subtraction for TN loads).
+  gagetype_lu <- dbasing |>
+    dplyr::mutate(basin = remap_basins(.data$basin)) |>
+    dplyr::select("basin", "gagetype") |>
+    dplyr::distinct()
+
   # ---- Shared: annual NPS basin loads (used by both paths) -----------------
 
   nps_annual <- nps_data |>
@@ -247,16 +270,24 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
     dplyr::group_by(.data$bay_seg, .data$basin, .data$Year) |>
     dplyr::summarise(hy_load_dps = sum(.data$hy_load_dps, na.rm = TRUE), .groups = "drop")
 
-  # Total basin H2O = NPS + IPS + DPS (matches SAS ratio1_2224 construction)
+  # Total basin H2O (matches SAS ratio1_2224 construction): for gaged basins,
+  # NPS hy_load already IS the total (gauge-measured, inclusive of upstream
+  # point-source discharge); for ungaged basins, IPS + DPS must be added to
+  # the modeled NPS-only estimate to get the true total.
   nps_annual <- nps_annual |>
     dplyr::left_join(ips_basin_h2o, by = c("bay_seg", "basin", "Year")) |>
     dplyr::left_join(dps_basin_h2o, by = c("bay_seg", "basin", "Year")) |>
+    dplyr::left_join(gagetype_lu, by = "basin") |>
     dplyr::mutate(
-      total_h2o = .data$hy_load +
-        dplyr::coalesce(.data$hy_load_ips, 0) +
-        dplyr::coalesce(.data$hy_load_dps, 0)
+      total_h2o = dplyr::if_else(
+        dplyr::coalesce(.data$gagetype, "Ungaged") == "Gaged",
+        .data$hy_load,
+        .data$hy_load +
+          dplyr::coalesce(.data$hy_load_ips, 0) +
+          dplyr::coalesce(.data$hy_load_dps, 0)
+      )
     ) |>
-    dplyr::select(-dplyr::any_of(c("hy_load_ips", "hy_load_dps")))
+    dplyr::select(-dplyr::any_of(c("hy_load_ips", "hy_load_dps", "gagetype")))
 
   # ---- NPS path ------------------------------------------------------------
 
@@ -398,12 +429,12 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
     dplyr::filter(!is.na(.data$basin)) |>
     dplyr::rename(facname = "facility")
 
-  # Normalize per facility-basin-year using total basin water loads
-  # (NPS+IPS+DPS). Applied only to permits flagged hydro_affected in
-  # ps_allocations below — RP's own draft loading tables mark a specific
-  # subset of IPS facilities (mostly Mosaic mining operations) with a
-  # "Hydrologically Affected" row label; every other facility (and any with
-  # no ps_allocations match) is left unnormalized.
+  # Normalize per facility-basin-year using total basin water loads (gated by
+  # gagetype, see the shared nps_annual$total_h2o construction above).
+  # Applied only to permits flagged hydro_affected in ps_allocations below —
+  # RP's own draft loading tables mark a specific subset of IPS facilities
+  # with a "Hydrologically Affected" row label; every other facility (and
+  # any with no ps_allocations match) is left unnormalized.
   ips_normalized <- ips_annual |>
     dplyr::left_join(
       nps_annual |>

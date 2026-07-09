@@ -237,55 +237,58 @@ test_that("IPS facilities sharing a coastco are not cross-contaminated", {
 })
 
 test_that("IPS eff_load_tons is finite and positive when NPS water data covers the matching basin", {
-  # Busch Gardens (bay_seg=2, basin=02304500, permit=FL0185833) needs NPS water
-  # for basin 02304500 in bay_seg=2 so nps_h2o is non-NA for its normalization.
+  # Coronet Industries (bay_seg=2, basin=02303330 -> remapped 02304500,
+  # permit=FL0034657) needs NPS water for basin 02304500 in bay_seg=2 so
+  # nps_h2o is non-NA for its normalization. The fixture only has Coronet
+  # data for 2021.
   nps_hb <- data.frame(
-    Year = 2020L, source = "NPS", segment = "Hillsborough Bay",
+    Year = 2021L, source = "NPS", segment = "Hillsborough Bay",
     basin = "02304500", tn_load = 100.0, hy_load = 200.0
   )
 
-  result <- anlz_aa(2020L, make_dps_empty(), ips, make_ml_empty(), nps_hb, tbbase)
+  result <- anlz_aa(2021L, make_dps_empty(), ips, make_ml_empty(), nps_hb, tbbase)
 
-  bg <- result[!is.na(result$facname) & result$facname == "Busch Gardens", ]
-  expect_true(nrow(bg) >= 1)
-  expect_true(is.finite(bg$eff_load_tons[1]))
-  expect_true(bg$eff_load_tons[1] > 0)
+  cor <- result[!is.na(result$facname) & result$facname == "Coronet Industries", ]
+  expect_true(nrow(cor) >= 1)
+  expect_true(is.finite(cor$eff_load_tons[1]))
+  expect_true(cor$eff_load_tons[1] > 0)
 })
 
 test_that("IPS eff_load_tons is normalized only for hydro_affected facilities", {
-  # Busch Gardens (permit FL0185833) is flagged hydro_affected in
+  # Coronet Industries (permit FL0034657) is flagged hydro_affected in
   # ps_allocations; Kinder Morgan Port Sutton (permit FL0122904) has no
   # ps_allocations row at all and so defaults to unnormalized. Both need NPS
-  # water for their own basin so nps_h2o is non-NA.
-  expect_true(ps_allocations$hydro_affected[ps_allocations$permit == "FL0185833"])
+  # water for their own basin so nps_h2o is non-NA. The fixture only has
+  # Coronet data for 2021.
+  expect_true(ps_allocations$hydro_affected[ps_allocations$permit == "FL0034657"])
   expect_false("FL0122904" %in% ps_allocations$permit)
 
   nps_two_basins <- rbind(
     data.frame(
-      Year = 2020L, source = "NPS", segment = "Hillsborough Bay",
+      Year = 2021L, source = "NPS", segment = "Hillsborough Bay",
       basin = "02304500", tn_load = 100.0, hy_load = 200.0
     ),
     data.frame(
-      Year = 2020L, source = "NPS", segment = "Hillsborough Bay",
+      Year = 2021L, source = "NPS", segment = "Hillsborough Bay",
       basin = "206-2", tn_load = 100.0, hy_load = 200.0
     )
   )
 
   ips_kinder <- data.frame(
-    Year = 2020L, Month = 1:12,
+    Year = 2021L, Month = 1:12,
     entity = "Kinder Morgan", facility = "Kinder Morgan Port Sutton",
     coastco = "528", tn_load = 10.0 / 12, hy_load = 0.01
   )
 
-  result <- anlz_aa(2020L, make_dps_empty(), dplyr::bind_rows(ips, ips_kinder), make_ml_empty(),
+  result <- anlz_aa(2021L, make_dps_empty(), dplyr::bind_rows(ips, ips_kinder), make_ml_empty(),
                     nps_two_basins, tbbase)
 
-  bg <- result[!is.na(result$facname) & result$facname == "Busch Gardens", ]
+  cor <- result[!is.na(result$facname) & result$facname == "Coronet Industries", ]
   km <- result[!is.na(result$facname) & result$facname == "Kinder Morgan Port Sutton", ]
 
-  expect_true(nrow(bg) >= 1)
+  expect_true(nrow(cor) >= 1)
   expect_true(nrow(km) >= 1)
-  expect_false(isTRUE(all.equal(bg$eff_load_tons[1], bg$load_tons[1])))
+  expect_false(isTRUE(all.equal(cor$eff_load_tons[1], cor$load_tons[1])))
   expect_equal(km$eff_load_tons[1], km$load_tons[1])
 })
 

@@ -92,10 +92,17 @@ leave the rest unnormalized. For \code{hydro_affected} permits:
   \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}
 }
 
-where \code{basin\_total\_h2o} is the annual total water load (NPS + DPS +
-IPS) for the same basin and year, matching the SAS \code{ratio1\_2224}
-denominator. All other IPS facilities, and any facility with no
-\code{ps_allocations} match, use the raw (unnormalized) load.
+where \code{basin\_total\_h2o} is the annual total basin water load for
+the same basin and year, computed differently depending on whether the
+basin is gaged (per \code{\link{dbasing}}): for gaged basins, NPS water is
+estimated from a stream gauge and so already reflects any upstream IPS +
+DPS discharge, so \code{basin\_total\_h2o} is the NPS water alone; for
+ungaged basins, the modeled NPS-only water excludes point-source
+discharge entirely, so IPS and DPS water are added to it (matching the
+SAS \code{ratio1\_2224} construction, which sums all three sources for
+the same basin/year regardless of gage status). All other IPS facilities,
+and any facility with no \code{ps_allocations} match, use the raw
+(unnormalized) load.
 
 \strong{ML path}
 
@@ -140,6 +147,10 @@ across basins to the segment level. TN corrections from \code{\link{aa_correctio
   \text{eff\_tn} = (\text{tn\_entity} - \text{corr\_tons}) \times
   \frac{\text{mean\_h2o\_9294}}{\text{total\_h2o}}
 }
+
+\code{total_h2o} is the same gaged/ungaged-gated basin water quantity
+described in the IPS path below (NPS water alone for gaged basins; NPS +
+IPS + DPS for ungaged basins).
 
 Bay segments Terra Ceia Bay (6) and Manatee River (7) are merged into
 segment 55 (Remaining Lower Tampa Bay) after disaggregation, consistent
