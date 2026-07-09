@@ -234,10 +234,9 @@ totals per permit and bay segment, averaged over `yrrng`, and compared
 against `ps_allocations`.
 
 Hydrologic normalization is applied only to permits flagged
-`hydro_affected` in `ps_allocations` — RP’s own draft TN-loading tables
-mark a specific subset of IPS facilities (mostly Mosaic mining
-operations) with a “Hydrologically Affected” row label; every other IPS
-facility uses its raw (unnormalized) load. For flagged facilities:
+`hydro_affected` in `ps_allocations` (mostly Mosaic mining operations);
+every other IPS facility uses its raw (unnormalized) load. For flagged
+facilities:
 
 ``` math
 \text{eff\_tn} = \text{tn\_load} \times \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}

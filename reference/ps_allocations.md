@@ -29,10 +29,9 @@ framework.
 
 - `alloc_tons`: Allocation in tons TN per year
 
-- `hydro_affected`: Logical; `TRUE` for permits RP's draft TN-loading
-  tables mark with a "Hydrologically Affected" row label, meaning
+- `hydro_affected`: Logical; `TRUE` for permits whose IPS load
   [`anlz_aa`](https://tbep-tech.github.io/tbeploads/reference/anlz_aa.md)
-  applies hydrologic normalization to that facility's IPS load
+  hydrologically normalizes
 
 ## Examples
 

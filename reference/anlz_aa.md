@@ -133,12 +133,11 @@ to 55.
 Raw facility loads are joined to facility metadata on `entity + facname`
 (not `coastco`), since several distinct permits share a single coastco.
 Monthly loads are summed to annual totals per permit per bay segment and
-averaged over `yrrng`, matching RP's own draft TN-loading tables, which
-apply hydrologic normalization to only a subset of IPS facilities
-(mostly Mosaic mining operations, flagged via the `hydro_affected`
-column added to
-[`ps_allocations`](https://tbep-tech.github.io/tbeploads/reference/ps_allocations.md))
-and leave the rest unnormalized. For `hydro_affected` permits:
+averaged over `yrrng`. Hydrologic normalization is applied only to IPS
+facilities flagged `hydro_affected` in
+[`ps_allocations`](https://tbep-tech.github.io/tbeploads/reference/ps_allocations.md)
+(mostly Mosaic mining operations); all other facilities use their raw
+(unnormalized) load. For `hydro_affected` permits:
 
 \$\$ \text{eff\\tn} = \text{tn\\load} \times
 \frac{\text{mean\\h2o\\9294}}{\text{basin\\total\\h2o}} \$\$
