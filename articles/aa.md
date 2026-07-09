@@ -156,7 +156,7 @@ The function returns one row per entity (NPS/MS4) or entity/facility
 | `source` | Allocation type (`"MS4"`, `"IPS"`, `"DPS - end of pipe"`, `"DPS - reuse"`, `"ML"`) |
 | `alloc_pct` | Fractional TN allocation (0-1) |
 | `alloc_tons` | Allowable TN load (tons/yr) |
-| `eff_load_tons` | Mean hydrologically-normalized TN load (tons/yr) |
+| `eff_load_tons` | Mean hydrologically-normalized TN load (tons/yr); equals `load_tons` for DPS, IPS, and ML (only NPS/MS4 is normalized) |
 | `load_tons` | Mean annual TN load without normalization (tons/yr) |
 | `pass` | `TRUE` if `eff_load_tons <= alloc_tons`, `NA` when either value is missing |
 
@@ -218,18 +218,12 @@ excluded from the allocation framework.
 
 ### IPS
 
-Industrial point source loads from each facility are normalized by the
-ratio of the 1992-1994 baseline basin water volume to the total annual
-basin water load:
-
-``` math
-\text{eff\_tn} = \text{tn\_load} \times \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}
-```
-
-The normalization denominator is the same total basin water load (NPS +
-IPS + DPS) used in the NPS path, matching the SAS `ratio1_2224`
-construction. Effective loads are summed across basins per permit and
-averaged over `yrrng`.
+Industrial point source loads require no hydrologic normalization. Raw
+facility loads are joined to facility metadata on entity + facility name
+rather than coastal segment (`coastco`), since several distinct NPDES
+permits share a single coastco. Monthly loads are summed to annual
+totals per permit and bay segment, averaged over `yrrng`, and compared
+against `ps_allocations`.
 
 ### DPS
 

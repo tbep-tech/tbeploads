@@ -1,5 +1,5 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   aa: aa.html
@@ -11,7 +11,7 @@ articles:
   nps: nps.html
   spr: spr.html
   tbeploads: tbeploads.html
-last_built: 2026-06-04T16:00Z
+last_built: 2026-07-09T13:54Z
 urls:
   reference: https://tbep-tech.github.io/tbeploads/reference
   article: https://tbep-tech.github.io/tbeploads/articles

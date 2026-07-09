@@ -127,8 +127,8 @@ per bay segment:</p><dl><dt>bay_seg</dt>
 
 <dt>eff_load_tons</dt>
 <dd><p>Mean hydrologically-normalized TN load (tons/yr),
-averaged over <code>yrrng</code>; equals <code>load_tons</code> for DPS and ML
-(no normalization applied)</p></dd>
+averaged over <code>yrrng</code>; equals <code>load_tons</code> for DPS, IPS, and
+ML (no normalization applied). Only NPS/MS4 rows are normalized</p></dd>
 
 <dt>load_tons</dt>
 <dd><p>Mean annual TN load (tons/yr) without hydrologic
@@ -155,15 +155,12 @@ table. The join key is <code>entity + facname + bay\_seg + source</code>, where
 (<code>"DPS - reuse"</code>). Bay segment 5 (Boca Ciega Bay) is excluded
 and bayseg 6/7 are remapped to 55.</p>
 <p><strong>IPS path</strong></p>
-<p>Annual IPS facility TN loads are normalized using the ratio:</p>
-<p>$$
-  \text{eff\_tn} = \text{tn\_load} \times
-  \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}
-$$</p>
-<p>where <code>basin\_total\_h2o</code> is the annual total water load (NPS + DPS + IPS)
-for the same basin and year, matching the SAS <code>ratio1\_2224</code> denominator.
-Effective loads are summed across basins per permit per bay segment, then
-averaged over <code>yrrng</code>.</p>
+<p>IPS facility TN loads require no hydrologic normalization. Raw facility
+loads are joined to facility metadata on <code>entity + facname</code> (not
+<code>coastco</code>), since several distinct permits share a single coastco.
+Monthly loads are summed to annual totals per permit per bay segment,
+averaged over <code>yrrng</code>, and compared against the
+<code><a href="ps_allocations.html">ps_allocations</a></code> table.</p>
 <p><strong>ML path</strong></p>
 <p>Material loss TN loads require no hydrologic normalization. Monthly loads
 from <code>ml_data</code> are summed to annual totals per facility, averaged
@@ -239,7 +236,7 @@ Boca Ciega Bay (segment 5) is excluded from the allocation framework.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

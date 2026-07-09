@@ -95,7 +95,8 @@ segment:
 - eff_load_tons:
 
   Mean hydrologically-normalized TN load (tons/yr), averaged over
-  `yrrng`; equals `load_tons` for DPS and ML (no normalization applied)
+  `yrrng`; equals `load_tons` for DPS, IPS, and ML (no normalization
+  applied). Only NPS/MS4 rows are normalized
 
 - load_tons:
 
@@ -127,15 +128,13 @@ to 55.
 
 **IPS path**
 
-Annual IPS facility TN loads are normalized using the ratio:
-
-\$\$ \text{eff\\tn} = \text{tn\\load} \times
-\frac{\text{mean\\h2o\\9294}}{\text{basin\\total\\h2o}} \$\$
-
-where `basin\_total\_h2o` is the annual total water load (NPS + DPS +
-IPS) for the same basin and year, matching the SAS `ratio1\_2224`
-denominator. Effective loads are summed across basins per permit per bay
-segment, then averaged over `yrrng`.
+IPS facility TN loads require no hydrologic normalization. Raw facility
+loads are joined to facility metadata on `entity + facname` (not
+`coastco`), since several distinct permits share a single coastco.
+Monthly loads are summed to annual totals per permit per bay segment,
+averaged over `yrrng`, and compared against the
+[`ps_allocations`](https://tbep-tech.github.io/tbeploads/reference/ps_allocations.md)
+table.
 
 **ML path**
 
