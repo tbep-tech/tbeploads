@@ -156,7 +156,7 @@ The function returns one row per entity (NPS/MS4) or entity/facility
 | `source` | Allocation type (`"MS4"`, `"IPS"`, `"DPS - end of pipe"`, `"DPS - reuse"`, `"ML"`) |
 | `alloc_pct` | Fractional TN allocation (0-1) |
 | `alloc_tons` | Allowable TN load (tons/yr) |
-| `eff_load_tons` | Mean hydrologically-normalized TN load (tons/yr); equals `load_tons` for DPS, IPS, and ML (only NPS/MS4 is normalized) |
+| `eff_load_tons` | Mean hydrologically-normalized TN load (tons/yr); equals `load_tons` for DPS and ML, and for IPS facilities not flagged `hydro_affected` in `ps_allocations` |
 | `load_tons` | Mean annual TN load without normalization (tons/yr) |
 | `pass` | `TRUE` if `eff_load_tons <= alloc_tons`, `NA` when either value is missing |
 
@@ -218,12 +218,24 @@ excluded from the allocation framework.
 
 ### IPS
 
-Industrial point source loads require no hydrologic normalization. Raw
-facility loads are joined to facility metadata on entity + facility name
-rather than coastal segment (`coastco`), since several distinct NPDES
-permits share a single coastco. Monthly loads are summed to annual
+Raw facility loads are joined to facility metadata on entity + facility
+name rather than coastal segment (`coastco`), since several distinct
+NPDES permits share a single coastco. Monthly loads are summed to annual
 totals per permit and bay segment, averaged over `yrrng`, and compared
 against `ps_allocations`.
+
+Hydrologic normalization is applied only to permits flagged
+`hydro_affected` in `ps_allocations` — RP’s own draft TN-loading tables
+mark a specific subset of IPS facilities (mostly Mosaic mining
+operations) with a “Hydrologically Affected” row label; every other IPS
+facility uses its raw (unnormalized) load. For flagged facilities:
+
+``` math
+\text{eff\_tn} = \text{tn\_load} \times \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}
+```
+
+where `basin_total_h2o` is the same total basin water load (NPS + IPS +
+DPS) used in the NPS path, matching the SAS `ratio1_2224` construction.
 
 ### DPS
 

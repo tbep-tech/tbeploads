@@ -232,8 +232,9 @@ RALTB)</td>
 <tr class="even">
 <td><code>eff_load_tons</code></td>
 <td>Mean hydrologically-normalized TN load (tons/yr); equals
-<code>load_tons</code> for DPS, IPS, and ML (only NPS/MS4 is
-normalized)</td>
+<code>load_tons</code> for DPS and ML, and for IPS facilities not
+flagged <code>hydro_affected</code> in <code>ps_allocations</code>
+</td>
 </tr>
 <tr class="odd">
 <td><code>load_tons</code></td>
@@ -308,13 +309,22 @@ with <code>hydro_baseline</code> and TBNMC reporting. Boca Ciega Bay
 <div class="section level3">
 <h3 id="ips">IPS<a class="anchor" aria-label="anchor" href="#ips"></a>
 </h3>
-<p>Industrial point source loads require no hydrologic normalization.
-Raw facility loads are joined to facility metadata on entity + facility
-name rather than coastal segment (<code>coastco</code>), since several
-distinct NPDES permits share a single coastco. Monthly loads are summed
-to annual totals per permit and bay segment, averaged over
+<p>Raw facility loads are joined to facility metadata on entity +
+facility name rather than coastal segment (<code>coastco</code>), since
+several distinct NPDES permits share a single coastco. Monthly loads are
+summed to annual totals per permit and bay segment, averaged over
 <code>yrrng</code>, and compared against
 <code>ps_allocations</code>.</p>
+<p>Hydrologic normalization is applied only to permits flagged
+<code>hydro_affected</code> in <code>ps_allocations</code> — RP’s own
+draft TN-loading tables mark a specific subset of IPS facilities (mostly
+Mosaic mining operations) with a “Hydrologically Affected” row label;
+every other IPS facility uses its raw (unnormalized) load. For flagged
+facilities:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">eff_tn</mtext><mo>=</mo><mtext mathvariant="normal">tn_load</mtext><mo>×</mo><mfrac><mtext mathvariant="normal">mean_h2o_9294</mtext><mtext mathvariant="normal">basin_total_h2o</mtext></mfrac></mrow><annotation encoding="application/x-tex">\text{eff\_tn} = \text{tn\_load} \times \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}</annotation></semantics></math></p>
+<p>where <code>basin_total_h2o</code> is the same total basin water load
+(NPS + IPS + DPS) used in the NPS path, matching the SAS
+<code>ratio1_2224</code> construction.</p>
 </div>
 <div class="section level3">
 <h3 id="dps">DPS<a class="anchor" aria-label="anchor" href="#dps"></a>

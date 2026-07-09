@@ -29,22 +29,27 @@ framework.
 
 - `alloc_tons`: Allocation in tons TN per year
 
+- `hydro_affected`: Logical; `TRUE` for permits RP's draft TN-loading
+  tables mark with a "Hydrologically Affected" row label, meaning
+  [`anlz_aa`](https://tbep-tech.github.io/tbeploads/reference/anlz_aa.md)
+  applies hydrologic normalization to that facility's IPS load
+
 ## Examples
 
 ``` r
 ps_allocations
-#> # A tibble: 30 × 5
-#>    entity facname                                    permit alloc_pct alloc_tons
-#>    <chr>  <chr>                                      <chr>      <dbl>      <dbl>
-#>  1 CSX    Rockport  (fka Eastern Terminals)          FL016…    0.0072        7.5
-#>  2 Mosaic Point Source - Bonnie (fka CF Bartow)      FL000…    0.0145       15.1
-#>  3 Mosaic Point Source - Plant City (fka CF)         FL000…    0.0009        0.9
-#>  4 Mosaic Point Source - Tampa Ammonia Terminal (fk… FL018…    0.0002        0.2
-#>  5 Mosaic Point Source - Tampa Marine (fka CF Phosp… FL016…    0.0006        0.6
-#>  6 Mosaic Point Source - Bartow                      FL000…    0.001         1.1
-#>  7 Mosaic Point Source - Ft. Lonesome                FL003…    0.0025        2.6
-#>  8 Mosaic Point Source - Green Bay                   FL000…    0.0064        6.6
-#>  9 Mosaic Point Source - Hookers Prairie             FL003…    0.0052        5.5
-#> 10 Mosaic Point Source - Hopewell                    FL003…    0.0025        2.6
+#> # A tibble: 30 × 6
+#>    entity facname                     permit alloc_pct alloc_tons hydro_affected
+#>    <chr>  <chr>                       <chr>      <dbl>      <dbl> <lgl>         
+#>  1 CSX    CSX - Rockport Newport      FL016…    0.0072        7.5 FALSE         
+#>  2 Mosaic Point Source - Bonnie (fka… FL000…    0.0145       15.1 TRUE          
+#>  3 Mosaic Point Source - Plant City … FL000…    0.0009        0.9 TRUE          
+#>  4 Mosaic Point Source - Tampa Ammon… FL018…    0.0002        0.2 TRUE          
+#>  5 Mosaic Point Source - Tampa Marin… FL016…    0.0006        0.6 TRUE          
+#>  6 Mosaic Point Source - Bartow       FL000…    0.001         1.1 TRUE          
+#>  7 Mosaic Point Source - Ft. Lonesome FL003…    0.0025        2.6 TRUE          
+#>  8 Mosaic Point Source - Green Bay    FL000…    0.0064        6.6 TRUE          
+#>  9 Mosaic Point Source - Hookers Pra… FL003…    0.0052        5.5 TRUE          
+#> 10 Mosaic Point Source - Hopewell     FL003…    0.0025        2.6 TRUE          
 #> # ℹ 20 more rows
 ```

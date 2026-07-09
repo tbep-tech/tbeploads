@@ -127,8 +127,10 @@ per bay segment:</p><dl><dt>bay_seg</dt>
 
 <dt>eff_load_tons</dt>
 <dd><p>Mean hydrologically-normalized TN load (tons/yr),
-averaged over <code>yrrng</code>; equals <code>load_tons</code> for DPS, IPS, and
-ML (no normalization applied). Only NPS/MS4 rows are normalized</p></dd>
+averaged over <code>yrrng</code>; equals <code>load_tons</code> for DPS and ML (no
+normalization applied) and for IPS facilities not flagged
+<code>hydro_affected</code> in <code><a href="ps_allocations.html">ps_allocations</a></code>. NPS/MS4 rows and
+<code>hydro_affected</code> IPS facilities are normalized</p></dd>
 
 <dt>load_tons</dt>
 <dd><p>Mean annual TN load (tons/yr) without hydrologic
@@ -155,12 +157,22 @@ table. The join key is <code>entity + facname + bay\_seg + source</code>, where
 (<code>"DPS - reuse"</code>). Bay segment 5 (Boca Ciega Bay) is excluded
 and bayseg 6/7 are remapped to 55.</p>
 <p><strong>IPS path</strong></p>
-<p>IPS facility TN loads require no hydrologic normalization. Raw facility
-loads are joined to facility metadata on <code>entity + facname</code> (not
-<code>coastco</code>), since several distinct permits share a single coastco.
-Monthly loads are summed to annual totals per permit per bay segment,
-averaged over <code>yrrng</code>, and compared against the
-<code><a href="ps_allocations.html">ps_allocations</a></code> table.</p>
+<p>Raw facility loads are joined to facility metadata on <code>entity +
+facname</code> (not <code>coastco</code>), since several distinct permits share a
+single coastco. Monthly loads are summed to annual totals per permit per
+bay segment and averaged over <code>yrrng</code>, matching RP's own draft
+TN-loading tables, which apply hydrologic normalization to only a subset
+of IPS facilities (mostly Mosaic mining operations, flagged via the
+<code>hydro_affected</code> column added to <code><a href="ps_allocations.html">ps_allocations</a></code>) and
+leave the rest unnormalized. For <code>hydro_affected</code> permits:</p>
+<p>$$
+  \text{eff\_tn} = \text{tn\_load} \times
+  \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}
+$$</p>
+<p>where <code>basin\_total\_h2o</code> is the annual total water load (NPS + DPS +
+IPS) for the same basin and year, matching the SAS <code>ratio1\_2224</code>
+denominator. All other IPS facilities, and any facility with no
+<code>ps_allocations</code> match, use the raw (unnormalized) load.</p>
 <p><strong>ML path</strong></p>
 <p>Material loss TN loads require no hydrologic normalization. Monthly loads
 from <code>ml_data</code> are summed to annual totals per facility, averaged
