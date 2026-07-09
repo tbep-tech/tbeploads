@@ -20,6 +20,15 @@ ps_allocations <- read_csv(
     facname = if_else(
       facname == "Point Source - Yara North America",
       "Point Source - Black Point", facname
+    ),
+    # New Wales Stack Closure (retired, no facilities/ips_data entry) is
+    # mis-recorded in the source CSV with the active New Wales Chemical
+    # Plant's permit (FL0036421); correct it to its own permit so anlz_aa's
+    # permit join doesn't duplicate the active plant's real IPS load onto
+    # the closed stack's row
+    permit = if_else(
+      facname == "Point Source - New Wales Stack Closure",
+      "FL0178527", permit
     )
   ) |>
   select(entity, facname, permit, alloc_pct, alloc_tons)

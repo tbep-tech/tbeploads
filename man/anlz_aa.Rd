@@ -47,8 +47,8 @@ per bay segment:
 \item{alloc_pct}{Fractional TN allocation (0-1)}
 \item{alloc_tons}{Allocation in TN tons per year}
 \item{eff_load_tons}{Mean hydrologically-normalized TN load (tons/yr),
-averaged over \code{yrrng}; equals \code{load_tons} for DPS and ML
-(no normalization applied)}
+averaged over \code{yrrng}; equals \code{load_tons} for DPS, IPS, and
+ML (no normalization applied). Only NPS/MS4 rows are normalized}
 \item{load_tons}{Mean annual TN load (tons/yr) without hydrologic
 normalization, averaged over \code{yrrng}}
 \item{pass}{Logical: \code{eff_load_tons <= alloc_tons}; \code{NA} when
@@ -76,17 +76,12 @@ and bayseg 6/7 are remapped to 55.
 
 \strong{IPS path}
 
-Annual IPS facility TN loads are normalized using the ratio:
-
-\deqn{
-  \text{eff\_tn} = \text{tn\_load} \times
-  \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}
-}
-
-where \code{basin\_total\_h2o} is the annual total water load (NPS + DPS + IPS)
-for the same basin and year, matching the SAS \code{ratio1\_2224} denominator.
-Effective loads are summed across basins per permit per bay segment, then
-averaged over \code{yrrng}.
+IPS facility TN loads require no hydrologic normalization. Raw facility
+loads are joined to facility metadata on \code{entity + facname} (not
+\code{coastco}), since several distinct permits share a single coastco.
+Monthly loads are summed to annual totals per permit per bay segment,
+averaged over \code{yrrng}, and compared against the
+\code{\link{ps_allocations}} table.
 
 \strong{ML path}
 

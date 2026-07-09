@@ -205,6 +205,37 @@ test_that("IPS rows all carry source equal to IPS", {
   expect_true(all(ips_rows$source == "IPS"))
 })
 
+test_that("IPS facilities sharing a coastco are not cross-contaminated", {
+  # Kinder Morgan Port Sutton (permit FL0122904) and Kinder Morgan Tampaplex
+  # (permit FL0321486) both sit at coastco 528. Before the entity+facname join
+  # fix, entity+coastco alone matched a facility's raw load onto every other
+  # permit sharing its coastco, so both facilities ended up with the same
+  # (summed) eff_load_tons instead of their own distinct values.
+  nps_hb <- data.frame(
+    Year = 2020L, source = "NPS", segment = "Hillsborough Bay",
+    basin = "206-2", tn_load = 100.0, hy_load = 200.0
+  )
+
+  ips_kinder <- data.frame(
+    Year = 2020L, Month = rep(1:12, 2),
+    entity = "Kinder Morgan",
+    facility = rep(c("Kinder Morgan Port Sutton", "Kinder Morgan Tampaplex"), each = 12),
+    coastco = "528",
+    tn_load = rep(c(10.0, 3.0), each = 12) / 12,
+    hy_load = 0.01
+  )
+
+  result <- anlz_aa(2020L, make_dps_empty(), ips_kinder, make_ml_empty(), nps_hb, tbbase)
+
+  port_sutton <- result[!is.na(result$facname) & result$facname == "Kinder Morgan Port Sutton", ]
+  tampaplex   <- result[!is.na(result$facname) & result$facname == "Kinder Morgan Tampaplex", ]
+
+  expect_true(nrow(port_sutton) >= 1)
+  expect_true(nrow(tampaplex) >= 1)
+  expect_true(port_sutton$eff_load_tons[1] > tampaplex$eff_load_tons[1])
+  expect_equal(tampaplex$eff_load_tons[1] / port_sutton$eff_load_tons[1], 3.0 / 10.0, tolerance = 1e-9)
+})
+
 test_that("IPS eff_load_tons is finite and positive when NPS water data covers the matching basin", {
   # Busch Gardens (bay_seg=2, basin=02304500, permit=FL0185833) needs NPS water
   # for basin 02304500 in bay_seg=2 so nps_h2o is non-NA for its normalization.

@@ -33,8 +33,8 @@
 #'   \item{alloc_pct}{Fractional TN allocation (0-1)}
 #'   \item{alloc_tons}{Allocation in TN tons per year}
 #'   \item{eff_load_tons}{Mean hydrologically-normalized TN load (tons/yr),
-#'     averaged over \code{yrrng}; equals \code{load_tons} for DPS and ML
-#'     (no normalization applied)}
+#'     averaged over \code{yrrng}; equals \code{load_tons} for DPS, IPS, and
+#'     ML (no normalization applied). Only NPS/MS4 rows are normalized}
 #'   \item{load_tons}{Mean annual TN load (tons/yr) without hydrologic
 #'     normalization, averaged over \code{yrrng}}
 #'   \item{pass}{Logical: \code{eff_load_tons <= alloc_tons}; \code{NA} when
@@ -59,17 +59,12 @@
 #'
 #' \strong{IPS path}
 #'
-#' Annual IPS facility TN loads are normalized using the ratio:
-#'
-#' \deqn{
-#'   \text{eff\_tn} = \text{tn\_load} \times
-#'   \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}
-#' }
-#'
-#' where \code{basin\_total\_h2o} is the annual total water load (NPS + DPS + IPS)
-#' for the same basin and year, matching the SAS \code{ratio1\_2224} denominator.
-#' Effective loads are summed across basins per permit per bay segment, then
-#' averaged over \code{yrrng}.
+#' IPS facility TN loads require no hydrologic normalization. Raw facility
+#' loads are joined to facility metadata on \code{entity + facname} (not
+#' \code{coastco}), since several distinct permits share a single coastco.
+#' Monthly loads are summed to annual totals per permit per bay segment,
+#' averaged over \code{yrrng}, and compared against the
+#' \code{\link{ps_allocations}} table.
 #'
 #' \strong{ML path}
 #'
@@ -364,7 +359,12 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
 
   # ---- IPS path ------------------------------------------------------------
 
-  # Industrial facility lookup with basin remapping to match nps_annual
+  # Industrial facility lookup with basin remapping to match nps_annual.
+  # Joined below on entity + facname (not coastco): several distinct permits
+  # share one coastco (e.g. Kinder Morgan Port Sutton and Tampaplex both sit
+  # at coastco 528), so entity + coastco alone is not a unique key and would
+  # cross-match a facility's raw load onto every other permit sharing its
+  # coastco.
   ips_fac <- facilities |>
     dplyr::filter(grepl("Industrial", .data$source)) |>
     dplyr::rename(bay_seg = "bayseg") |>
@@ -373,48 +373,32 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
       basin   = remap_basins(.data$basin)
     ) |>
     dplyr::filter(!is.na(.data$basin), !is.na(.data$permit)) |>
-    dplyr::select("entity", "facname", "coastco", "bay_seg", "basin", "permit")
+    dplyr::select("entity", "facname", "bay_seg", "basin", "permit")
 
-  # Annual IPS TN loads joined to facility metadata
+  # Annual IPS TN loads joined to facility metadata via entity + facname
   ips_annual <- ips_data |>
     dplyr::filter(.data$Year %in% yrrng) |>
     dplyr::group_by(.data$Year, .data$entity, .data$facility, .data$coastco) |>
     dplyr::summarise(tn_ips = sum(.data$tn_load, na.rm = TRUE), .groups = "drop") |>
-    dplyr::left_join(ips_fac, by = c("entity", "coastco")) |>
+    dplyr::left_join(ips_fac, by = c("entity", "facility" = "facname")) |>
     dplyr::filter(!is.na(.data$basin)) |>
-    dplyr::select(-"facility")
+    dplyr::rename(facname = "facility")
 
-  # Normalize per facility-basin-year using total basin water loads (NPS+IPS+DPS)
-  ips_normalized <- ips_annual |>
-    dplyr::left_join(
-      nps_annual |>
-        dplyr::select("bay_seg", "basin", "Year", nps_h2o = "total_h2o"),
-      by = c("bay_seg", "basin", "Year")
-    ) |>
-    dplyr::left_join(hydro_baseline, by = c("bay_seg", "basin")) |>
-    dplyr::mutate(
-      eff_tn = dplyr::if_else(
-        !is.na(.data$nps_h2o) & .data$nps_h2o > 0,
-        .data$tn_ips * (.data$mean_h2o_9294 / .data$nps_h2o),
-        NA_real_
-      )
-    )
-
-  # Sum across basins per permit × entity × facname × bay_seg × year, then divide
-  # by length(yrrng) so missing years contribute zero
-  ips_mean <- ips_normalized |>
+  # IPS requires no hydrologic normalization; sum across basins per permit ×
+  # entity × facname × bay_seg × year, then divide by length(yrrng) so
+  # missing years contribute zero
+  ips_mean <- ips_annual |>
     dplyr::group_by(.data$bay_seg, .data$entity, .data$facname, .data$permit, .data$Year) |>
     dplyr::summarise(
-      eff_tn = sum(.data$eff_tn, na.rm = TRUE),
       tn_ips = sum(.data$tn_ips, na.rm = TRUE),
       .groups = "drop"
     ) |>
     dplyr::group_by(.data$bay_seg, .data$entity, .data$facname, .data$permit) |>
     dplyr::summarise(
-      eff_load_tons = sum(.data$eff_tn, na.rm = TRUE) / length(yrrng),
-      load_tons     = sum(.data$tn_ips, na.rm = TRUE) / length(yrrng),
+      load_tons = sum(.data$tn_ips, na.rm = TRUE) / length(yrrng),
       .groups = "drop"
-    )
+    ) |>
+    dplyr::mutate(eff_load_tons = .data$load_tons)
 
   # Full join with allocations on permit; retain unmatched on both sides
   ips_out <- ips_mean |>
