@@ -124,12 +124,13 @@ head(nps)
 
 The NPS loads passed to
 [`anlz_aa()`](https://tbep-tech.github.io/tbeploads/reference/anlz_aa.md)
-represent total NPS contributions and are not corrected for point-source
-loads upstream of stream gauges. The point-source correction handled by
-[`anlz_nps_psremove()`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps_psremove.md)
-is intentionally omitted here because the allocation assessment
-disaggregates loads at the basin level, which is inconsistent with that
-subtraction.
+are not pre-corrected for point-source loads upstream of stream gauges
+(unlike
+[`anlz_nps_psremove()`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps_psremove.md));
+for gaged basins,
+[`anlz_aa()`](https://tbep-tech.github.io/tbeploads/reference/anlz_aa.md)
+removes the upstream point-source contribution internally before
+disaggregating loads to MS4 entities (see below).
 
 ## Running the assessment
 
@@ -168,9 +169,20 @@ unmatched entries are visible for troubleshooting.
 
 ### NPS/MS4
 
-The NPS path disaggregates basin-level loads to individual MS4
-jurisdictions using land use and runoff coefficient data from `tbbase`.
-The core disaggregation uses two factors computed internally by
+Gaged-basin TN loads are gauge-measured totals and so include any
+industrial or domestic point-source discharge upstream of the gauge.
+Before disaggregation,
+[`anlz_aa()`](https://tbep-tech.github.io/tbeploads/reference/anlz_aa.md)
+subtracts the basin’s IPS and DPS TN loads from gaged-basin totals so
+that only the true non-point-source contribution is assigned to MS4
+entities. Ungaged-basin TN loads are already non-point-source only,
+since the modeled estimate never includes point-source discharge, and
+are left unchanged.
+
+The NPS path disaggregates basin-level loads (after the point-source
+removal above) to individual MS4 jurisdictions using land use and runoff
+coefficient data from `tbbase`. The core disaggregation uses two factors
+computed internally by
 [`util_aa_npsfactors()`](https://tbep-tech.github.io/tbeploads/reference/util_aa_npsfactors.md):
 
 1.  **`factor_tn`**: each CLUCSID’s share of basin TN load, proportional
@@ -185,12 +197,12 @@ aggregate entity `"All"` regardless of the underlying MS4 jurisdiction.
 A conservation land correction is applied before summing across
 CLUCSIDs. The `conserv_correction` dataset provides entity- and
 CLUCSID-specific fractions of area times runoff coefficient attributable
-to conservation land. These fractions are derived from the original SAS
-land cover file, which includes a binary conservation land flag while
-retaining the original MS4 jurisdiction for each spatial unit. Each
-entity’s disaggregated TN load for a given basin and CLUCSID is scaled
-by `(1 - conserv_frac)` to remove the conservation land contribution.
-The `tbbase` file herein does not include a conservation land overlay
+to conservation land. These fractions are derived from a legacy land
+cover file that includes a binary conservation land flag while retaining
+the original MS4 jurisdiction for each spatial unit. Each entity’s
+disaggregated TN load for a given basin and CLUCSID is scaled by
+`(1 - conserv_frac)` to remove the conservation land contribution. The
+`tbbase` file herein does not include a conservation land overlay
 because the original spatial layer is unavailable for routine GIS
 updates, so `conserv_correction` is stored as a separate stable dataset
 and applied as a backend correction.
@@ -209,16 +221,13 @@ subtracted before hydrologic normalization:
 by whether the basin is gaged (per `dbasing$gagetype`): for gaged
 basins, NPS water is estimated from a stream gauge and so already
 reflects any upstream IPS + DPS discharge, so `total_h2o` is the NPS
-water alone; for ungaged basins, the modeled NPS-only water excludes
-point-source discharge entirely, so IPS and DPS water are added to it.
-This matches the SAS `ratio1_2224` construction, which sums all three
-sources for the same basin/year regardless of gage status — the gating
-is needed because tbeploads’ own gaged-basin NPS water estimate is a
-measured total (already inclusive of point sources), not a pure NPS
-estimate. `mean_h2o_9294` is the 1992-1994 baseline total basin water
-volume from `hydro_baseline`. Effective loads are averaged over `yrrng`
-as `sum / length(yrrng)`, so missing years contribute zero rather than
-being excluded.
+water alone (adding IPS/DPS water again would double-count it); for
+ungaged basins, the modeled NPS-only water excludes point-source
+discharge entirely, so IPS and DPS water are added to it to reconstruct
+the true total. `mean_h2o_9294` is the 1992-1994 baseline total basin
+water volume from `hydro_baseline`. Effective loads are averaged over
+`yrrng` as `sum / length(yrrng)`, so missing years contribute zero
+rather than being excluded.
 
 Bay segments Terra Ceia Bay (6) and Manatee River (7) are merged into
 segment 55 (Remaining Lower Tampa Bay) after disaggregation, consistent

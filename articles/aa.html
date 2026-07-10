@@ -162,12 +162,11 @@ inputs.</p>
 <span>  summtime <span class="op">=</span> <span class="st">"year"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">nps</span><span class="op">)</span></span></code></pre></div>
-<p>The NPS loads passed to <code><a href="../reference/anlz_aa.html">anlz_aa()</a></code> represent total NPS
-contributions and are not corrected for point-source loads upstream of
-stream gauges. The point-source correction handled by
-<code><a href="../reference/anlz_nps_psremove.html">anlz_nps_psremove()</a></code> is intentionally omitted here because
-the allocation assessment disaggregates loads at the basin level, which
-is inconsistent with that subtraction.</p>
+<p>The NPS loads passed to <code><a href="../reference/anlz_aa.html">anlz_aa()</a></code> are not pre-corrected
+for point-source loads upstream of stream gauges (unlike
+<code><a href="../reference/anlz_nps_psremove.html">anlz_nps_psremove()</a></code>); for gaged basins,
+<code><a href="../reference/anlz_aa.html">anlz_aa()</a></code> removes the upstream point-source contribution
+internally before disaggregating loads to MS4 entities (see below).</p>
 </div>
 </div>
 <div class="section level2">
@@ -258,10 +257,18 @@ so that unmatched entries are visible for troubleshooting.</p>
 <div class="section level3">
 <h3 id="npsms4">NPS/MS4<a class="anchor" aria-label="anchor" href="#npsms4"></a>
 </h3>
-<p>The NPS path disaggregates basin-level loads to individual MS4
-jurisdictions using land use and runoff coefficient data from
-<code>tbbase</code>. The core disaggregation uses two factors computed
-internally by <code><a href="../reference/util_aa_npsfactors.html">util_aa_npsfactors()</a></code>:</p>
+<p>Gaged-basin TN loads are gauge-measured totals and so include any
+industrial or domestic point-source discharge upstream of the gauge.
+Before disaggregation, <code><a href="../reference/anlz_aa.html">anlz_aa()</a></code> subtracts the basin’s IPS
+and DPS TN loads from gaged-basin totals so that only the true
+non-point-source contribution is assigned to MS4 entities. Ungaged-basin
+TN loads are already non-point-source only, since the modeled estimate
+never includes point-source discharge, and are left unchanged.</p>
+<p>The NPS path disaggregates basin-level loads (after the point-source
+removal above) to individual MS4 jurisdictions using land use and runoff
+coefficient data from <code>tbbase</code>. The core disaggregation uses
+two factors computed internally by
+<code><a href="../reference/util_aa_npsfactors.html">util_aa_npsfactors()</a></code>:</p>
 <ol style="list-style-type: decimal">
 <li>
 <strong><code>factor_tn</code></strong>: each CLUCSID’s share of
@@ -278,11 +285,11 @@ underlying MS4 jurisdiction.</p>
 <p>A conservation land correction is applied before summing across
 CLUCSIDs. The <code>conserv_correction</code> dataset provides entity-
 and CLUCSID-specific fractions of area times runoff coefficient
-attributable to conservation land. These fractions are derived from the
-original SAS land cover file, which includes a binary conservation land
-flag while retaining the original MS4 jurisdiction for each spatial
-unit. Each entity’s disaggregated TN load for a given basin and CLUCSID
-is scaled by <code>(1 - conserv_frac)</code> to remove the conservation
+attributable to conservation land. These fractions are derived from a
+legacy land cover file that includes a binary conservation land flag
+while retaining the original MS4 jurisdiction for each spatial unit.
+Each entity’s disaggregated TN load for a given basin and CLUCSID is
+scaled by <code>(1 - conserv_frac)</code> to remove the conservation
 land contribution. The <code>tbbase</code> file herein does not include
 a conservation land overlay because the original spatial layer is
 unavailable for routine GIS updates, so <code>conserv_correction</code>
@@ -299,13 +306,10 @@ normalization:</p>
 basin, gated by whether the basin is gaged (per
 <code>dbasing$gagetype</code>): for gaged basins, NPS water is estimated
 from a stream gauge and so already reflects any upstream IPS + DPS
-discharge, so <code>total_h2o</code> is the NPS water alone; for ungaged
-basins, the modeled NPS-only water excludes point-source discharge
-entirely, so IPS and DPS water are added to it. This matches the SAS
-<code>ratio1_2224</code> construction, which sums all three sources for
-the same basin/year regardless of gage status — the gating is needed
-because tbeploads’ own gaged-basin NPS water estimate is a measured
-total (already inclusive of point sources), not a pure NPS estimate.
+discharge, so <code>total_h2o</code> is the NPS water alone (adding
+IPS/DPS water again would double-count it); for ungaged basins, the
+modeled NPS-only water excludes point-source discharge entirely, so IPS
+and DPS water are added to it to reconstruct the true total.
 <code>mean_h2o_9294</code> is the 1992-1994 baseline total basin water
 volume from <code>hydro_baseline</code>. Effective loads are averaged
 over <code>yrrng</code> as <code>sum / length(yrrng)</code>, so missing

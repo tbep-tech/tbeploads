@@ -40,8 +40,10 @@ anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase)
   [`anlz_nps`](https://tbep-tech.github.io/tbeploads/reference/anlz_nps.md)
   called with `summ = 'basin'` and `summtime = 'year'`. Required
   columns: `Year`, `source`, `segment`, `basin`, `tn_load`, `hy_load`.
-  TN loads represent NPS contributions only and are not corrected for
-  point-source loads.
+  For gaged basins these are gauge-measured totals that include upstream
+  point-source discharge; `anlz_aa` removes the IPS/DPS contribution
+  from `tn_load` internally before disaggregating to MS4 entities (see
+  Details).
 
 - tbbase:
 
@@ -148,12 +150,12 @@ is gaged (per
 [`dbasing`](https://tbep-tech.github.io/tbeploads/reference/dbasing.md)):
 for gaged basins, NPS water is estimated from a stream gauge and so
 already reflects any upstream IPS + DPS discharge, so
-`basin\_total\_h2o` is the NPS water alone; for ungaged basins, the
-modeled NPS-only water excludes point-source discharge entirely, so IPS
-and DPS water are added to it (matching the SAS `ratio1\_2224`
-construction, which sums all three sources for the same basin/year
-regardless of gage status). All other IPS facilities, and any facility
-with no `ps_allocations` match, use the raw (unnormalized) load.
+`basin\_total\_h2o` is the NPS water alone (adding IPS/DPS water again
+would double-count it); for ungaged basins, the modeled NPS-only water
+excludes point-source discharge entirely, so IPS and DPS water are added
+to it to reconstruct the true total. All other IPS facilities, and any
+facility with no `ps_allocations` match, use the raw (unnormalized)
+load.
 
 **ML path**
 
@@ -170,9 +172,15 @@ allocation.
 
 **NPS/MS4 path**
 
-TN loads in `nps_data` are NPS-only; no point-source correction is
-applied to the input loads. Basin-level NPS loads are disaggregated to
-individual MS4 entities using the output (created internally) from
+Gaged-basin TN loads in `nps_data` are gauge-measured totals and so
+include any upstream IPS + DPS discharge in that basin. Before
+disaggregation, `anlz_aa` subtracts the basin's IPS and DPS TN loads
+from gaged-basin `tn_load` so that only the true non-point-source
+contribution is assigned to MS4 entities. Ungaged-basin `tn_load` is
+already NPS-only (the modeled estimate never includes point-source
+discharge) and is left unchanged. Basin-level NPS loads
+(post-correction) are disaggregated to individual MS4 entities using the
+output (created internally) from
 [`util_aa_npsfactors`](https://tbep-tech.github.io/tbeploads/reference/util_aa_npsfactors.md)
 that combines
 [`tbbase`](https://tbep-tech.github.io/tbeploads/reference/tbbase.md),

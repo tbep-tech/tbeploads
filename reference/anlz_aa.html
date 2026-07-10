@@ -83,8 +83,10 @@ columns: <code>Year</code>, <code>Month</code>, <code>entity</code>, <code>facil
 <dd><p>Data frame from <code><a href="anlz_nps.html">anlz_nps</a></code> called with
 <code>summ = 'basin'</code> and <code>summtime = 'year'</code>. Required columns:
 <code>Year</code>, <code>source</code>, <code>segment</code>, <code>basin</code>, <code>tn_load</code>,
-<code>hy_load</code>. TN loads represent NPS contributions only and are not
-corrected for point-source loads.</p></dd>
+<code>hy_load</code>. For gaged basins these are gauge-measured totals that
+include upstream point-source discharge; <code>anlz_aa</code> removes
+the IPS/DPS contribution from <code>tn_load</code> internally before
+disaggregating to MS4 entities (see Details).</p></dd>
 
 
 <dt id="arg-tbbase">tbbase<a class="anchor" aria-label="anchor" href="#arg-tbbase"></a></dt>
@@ -173,12 +175,12 @@ $$</p>
 the same basin and year, computed differently depending on whether the
 basin is gaged (per <code><a href="dbasing.html">dbasing</a></code>): for gaged basins, NPS water is
 estimated from a stream gauge and so already reflects any upstream IPS +
-DPS discharge, so <code>basin\_total\_h2o</code> is the NPS water alone; for
-ungaged basins, the modeled NPS-only water excludes point-source
-discharge entirely, so IPS and DPS water are added to it (matching the
-SAS <code>ratio1\_2224</code> construction, which sums all three sources for
-the same basin/year regardless of gage status). All other IPS facilities,
-and any facility with no <code>ps_allocations</code> match, use the raw
+DPS discharge, so <code>basin\_total\_h2o</code> is the NPS water alone (adding
+IPS/DPS water again would double-count it); for ungaged basins, the
+modeled NPS-only water excludes point-source discharge entirely, so IPS
+and DPS water are added to it to reconstruct the true total. All other
+IPS facilities, and any facility with no <code>ps_allocations</code> match, use
+the raw
 (unnormalized) load.</p>
 <p><strong>ML path</strong></p>
 <p>Material loss TN loads require no hydrologic normalization. Monthly loads
@@ -191,9 +193,14 @@ Sutton + Tampaplex, also in Hillsborough Bay) have their loads summed to
 an entity + bay segment total before comparison to the single shared
 allocation.</p>
 <p><strong>NPS/MS4 path</strong></p>
-<p>TN loads in <code>nps_data</code> are NPS-only; no point-source correction is
-applied to the input loads. Basin-level NPS loads are disaggregated to
-individual MS4 entities using the output (created internally) from
+<p>Gaged-basin TN loads in <code>nps_data</code> are gauge-measured totals and so
+include any upstream IPS + DPS discharge in that basin. Before
+disaggregation, <code>anlz_aa</code> subtracts the basin's IPS and DPS TN loads
+from gaged-basin <code>tn_load</code> so that only the true non-point-source
+contribution is assigned to MS4 entities. Ungaged-basin <code>tn_load</code> is already NPS-only (the modeled
+estimate never includes point-source discharge) and is left unchanged.
+Basin-level NPS loads (post-correction) are disaggregated to individual
+MS4 entities using the output (created internally) from
 <code><a href="util_aa_npsfactors.html">util_aa_npsfactors</a></code>
 that combines <code><a href="tbbase.html">tbbase</a></code>, <code><a href="rcclucsid.html">rcclucsid</a></code>, and <code><a href="emc.html">emc</a></code>
 into:</p>
