@@ -142,8 +142,10 @@
 #' \code{"MSGP PINELLAS"} in \code{\link{tbbase}}) is not part of any
 #' individually-tracked MS4 jurisdiction and is aggregated the same way to
 #' entity \code{"Non-MS4/Ag NPS"}, matching the row label used in the TBNMC
-#' draft loading tables; Middle Tampa Bay (\code{bay_seg} 3) additionally
-#' folds \code{"PORT MANATEE"} into this aggregate.
+#' draft loading tables. \code{"PORT MANATEE"}'s footprint spans both
+#' Middle Tampa Bay (\code{bay_seg} 3) and Lower Tampa Bay (\code{bay_seg}
+#' 4), so it also folds into this aggregate in both segments; Lower Tampa
+#' Bay has no other MSGP entities, so Port Manatee is its sole contributor.
 #'
 #' After disaggregation, loads and 1992-1994 baseline water volumes are summed
 #' across basins to the segment level. TN corrections from \code{\link{aa_corrections}}
@@ -394,14 +396,16 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
   # Permit ("MSGP COT", "MSGP PINELLAS" in tbbase) is not part of any
   # individually-tracked MS4 jurisdiction and is aggregated the same way to
   # entity "Non-MS4/Ag NPS", matching the row label used in the TBNMC draft
-  # loading tables; Middle Tampa Bay (bay_seg 3) additionally folds Port
-  # Manatee into this aggregate, per TBNMC staff confirmation.
+  # loading tables. Port Manatee's footprint spans both Middle Tampa Bay
+  # (bay_seg 3) and Lower Tampa Bay (bay_seg 4), so it also folds into this
+  # aggregate in both segments; Lower Tampa Bay has no other MSGP entities,
+  # so Port Manatee is its sole contributor. Per TBNMC staff confirmation.
   entity_clucsid <- entity_clucsid |>
     dplyr::mutate(
       entity = dplyr::case_when(
         !is.na(.data$category) & .data$category == "Agriculture" ~ "All",
         .data$entity %in% c("MSGP COT", "MSGP PINELLAS") ~ "Non-MS4/Ag NPS",
-        .data$bay_seg == 3L & .data$entity == "PORT MANATEE" ~ "Non-MS4/Ag NPS",
+        .data$bay_seg %in% c(3L, 4L) & .data$entity == "PORT MANATEE" ~ "Non-MS4/Ag NPS",
         TRUE ~ .data$entity
       )
     )
