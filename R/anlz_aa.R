@@ -48,7 +48,13 @@
 #' @details
 #' Entities present in the computed loads but absent from the allocation tables
 #' are retained in the output with \code{NA} allocation fields so that
-#' unmatched entries are visible for troubleshooting.
+#' unmatched entries are visible for troubleshooting, with one exception:
+#' unmatched NPS/MS4 entities with a mean annual load under 0.01 tons/yr are
+#' dropped, since these are negligible land-use polygon artifacts (e.g. land
+#' in \code{\link{tbbase}} not attributed to any jurisdiction, or a
+#' jurisdiction's boundary crossing into an adjacent basin/segment where it
+#' has no allocation) rather than real troubleshooting signal. A message
+#' reports what was dropped and why.
 #'
 #' \strong{DPS path}
 #'
@@ -475,6 +481,43 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
       "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "pass"
+    )
+
+  # Drop negligible unmatched NPS/MS4 entities: land not attributed to any
+  # jurisdiction ("None" in tbbase) and GIS boundary slivers (a jurisdiction's
+  # polygon crossing into an adjacent basin/segment where it has no
+  # allocation) show up as tiny, unmatched entities that add noise without
+  # being real troubleshooting signal. This is magnitude- rather than
+  # name-based (entities with no match anywhere in nps_allocations, i.e.
+  # source is NA, and mean load under 0.01 tons/yr) so it stays correct as
+  # tbbase is updated over time, rather than depending on a fixed entity
+  # list. It never touches IPS/DPS/ML placeholders (which always carry a
+  # real source value regardless of allocation match) or substantive
+  # unmatched entities like "Non-MS4/Ag NPS", whose loads are well above
+  # this threshold.
+  negligible <- nps_out |>
+    dplyr::filter(
+      is.na(.data$source), is.na(.data$alloc_tons),
+      dplyr::coalesce(.data$load_tons, 0) < 0.01
+    )
+
+  if (nrow(negligible) > 0) {
+    message(
+      "anlz_aa: dropped ", nrow(negligible), " negligible unmatched NPS/MS4 ",
+      if (nrow(negligible) == 1) "entity" else "entities",
+      " (no allocation match, mean load < 0.01 tons/yr): ",
+      paste(
+        sprintf("%s (%s, %.4f tons/yr)", negligible$entity, negligible$segment,
+                dplyr::coalesce(negligible$load_tons, 0)),
+        collapse = "; "
+      )
+    )
+  }
+
+  nps_out <- nps_out |>
+    dplyr::filter(
+      !(is.na(.data$source) & is.na(.data$alloc_tons) &
+          dplyr::coalesce(.data$load_tons, 0) < 0.01)
     )
 
   # ---- IPS path ------------------------------------------------------------
