@@ -168,8 +168,8 @@ unmatched NPS/MS4 entities with a mean annual load under 0.01 tons/yr
 are dropped, since these are negligible land-use polygon artifacts
 (e.g. land in `tbbase` not attributed to any jurisdiction, or a
 jurisdiction’s boundary crossing into an adjacent basin/segment where it
-has no allocation) rather than real troubleshooting signal. A message
-reports what was dropped and why.
+has no allocation) rather than real troubleshooting signal. Set
+`verbose = TRUE` to print a message reporting what was dropped and why.
 
 ## Source-specific methodology
 

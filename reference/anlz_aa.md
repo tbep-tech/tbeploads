@@ -5,7 +5,7 @@ Allocation assessment for DPS, IPS, and NPS/MS4 entities
 ## Usage
 
 ``` r
-anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase)
+anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbose = FALSE)
 ```
 
 ## Arguments
@@ -49,6 +49,12 @@ anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase)
 
   data frame containing polygon areas for the combined data layer of bay
   segment, basin, jurisdiction, land use data, and soils, see details
+
+- verbose:
+
+  logical, if `TRUE` print a message reporting negligible unmatched
+  NPS/MS4 entities dropped from the output (see Details). Default
+  `FALSE`.
 
 ## Value
 
@@ -123,8 +129,8 @@ land in
 [`tbbase`](https://tbep-tech.github.io/tbeploads/reference/tbbase.md)
 not attributed to any jurisdiction, or a jurisdiction's boundary
 crossing into an adjacent basin/segment where it has no allocation)
-rather than real troubleshooting signal. A message reports what was
-dropped and why.
+rather than real troubleshooting signal. When `verbose = TRUE`, a
+message reports what was dropped and why.
 
 **DPS path**
 
