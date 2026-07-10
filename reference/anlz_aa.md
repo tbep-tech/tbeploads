@@ -162,10 +162,11 @@ loads from `ml_data` are summed to annual totals per facility, averaged
 over `yrrng`, and compared against the
 [`ml_allocations`](https://tbep-tech.github.io/tbeploads/reference/ml_allocations.md)
 table. Facilities with `ishared = FALSE` are assessed individually on
-entity + facname + bay segment. Facilities with `ishared = TRUE`
-(currently the three Mosaic facilities in Hillsborough Bay) have their
-loads summed to an entity + bay segment total before comparison to the
-single shared allocation.
+entity + facname + bay segment. Facilities with `ishared = TRUE` (the
+three Mosaic facilities in Hillsborough Bay, and Kinder Morgan Port
+Sutton + Tampaplex, also in Hillsborough Bay) have their loads summed to
+an entity + bay segment total before comparison to the single shared
+allocation.
 
 **NPS/MS4 path**
 

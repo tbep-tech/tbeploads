@@ -74,23 +74,25 @@ facilities belonging to the same entity and bay segment is compared to
 the single <code>alloc_tons</code> value.</p></li>
 </ul><p>The three Mosaic material loss facilities (Big Bend, Riverview, Tampa Marine)
 share a single 3.30 ton/year allocation in Hillsborough Bay; they are
-represented by one row (<code>ishared = TRUE</code>, <code>facname = NA</code>).
-All other entries are non-shared (<code>ishared = FALSE</code>) with one row per
-facility.</p>
+represented by one row (<code>ishared = TRUE</code>, <code>facname = NA</code>). Kinder
+Morgan Port Sutton and Tampaplex are likewise assessed jointly against the
+sum of their two individual allocations and represented by one row
+(<code>ishared = TRUE</code>, <code>facname = NA</code>); Kinder Morgan Port Manatee is
+a separate, non-shared facility. All other entries are non-shared
+(<code>ishared = FALSE</code>) with one row per facility.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">ml_allocations</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 5</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   entity        facname                    bay_seg alloc_tons ishared</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> CSX           Rockport                         2      5.63  FALSE  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> CSX           Newport                          2      5.63  FALSE  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Kinder Morgan Kinder Morgan Port Sutton        2      1.8   FALSE  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Kinder Morgan Kinder Morgan Tampaplex          2      3.38  FALSE  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Kinder Morgan Kinder Morgan Port Manatee       4      0.299 FALSE  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> Mosaic        <span style="color: #BB0000;">NA</span>                               2      3.3   TRUE   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Kinder Morgan Kinder Morgan Port Manatee       4      0.299 FALSE  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Mosaic        <span style="color: #BB0000;">NA</span>                               2      3.3   TRUE   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Kinder Morgan <span style="color: #BB0000;">NA</span>                               2      5.18  TRUE   </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

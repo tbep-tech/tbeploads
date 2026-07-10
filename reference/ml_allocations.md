@@ -37,21 +37,23 @@ under the Tampa Bay Nitrogen Management Consortium (TBNMC) framework.
 
 The three Mosaic material loss facilities (Big Bend, Riverview, Tampa
 Marine) share a single 3.30 ton/year allocation in Hillsborough Bay;
-they are represented by one row (`ishared = TRUE`, `facname = NA`). All
-other entries are non-shared (`ishared = FALSE`) with one row per
-facility.
+they are represented by one row (`ishared = TRUE`, `facname = NA`).
+Kinder Morgan Port Sutton and Tampaplex are likewise assessed jointly
+against the sum of their two individual allocations and represented by
+one row (`ishared = TRUE`, `facname = NA`); Kinder Morgan Port Manatee
+is a separate, non-shared facility. All other entries are non-shared
+(`ishared = FALSE`) with one row per facility.
 
 ## Examples
 
 ``` r
 ml_allocations
-#> # A tibble: 6 × 5
+#> # A tibble: 5 × 5
 #>   entity        facname                    bay_seg alloc_tons ishared
 #>   <chr>         <chr>                        <int>      <dbl> <lgl>  
 #> 1 CSX           Rockport                         2      5.63  FALSE  
 #> 2 CSX           Newport                          2      5.63  FALSE  
-#> 3 Kinder Morgan Kinder Morgan Port Sutton        2      1.8   FALSE  
-#> 4 Kinder Morgan Kinder Morgan Tampaplex          2      3.38  FALSE  
-#> 5 Kinder Morgan Kinder Morgan Port Manatee       4      0.299 FALSE  
-#> 6 Mosaic        NA                               2      3.3   TRUE   
+#> 3 Kinder Morgan Kinder Morgan Port Manatee       4      0.299 FALSE  
+#> 4 Mosaic        NA                               2      3.3   TRUE   
+#> 5 Kinder Morgan NA                               2      5.18  TRUE   
 ```
