@@ -121,14 +121,17 @@
 #'     entities proportional to area × runoff coefficient.
 #' }
 #'
-#' Agricultural land use (category \code{"Agriculture"}) is attributed to the
-#' aggregate entity \code{"All"} regardless of the underlying MS4 jurisdiction.
-#'
 #' Before summing across CLUCSIDs, each entity's disaggregated TN load is
 #' scaled by \code{(1 - conserv\_frac)} using \code{\link{conserv_correction}},
 #' which provides entity- and CLUCSID-specific fractions of area times runoff
 #' coefficient attributable to conservation land. This removes the conservation
-#' land contribution that is absent from the tbeploads-built \code{\link{tbbase}}.
+#' land contribution that is absent from the tbeploads-built \code{\link{tbbase}},
+#' and is applied using the true underlying MS4 jurisdiction since conservation
+#' land can occur within Agriculture-classified parcels too.
+#'
+#' Only after this correction is agricultural land use (category
+#' \code{"Agriculture"}) attributed to the aggregate entity \code{"All"}
+#' regardless of the underlying MS4 jurisdiction.
 #'
 #' After disaggregation, loads and 1992-1994 baseline water volumes are summed
 #' across basins to the segment level. TN corrections from \code{\link{aa_corrections}}
@@ -350,17 +353,17 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
     dplyr::left_join(nps_factors$rc, by = c("bay_seg", "basin", "clucsid"),
                      relationship = "many-to-many") |>
     dplyr::mutate(
-      entity    = dplyr::case_when(
-        !is.na(.data$category) & .data$category == "Agriculture"  ~ "All",
-        TRUE ~ .data$entity
-      ),
       tn_entity = .data$tn_load * .data$factor_tn * .data$factor_rc
     )
 
-  # Scale down MS4 entity TN by the conservation land fraction for each
-  # basin x clucsid. Agriculture rows (entity = "All") are left unchanged.
-  # conserv_correction rows with no matching basin/clucsid join as NA and
-  # are skipped (coalesce to the unscaled value).
+  # Scale down TN by the conservation land fraction for each entity x basin x
+  # clucsid, using the true underlying MS4 jurisdiction. Conservation land
+  # occurs within Agriculture-classified parcels too (conserv_correction has
+  # entries for Agriculture clucsids), so this must happen before Agriculture
+  # rows are relabeled to the aggregate "All" entity below — conserv_correction
+  # is keyed by the real entity and would never match "All". conserv_correction
+  # rows with no matching basin/clucsid join as NA and are skipped (coalesce
+  # to the unscaled value).
   entity_clucsid <- entity_clucsid |>
     dplyr::left_join(conserv_correction, by = c("bay_seg", "basin", "entity", "clucsid")) |>
     dplyr::mutate(
@@ -371,6 +374,18 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
       )
     ) |>
     dplyr::select(-"conserv_frac")
+
+  # Agricultural land use (category "Agriculture") is attributed to the
+  # aggregate entity "All" regardless of the underlying MS4 jurisdiction,
+  # applied after the conservation land correction above so it can match on
+  # the true entity.
+  entity_clucsid <- entity_clucsid |>
+    dplyr::mutate(
+      entity = dplyr::case_when(
+        !is.na(.data$category) & .data$category == "Agriculture" ~ "All",
+        TRUE ~ .data$entity
+      )
+    )
 
   # Sum TN over clucsids; carry one copy of basin total_h2o per entity-basin-year
   entity_basin_yr <- entity_clucsid |>
