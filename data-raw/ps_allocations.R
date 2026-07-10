@@ -35,6 +35,10 @@ ps_allocations <- read_csv(
       facname == "Point Source - New Wales Stack Closure",
       "FL0178527", permit
     ),
+    # Busch Gardens (FL0185833) is recorded in the source CSV with a 0 ton/yr
+    # allocation, predating its official 1 ton/yr allocation set in the 2022
+    # RA Update
+    alloc_tons = if_else(permit == "FL0185833", 1, alloc_tons),
     # RP's draft TN-loading tables mark these permits (mostly Mosaic mining
     # facilities plus a handful of others) with a "Hydrologically Affected"
     # row label in the Point Sources section; all other IPS facilities (and
@@ -60,7 +64,6 @@ ps_allocations <- read_csv(
       "FL0000647", # Trademark Nitrogen Corporation
       "FL0029653", # Alpha/Owens Corning
       "FL0132381", # Brewster Phosphogypsum
-      "FL0185833", # Busch Gardens
       "FL0034657", # Coronet Industries
       "FL0160083", # Estech Agricola
       "FL0002666", # Point Source - Exxon Mobil
@@ -69,6 +72,12 @@ ps_allocations <- read_csv(
       "FL0000299", # Point Source - Nichols Prep Plant (Agrifos)
       "FL0178527", # Point Source - New Wales Stack Closure
       "FL0038652"  # Mosaic - Black Point (fka Yara)
+      # Busch Gardens (FL0185833) also carries the "Hydrologically Affected"
+      # row label but is intentionally excluded here: per direct confirmation
+      # from RP, its 1 ton/yr allocation is a fixed value assessed
+      # against the raw (unnormalized) load. A normalized value exists
+      # elsewhere as a carryover from an outdated calculation step, but it is
+      # not what's actually used for the pass/fail comparison.
     )
   ) |>
   select(entity, facname, permit, alloc_pct, alloc_tons, hydro_affected)
