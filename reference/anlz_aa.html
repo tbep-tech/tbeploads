@@ -207,13 +207,16 @@ into:</p>
 <ol><li><p><code>factor_tn</code> distributes basin TN load among land use classes.</p></li>
 <li><p><code>factor_rc</code> distributes each land use class's load among
 entities proportional to area × runoff coefficient.</p></li>
-</ol><p>Agricultural land use (category <code>"Agriculture"</code>) is attributed to the
-aggregate entity <code>"All"</code> regardless of the underlying MS4 jurisdiction.</p>
-<p>Before summing across CLUCSIDs, each entity's disaggregated TN load is
+</ol><p>Before summing across CLUCSIDs, each entity's disaggregated TN load is
 scaled by <code>(1 - conserv\_frac)</code> using <code><a href="conserv_correction.html">conserv_correction</a></code>,
 which provides entity- and CLUCSID-specific fractions of area times runoff
 coefficient attributable to conservation land. This removes the conservation
-land contribution that is absent from the tbeploads-built <code><a href="tbbase.html">tbbase</a></code>.</p>
+land contribution that is absent from the tbeploads-built <code><a href="tbbase.html">tbbase</a></code>,
+and is applied using the true underlying MS4 jurisdiction since conservation
+land can occur within Agriculture-classified parcels too.</p>
+<p>Only after this correction is agricultural land use (category
+<code>"Agriculture"</code>) attributed to the aggregate entity <code>"All"</code>
+regardless of the underlying MS4 jurisdiction.</p>
 <p>After disaggregation, loads and 1992-1994 baseline water volumes are summed
 across basins to the segment level. TN corrections from <code><a href="aa_corrections.html">aa_corrections</a></code>
 (<code>ad_tons</code> + <code>project_tons</code>) are subtracted before hydrologic normalization:</p>

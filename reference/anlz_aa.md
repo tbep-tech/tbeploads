@@ -193,16 +193,19 @@ into:
 2.  `factor_rc` distributes each land use class's load among entities
     proportional to area × runoff coefficient.
 
-Agricultural land use (category `"Agriculture"`) is attributed to the
-aggregate entity `"All"` regardless of the underlying MS4 jurisdiction.
-
 Before summing across CLUCSIDs, each entity's disaggregated TN load is
 scaled by `(1 - conserv\_frac)` using
 [`conserv_correction`](https://tbep-tech.github.io/tbeploads/reference/conserv_correction.md),
 which provides entity- and CLUCSID-specific fractions of area times
 runoff coefficient attributable to conservation land. This removes the
 conservation land contribution that is absent from the tbeploads-built
-[`tbbase`](https://tbep-tech.github.io/tbeploads/reference/tbbase.md).
+[`tbbase`](https://tbep-tech.github.io/tbeploads/reference/tbbase.md),
+and is applied using the true underlying MS4 jurisdiction since
+conservation land can occur within Agriculture-classified parcels too.
+
+Only after this correction is agricultural land use (category
+`"Agriculture"`) attributed to the aggregate entity `"All"` regardless
+of the underlying MS4 jurisdiction.
 
 After disaggregation, loads and 1992-1994 baseline water volumes are
 summed across basins to the segment level. TN corrections from
