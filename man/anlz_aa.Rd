@@ -111,9 +111,10 @@ from \code{ml_data} are summed to annual totals per facility, averaged
 over \code{yrrng}, and compared against the \code{\link{ml_allocations}}
 table. Facilities with \code{ishared = FALSE} are assessed individually on
 entity + facname + bay segment. Facilities with \code{ishared = TRUE}
-(currently the three Mosaic facilities in Hillsborough Bay) have their
-loads summed to an entity + bay segment total before comparison to the
-single shared allocation.
+(the three Mosaic facilities in Hillsborough Bay, and Kinder Morgan Port
+Sutton + Tampaplex, also in Hillsborough Bay) have their loads summed to
+an entity + bay segment total before comparison to the single shared
+allocation.
 
 \strong{NPS/MS4 path}
 

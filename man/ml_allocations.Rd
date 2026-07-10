@@ -33,9 +33,12 @@ the single \code{alloc_tons} value.
 
 The three Mosaic material loss facilities (Big Bend, Riverview, Tampa Marine)
 share a single 3.30 ton/year allocation in Hillsborough Bay; they are
-represented by one row (\code{ishared = TRUE}, \code{facname = NA}).
-All other entries are non-shared (\code{ishared = FALSE}) with one row per
-facility.
+represented by one row (\code{ishared = TRUE}, \code{facname = NA}). Kinder
+Morgan Port Sutton and Tampaplex are likewise assessed jointly against the
+sum of their two individual allocations and represented by one row
+(\code{ishared = TRUE}, \code{facname = NA}); Kinder Morgan Port Manatee is
+a separate, non-shared facility. All other entries are non-shared
+(\code{ishared = FALSE}) with one row per facility.
 }
 \examples{
 ml_allocations
