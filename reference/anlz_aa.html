@@ -148,7 +148,13 @@ allocation or effective load is missing</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Entities present in the computed loads but absent from the allocation tables
 are retained in the output with <code>NA</code> allocation fields so that
-unmatched entries are visible for troubleshooting.</p>
+unmatched entries are visible for troubleshooting, with one exception:
+unmatched NPS/MS4 entities with a mean annual load under 0.01 tons/yr are
+dropped, since these are negligible land-use polygon artifacts (e.g. land
+in <code><a href="tbbase.html">tbbase</a></code> not attributed to any jurisdiction, or a
+jurisdiction's boundary crossing into an adjacent basin/segment where it
+has no allocation) rather than real troubleshooting signal. A message
+reports what was dropped and why.</p>
 <p><strong>DPS path</strong></p>
 <p>DPS facility TN loads require no hydrologic normalization. Monthly loads
 from <code>dps_data</code> are summed to annual totals per facility, averaged

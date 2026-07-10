@@ -116,7 +116,15 @@ segment:
 
 Entities present in the computed loads but absent from the allocation
 tables are retained in the output with `NA` allocation fields so that
-unmatched entries are visible for troubleshooting.
+unmatched entries are visible for troubleshooting, with one exception:
+unmatched NPS/MS4 entities with a mean annual load under 0.01 tons/yr
+are dropped, since these are negligible land-use polygon artifacts (e.g.
+land in
+[`tbbase`](https://tbep-tech.github.io/tbeploads/reference/tbbase.md)
+not attributed to any jurisdiction, or a jurisdiction's boundary
+crossing into an adjacent basin/segment where it has no allocation)
+rather than real troubleshooting signal. A message reports what was
+dropped and why.
 
 **DPS path**
 
