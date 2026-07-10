@@ -4,7 +4,7 @@
 \alias{anlz_aa}
 \title{Allocation assessment for DPS, IPS, and NPS/MS4 entities}
 \usage{
-anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase)
+anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbose = FALSE)
 }
 \arguments{
 \item{yrrng}{Integer vector of length 2, start and end year, e.g., \code{c(2022, 2024)}.}
@@ -31,6 +31,10 @@ disaggregating to MS4 entities (see Details).}
 
 \item{tbbase}{data frame containing polygon areas for the combined data
 layer of bay segment, basin, jurisdiction, land use data, and soils, see details}
+
+\item{verbose}{logical, if \code{TRUE} print a message reporting negligible
+unmatched NPS/MS4 entities dropped from the output (see Details). Default
+\code{FALSE}.}
 }
 \value{
 A data frame with one row per entity (NPS/MS4) or facility (IPS)
@@ -70,8 +74,8 @@ unmatched NPS/MS4 entities with a mean annual load under 0.01 tons/yr are
 dropped, since these are negligible land-use polygon artifacts (e.g. land
 in \code{\link{tbbase}} not attributed to any jurisdiction, or a
 jurisdiction's boundary crossing into an adjacent basin/segment where it
-has no allocation) rather than real troubleshooting signal. A message
-reports what was dropped and why.
+has no allocation) rather than real troubleshooting signal. When
+\code{verbose = TRUE}, a message reports what was dropped and why.
 
 \strong{DPS path}
 
