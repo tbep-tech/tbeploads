@@ -196,6 +196,16 @@ ipsfac <- ipsfac |>
 dpsfac <- read_sas(here('data-raw/dps1721monthentbas.sas7bdat')) |>
   select(bayseg, basin, entity, facname, source = source2) |>
   distinct() |>
+  # Northwest Regional WRF is erroneously double-listed under both its true
+  # basin (206-1) and basin 02307000. The 02307000 rows carry essentially
+  # zero load in the raw 2017-2021 source (< 0.04 tons/yr), confirming they
+  # are a stale artifact rather than a real split discharge; RP's own 1992-94
+  # IPS/DPS baseline tables (IPSAnnBasin9294All.csv, DPSAnnBasin9294All.csv)
+  # show zero point-source load ever attributed to basin 02307000. Left in,
+  # this duplicate causes anlz_aa's basin joins to attribute Northwest's full
+  # current TN load to 02307000 a second time (on top of 206-1), which
+  # over-subtracts basin 02307000's gaged NPS total by ~18-21 tons/yr.
+  filter(!(facname == 'Northwest Regional WRF' & basin == '02307000')) |>
   mutate( # make ototw its own entity
     entity = case_when(
       entity == 'Pinellas Co.' & facname == 'On Top Of The World WWTP' ~ 'On Top Of The World',

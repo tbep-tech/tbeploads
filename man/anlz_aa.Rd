@@ -24,8 +24,10 @@ columns: \code{Year}, \code{Month}, \code{entity}, \code{facility},
 \item{nps_data}{Data frame from \code{\link{anlz_nps}} called with
 \code{summ = 'basin'} and \code{summtime = 'year'}. Required columns:
 \code{Year}, \code{source}, \code{segment}, \code{basin}, \code{tn_load},
-\code{hy_load}. TN loads represent NPS contributions only and are not
-corrected for point-source loads.}
+\code{hy_load}. For gaged basins these are gauge-measured totals that
+include upstream point-source discharge; \code{\link{anlz_aa}} removes
+the IPS/DPS contribution from \code{tn_load} internally before
+disaggregating to MS4 entities (see Details).}
 
 \item{tbbase}{data frame containing polygon areas for the combined data
 layer of bay segment, basin, jurisdiction, land use data, and soils, see details}
@@ -96,12 +98,12 @@ where \code{basin\_total\_h2o} is the annual total basin water load for
 the same basin and year, computed differently depending on whether the
 basin is gaged (per \code{\link{dbasing}}): for gaged basins, NPS water is
 estimated from a stream gauge and so already reflects any upstream IPS +
-DPS discharge, so \code{basin\_total\_h2o} is the NPS water alone; for
-ungaged basins, the modeled NPS-only water excludes point-source
-discharge entirely, so IPS and DPS water are added to it (matching the
-SAS \code{ratio1\_2224} construction, which sums all three sources for
-the same basin/year regardless of gage status). All other IPS facilities,
-and any facility with no \code{ps_allocations} match, use the raw
+DPS discharge, so \code{basin\_total\_h2o} is the NPS water alone (adding
+IPS/DPS water again would double-count it); for ungaged basins, the
+modeled NPS-only water excludes point-source discharge entirely, so IPS
+and DPS water are added to it to reconstruct the true total. All other
+IPS facilities, and any facility with no \code{ps_allocations} match, use
+the raw
 (unnormalized) load.
 
 \strong{ML path}
@@ -118,9 +120,14 @@ allocation.
 
 \strong{NPS/MS4 path}
 
-TN loads in \code{nps_data} are NPS-only; no point-source correction is
-applied to the input loads. Basin-level NPS loads are disaggregated to
-individual MS4 entities using the output (created internally) from
+Gaged-basin TN loads in \code{nps_data} are gauge-measured totals and so
+include any upstream IPS + DPS discharge in that basin. Before
+disaggregation, \code{anlz_aa} subtracts the basin's IPS and DPS TN loads
+from gaged-basin \code{tn_load} so that only the true non-point-source
+contribution is assigned to MS4 entities. Ungaged-basin \code{tn_load} is already NPS-only (the modeled
+estimate never includes point-source discharge) and is left unchanged.
+Basin-level NPS loads (post-correction) are disaggregated to individual
+MS4 entities using the output (created internally) from
 \code{\link{util_aa_npsfactors}}
 that combines \code{\link{tbbase}}, \code{\link{rcclucsid}}, and \code{\link{emc}}
 into:

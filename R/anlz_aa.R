@@ -13,8 +13,10 @@
 #' @param nps_data Data frame from \code{\link{anlz_nps}} called with
 #'   \code{summ = 'basin'} and \code{summtime = 'year'}. Required columns:
 #'   \code{Year}, \code{source}, \code{segment}, \code{basin}, \code{tn_load},
-#'   \code{hy_load}. TN loads represent NPS contributions only and are not
-#'   corrected for point-source loads.
+#'   \code{hy_load}. For gaged basins these are gauge-measured totals that
+#'   include upstream point-source discharge; \code{\link{anlz_aa}} removes
+#'   the IPS/DPS contribution from \code{tn_load} internally before
+#'   disaggregating to MS4 entities (see Details).
 #' @param tbbase data frame containing polygon areas for the combined data
 #'   layer of bay segment, basin, jurisdiction, land use data, and soils, see details
 #' @returns A data frame with one row per entity (NPS/MS4) or facility (IPS)
@@ -79,12 +81,12 @@
 #' the same basin and year, computed differently depending on whether the
 #' basin is gaged (per \code{\link{dbasing}}): for gaged basins, NPS water is
 #' estimated from a stream gauge and so already reflects any upstream IPS +
-#' DPS discharge, so \code{basin\_total\_h2o} is the NPS water alone; for
-#' ungaged basins, the modeled NPS-only water excludes point-source
-#' discharge entirely, so IPS and DPS water are added to it (matching the
-#' SAS \code{ratio1\_2224} construction, which sums all three sources for
-#' the same basin/year regardless of gage status). All other IPS facilities,
-#' and any facility with no \code{ps_allocations} match, use the raw
+#' DPS discharge, so \code{basin\_total\_h2o} is the NPS water alone (adding
+#' IPS/DPS water again would double-count it); for ungaged basins, the
+#' modeled NPS-only water excludes point-source discharge entirely, so IPS
+#' and DPS water are added to it to reconstruct the true total. All other
+#' IPS facilities, and any facility with no \code{ps_allocations} match, use
+#' the raw
 #' (unnormalized) load.
 #'
 #' \strong{ML path}
@@ -101,9 +103,14 @@
 #' 
 #' \strong{NPS/MS4 path}
 #'
-#' TN loads in \code{nps_data} are NPS-only; no point-source correction is
-#' applied to the input loads. Basin-level NPS loads are disaggregated to
-#' individual MS4 entities using the output (created internally) from
+#' Gaged-basin TN loads in \code{nps_data} are gauge-measured totals and so
+#' include any upstream IPS + DPS discharge in that basin. Before
+#' disaggregation, \code{anlz_aa} subtracts the basin's IPS and DPS TN loads
+#' from gaged-basin \code{tn_load} so that only the true non-point-source
+#' contribution is assigned to MS4 entities. Ungaged-basin \code{tn_load} is already NPS-only (the modeled
+#' estimate never includes point-source discharge) and is left unchanged.
+#' Basin-level NPS loads (post-correction) are disaggregated to individual
+#' MS4 entities using the output (created internally) from
 #' \code{\link{util_aa_npsfactors}}
 #' that combines \code{\link{tbbase}}, \code{\link{rcclucsid}}, and \code{\link{emc}}
 #' into:
@@ -271,24 +278,63 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase) {
     dplyr::group_by(.data$bay_seg, .data$basin, .data$Year) |>
     dplyr::summarise(hy_load_dps = sum(.data$hy_load_dps, na.rm = TRUE), .groups = "drop")
 
+  # IPS/DPS basin TN (short tons/yr): mirrors ips_basin_h2o/dps_basin_h2o
+  # above, used to remove point-source TN from gaged-basin NPS totals below.
+  ips_basin_tn <- ips_data |>
+    dplyr::filter(.data$Year %in% yrrng) |>
+    dplyr::group_by(.data$Year, .data$entity, .data$coastco) |>
+    dplyr::summarise(tn_load_ips = sum(.data$tn_load, na.rm = TRUE), .groups = "drop") |>
+    dplyr::left_join(ips_fac_h2o, by = c("entity", "coastco")) |>
+    dplyr::filter(!is.na(.data$basin)) |>
+    dplyr::group_by(.data$bay_seg, .data$basin, .data$Year) |>
+    dplyr::summarise(tn_load_ips = sum(.data$tn_load_ips, na.rm = TRUE), .groups = "drop")
+
+  dps_basin_tn <- dps_data |>
+    dplyr::filter(.data$Year %in% yrrng) |>
+    dplyr::group_by(.data$Year, .data$entity, .data$coastco) |>
+    dplyr::summarise(tn_load_dps = sum(.data$tn_load, na.rm = TRUE), .groups = "drop") |>
+    dplyr::left_join(dps_fac_h2o, by = c("entity", "coastco")) |>
+    dplyr::filter(!is.na(.data$basin)) |>
+    dplyr::group_by(.data$bay_seg, .data$basin, .data$Year) |>
+    dplyr::summarise(tn_load_dps = sum(.data$tn_load_dps, na.rm = TRUE), .groups = "drop")
+
   # Total basin H2O (matches SAS ratio1_2224 construction): for gaged basins,
   # NPS hy_load already IS the total (gauge-measured, inclusive of upstream
   # point-source discharge); for ungaged basins, IPS + DPS must be added to
   # the modeled NPS-only estimate to get the true total.
+  #
+  # tn_load is adjusted the opposite way: gaged-basin tn_load is also a
+  # gauge-derived total that includes upstream IPS + DPS TN, which must be
+  # subtracted so only the true NPS contribution is disaggregated to MS4
+  # entities below (matches SAS NPS_Basin2224 construction, script
+  # 1_TOTN2224_monthly_basin.sas, which nets IPS/DPS out of gaged-basin NPS
+  # loads before they are used downstream). Ungaged tn_load is already
+  # NPS-only (point-source discharge was never part of the modeled estimate)
+  # and is left unchanged.
   nps_annual <- nps_annual |>
     dplyr::left_join(ips_basin_h2o, by = c("bay_seg", "basin", "Year")) |>
     dplyr::left_join(dps_basin_h2o, by = c("bay_seg", "basin", "Year")) |>
+    dplyr::left_join(ips_basin_tn, by = c("bay_seg", "basin", "Year")) |>
+    dplyr::left_join(dps_basin_tn, by = c("bay_seg", "basin", "Year")) |>
     dplyr::left_join(gagetype_lu, by = "basin") |>
     dplyr::mutate(
+      gaged = dplyr::coalesce(.data$gagetype, "Ungaged") == "Gaged",
       total_h2o = dplyr::if_else(
-        dplyr::coalesce(.data$gagetype, "Ungaged") == "Gaged",
+        .data$gaged,
         .data$hy_load,
         .data$hy_load +
           dplyr::coalesce(.data$hy_load_ips, 0) +
           dplyr::coalesce(.data$hy_load_dps, 0)
+      ),
+      tn_load = dplyr::if_else(
+        .data$gaged,
+        .data$tn_load -
+          dplyr::coalesce(.data$tn_load_ips, 0) -
+          dplyr::coalesce(.data$tn_load_dps, 0),
+        .data$tn_load
       )
     ) |>
-    dplyr::select(-dplyr::any_of(c("hy_load_ips", "hy_load_dps", "gagetype")))
+    dplyr::select(-dplyr::any_of(c("hy_load_ips", "hy_load_dps", "tn_load_ips", "tn_load_dps", "gagetype", "gaged")))
 
   # ---- NPS path ------------------------------------------------------------
 
