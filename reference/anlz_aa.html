@@ -216,7 +216,13 @@ and is applied using the true underlying MS4 jurisdiction since conservation
 land can occur within Agriculture-classified parcels too.</p>
 <p>Only after this correction is agricultural land use (category
 <code>"Agriculture"</code>) attributed to the aggregate entity <code>"All"</code>
-regardless of the underlying MS4 jurisdiction.</p>
+regardless of the underlying MS4 jurisdiction. Land under a Municipal
+Separate storm sewer Generic Permit (entities <code>"MSGP COT"</code> and
+<code>"MSGP PINELLAS"</code> in <code><a href="tbbase.html">tbbase</a></code>) is not part of any
+individually-tracked MS4 jurisdiction and is aggregated the same way to
+entity <code>"Non-MS4/Ag NPS"</code>, matching the row label used in the TBNMC
+draft loading tables; Middle Tampa Bay (<code>bay_seg</code> 3) additionally
+folds <code>"PORT MANATEE"</code> into this aggregate.</p>
 <p>After disaggregation, loads and 1992-1994 baseline water volumes are summed
 across basins to the segment level. TN corrections from <code><a href="aa_corrections.html">aa_corrections</a></code>
 (<code>ad_tons</code> + <code>project_tons</code>) are subtracted before hydrologic normalization:</p>
