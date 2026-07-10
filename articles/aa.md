@@ -154,7 +154,7 @@ The function returns one row per entity (NPS/MS4) or entity/facility
 | `entity_full` | Full entity name (NPS rows only) |
 | `facname` | Facility name (IPS, DPS, ML rows only) |
 | `permit` | NPDES permit number (IPS rows only) |
-| `source` | Allocation type (`"MS4"`, `"IPS"`, `"DPS - end of pipe"`, `"DPS - reuse"`, `"ML"`) |
+| `source` | Allocation type (`"MS4"`, `"Nonpoint Source/MS4"`, `"IPS"`, `"DPS - end of pipe"`, `"DPS - reuse"`, `"ML"`); `NA` for unmatched entities |
 | `alloc_pct` | Fractional TN allocation (0-1) |
 | `alloc_tons` | Allowable TN load (tons/yr) |
 | `eff_load_tons` | Mean hydrologically-normalized TN load (tons/yr); equals `load_tons` for DPS and ML, and for IPS facilities not flagged `hydro_affected` in `ps_allocations` |
@@ -163,7 +163,13 @@ The function returns one row per entity (NPS/MS4) or entity/facility
 
 Entities present in the computed loads but absent from the allocation
 tables are retained in the output with `NA` allocation fields so that
-unmatched entries are visible for troubleshooting.
+unmatched entries are visible for troubleshooting, with one exception:
+unmatched NPS/MS4 entities with a mean annual load under 0.01 tons/yr
+are dropped, since these are negligible land-use polygon artifacts
+(e.g. land in `tbbase` not attributed to any jurisdiction, or a
+jurisdiction’s boundary crossing into an adjacent basin/segment where it
+has no allocation) rather than real troubleshooting signal. A message
+reports what was dropped and why.
 
 ## Source-specific methodology
 
@@ -191,21 +197,32 @@ computed internally by
     basin, proportional to entity area times runoff coefficient relative
     to the CLUCSID total.
 
-Agricultural land use (category `"Agriculture"`) is attributed to the
-aggregate entity `"All"` regardless of the underlying MS4 jurisdiction.
-
 A conservation land correction is applied before summing across
-CLUCSIDs. The `conserv_correction` dataset provides entity- and
-CLUCSID-specific fractions of area times runoff coefficient attributable
-to conservation land. These fractions are derived from a legacy land
-cover file that includes a binary conservation land flag while retaining
-the original MS4 jurisdiction for each spatial unit. Each entity’s
-disaggregated TN load for a given basin and CLUCSID is scaled by
-`(1 - conserv_frac)` to remove the conservation land contribution. The
-`tbbase` file herein does not include a conservation land overlay
-because the original spatial layer is unavailable for routine GIS
-updates, so `conserv_correction` is stored as a separate stable dataset
-and applied as a backend correction.
+CLUCSIDs, using the true underlying MS4 jurisdiction (this ordering
+matters, see below). The `conserv_correction` dataset provides entity-
+and CLUCSID-specific fractions of area times runoff coefficient
+attributable to conservation land. These fractions are derived from a
+legacy land cover file that includes a binary conservation land flag
+while retaining the original MS4 jurisdiction for each spatial unit.
+Each entity’s disaggregated TN load for a given basin and CLUCSID is
+scaled by `(1 - conserv_frac)` to remove the conservation land
+contribution. The `tbbase` file herein does not include a conservation
+land overlay because the original spatial layer is unavailable for
+routine GIS updates, so `conserv_correction` is stored as a separate
+stable dataset and applied as a backend correction.
+
+Only after this correction are two groups of entities aggregated
+regardless of their underlying MS4 jurisdiction: agricultural land use
+(category `"Agriculture"`) is attributed to entity `"All"`, and land
+under a Municipal Separate storm sewer Generic Permit (entities
+`"MSGP COT"` and `"MSGP PINELLAS"` in `tbbase`, plus `"PORT MANATEE"`,
+whose footprint spans both Middle Tampa Bay and Lower Tampa Bay) is
+attributed to entity `"Non-MS4/Ag NPS"`, consistent with the loading
+tables generated for each Reasonable Assurance period. Lower Tampa Bay
+has no other MSGP entities, so Port Manatee is its sole contributor.
+Conservation land correction must precede both relabeling steps since
+`conserv_correction` is keyed by the true entity and would never match
+either aggregate label.
 
 After disaggregation, entity loads and 1992-1994 baseline water volumes
 from `hydro_baseline` are summed across basins to the bay segment level.

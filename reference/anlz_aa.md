@@ -219,8 +219,11 @@ in
 [`tbbase`](https://tbep-tech.github.io/tbeploads/reference/tbbase.md))
 is not part of any individually-tracked MS4 jurisdiction and is
 aggregated the same way to entity `"Non-MS4/Ag NPS"`, matching the row
-label used in the TBNMC draft loading tables; Middle Tampa Bay
-(`bay_seg` 3) additionally folds `"PORT MANATEE"` into this aggregate.
+label used in the TBNMC draft loading tables. `"PORT MANATEE"`'s
+footprint spans both Middle Tampa Bay (`bay_seg` 3) and Lower Tampa Bay
+(`bay_seg` 4), so it also folds into this aggregate in both segments;
+Lower Tampa Bay has no other MSGP entities, so Port Manatee is its sole
+contributor.
 
 After disaggregation, loads and 1992-1994 baseline water volumes are
 summed across basins to the segment level. TN corrections from
