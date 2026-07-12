@@ -22,11 +22,11 @@ make_ml_empty <- function() {
   )
 }
 
-# Single ML facility: Kinder Morgan Tampaplex (bay_seg = 2, HB, ishared = FALSE)
-ml_tampaplex <- function(tn_tonsyr = 5.0, yr = 2023L) {
+# Single ML facility: Kinder Morgan Port Manatee (bay_seg = 4, LTB, ishared = FALSE)
+ml_portmanatee <- function(tn_tonsyr = 5.0, yr = 2023L) {
   data.frame(
     Year = yr, Month = 1:12, entity = "Kinder Morgan",
-    facility = "Kinder Morgan Tampaplex",
+    facility = "Kinder Morgan Port Manatee",
     tn_load = tn_tonsyr / 12
   )
 }
@@ -256,12 +256,12 @@ test_that("IPS eff_load_tons is finite and positive when NPS water data covers t
 
 test_that("IPS eff_load_tons is normalized only for hydro_affected facilities", {
   # Coronet Industries (permit FL0034657) is flagged hydro_affected in
-  # ps_allocations; Kinder Morgan Port Sutton (permit FL0122904) has no
-  # ps_allocations row at all and so defaults to unnormalized. Both need NPS
-  # water for their own basin so nps_h2o is non-NA. The fixture only has
-  # Coronet data for 2021.
+  # ps_allocations; Kinder Morgan Port Sutton (permit FL0122904) has a real
+  # ps_allocations row but is not flagged hydro_affected, so it is left
+  # unnormalized. Both need NPS water for their own basin so nps_h2o is
+  # non-NA. The fixture only has Coronet data for 2021.
   expect_true(ps_allocations$hydro_affected[ps_allocations$permit == "FL0034657"])
-  expect_false("FL0122904" %in% ps_allocations$permit)
+  expect_false(ps_allocations$hydro_affected[ps_allocations$permit == "FL0122904"])
 
   nps_two_basins <- rbind(
     data.frame(
@@ -443,15 +443,15 @@ test_that("ML rows carry source equal to ML", {
 })
 
 test_that("ML eff_load_tons is finite and positive for non-shared facility", {
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), ml_tampaplex(tn_tonsyr = 5.0), make_nps_empty(),
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), ml_portmanatee(tn_tonsyr = 5.0), make_nps_empty(),
                     tbbase)
 
-  km_tp <- result[
-    !is.na(result$facname) & result$facname == "Kinder Morgan Tampaplex" &
+  km_pm <- result[
+    !is.na(result$facname) & result$facname == "Kinder Morgan Port Manatee" &
       !is.na(result$source) & result$source == "ML",
   ]
-  expect_true(nrow(km_tp) >= 1)
-  expect_equal(km_tp$eff_load_tons[1], 5.0, tolerance = 1e-9)
+  expect_true(nrow(km_pm) >= 1)
+  expect_equal(km_pm$eff_load_tons[1], 5.0, tolerance = 1e-9)
 })
 
 test_that("ML shared eff_load_tons equals sum of individual Mosaic facility loads", {
@@ -473,8 +473,8 @@ test_that("ML shared eff_load_tons equals sum of individual Mosaic facility load
 
 test_that("ML year range filtering averages only over yrrng years", {
   ml_two <- rbind(
-    ml_tampaplex(tn_tonsyr = 10.0, yr = 2022L),
-    ml_tampaplex(tn_tonsyr = 90.0, yr = 2023L)
+    ml_portmanatee(tn_tonsyr = 10.0, yr = 2022L),
+    ml_portmanatee(tn_tonsyr = 90.0, yr = 2023L)
   )
 
   result_2022 <- anlz_aa(2022L, make_dps_empty(), make_ips_empty(), ml_two, make_nps_empty(),
@@ -483,11 +483,11 @@ test_that("ML year range filtering averages only over yrrng years", {
                           tbbase)
 
   km_2022 <- result_2022$eff_load_tons[
-    !is.na(result_2022$facname) & result_2022$facname == "Kinder Morgan Tampaplex" &
+    !is.na(result_2022$facname) & result_2022$facname == "Kinder Morgan Port Manatee" &
       !is.na(result_2022$source) & result_2022$source == "ML"
   ]
   km_both <- result_both$eff_load_tons[
-    !is.na(result_both$facname) & result_both$facname == "Kinder Morgan Tampaplex" &
+    !is.na(result_both$facname) & result_both$facname == "Kinder Morgan Port Manatee" &
       !is.na(result_both$source) & result_both$source == "ML"
   ]
 

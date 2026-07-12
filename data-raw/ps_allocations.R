@@ -1,5 +1,6 @@
 library(dplyr)
 library(readr)
+library(tibble)
 library(usethis)
 
 ps_allocations <- read_csv(
@@ -81,5 +82,27 @@ ps_allocations <- read_csv(
     )
   ) |>
   select(entity, facname, permit, alloc_pct, alloc_tons, hydro_affected)
+
+# These IPS facilities are absent from the original 2016 source CSV entirely
+# but carry a real allocation in RP's draft assessment tables (confirmed
+# against prior_assess); added here so they compare against a real allocation
+# instead of showing as unmatched. alloc_pct is not available for these (only
+# tracked in the original CSV) and is left NA.
+missing_ps <- tribble(
+  ~entity,                ~facname,                    ~permit,     ~alloc_tons,
+  "Duke Energy",          "Duke Energy-Bartow Plant",  "FL0000132", 3.00,
+  "Kerry",                "Kerry I and F",             "FL0037389", 1.80,
+  "Kinder Morgan",        "Kinder Morgan Port Sutton", "FL0122904", 25.00,
+  "Kinder Morgan",        "Kinder Morgan Tampaplex",   "FL0321486", 0.00,
+  "Lowry Park Zoo",       "Lowry Park Zoo",            "FL0188651", 1.00,
+  "TECO",                 "TECO - Big Bend",           "FL0000817", 56.50,
+  "Piney Point Facility", "HRK Piney Point",           "FL0000124", 0.9354,
+  "CSX",                  "CSX Winston Yard",          "FL0032581", 3.00
+) |>
+  mutate(alloc_pct = NA_real_, hydro_affected = FALSE) |>
+  select(entity, facname, permit, alloc_pct, alloc_tons, hydro_affected)
+
+ps_allocations <- ps_allocations |>
+  bind_rows(missing_ps)
 
 usethis::use_data(ps_allocations, overwrite = TRUE)

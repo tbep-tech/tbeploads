@@ -729,11 +729,23 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
       .groups = "drop"
     )
 
+  # Shared-group keys (entity + bay_seg) computed first so both the shared
+  # and non-shared joins below can be built from disjoint subsets of ml_mean;
+  # otherwise ishared facilities' individual rows (no non-shared allocation
+  # match) would also leak into ml_out_ns as spurious unmatched rows.
+  shared_keys <- ml_allocations |>
+    dplyr::filter(.data$ishared) |>
+    dplyr::select("entity", "bay_seg") |>
+    dplyr::distinct()
+
   # Non-shared: one output row per facility; full join on entity + facname + bay_seg
   ml_out_ns <- ml_allocations |>
     dplyr::filter(!.data$ishared) |>
     dplyr::select(-"ishared") |>
-    dplyr::full_join(ml_mean, by = c("entity", "facname", "bay_seg")) |>
+    dplyr::full_join(
+      ml_mean |> dplyr::anti_join(shared_keys, by = c("entity", "bay_seg")),
+      by = c("entity", "facname", "bay_seg")
+    ) |>
     dplyr::mutate(
       segment     = bay_label[as.character(.data$bay_seg)],
       source      = "ML",
@@ -755,11 +767,6 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
 
   # Shared: sum loads across all facilities in the shared group (entity + bay_seg),
   # then compare to the single combined allocation
-  shared_keys <- ml_allocations |>
-    dplyr::filter(.data$ishared) |>
-    dplyr::select("entity", "bay_seg") |>
-    dplyr::distinct()
-
   ml_mean_shared <- ml_mean |>
     dplyr::semi_join(shared_keys, by = c("entity", "bay_seg")) |>
     dplyr::group_by(.data$bay_seg, .data$entity) |>

@@ -219,6 +219,16 @@ dpsfac <- read_sas(here('data-raw/dps1721monthentbas.sas7bdat')) |>
   # current TN load to 02307000 a second time (on top of 206-1), which
   # over-subtracts basin 02307000's gaged NPS total by ~18-21 tons/yr.
   filter(!(facname == 'Northwest Regional WRF' & basin == '02307000')) |>
+  # South County Regional WWTP is listed at both bayseg 2 (basin 206-2) and
+  # bayseg 3 (basin 02300530) for each source type, but only one bayseg is
+  # real per type: SW (end of pipe) totals 23.4 tons/yr at bayseg 2 and
+  # exactly 0 across the full 2017-2021 history at bayseg 3, while REUSE
+  # totals 7.4 tons/yr at bayseg 3 and exactly 0 at bayseg 2. Left in, both
+  # bayseg values match the same coastco in anlz_aa's DPS join (coastco is
+  # assigned by facname + source only, not bayseg), so the real load fans
+  # out and gets duplicated onto the zero-valued bayseg's row as well.
+  filter(!(facname == 'South County Regional WWTP' & bayseg == 2 & source == 'PS - Domestic - REUSE')) |>
+  filter(!(facname == 'South County Regional WWTP' & bayseg == 3 & source == 'PS - Domestic - SW')) |>
   mutate( # make ototw its own entity
     entity = case_when(
       entity == 'Pinellas Co.' & facname == 'On Top Of The World WWTP' ~ 'On Top Of The World',
