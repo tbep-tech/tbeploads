@@ -69,7 +69,7 @@ ipsfac <- read_sas(here('data-raw/ips1721monthentbas.sas7bdat')) |>
       facname == 'Brewster Phosphogypsum' ~ 'FL0132381',
       facname == 'Busch Gardens' ~ 'FL0185833',
       facname == 'Coronet Industries' ~ 'FL0034657',
-      facname == 'CSX - Rockport Newport' ~ 'FL0450600',
+      facname == 'CSX - Rockport Newport' ~ 'FL0166154',
       facname == 'CSX Winston Yard' ~ 'FL0032581',
       facname == 'Duke Energy-Bartow Plant' ~ 'FL0000132',
       facname == 'Estech Agricola' ~ 'FL0160083',
@@ -138,7 +138,7 @@ ipsfac <- read_sas(here('data-raw/ips1721monthentbas.sas7bdat')) |>
       permit == 'FL0188651' ~ 'FL0188651',
       permit == 'FL0321486' ~ 'FL0321486',
       permit == 'FL0334944' ~ 'FL0334944',
-      permit == 'FL0450600' ~ 'FL0450600'
+      permit == 'FL0166154' ~ 'FL0166154'
     )
   ) |>
   mutate(
@@ -177,7 +177,7 @@ ipsfac <- read_sas(here('data-raw/ips1721monthentbas.sas7bdat')) |>
       permit == 'FL0188651' ~ '191',
       permit == 'FL0321486' ~ '528',
       permit == 'FL0334944' ~ '515b',
-      permit == 'FL0450600' ~ '504'
+      permit == 'FL0166154' ~ '504'
     )
   )
 
