@@ -171,6 +171,13 @@ to it to reconstruct the true total. All other IPS facilities, and any
 facility with no `ps_allocations` match, use the raw (unnormalized)
 load.
 
+Permits with a real
+[`ps_allocations`](https://tbep-tech.github.io/tbeploads/reference/ps_allocations.md)
+entry but no current `ips_data` (permanently closed facilities) still
+receive their known `bay_seg` from `facilities` where available, so they
+appear in the output with `NA` loads but a real bay segment rather than
+`NA` throughout.
+
 **ML path**
 
 Material loss TN loads require no hydrologic normalization. Monthly

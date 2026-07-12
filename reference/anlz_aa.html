@@ -192,8 +192,12 @@ IPS/DPS water again would double-count it); for ungaged basins, the
 modeled NPS-only water excludes point-source discharge entirely, so IPS
 and DPS water are added to it to reconstruct the true total. All other
 IPS facilities, and any facility with no <code>ps_allocations</code> match, use
-the raw
-(unnormalized) load.</p>
+the raw (unnormalized) load.</p>
+<p>Permits with a real <code><a href="ps_allocations.html">ps_allocations</a></code> entry but no current
+<code>ips_data</code> (permanently closed facilities) still receive their known
+<code>bay_seg</code> from <code>facilities</code> where available, so they appear in
+the output with <code>NA</code> loads but a real bay segment rather than
+<code>NA</code> throughout.</p>
 <p><strong>ML path</strong></p>
 <p>Material loss TN loads require no hydrologic normalization. Monthly loads
 from <code>ml_data</code> are summed to annual totals per facility, averaged
