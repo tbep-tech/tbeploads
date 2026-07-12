@@ -95,8 +95,13 @@
 #' modeled NPS-only water excludes point-source discharge entirely, so IPS
 #' and DPS water are added to it to reconstruct the true total. All other
 #' IPS facilities, and any facility with no \code{ps_allocations} match, use
-#' the raw
-#' (unnormalized) load.
+#' the raw (unnormalized) load.
+#' 
+#' Permits with a real \code{\link{ps_allocations}} entry but no current
+#' \code{ips_data} (permanently closed facilities) still receive their known
+#' \code{bay_seg} from \code{facilities} where available, so they appear in
+#' the output with \code{NA} loads but a real bay segment rather than
+#' \code{NA} throughout.
 #'
 #' \strong{ML path}
 #'
@@ -545,6 +550,15 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
     dplyr::filter(!is.na(.data$basin), !is.na(.data$permit)) |>
     dplyr::select("entity", "facname", "bay_seg", "basin", "permit")
 
+  # Permit-keyed bay_seg fallback for facilities with no current ips_data
+  # (e.g. permanently closed) but a known location in facilities, so their
+  # allocation still displays a real bay segment instead of NA.
+  ips_fac_bayseg <- facilities |>
+    dplyr::filter(grepl("Industrial", .data$source), !is.na(.data$permit)) |>
+    dplyr::mutate(bay_seg = as.integer(.data$bayseg)) |>
+    dplyr::select("permit", "bay_seg") |>
+    dplyr::distinct()
+
   # Annual IPS TN loads joined to facility metadata via entity + facname
   ips_annual <- ips_data |>
     dplyr::filter(.data$Year %in% yrrng) |>
@@ -597,9 +611,14 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
         dplyr::rename(entity_ps = "entity", facname_ps = "facname"),
       by = "permit"
     ) |>
+    dplyr::left_join(
+      ips_fac_bayseg |> dplyr::rename(bay_seg_fac = "bay_seg"),
+      by = "permit"
+    ) |>
     dplyr::mutate(
       entity  = dplyr::coalesce(.data$entity,     .data$entity_ps),
       facname = dplyr::coalesce(.data$facname,     .data$facname_ps),
+      bay_seg = dplyr::coalesce(.data$bay_seg, .data$bay_seg_fac),
       segment      = bay_label[as.character(.data$bay_seg)],
       source       = "IPS",
       entity_full  = NA_character_,

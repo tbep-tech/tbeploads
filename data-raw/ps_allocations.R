@@ -23,17 +23,8 @@ ps_allocations <- read_csv(
     ),
     facname = if_else(
       facname == "Rockport  (fka Eastern Terminals)",
-      "CSX - Rockport Newport", 
+      "CSX - Rockport Newport",
       facname
-    ),
-    # New Wales Stack Closure (retired, no facilities/ips_data entry) is
-    # mis-recorded in the source CSV with the active New Wales Chemical
-    # Plant's permit (FL0036421); correct it to its own permit so anlz_aa's
-    # permit join doesn't duplicate the active plant's real IPS load onto
-    # the closed stack's row
-    permit = if_else(
-      facname == "Point Source - New Wales Stack Closure",
-      "FL0178527", permit
     ),
     # Busch Gardens (FL0185833) is recorded in the source CSV with a 0 ton/yr
     # allocation, predating its official 1 ton/yr allocation set in the 2022
@@ -69,8 +60,6 @@ ps_allocations <- read_csv(
       "FL0002666", # Point Source - Exxon Mobil
       "FL0032590", # Point Source - Hopewell
       "FL0000256", # Point Source - Kingsford
-      "FL0000299", # Point Source - Nichols Prep Plant (Agrifos)
-      "FL0178527", # Point Source - New Wales Stack Closure
       "FL0038652"  # Mosaic - Black Point (fka Yara)
       # Busch Gardens (FL0185833) also carries the "Hydrologically Affected"
       # row label but is intentionally excluded here: per direct confirmation
@@ -78,6 +67,17 @@ ps_allocations <- read_csv(
       # against the raw (unnormalized) load. A normalized value exists
       # elsewhere as a carryover from an outdated calculation step, but it is
       # not what's actually used for the pass/fail comparison.
+    )
+  ) |>
+  # Point Source - New Wales Stack Closure and Point Source - Nichols Prep
+  # Plant (Agrifos) are closed facilities represented elsewhere by an active
+  # sibling entry with a real allocation (Mosaic - New Wales Chemical Plant
+  # and Mosaic - Nichols Mine, respectively); dropped here rather than
+  # retained as unmatched no-load rows.
+  filter(
+    !facname %in% c(
+      "Point Source - New Wales Stack Closure",
+      "Point Source - Nichols Prep Plant"
     )
   ) |>
   select(entity, facname, permit, alloc_pct, alloc_tons, hydro_affected)

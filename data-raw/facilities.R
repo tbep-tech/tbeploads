@@ -188,9 +188,22 @@ mosaicbp <- tribble(
   2, '206-2', 'Mosaic', 'Mosaic - Black Point', 'PS - Industrial', 'mosaic', 'blackpt', 'FL0038652', '4029P20069', '528', NA_character_
 )
 
+# Mosaic - Hopewell and Exxon Mobil are closed facilities with no monthly
+# discharge records in the 2017-2021 source file, so they never get a bay_seg
+# through the usual entity + facname join to actual load data. They do carry
+# a real allocation in ps_allocations, so their known bay segment (both in
+# the Alafia River basin cluster with Kingsford/Nichols/New Wales, confirmed
+# Hillsborough Bay) is added here as a permit-keyed fallback (see anlz_aa()).
+closedfac <- tribble(
+  ~bayseg, ~basin, ~entity, ~facname, ~source, ~entityshr, ~facnameshr, ~permit, ~facid, ~coastco, ~coastid,
+  2, NA_character_, 'Mosaic', 'Point Source - Hopewell', 'PS - Industrial', NA_character_, NA_character_, 'FL0032590', NA_character_, NA_character_, NA_character_,
+  2, NA_character_, 'Exxon Mobil', 'Point Source - Exxon Mobil', 'PS - Industrial', NA_character_, NA_character_, 'FL0002666', NA_character_, NA_character_, NA_character_
+)
+
 # combine ips
 ipsfac <- ipsfac |>
-  bind_rows(mosaicbp)
+  bind_rows(mosaicbp) |>
+  bind_rows(closedfac)
 
 # original T:/03_BOARDS_COMMITTEES/05_TBNMC/2022_RA_Update/01_FUNDING_OUT/DELIVERABLES/TO-9/datastick_deliverables/2017-2021LUEntityLoads/2017-2021DPSMonthlyEntityBasin/dps1721monthentbas.sas7bdat
 dpsfac <- read_sas(here('data-raw/dps1721monthentbas.sas7bdat')) |>

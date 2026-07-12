@@ -113,8 +113,13 @@ IPS/DPS water again would double-count it); for ungaged basins, the
 modeled NPS-only water excludes point-source discharge entirely, so IPS
 and DPS water are added to it to reconstruct the true total. All other
 IPS facilities, and any facility with no \code{ps_allocations} match, use
-the raw
-(unnormalized) load.
+the raw (unnormalized) load.
+
+Permits with a real \code{\link{ps_allocations}} entry but no current
+\code{ips_data} (permanently closed facilities) still receive their known
+\code{bay_seg} from \code{facilities} where available, so they appear in
+the output with \code{NA} loads but a real bay segment rather than
+\code{NA} throughout.
 
 \strong{ML path}
 
