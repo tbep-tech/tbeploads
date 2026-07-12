@@ -37,7 +37,7 @@ framework.
 
 ``` r
 ps_allocations
-#> # A tibble: 28 × 6
+#> # A tibble: 36 × 6
 #>    entity facname                     permit alloc_pct alloc_tons hydro_affected
 #>    <chr>  <chr>                       <chr>      <dbl>      <dbl> <lgl>         
 #>  1 CSX    CSX - Rockport Newport      FL016…    0.0072        7.5 FALSE         
@@ -50,5 +50,5 @@ ps_allocations
 #>  8 Mosaic Point Source - Green Bay    FL000…    0.0064        6.6 TRUE          
 #>  9 Mosaic Point Source - Hookers Pra… FL003…    0.0052        5.5 TRUE          
 #> 10 Mosaic Point Source - Hopewell     FL003…    0.0025        2.6 TRUE          
-#> # ℹ 18 more rows
+#> # ℹ 26 more rows
 ```
