@@ -227,7 +227,9 @@ RALTB)</td>
 </tr>
 <tr class="odd">
 <td><code>alloc_tons</code></td>
-<td>Allowable TN load (tons/yr)</td>
+<td>Allowable TN load (tons/yr); for <code>ishared</code> rows, the
+group’s collective allocation, repeated on every member row, not an
+individual facility allocation</td>
 </tr>
 <tr class="even">
 <td><code>eff_load_tons</code></td>
@@ -238,13 +240,15 @@ flagged <code>hydro_affected</code> in <code>ps_allocations</code>
 </tr>
 <tr class="odd">
 <td><code>load_tons</code></td>
-<td>Mean annual TN load without normalization (tons/yr)</td>
+<td>Mean annual TN load without normalization (tons/yr); always the
+facility’s own individual load, even for <code>ishared</code> rows</td>
 </tr>
 <tr class="even">
-<td><code>pass</code></td>
+<td><code>ishared</code></td>
 <td>
-<code>TRUE</code> if <code>eff_load_tons &lt;= alloc_tons</code>,
-<code>NA</code> when either value is missing</td>
+<code>TRUE</code> when the facility is jointly assessed against a
+collective allocation shared with other facilities; <code>FALSE</code>
+for NPS/MS4 and DPS rows</td>
 </tr>
 </tbody>
 </table>
@@ -355,6 +359,13 @@ Mosaic mining operations); every other IPS facility uses its raw
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">eff_tn</mtext><mo>=</mo><mtext mathvariant="normal">tn_load</mtext><mo>×</mo><mfrac><mtext mathvariant="normal">mean_h2o_9294</mtext><mtext mathvariant="normal">basin_total_h2o</mtext></mfrac></mrow><annotation encoding="application/x-tex">\text{eff\_tn} = \text{tn\_load} \times \frac{\text{mean\_h2o\_9294}}{\text{basin\_total\_h2o}}</annotation></semantics></math></p>
 <p>where <code>basin_total_h2o</code> is the same gaged/ungaged-gated
 basin water quantity described in the NPS path above.</p>
+<p>Permits flagged <code>ishared = TRUE</code> in
+<code>ps_allocations</code> carry their group’s collective allocation in
+<code>alloc_tons</code> rather than an individual one, while
+<code>load_tons</code>/<code>eff_load_tons</code> remain each permit’s
+own load. <code>ishared</code> and <code>hydro_affected</code> are
+independent flags — a permit can be jointly assessed without being
+hydrologically normalized, or vice versa.</p>
 </div>
 <div class="section level3">
 <h3 id="dps">DPS<a class="anchor" aria-label="anchor" href="#dps"></a>
@@ -372,11 +383,13 @@ Tampa Bay segment. The join key is entity + facility name + bay segment
 </h3>
 <p>Material loss loads require no hydrologic normalization. Monthly
 loads are summed to annual totals per facility and averaged over
-<code>yrrng</code>. Facilities with <code>ishared = FALSE</code> in
-<code>ml_allocations</code> are assessed individually against their own
-allocation. Facilities with <code>ishared = TRUE</code> (e.g., Mosaic
-facilities in Hillsborough Bay) have their loads summed to an entity +
-bay segment total before comparison to a single shared allocation.</p>
+<code>yrrng</code>, then joined to <code>ml_allocations</code> on entity
++ facname + bay segment — one output row per facility, always.
+Facilities with <code>ishared = TRUE</code> in
+<code>ml_allocations</code> carry their group’s collective allocation in
+<code>alloc_tons</code> rather than an individual one, while
+<code>load_tons</code>/<code>eff_load_tons</code> remain each facility’s
+own load.</p>
 </div>
 </div>
 <div class="section level2">

@@ -117,7 +117,8 @@ per bay segment:</p><dl><dt>bay_seg</dt>
 (NPS rows only)</p></dd>
 
 <dt>facname</dt>
-<dd><p>Facility name (IPS, DPS, and non-shared ML rows)</p></dd>
+<dd><p>Facility name (IPS and DPS rows; also ML rows, one per
+facility whether shared or not)</p></dd>
 
 <dt>permit</dt>
 <dd><p>NPDES permit number (IPS rows only)</p></dd>
@@ -131,7 +132,9 @@ per bay segment:</p><dl><dt>bay_seg</dt>
 <dd><p>Fractional TN allocation (0-1)</p></dd>
 
 <dt>alloc_tons</dt>
-<dd><p>Allocation in TN tons per year</p></dd>
+<dd><p>Allocation in TN tons per year. For <code>ishared</code>
+rows, this is the group's collective allocation (the same value
+repeated on every member row), not an individual facility allocation</p></dd>
 
 <dt>eff_load_tons</dt>
 <dd><p>Mean hydrologically-normalized TN load (tons/yr),
@@ -142,11 +145,15 @@ normalization applied) and for IPS facilities not flagged
 
 <dt>load_tons</dt>
 <dd><p>Mean annual TN load (tons/yr) without hydrologic
-normalization, averaged over <code>yrrng</code></p></dd>
+normalization, averaged over <code>yrrng</code>; always the facility's own
+individual load, even for <code>ishared</code> rows</p></dd>
 
-<dt>pass</dt>
-<dd><p>Logical: <code>eff_load_tons &lt;= alloc_tons</code>; <code>NA</code> when
-allocation or effective load is missing</p></dd>
+<dt>ishared</dt>
+<dd><p>Logical: <code>TRUE</code> when the row's facility is jointly
+assessed against a collective allocation shared with other
+facilities (see <code>alloc_tons</code>), rather than its own individual
+allocation. <code>FALSE</code> for NPS/MS4 and DPS rows, which have no
+shared-group concept currently</p></dd>
 
 
 </dl></div>
@@ -198,16 +205,21 @@ the raw (unnormalized) load.</p>
 <code>bay_seg</code> from <code>facilities</code> where available, so they appear in
 the output with <code>NA</code> loads but a real bay segment rather than
 <code>NA</code> throughout.</p>
+<p>Permits flagged <code>ishared = TRUE</code> in <code><a href="ps_allocations.html">ps_allocations</a></code> carry
+their group's collective allocation in <code>alloc_tons</code> rather than an
+individual one, while <code>load_tons</code>/<code>eff_load_tons</code> remain each
+permit's own load — see <code>ishared</code> in Returns. <code>ishared</code> and
+<code>hydro_affected</code> are independent: a permit can be jointly assessed
+without being hydrologically normalized, or vice versa.</p>
 <p><strong>ML path</strong></p>
 <p>Material loss TN loads require no hydrologic normalization. Monthly loads
 from <code>ml_data</code> are summed to annual totals per facility, averaged
-over <code>yrrng</code>, and compared against the <code><a href="ml_allocations.html">ml_allocations</a></code>
-table. Facilities with <code>ishared = FALSE</code> are assessed individually on
-entity + facname + bay segment. Facilities with <code>ishared = TRUE</code>
-(the three Mosaic facilities in Hillsborough Bay, and Kinder Morgan Port
-Sutton + Tampaplex, also in Hillsborough Bay) have their loads summed to
-an entity + bay segment total before comparison to the single shared
-allocation.</p>
+over <code>yrrng</code>, and joined to the <code><a href="ml_allocations.html">ml_allocations</a></code> table on
+entity + facname + bay segment — one output row per facility, always.
+Facilities with <code>ishared = TRUE</code> carry
+their group's collective allocation in <code>alloc_tons</code> rather than an
+individual one, while <code>load_tons</code>/<code>eff_load_tons</code> remain each
+facility's own load — see <code>ishared</code> in Returns.</p>
 <p><strong>NPS/MS4 path</strong></p>
 <p>Gaged-basin TN loads in <code>nps_data</code> are gauge-measured totals and so
 include any upstream IPS + DPS discharge in that basin. Before

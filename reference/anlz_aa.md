@@ -81,7 +81,8 @@ segment:
 
 - facname:
 
-  Facility name (IPS, DPS, and non-shared ML rows)
+  Facility name (IPS and DPS rows; also ML rows, one per facility
+  whether shared or not)
 
 - permit:
 
@@ -98,7 +99,9 @@ segment:
 
 - alloc_tons:
 
-  Allocation in TN tons per year
+  Allocation in TN tons per year. For `ishared` rows, this is the
+  group's collective allocation (the same value repeated on every member
+  row), not an individual facility allocation
 
 - eff_load_tons:
 
@@ -111,12 +114,15 @@ segment:
 - load_tons:
 
   Mean annual TN load (tons/yr) without hydrologic normalization,
-  averaged over `yrrng`
+  averaged over `yrrng`; always the facility's own individual load, even
+  for `ishared` rows
 
-- pass:
+- ishared:
 
-  Logical: `eff_load_tons <= alloc_tons`; `NA` when allocation or
-  effective load is missing
+  Logical: `TRUE` when the row's facility is jointly assessed against a
+  collective allocation shared with other facilities (see `alloc_tons`),
+  rather than its own individual allocation. `FALSE` for NPS/MS4 and DPS
+  rows, which have no shared-group concept currently
 
 ## Details
 
@@ -178,18 +184,25 @@ receive their known `bay_seg` from `facilities` where available, so they
 appear in the output with `NA` loads but a real bay segment rather than
 `NA` throughout.
 
+Permits flagged `ishared = TRUE` in
+[`ps_allocations`](https://tbep-tech.github.io/tbeploads/reference/ps_allocations.md)
+carry their group's collective allocation in `alloc_tons` rather than an
+individual one, while `load_tons`/`eff_load_tons` remain each permit's
+own load — see `ishared` in Returns. `ishared` and `hydro_affected` are
+independent: a permit can be jointly assessed without being
+hydrologically normalized, or vice versa.
+
 **ML path**
 
 Material loss TN loads require no hydrologic normalization. Monthly
 loads from `ml_data` are summed to annual totals per facility, averaged
-over `yrrng`, and compared against the
+over `yrrng`, and joined to the
 [`ml_allocations`](https://tbep-tech.github.io/tbeploads/reference/ml_allocations.md)
-table. Facilities with `ishared = FALSE` are assessed individually on
-entity + facname + bay segment. Facilities with `ishared = TRUE` (the
-three Mosaic facilities in Hillsborough Bay, and Kinder Morgan Port
-Sutton + Tampaplex, also in Hillsborough Bay) have their loads summed to
-an entity + bay segment total before comparison to the single shared
-allocation.
+table on entity + facname + bay segment — one output row per facility,
+always. Facilities with `ishared = TRUE` carry their group's collective
+allocation in `alloc_tons` rather than an individual one, while
+`load_tons`/`eff_load_tons` remain each facility's own load — see
+`ishared` in Returns.
 
 **NPS/MS4 path**
 

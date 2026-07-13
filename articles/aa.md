@@ -156,10 +156,10 @@ The function returns one row per entity (NPS/MS4) or entity/facility
 | `permit` | NPDES permit number (IPS rows only) |
 | `source` | Allocation type (`"MS4"`, `"Nonpoint Source/MS4"`, `"IPS"`, `"DPS - end of pipe"`, `"DPS - reuse"`, `"ML"`); `NA` for unmatched entities |
 | `alloc_pct` | Fractional TN allocation (0-1) |
-| `alloc_tons` | Allowable TN load (tons/yr) |
+| `alloc_tons` | Allowable TN load (tons/yr); for `ishared` rows, the group’s collective allocation, repeated on every member row, not an individual facility allocation |
 | `eff_load_tons` | Mean hydrologically-normalized TN load (tons/yr); equals `load_tons` for DPS and ML, and for IPS facilities not flagged `hydro_affected` in `ps_allocations` |
-| `load_tons` | Mean annual TN load without normalization (tons/yr) |
-| `pass` | `TRUE` if `eff_load_tons <= alloc_tons`, `NA` when either value is missing |
+| `load_tons` | Mean annual TN load without normalization (tons/yr); always the facility’s own individual load, even for `ishared` rows |
+| `ishared` | `TRUE` when the facility is jointly assessed against a collective allocation shared with other facilities; `FALSE` for NPS/MS4 and DPS rows |
 
 Entities present in the computed loads but absent from the allocation
 tables are retained in the output with `NA` allocation fields so that
@@ -271,6 +271,12 @@ facilities:
 where `basin_total_h2o` is the same gaged/ungaged-gated basin water
 quantity described in the NPS path above.
 
+Permits flagged `ishared = TRUE` in `ps_allocations` carry their group’s
+collective allocation in `alloc_tons` rather than an individual one,
+while `load_tons`/`eff_load_tons` remain each permit’s own load.
+`ishared` and `hydro_affected` are independent flags — a permit can be
+jointly assessed without being hydrologically normalized, or vice versa.
+
 ### DPS
 
 Domestic point source loads require no hydrologic normalization. Monthly
@@ -284,12 +290,12 @@ or reuse).
 ### ML
 
 Material loss loads require no hydrologic normalization. Monthly loads
-are summed to annual totals per facility and averaged over `yrrng`.
-Facilities with `ishared = FALSE` in `ml_allocations` are assessed
-individually against their own allocation. Facilities with
-`ishared = TRUE` (e.g., Mosaic facilities in Hillsborough Bay) have
-their loads summed to an entity + bay segment total before comparison to
-a single shared allocation.
+are summed to annual totals per facility and averaged over `yrrng`, then
+joined to `ml_allocations` on entity + facname + bay segment — one
+output row per facility, always. Facilities with `ishared = TRUE` in
+`ml_allocations` carry their group’s collective allocation in
+`alloc_tons` rather than an individual one, while
+`load_tons`/`eff_load_tons` remain each facility’s own load.
 
 ## Supporting datasets
 
