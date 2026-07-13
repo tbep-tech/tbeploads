@@ -73,16 +73,16 @@ test_that("anlz_aa returns a data frame with expected columns", {
   expect_s3_class(result, "data.frame")
   expected_cols <- c(
     "bay_seg", "segment", "entity", "entity_full", "facname",
-    "permit", "source", "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "pass"
+    "permit", "source", "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared"
   )
   expect_true(all(expected_cols %in% names(result)))
 })
 
-test_that("bay_seg is integer and pass is logical", {
+test_that("bay_seg is integer and ishared is logical", {
   result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(),  make_ml_empty(), make_nps_empty(), tbbase)
 
   expect_type(result$bay_seg, "integer")
-  expect_type(result$pass, "logical")
+  expect_type(result$ishared, "logical")
 })
 
 # ---- Full join: all allocation rows retained ---------------------------------
@@ -110,21 +110,42 @@ test_that("every dps_allocations row appears in output with empty DPS input", {
   expect_true(all(alloc_keys %in% out_keys))
 })
 
-# ---- pass column logic -------------------------------------------------------
+# ---- ishared column logic -----------------------------------------------------
 
-test_that("pass is NA for all rows when no load data is supplied", {
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), make_nps_empty(), tbbase)
+test_that("ishared is FALSE for NPS/MS4 and DPS rows", {
+  result <- anlz_aa(2023L, dps_bradenton_sw(), make_ips_empty(), make_ml_empty(), nps_206_1(), tbbase)
 
-  expect_true(all(is.na(result$pass)))
+  nps_rows <- result[!is.na(result$source) & result$source %in% c("MS4", "Nonpoint Source/MS4"), ]
+  dps_rows <- result[!is.na(result$source) & grepl("^DPS", result$source), ]
+  expect_true(nrow(nps_rows) > 0)
+  expect_true(nrow(dps_rows) > 0)
+  expect_true(all(!nps_rows$ishared))
+  expect_true(all(!dps_rows$ishared))
 })
 
-test_that("pass equals eff_load_tons <= alloc_tons wherever both are non-NA", {
-  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_206_1(), tbbase)
+test_that("a shared-group IPS facility carries the collective allocation, not an individual one", {
+  # Mosaic - Bartow (permit FL0001589) is one of 19 Mosaic facilities in
+  # Hillsborough Bay jointly assessed against a combined 124.1 ton/yr
+  # allocation (entity_facility_alloc.RData, confirmed against prior_assess).
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), make_nps_empty(), tbbase)
 
-  rows_both <- result[!is.na(result$alloc_tons) & !is.na(result$eff_load_tons), ]
-  if (nrow(rows_both) > 0) {
-    expect_equal(rows_both$pass, rows_both$eff_load_tons <= rows_both$alloc_tons)
-  }
+  bartow <- result[!is.na(result$permit) & result$permit == "FL0001589", ]
+  expect_equal(nrow(bartow), 1L)
+  expect_true(bartow$ishared)
+  expect_equal(bartow$alloc_tons, 124.1, tolerance = 1e-9)
+})
+
+test_that("a non-shared ML facility carries its own individual allocation with ishared FALSE", {
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), ml_portmanatee(tn_tonsyr = 5.0),
+                    make_nps_empty(), tbbase)
+
+  km_pm <- result[
+    !is.na(result$facname) & result$facname == "Kinder Morgan Port Manatee" &
+      !is.na(result$source) & result$source == "ML",
+  ]
+  expect_true(nrow(km_pm) >= 1)
+  expect_false(km_pm$ishared[1])
+  expect_equal(km_pm$alloc_tons[1], 0.29894, tolerance = 1e-9)
 })
 
 # ---- load_tons column -------------------------------------------------------
@@ -260,8 +281,8 @@ test_that("IPS eff_load_tons is normalized only for hydro_affected facilities", 
   # ps_allocations row but is not flagged hydro_affected, so it is left
   # unnormalized. Both need NPS water for their own basin so nps_h2o is
   # non-NA. The fixture only has Coronet data for 2021.
-  expect_true(ps_allocations$hydro_affected[ps_allocations$permit == "FL0034657"])
-  expect_false(ps_allocations$hydro_affected[ps_allocations$permit == "FL0122904"])
+  expect_true(ps_allocations$hydro_affected[!is.na(ps_allocations$permit) & ps_allocations$permit == "FL0034657"])
+  expect_false(ps_allocations$hydro_affected[!is.na(ps_allocations$permit) & ps_allocations$permit == "FL0122904"])
 
   nps_two_basins <- rbind(
     data.frame(
@@ -315,9 +336,9 @@ test_that("DPS eff_load_tons is finite and positive when dps_data covers the fac
   expect_true(brd$eff_load_tons[1] > 0)
 })
 
-test_that("DPS pass is FALSE when eff_load_tons exceeds alloc_tons", {
-  # Use a very large tn_load to force a fail
-  result <- anlz_aa(2023L, dps_bradenton_sw(tn = 1e6), make_ips_empty(), make_ml_empty(), make_nps_empty(), 
+test_that("DPS eff_load_tons exceeds alloc_tons for an implausibly large load", {
+  # Use a very large tn_load so eff_load_tons is far above the real allocation
+  result <- anlz_aa(2023L, dps_bradenton_sw(tn = 1e6), make_ips_empty(), make_ml_empty(), make_nps_empty(),
                     tbbase)
 
   brd <- result[
@@ -325,7 +346,7 @@ test_that("DPS pass is FALSE when eff_load_tons exceeds alloc_tons", {
       !is.na(result$source) & result$source == "DPS - end of pipe",
   ]
   expect_true(nrow(brd) >= 1)
-  expect_false(isTRUE(brd$pass[1]))
+  expect_true(brd$eff_load_tons[1] > brd$alloc_tons[1])
 })
 
 test_that("DPS year range filtering averages only over yrrng years", {
@@ -421,16 +442,18 @@ test_that("every ml_allocations non-shared row appears in output with empty ML i
   expect_true(all(ns_keys %in% out_keys))
 })
 
-test_that("shared ML allocation row appears in output with empty ML input", {
+test_that("shared ML Mosaic facilities each appear with the collective allocation", {
   result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), make_nps_empty(),
                     tbbase)
 
-  shared_row <- result[
+  shared_rows <- result[
     !is.na(result$source) & result$source == "ML" &
-      result$entity == "Mosaic" & result$bay_seg == 2 & is.na(result$facname),
+      result$entity == "Mosaic" & result$bay_seg == 2,
   ]
-  expect_equal(nrow(shared_row), 1L)
-  expect_equal(shared_row$alloc_tons, 3.3, tolerance = 1e-9)
+  expect_equal(nrow(shared_rows), 3L)
+  expect_setequal(shared_rows$facname, c("Riverview", "Tampa Marine", "Big Bend"))
+  expect_true(all(shared_rows$ishared))
+  expect_equal(shared_rows$alloc_tons, rep(9.9, 3), tolerance = 1e-9)
 })
 
 test_that("ML rows carry source equal to ML", {
@@ -454,8 +477,9 @@ test_that("ML eff_load_tons is finite and positive for non-shared facility", {
   expect_equal(km_pm$eff_load_tons[1], 5.0, tolerance = 1e-9)
 })
 
-test_that("ML shared eff_load_tons equals sum of individual Mosaic facility loads", {
-  # Supply one Mosaic ML facility (Riverview) and verify the shared row reflects it
+test_that("ML shared Mosaic facility keeps its own individual load, not the group sum", {
+  # Supply one Mosaic ML facility (Riverview) and verify its own row reflects
+  # only its own load, while still carrying the group's collective allocation.
   ml_riverview <- data.frame(
     Year = 2023L, Month = 1:12, entity = "Mosaic",
     facility = "Riverview", tn_load = 1.0 / 12
@@ -463,12 +487,14 @@ test_that("ML shared eff_load_tons equals sum of individual Mosaic facility load
   result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), ml_riverview, make_nps_empty(),
                     tbbase)
 
-  shared_row <- result[
+  riverview <- result[
     !is.na(result$source) & result$source == "ML" &
-      result$entity == "Mosaic" & is.na(result$facname),
+      result$entity == "Mosaic" & !is.na(result$facname) & result$facname == "Riverview",
   ]
-  expect_true(nrow(shared_row) == 1L)
-  expect_equal(shared_row$eff_load_tons, 1.0, tolerance = 1e-9)
+  expect_true(nrow(riverview) == 1L)
+  expect_equal(riverview$eff_load_tons, 1.0, tolerance = 1e-9)
+  expect_true(riverview$ishared)
+  expect_equal(riverview$alloc_tons, 9.9, tolerance = 1e-9)
 })
 
 test_that("ML year range filtering averages only over yrrng years", {

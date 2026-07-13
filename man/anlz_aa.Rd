@@ -45,22 +45,29 @@ per bay segment:
 \item{entity}{MS4 entity name or facility operator}
 \item{entity_full}{Full entity name from \code{\link{nps_allocations}}
 (NPS rows only)}
-\item{facname}{Facility name (IPS, DPS, and non-shared ML rows)}
+\item{facname}{Facility name (IPS and DPS rows; also ML rows, one per
+facility whether shared or not)}
 \item{permit}{NPDES permit number (IPS rows only)}
 \item{source}{Allocation type: \code{"MS4"},
 \code{"Nonpoint Source/MS4"}, \code{"IPS"},
 \code{"DPS - end of pipe"}, \code{"DPS - reuse"}, or \code{"ML"}}
 \item{alloc_pct}{Fractional TN allocation (0-1)}
-\item{alloc_tons}{Allocation in TN tons per year}
+\item{alloc_tons}{Allocation in TN tons per year. For \code{ishared}
+rows, this is the group's collective allocation (the same value
+repeated on every member row), not an individual facility allocation}
 \item{eff_load_tons}{Mean hydrologically-normalized TN load (tons/yr),
 averaged over \code{yrrng}; equals \code{load_tons} for DPS and ML (no
 normalization applied) and for IPS facilities not flagged
 \code{hydro_affected} in \code{\link{ps_allocations}}. NPS/MS4 rows and
 \code{hydro_affected} IPS facilities are normalized}
 \item{load_tons}{Mean annual TN load (tons/yr) without hydrologic
-normalization, averaged over \code{yrrng}}
-\item{pass}{Logical: \code{eff_load_tons <= alloc_tons}; \code{NA} when
-allocation or effective load is missing}
+normalization, averaged over \code{yrrng}; always the facility's own
+individual load, even for \code{ishared} rows}
+\item{ishared}{Logical: \code{TRUE} when the row's facility is jointly
+assessed against a collective allocation shared with other
+facilities (see \code{alloc_tons}), rather than its own individual
+allocation. \code{FALSE} for NPS/MS4 and DPS rows, which have no
+shared-group concept currently}
 }
 }
 \description{
@@ -121,17 +128,23 @@ Permits with a real \code{\link{ps_allocations}} entry but no current
 the output with \code{NA} loads but a real bay segment rather than
 \code{NA} throughout.
 
+Permits flagged \code{ishared = TRUE} in \code{\link{ps_allocations}} carry
+their group's collective allocation in \code{alloc_tons} rather than an
+individual one, while \code{load_tons}/\code{eff_load_tons} remain each
+permit's own load — see \code{ishared} in Returns. \code{ishared} and
+\code{hydro_affected} are independent: a permit can be jointly assessed
+without being hydrologically normalized, or vice versa.
+
 \strong{ML path}
 
 Material loss TN loads require no hydrologic normalization. Monthly loads
 from \code{ml_data} are summed to annual totals per facility, averaged
-over \code{yrrng}, and compared against the \code{\link{ml_allocations}}
-table. Facilities with \code{ishared = FALSE} are assessed individually on
-entity + facname + bay segment. Facilities with \code{ishared = TRUE}
-(the three Mosaic facilities in Hillsborough Bay, and Kinder Morgan Port
-Sutton + Tampaplex, also in Hillsborough Bay) have their loads summed to
-an entity + bay segment total before comparison to the single shared
-allocation.
+over \code{yrrng}, and joined to the \code{\link{ml_allocations}} table on
+entity + facname + bay segment — one output row per facility, always.
+Facilities with \code{ishared = TRUE} carry
+their group's collective allocation in \code{alloc_tons} rather than an
+individual one, while \code{load_tons}/\code{eff_load_tons} remain each
+facility's own load — see \code{ishared} in Returns.
 
 \strong{NPS/MS4 path}
 

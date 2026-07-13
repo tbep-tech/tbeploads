@@ -30,22 +30,29 @@
 #'   \item{entity}{MS4 entity name or facility operator}
 #'   \item{entity_full}{Full entity name from \code{\link{nps_allocations}}
 #'     (NPS rows only)}
-#'   \item{facname}{Facility name (IPS, DPS, and non-shared ML rows)}
+#'   \item{facname}{Facility name (IPS and DPS rows; also ML rows, one per
+#'     facility whether shared or not)}
 #'   \item{permit}{NPDES permit number (IPS rows only)}
 #'   \item{source}{Allocation type: \code{"MS4"},
 #'     \code{"Nonpoint Source/MS4"}, \code{"IPS"},
 #'     \code{"DPS - end of pipe"}, \code{"DPS - reuse"}, or \code{"ML"}}
 #'   \item{alloc_pct}{Fractional TN allocation (0-1)}
-#'   \item{alloc_tons}{Allocation in TN tons per year}
+#'   \item{alloc_tons}{Allocation in TN tons per year. For \code{ishared}
+#'     rows, this is the group's collective allocation (the same value
+#'     repeated on every member row), not an individual facility allocation}
 #'   \item{eff_load_tons}{Mean hydrologically-normalized TN load (tons/yr),
 #'     averaged over \code{yrrng}; equals \code{load_tons} for DPS and ML (no
 #'     normalization applied) and for IPS facilities not flagged
 #'     \code{hydro_affected} in \code{\link{ps_allocations}}. NPS/MS4 rows and
 #'     \code{hydro_affected} IPS facilities are normalized}
 #'   \item{load_tons}{Mean annual TN load (tons/yr) without hydrologic
-#'     normalization, averaged over \code{yrrng}}
-#'   \item{pass}{Logical: \code{eff_load_tons <= alloc_tons}; \code{NA} when
-#'     allocation or effective load is missing}
+#'     normalization, averaged over \code{yrrng}; always the facility's own
+#'     individual load, even for \code{ishared} rows}
+#'   \item{ishared}{Logical: \code{TRUE} when the row's facility is jointly
+#'     assessed against a collective allocation shared with other
+#'     facilities (see \code{alloc_tons}), rather than its own individual
+#'     allocation. \code{FALSE} for NPS/MS4 and DPS rows, which have no
+#'     shared-group concept currently}
 #' }
 #'
 #' @details
@@ -103,17 +110,23 @@
 #' the output with \code{NA} loads but a real bay segment rather than
 #' \code{NA} throughout.
 #'
+#' Permits flagged \code{ishared = TRUE} in \code{\link{ps_allocations}} carry
+#' their group's collective allocation in \code{alloc_tons} rather than an
+#' individual one, while \code{load_tons}/\code{eff_load_tons} remain each
+#' permit's own load — see \code{ishared} in Returns. \code{ishared} and
+#' \code{hydro_affected} are independent: a permit can be jointly assessed
+#' without being hydrologically normalized, or vice versa.
+#'
 #' \strong{ML path}
 #'
 #' Material loss TN loads require no hydrologic normalization. Monthly loads
 #' from \code{ml_data} are summed to annual totals per facility, averaged
-#' over \code{yrrng}, and compared against the \code{\link{ml_allocations}}
-#' table. Facilities with \code{ishared = FALSE} are assessed individually on
-#' entity + facname + bay segment. Facilities with \code{ishared = TRUE}
-#' (the three Mosaic facilities in Hillsborough Bay, and Kinder Morgan Port
-#' Sutton + Tampaplex, also in Hillsborough Bay) have their loads summed to
-#' an entity + bay segment total before comparison to the single shared
-#' allocation.
+#' over \code{yrrng}, and joined to the \code{\link{ml_allocations}} table on
+#' entity + facname + bay segment — one output row per facility, always.
+#' Facilities with \code{ishared = TRUE} carry
+#' their group's collective allocation in \code{alloc_tons} rather than an
+#' individual one, while \code{load_tons}/\code{eff_load_tons} remain each
+#' facility's own load — see \code{ishared} in Returns.
 #' 
 #' \strong{NPS/MS4 path}
 #'
@@ -483,16 +496,12 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
       source  = .data$type,
       facname = NA_character_,
       permit  = NA_character_,
-      pass    = dplyr::if_else(
-        !is.na(.data$alloc_tons) & !is.na(.data$eff_load_tons),
-        .data$eff_load_tons <= .data$alloc_tons,
-        NA
-      )
+      ishared = FALSE
     ) |>
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "pass"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared"
     )
 
   # Drop negligible unmatched NPS/MS4 entities: land not attributed to any
@@ -618,7 +627,16 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
     dplyr::mutate(
       entity  = dplyr::coalesce(.data$entity,     .data$entity_ps),
       facname = dplyr::coalesce(.data$facname,     .data$facname_ps),
-      bay_seg = dplyr::coalesce(.data$bay_seg, .data$bay_seg_fac),
+      # Tampa Bay Water and Kinder Morgan Hartford Terminal have no known
+      # NPDES permit (so the permit-keyed bay_seg_fac fallback above can't
+      # match), but the user confirmed both are Hillsborough Bay facilities
+      bay_seg = dplyr::coalesce(
+        .data$bay_seg, .data$bay_seg_fac,
+        dplyr::if_else(
+          .data$entity == "Tampa Bay Water" | .data$facname == "Kinder Morgan Hartford Terminal",
+          2L, NA_integer_
+        )
+      ),
       segment      = bay_label[as.character(.data$bay_seg)],
       source       = "IPS",
       entity_full  = NA_character_,
@@ -627,16 +645,12 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
         .data$eff_load_tons_hy,
         .data$load_tons
       ),
-      pass         = dplyr::if_else(
-        !is.na(.data$alloc_tons) & !is.na(.data$eff_load_tons),
-        .data$eff_load_tons <= .data$alloc_tons,
-        NA
-      )
+      ishared      = dplyr::coalesce(.data$ishared, FALSE)
     ) |>
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "pass"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared"
     )
 
   # ---- DPS path ------------------------------------------------------------
@@ -691,16 +705,12 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
       permit    = NA_character_,
       alloc_pct = NA_real_,
       load_tons = .data$eff_load_tons,
-      pass      = dplyr::if_else(
-        !is.na(.data$alloc_tons) & !is.na(.data$eff_load_tons),
-        .data$eff_load_tons <= .data$alloc_tons,
-        NA
-      )
+      ishared   = FALSE
     ) |>
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "pass"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared"
     )
 
   # ---- ML path ------------------------------------------------------------
@@ -729,23 +739,12 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
       .groups = "drop"
     )
 
-  # Shared-group keys (entity + bay_seg) computed first so both the shared
-  # and non-shared joins below can be built from disjoint subsets of ml_mean;
-  # otherwise ishared facilities' individual rows (no non-shared allocation
-  # match) would also leak into ml_out_ns as spurious unmatched rows.
-  shared_keys <- ml_allocations |>
-    dplyr::filter(.data$ishared) |>
-    dplyr::select("entity", "bay_seg") |>
-    dplyr::distinct()
-
-  # Non-shared: one output row per facility; full join on entity + facname + bay_seg
-  ml_out_ns <- ml_allocations |>
-    dplyr::filter(!.data$ishared) |>
-    dplyr::select(-"ishared") |>
-    dplyr::full_join(
-      ml_mean |> dplyr::anti_join(shared_keys, by = c("entity", "bay_seg")),
-      by = c("entity", "facname", "bay_seg")
-    ) |>
+  # Full join on entity + facname + bay_seg; retain unmatched rows on both
+  # sides. ml_allocations has one row per real facility, whether shared or
+  # not, with the correct (individual or collective) alloc_tons already
+  # attached — no aggregation needed here.
+  ml_out <- ml_allocations |>
+    dplyr::full_join(ml_mean, by = c("entity", "facname", "bay_seg")) |>
     dplyr::mutate(
       segment     = bay_label[as.character(.data$bay_seg)],
       source      = "ML",
@@ -753,53 +752,13 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
       permit      = NA_character_,
       alloc_pct   = NA_real_,
       load_tons   = .data$eff_load_tons,
-      pass        = dplyr::if_else(
-        !is.na(.data$alloc_tons) & !is.na(.data$eff_load_tons),
-        .data$eff_load_tons <= .data$alloc_tons,
-        NA
-      )
+      ishared     = dplyr::coalesce(.data$ishared, FALSE)
     ) |>
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "pass"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared"
     )
-
-  # Shared: sum loads across all facilities in the shared group (entity + bay_seg),
-  # then compare to the single combined allocation
-  ml_mean_shared <- ml_mean |>
-    dplyr::semi_join(shared_keys, by = c("entity", "bay_seg")) |>
-    dplyr::group_by(.data$bay_seg, .data$entity) |>
-    dplyr::summarise(
-      eff_load_tons = sum(.data$eff_load_tons, na.rm = TRUE),
-      .groups = "drop"
-    )
-
-  ml_out_shared <- ml_allocations |>
-    dplyr::filter(.data$ishared) |>
-    dplyr::select(-"ishared", -"facname") |>
-    dplyr::full_join(ml_mean_shared, by = c("entity", "bay_seg")) |>
-    dplyr::mutate(
-      segment     = bay_label[as.character(.data$bay_seg)],
-      source      = "ML",
-      entity_full = NA_character_,
-      facname     = NA_character_,
-      permit      = NA_character_,
-      alloc_pct   = NA_real_,
-      load_tons   = .data$eff_load_tons,
-      pass        = dplyr::if_else(
-        !is.na(.data$alloc_tons) & !is.na(.data$eff_load_tons),
-        .data$eff_load_tons <= .data$alloc_tons,
-        NA
-      )
-    ) |>
-    dplyr::select(
-      "bay_seg", "segment", "entity", "entity_full",
-      "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "pass"
-    )
-
-  ml_out <- dplyr::bind_rows(ml_out_ns, ml_out_shared)
 
   # ---- Combine -------------------------------------------------------------
 
