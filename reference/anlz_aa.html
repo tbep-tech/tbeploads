@@ -50,7 +50,16 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">anlz_aa</span><span class="op">(</span><span class="va">yrrng</span>, <span class="va">dps_data</span>, <span class="va">ips_data</span>, <span class="va">ml_data</span>, <span class="va">nps_data</span>, <span class="va">tbbase</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">anlz_aa</span><span class="op">(</span></span>
+<span>  <span class="va">yrrng</span>,</span>
+<span>  <span class="va">dps_data</span>,</span>
+<span>  <span class="va">ips_data</span>,</span>
+<span>  <span class="va">ml_data</span>,</span>
+<span>  <span class="va">nps_data</span>,</span>
+<span>  <span class="va">tbbase</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  annavg <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -99,11 +108,20 @@ layer of bay segment, basin, jurisdiction, land use data, and soils, see details
 unmatched NPS/MS4 entities dropped from the output (see Details). Default
 <code>FALSE</code>.</p></dd>
 
+
+<dt id="arg-annavg">annavg<a class="anchor" aria-label="anchor" href="#arg-annavg"></a></dt>
+<dd><p>logical, if <code>TRUE</code> (default) loads are averaged over
+<code>yrrng</code> as in prior versions of this function. If <code>FALSE</code>, one
+row per entity/facility per year is returned instead, with an additional
+<code>year</code> column, and <code>load_tons</code>/<code>eff_load_tons</code> are that
+year's value rather than a <code>yrrng</code>-averaged one (see Details).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A data frame with one row per entity (NPS/MS4) or facility (IPS)
-per bay segment:</p><dl><dt>bay_seg</dt>
+per bay segment (or per bay segment per year when <code>annavg =
+  FALSE</code>):</p><dl><dt>bay_seg</dt>
 <dd><p>Integer bay segment identifier</p></dd>
 
 <dt>segment</dt>
@@ -160,6 +178,24 @@ shared-group concept currently</p></dd>
 to when <code>ishared</code> is <code>TRUE</code> (<code>NA</code> otherwise), from
 <code><a href="ps_allocations.html">ps_allocations</a></code>/<code><a href="ml_allocations.html">ml_allocations</a></code>.</p></dd>
 
+<dt>year</dt>
+<dd><p>Integer year. Only present when <code>annavg = FALSE</code>, in
+which case there is one row per entity/facility per year in
+<code>yrrng</code> instead of one <code>yrrng</code>-averaged row</p></dd>
+
+<dt>seg_h2o_total</dt>
+<dd><p>Total hydrologic load (NPS+IPS+DPS combined,
+million m3/yr) for the bay segment and year, repeated on every row
+sharing that <code>bay_seg</code>/<code>year</code> (see Details). Only present
+when <code>annavg = FALSE</code></p></dd>
+
+<dt>seg_conserv_tn</dt>
+<dd><p>Total TN (tons/yr) removed from NPS/MS4 entities
+by the conservation-land correction (see <code><a href="conserv_correction.html">conserv_correction</a></code>),
+summed for the bay segment and year and repeated on every row sharing
+that <code>bay_seg</code>/<code>year</code> (see Details). Only present when
+<code>annavg = FALSE</code></p></dd>
+
 
 </dl></div>
     <div class="section level2">
@@ -173,6 +209,29 @@ in <code><a href="tbbase.html">tbbase</a></code> not attributed to any jurisdict
 jurisdiction's boundary crossing into an adjacent basin/segment where it
 has no allocation) rather than real troubleshooting signal. When
 <code>verbose = TRUE</code>, a message reports what was dropped and why.</p>
+<p>When <code>annavg = FALSE</code>, each of the four paths below retains one row
+per entity/facility per year instead of averaging over <code>yrrng</code>: a
+year with no measured load for an entity/facility that has data in at
+least one other year of <code>yrrng</code> is zero-filled (mirroring the
+averaged path's existing "missing years contribute zero" behavior, just
+applied per year rather than to the mean); an entity/facility with a real
+allocation but no measured load in <em>any</em> year of <code>yrrng</code> still
+appears, once per year, with <code>NA</code> loads (mirroring how it already
+appears once, with <code>NA</code> loads, when <code>annavg = TRUE</code>).
+<code>alloc_pct</code>/<code>alloc_tons</code>/<code>ishared</code>/<code>group_id</code> do not
+vary by year and are repeated identically on every year-row for a given
+entity/facility.</p>
+<p>When <code>annavg = FALSE</code>, two additional bay-segment-level totals are
+computed once and repeated on every row sharing a <code>bay_seg</code>/<code>year</code>
+(analogous to how <code>alloc_tons</code> repeats for <code>ishared</code> groups):
+<code>seg_h2o_total</code> is the same NPS+IPS+DPS <code>total_h2o</code> already
+computed internally for entity-level hydrologic normalization (see the
+NPS/IPS paths below), summed across every basin in the segment instead of
+just an entity's own basins; <code>seg_conserv_tn</code> is the TN removed by the
+conservation-land correction (see <code><a href="conserv_correction.html">conserv_correction</a></code> in the
+NPS/MS4 path below), summed the same way. Both support downstream
+segment-total reporting (e.g. <code><a href="show_aaloads.html">show_aaloads</a></code>) that needs a
+whole-segment hydrologic budget rather than an entity-specific one.</p>
 <p><strong>DPS path</strong></p>
 <p>DPS facility TN loads require no hydrologic normalization. Monthly loads
 from <code>dps_data</code> are summed to annual totals per facility, averaged

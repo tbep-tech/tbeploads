@@ -5,7 +5,16 @@ Allocation assessment for DPS, IPS, and NPS/MS4 entities
 ## Usage
 
 ``` r
-anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbose = FALSE)
+anlz_aa(
+  yrrng,
+  dps_data,
+  ips_data,
+  ml_data,
+  nps_data,
+  tbbase,
+  verbose = FALSE,
+  annavg = TRUE
+)
 ```
 
 ## Arguments
@@ -56,10 +65,18 @@ anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbose = FALSE)
   NPS/MS4 entities dropped from the output (see Details). Default
   `FALSE`.
 
+- annavg:
+
+  logical, if `TRUE` (default) loads are averaged over `yrrng` as in
+  prior versions of this function. If `FALSE`, one row per
+  entity/facility per year is returned instead, with an additional
+  `year` column, and `load_tons`/`eff_load_tons` are that year's value
+  rather than a `yrrng`-averaged one (see Details).
+
 ## Value
 
 A data frame with one row per entity (NPS/MS4) or facility (IPS) per bay
-segment:
+segment (or per bay segment per year when `annavg = FALSE`):
 
 - bay_seg:
 
@@ -130,6 +147,27 @@ segment:
   `ishared` is `TRUE` (`NA` otherwise), from
   [`ps_allocations`](https://tbep-tech.github.io/tbeploads/reference/ps_allocations.md)/[`ml_allocations`](https://tbep-tech.github.io/tbeploads/reference/ml_allocations.md).
 
+- year:
+
+  Integer year. Only present when `annavg = FALSE`, in which case there
+  is one row per entity/facility per year in `yrrng` instead of one
+  `yrrng`-averaged row
+
+- seg_h2o_total:
+
+  Total hydrologic load (NPS+IPS+DPS combined, million m3/yr) for the
+  bay segment and year, repeated on every row sharing that
+  `bay_seg`/`year` (see Details). Only present when `annavg = FALSE`
+
+- seg_conserv_tn:
+
+  Total TN (tons/yr) removed from NPS/MS4 entities by the
+  conservation-land correction (see
+  [`conserv_correction`](https://tbep-tech.github.io/tbeploads/reference/conserv_correction.md)),
+  summed for the bay segment and year and repeated on every row sharing
+  that `bay_seg`/`year` (see Details). Only present when
+  `annavg = FALSE`
+
 ## Details
 
 Entities present in the computed loads but absent from the allocation
@@ -143,6 +181,33 @@ not attributed to any jurisdiction, or a jurisdiction's boundary
 crossing into an adjacent basin/segment where it has no allocation)
 rather than real troubleshooting signal. When `verbose = TRUE`, a
 message reports what was dropped and why.
+
+When `annavg = FALSE`, each of the four paths below retains one row per
+entity/facility per year instead of averaging over `yrrng`: a year with
+no measured load for an entity/facility that has data in at least one
+other year of `yrrng` is zero-filled (mirroring the averaged path's
+existing "missing years contribute zero" behavior, just applied per year
+rather than to the mean); an entity/facility with a real allocation but
+no measured load in *any* year of `yrrng` still appears, once per year,
+with `NA` loads (mirroring how it already appears once, with `NA` loads,
+when `annavg = TRUE`). `alloc_pct`/`alloc_tons`/`ishared`/`group_id` do
+not vary by year and are repeated identically on every year-row for a
+given entity/facility.
+
+When `annavg = FALSE`, two additional bay-segment-level totals are
+computed once and repeated on every row sharing a `bay_seg`/`year`
+(analogous to how `alloc_tons` repeats for `ishared` groups):
+`seg_h2o_total` is the same NPS+IPS+DPS `total_h2o` already computed
+internally for entity-level hydrologic normalization (see the NPS/IPS
+paths below), summed across every basin in the segment instead of just
+an entity's own basins; `seg_conserv_tn` is the TN removed by the
+conservation-land correction (see
+[`conserv_correction`](https://tbep-tech.github.io/tbeploads/reference/conserv_correction.md)
+in the NPS/MS4 path below), summed the same way. Both support downstream
+segment-total reporting (e.g.
+[`show_aaloads`](https://tbep-tech.github.io/tbeploads/reference/show_aaloads.md))
+that needs a whole-segment hydrologic budget rather than an
+entity-specific one.
 
 **DPS path**
 

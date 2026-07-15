@@ -33,6 +33,13 @@ Functions for analyzing data.
 - [`anlz_spr()`](https://tbep-tech.github.io/tbeploads/reference/anlz_spr.md)
   : Calculate spring loads to Hillsborough Bay
 
+## Show results
+
+Functions to show results.
+
+- [`show_aaloads()`](https://tbep-tech.github.io/tbeploads/reference/show_aaloads.md)
+  : Bay segment table of TN loads by year
+
 ## Internal datasets
 
 Supporting datasets used by the other functions.
