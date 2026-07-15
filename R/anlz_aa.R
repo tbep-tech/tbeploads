@@ -22,8 +22,14 @@
 #' @param verbose logical, if \code{TRUE} print a message reporting negligible
 #'   unmatched NPS/MS4 entities dropped from the output (see Details). Default
 #'   \code{FALSE}.
+#' @param annavg logical, if \code{TRUE} (default) loads are averaged over
+#'   \code{yrrng} as in prior versions of this function. If \code{FALSE}, one
+#'   row per entity/facility per year is returned instead, with an additional
+#'   \code{year} column, and \code{load_tons}/\code{eff_load_tons} are that
+#'   year's value rather than a \code{yrrng}-averaged one (see Details).
 #' @returns A data frame with one row per entity (NPS/MS4) or facility (IPS)
-#'   per bay segment:
+#'   per bay segment (or per bay segment per year when \code{annavg =
+#'   FALSE}):
 #' \describe{
 #'   \item{bay_seg}{Integer bay segment identifier}
 #'   \item{segment}{Bay segment name}
@@ -56,6 +62,18 @@
 #'   \item{group_id}{Character identifier for the shared group a row belongs
 #'     to when \code{ishared} is \code{TRUE} (\code{NA} otherwise), from
 #'     \code{\link{ps_allocations}}/\code{\link{ml_allocations}}.}
+#'   \item{year}{Integer year. Only present when \code{annavg = FALSE}, in
+#'     which case there is one row per entity/facility per year in
+#'     \code{yrrng} instead of one \code{yrrng}-averaged row}
+#'   \item{seg_h2o_total}{Total hydrologic load (NPS+IPS+DPS combined,
+#'     million m3/yr) for the bay segment and year, repeated on every row
+#'     sharing that \code{bay_seg}/\code{year} (see Details). Only present
+#'     when \code{annavg = FALSE}}
+#'   \item{seg_conserv_tn}{Total TN (tons/yr) removed from NPS/MS4 entities
+#'     by the conservation-land correction (see \code{\link{conserv_correction}}),
+#'     summed for the bay segment and year and repeated on every row sharing
+#'     that \code{bay_seg}/\code{year} (see Details). Only present when
+#'     \code{annavg = FALSE}}
 #' }
 #'
 #' @details
@@ -69,6 +87,32 @@
 #' has no allocation) rather than real troubleshooting signal. When
 #' \code{verbose = TRUE}, a message reports what was dropped and why.
 #'
+#' When \code{annavg = FALSE}, each of the four paths below retains one row
+#' per entity/facility per year instead of averaging over \code{yrrng}: a
+#' year with no measured load for an entity/facility that has data in at
+#' least one other year of \code{yrrng} is zero-filled (mirroring the
+#' averaged path's existing "missing years contribute zero" behavior, just
+#' applied per year rather than to the mean); an entity/facility with a real
+#' allocation but no measured load in \emph{any} year of \code{yrrng} still
+#' appears, once per year, with \code{NA} loads (mirroring how it already
+#' appears once, with \code{NA} loads, when \code{annavg = TRUE}).
+#' \code{alloc_pct}/\code{alloc_tons}/\code{ishared}/\code{group_id} do not
+#' vary by year and are repeated identically on every year-row for a given
+#' entity/facility.
+#'
+#' When \code{annavg = FALSE}, two additional bay-segment-level totals are
+#' computed once and repeated on every row sharing a \code{bay_seg}/\code{year}
+#' (analogous to how \code{alloc_tons} repeats for \code{ishared} groups):
+#' \code{seg_h2o_total} is the same NPS+IPS+DPS \code{total_h2o} already
+#' computed internally for entity-level hydrologic normalization (see the
+#' NPS/IPS paths below), summed across every basin in the segment instead of
+#' just an entity's own basins; \code{seg_conserv_tn} is the TN removed by the
+#' conservation-land correction (see \code{\link{conserv_correction}} in the
+#' NPS/MS4 path below), summed the same way. Both support downstream
+#' segment-total reporting (e.g. \code{\link{show_aaloads}}) that needs a
+#' whole-segment hydrologic budget rather than an entity-specific one.
+#'
+
 #' \strong{DPS path}
 #'
 #' DPS facility TN loads require no hydrologic normalization. Monthly loads
@@ -219,7 +263,7 @@
 #' 
 #' anlz_aa(c(2022, 2024), dps, ips, ml, nps, tbbase)
 #' }
-anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbose = FALSE) {
+anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbose = FALSE, annavg = TRUE) {
 
   yrrng <- seq(min(yrrng), max(yrrng))
 
@@ -381,6 +425,17 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
     ) |>
     dplyr::select(-dplyr::any_of(c("hy_load_ips", "hy_load_dps", "tn_load_ips", "tn_load_dps", "gagetype", "gaged")))
 
+  # Segment-level total hydrologic load (NPS+IPS+DPS), summed across every
+  # basin in the segment rather than just an entity's own basins — see
+  # seg_h2o_total in Returns/Details.
+  if (!annavg) {
+    seg_h2o_total <- nps_annual |>
+      dplyr::mutate(bay_seg = dplyr::if_else(.data$bay_seg %in% c(6L, 7L), 55L, .data$bay_seg)) |>
+      dplyr::group_by(.data$bay_seg, .data$Year) |>
+      dplyr::summarise(seg_h2o_total = sum(.data$total_h2o, na.rm = TRUE), .groups = "drop") |>
+      dplyr::rename(year = "Year")
+  }
+
   # ---- NPS path ------------------------------------------------------------
 
   nps_factors <- util_aa_npsfactors(tbbase, rcclucsid, emc)
@@ -409,6 +464,11 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
   entity_clucsid <- entity_clucsid |>
     dplyr::left_join(conserv_correction, by = c("bay_seg", "basin", "entity", "clucsid")) |>
     dplyr::mutate(
+      conserv_tn_removed = dplyr::if_else(
+        !is.na(.data$conserv_frac),
+        .data$tn_entity * .data$conserv_frac,
+        0
+      ),
       tn_entity = dplyr::if_else(
         !is.na(.data$conserv_frac),
         .data$tn_entity * (1 - .data$conserv_frac),
@@ -416,6 +476,18 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
       )
     ) |>
     dplyr::select(-"conserv_frac")
+
+  # Segment-level TN removed by the conservation-land correction, summed
+  # across every entity/basin/clucsid in the segment — see seg_conserv_tn in
+  # Returns/Details. Captured here (before entity relabeling/aggregation
+  # below) since it doesn't depend on which entity the TN was removed from.
+  if (!annavg) {
+    seg_conserv_tn <- entity_clucsid |>
+      dplyr::mutate(bay_seg = dplyr::if_else(.data$bay_seg %in% c(6L, 7L), 55L, .data$bay_seg)) |>
+      dplyr::group_by(.data$bay_seg, .data$Year) |>
+      dplyr::summarise(seg_conserv_tn = sum(.data$conserv_tn_removed, na.rm = TRUE), .groups = "drop") |>
+      dplyr::rename(year = "Year")
+  }
 
   # Agricultural land use (category "Agriculture") is attributed to the
   # aggregate entity "All" regardless of the underlying MS4 jurisdiction,
@@ -486,18 +558,34 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
       )
     )
 
-  # Sum over years then divide by length(yrrng); missing years contribute zero
-  nps_mean <- nps_normalized |>
-    dplyr::group_by(.data$bay_seg, .data$entity) |>
-    dplyr::summarise(
-      eff_load_tons = sum(.data$eff_tn,       na.rm = TRUE) / length(yrrng),
-      load_tons     = sum(.data$tn_corrected, na.rm = TRUE) / length(yrrng),
-      .groups = "drop"
-    )
+  # Sum over years then divide by length(yrrng) when annavg = TRUE (missing
+  # years contribute zero); when annavg = FALSE, keep one row per year
+  # instead, zero-filling any year with no data for an entity that has data
+  # in at least one other year (see Details).
+  if (annavg) {
+    nps_mean <- nps_normalized |>
+      dplyr::group_by(.data$bay_seg, .data$entity) |>
+      dplyr::summarise(
+        eff_load_tons = sum(.data$eff_tn,       na.rm = TRUE) / length(yrrng),
+        load_tons     = sum(.data$tn_corrected, na.rm = TRUE) / length(yrrng),
+        .groups = "drop"
+      )
+  } else {
+    nps_mean <- nps_normalized |>
+      tidyr::complete(
+        Year = yrrng,
+        tidyr::nesting(bay_seg, entity),
+        fill = list(eff_tn = 0, tn_corrected = 0)
+      ) |>
+      dplyr::rename(year = "Year", eff_load_tons = "eff_tn", load_tons = "tn_corrected")
+  }
 
   # Full join with allocations; retain unmatched rows on both sides
-  nps_out <- nps_allocations |>
-    dplyr::full_join(nps_mean, by = c("bay_seg", "entity")) |>
+  nps_alloc <- nps_allocations
+  if (!annavg) nps_alloc <- tidyr::crossing(nps_alloc, year = yrrng)
+
+  nps_out <- nps_alloc |>
+    dplyr::full_join(nps_mean, by = c("bay_seg", "entity", if (!annavg) "year")) |>
     dplyr::mutate(
       segment = bay_label[as.character(.data$bay_seg)],
       source  = .data$type,
@@ -509,7 +597,8 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared", "group_id"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared", "group_id",
+      dplyr::any_of("year")
     )
 
   # Drop negligible unmatched NPS/MS4 entities: land not attributed to any
@@ -605,28 +694,46 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
       )
     )
 
-  # Sum across basins per permit × entity × facname × bay_seg × year, then
-  # divide by length(yrrng) so missing years contribute zero
-  ips_mean <- ips_normalized |>
+  # Sum across basins per permit × entity × facname × bay_seg × year
+  ips_annual_permit <- ips_normalized |>
     dplyr::group_by(.data$bay_seg, .data$entity, .data$facname, .data$permit, .data$Year) |>
     dplyr::summarise(
       tn_ips = sum(.data$tn_ips, na.rm = TRUE),
       eff_tn = sum(.data$eff_tn, na.rm = TRUE),
       .groups = "drop"
-    ) |>
-    dplyr::group_by(.data$bay_seg, .data$entity, .data$facname, .data$permit) |>
-    dplyr::summarise(
-      load_tons        = sum(.data$tn_ips, na.rm = TRUE) / length(yrrng),
-      eff_load_tons_hy  = sum(.data$eff_tn, na.rm = TRUE) / length(yrrng),
-      .groups = "drop"
     )
 
+  # Then divide by length(yrrng) when annavg = TRUE so missing years
+  # contribute zero; when annavg = FALSE, keep one row per year instead,
+  # zero-filling any year with no data for a permit that has data in at
+  # least one other year (see Details).
+  if (annavg) {
+    ips_mean <- ips_annual_permit |>
+      dplyr::group_by(.data$bay_seg, .data$entity, .data$facname, .data$permit) |>
+      dplyr::summarise(
+        load_tons        = sum(.data$tn_ips, na.rm = TRUE) / length(yrrng),
+        eff_load_tons_hy  = sum(.data$eff_tn, na.rm = TRUE) / length(yrrng),
+        .groups = "drop"
+      )
+  } else {
+    ips_mean <- ips_annual_permit |>
+      tidyr::complete(
+        Year = yrrng,
+        tidyr::nesting(bay_seg, entity, facname, permit),
+        fill = list(tn_ips = 0, eff_tn = 0)
+      ) |>
+      dplyr::rename(year = "Year", load_tons = "tn_ips", eff_load_tons_hy = "eff_tn")
+  }
+
   # Full join with allocations on permit; retain unmatched on both sides
+  ps_alloc <- ps_allocations |>
+    dplyr::rename(entity_ps = "entity", facname_ps = "facname")
+  if (!annavg) ps_alloc <- tidyr::crossing(ps_alloc, year = yrrng)
+
   ips_out <- ips_mean |>
     dplyr::full_join(
-      ps_allocations |>
-        dplyr::rename(entity_ps = "entity", facname_ps = "facname"),
-      by = "permit"
+      ps_alloc,
+      by = c("permit", if (!annavg) "year")
     ) |>
     dplyr::left_join(
       ips_fac_bayseg |> dplyr::rename(bay_seg_fac = "bay_seg"),
@@ -658,7 +765,8 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared", "group_id"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared", "group_id",
+      dplyr::any_of("year")
     )
 
   # ---- DPS path ------------------------------------------------------------
@@ -695,18 +803,34 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
     dplyr::group_by(.data$Year, .data$bay_seg, .data$entity, .data$facname, .data$dps_source) |>
     dplyr::summarise(tn_dps = sum(.data$tn_dps, na.rm = TRUE), .groups = "drop")
 
-  # Sum over years then divide by length(yrrng); missing years contribute zero
-  dps_mean <- dps_annual |>
-    dplyr::group_by(.data$bay_seg, .data$entity, .data$facname, .data$dps_source) |>
-    dplyr::summarise(
-      eff_load_tons = sum(.data$tn_dps, na.rm = TRUE) / length(yrrng),
-      .groups = "drop"
-    )
+  # Sum over years then divide by length(yrrng) when annavg = TRUE (missing
+  # years contribute zero); when annavg = FALSE, keep one row per year
+  # instead, zero-filling any year with no data for a facility that has data
+  # in at least one other year (see Details).
+  if (annavg) {
+    dps_mean <- dps_annual |>
+      dplyr::group_by(.data$bay_seg, .data$entity, .data$facname, .data$dps_source) |>
+      dplyr::summarise(
+        eff_load_tons = sum(.data$tn_dps, na.rm = TRUE) / length(yrrng),
+        .groups = "drop"
+      )
+  } else {
+    dps_mean <- dps_annual |>
+      tidyr::complete(
+        Year = yrrng,
+        tidyr::nesting(bay_seg, entity, facname, dps_source),
+        fill = list(tn_dps = 0)
+      ) |>
+      dplyr::rename(year = "Year", eff_load_tons = "tn_dps")
+  }
 
   # Full join with DPS allocations; retain unmatched rows on both sides
-  dps_out <- dps_allocations |>
-    dplyr::rename(dps_source = "source") |>
-    dplyr::full_join(dps_mean, by = c("entity", "facname", "bay_seg", "dps_source")) |>
+  dps_alloc <- dps_allocations |>
+    dplyr::rename(dps_source = "source")
+  if (!annavg) dps_alloc <- tidyr::crossing(dps_alloc, year = yrrng)
+
+  dps_out <- dps_alloc |>
+    dplyr::full_join(dps_mean, by = c("entity", "facname", "bay_seg", "dps_source", if (!annavg) "year")) |>
     dplyr::mutate(
       segment   = bay_label[as.character(.data$bay_seg)],
       source    = .data$dps_source,
@@ -719,7 +843,8 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared", "group_id"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared", "group_id",
+      dplyr::any_of("year")
     )
 
   # ---- ML path ------------------------------------------------------------
@@ -740,20 +865,36 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
     dplyr::filter(!is.na(.data$bay_seg)) |>
     dplyr::rename(facname = "facility")
 
-  # Sum over years then divide by length(yrrng); missing years contribute zero
-  ml_mean <- ml_annual |>
-    dplyr::group_by(.data$bay_seg, .data$entity, .data$facname) |>
-    dplyr::summarise(
-      eff_load_tons = sum(.data$tn_ml, na.rm = TRUE) / length(yrrng),
-      .groups = "drop"
-    )
+  # Sum over years then divide by length(yrrng) when annavg = TRUE (missing
+  # years contribute zero); when annavg = FALSE, keep one row per year
+  # instead, zero-filling any year with no data for a facility that has data
+  # in at least one other year (see Details).
+  if (annavg) {
+    ml_mean <- ml_annual |>
+      dplyr::group_by(.data$bay_seg, .data$entity, .data$facname) |>
+      dplyr::summarise(
+        eff_load_tons = sum(.data$tn_ml, na.rm = TRUE) / length(yrrng),
+        .groups = "drop"
+      )
+  } else {
+    ml_mean <- ml_annual |>
+      tidyr::complete(
+        Year = yrrng,
+        tidyr::nesting(bay_seg, entity, facname),
+        fill = list(tn_ml = 0)
+      ) |>
+      dplyr::rename(year = "Year", eff_load_tons = "tn_ml")
+  }
 
   # Full join on entity + facname + bay_seg; retain unmatched rows on both
   # sides. ml_allocations has one row per real facility, whether shared or
   # not, with the correct (individual or collective) alloc_tons already
   # attached — no aggregation needed here.
-  ml_out <- ml_allocations |>
-    dplyr::full_join(ml_mean, by = c("entity", "facname", "bay_seg")) |>
+  ml_alloc <- ml_allocations
+  if (!annavg) ml_alloc <- tidyr::crossing(ml_alloc, year = yrrng)
+
+  ml_out <- ml_alloc |>
+    dplyr::full_join(ml_mean, by = c("entity", "facname", "bay_seg", if (!annavg) "year")) |>
     dplyr::mutate(
       segment     = bay_label[as.character(.data$bay_seg)],
       source      = "ML",
@@ -766,12 +907,21 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared", "group_id"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared", "group_id",
+      dplyr::any_of("year")
     )
 
   # ---- Combine -------------------------------------------------------------
 
-  dplyr::bind_rows(nps_out, ips_out, dps_out, ml_out) |>
-    dplyr::arrange(.data$bay_seg, .data$source, .data$entity)
+  out <- dplyr::bind_rows(nps_out, ips_out, dps_out, ml_out)
+
+  if (!annavg) {
+    out <- out |>
+      dplyr::left_join(seg_h2o_total, by = c("bay_seg", "year")) |>
+      dplyr::left_join(seg_conserv_tn, by = c("bay_seg", "year"))
+  }
+
+  out |>
+    dplyr::arrange(.data$bay_seg, .data$source, .data$entity, dplyr::across(dplyr::any_of("year")))
 
 }

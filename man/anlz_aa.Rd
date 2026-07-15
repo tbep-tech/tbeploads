@@ -4,7 +4,16 @@
 \alias{anlz_aa}
 \title{Allocation assessment for DPS, IPS, and NPS/MS4 entities}
 \usage{
-anlz_aa(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbose = FALSE)
+anlz_aa(
+  yrrng,
+  dps_data,
+  ips_data,
+  ml_data,
+  nps_data,
+  tbbase,
+  verbose = FALSE,
+  annavg = TRUE
+)
 }
 \arguments{
 \item{yrrng}{Integer vector of length 2, start and end year, e.g., \code{c(2022, 2024)}.}
@@ -35,10 +44,17 @@ layer of bay segment, basin, jurisdiction, land use data, and soils, see details
 \item{verbose}{logical, if \code{TRUE} print a message reporting negligible
 unmatched NPS/MS4 entities dropped from the output (see Details). Default
 \code{FALSE}.}
+
+\item{annavg}{logical, if \code{TRUE} (default) loads are averaged over
+\code{yrrng} as in prior versions of this function. If \code{FALSE}, one
+row per entity/facility per year is returned instead, with an additional
+\code{year} column, and \code{load_tons}/\code{eff_load_tons} are that
+year's value rather than a \code{yrrng}-averaged one (see Details).}
 }
 \value{
 A data frame with one row per entity (NPS/MS4) or facility (IPS)
-per bay segment:
+per bay segment (or per bay segment per year when \code{annavg =
+  FALSE}):
 \describe{
 \item{bay_seg}{Integer bay segment identifier}
 \item{segment}{Bay segment name}
@@ -71,6 +87,18 @@ shared-group concept currently}
 \item{group_id}{Character identifier for the shared group a row belongs
 to when \code{ishared} is \code{TRUE} (\code{NA} otherwise), from
 \code{\link{ps_allocations}}/\code{\link{ml_allocations}}.}
+\item{year}{Integer year. Only present when \code{annavg = FALSE}, in
+which case there is one row per entity/facility per year in
+\code{yrrng} instead of one \code{yrrng}-averaged row}
+\item{seg_h2o_total}{Total hydrologic load (NPS+IPS+DPS combined,
+million m3/yr) for the bay segment and year, repeated on every row
+sharing that \code{bay_seg}/\code{year} (see Details). Only present
+when \code{annavg = FALSE}}
+\item{seg_conserv_tn}{Total TN (tons/yr) removed from NPS/MS4 entities
+by the conservation-land correction (see \code{\link{conserv_correction}}),
+summed for the bay segment and year and repeated on every row sharing
+that \code{bay_seg}/\code{year} (see Details). Only present when
+\code{annavg = FALSE}}
 }
 }
 \description{
@@ -86,6 +114,31 @@ in \code{\link{tbbase}} not attributed to any jurisdiction, or a
 jurisdiction's boundary crossing into an adjacent basin/segment where it
 has no allocation) rather than real troubleshooting signal. When
 \code{verbose = TRUE}, a message reports what was dropped and why.
+
+When \code{annavg = FALSE}, each of the four paths below retains one row
+per entity/facility per year instead of averaging over \code{yrrng}: a
+year with no measured load for an entity/facility that has data in at
+least one other year of \code{yrrng} is zero-filled (mirroring the
+averaged path's existing "missing years contribute zero" behavior, just
+applied per year rather than to the mean); an entity/facility with a real
+allocation but no measured load in \emph{any} year of \code{yrrng} still
+appears, once per year, with \code{NA} loads (mirroring how it already
+appears once, with \code{NA} loads, when \code{annavg = TRUE}).
+\code{alloc_pct}/\code{alloc_tons}/\code{ishared}/\code{group_id} do not
+vary by year and are repeated identically on every year-row for a given
+entity/facility.
+
+When \code{annavg = FALSE}, two additional bay-segment-level totals are
+computed once and repeated on every row sharing a \code{bay_seg}/\code{year}
+(analogous to how \code{alloc_tons} repeats for \code{ishared} groups):
+\code{seg_h2o_total} is the same NPS+IPS+DPS \code{total_h2o} already
+computed internally for entity-level hydrologic normalization (see the
+NPS/IPS paths below), summed across every basin in the segment instead of
+just an entity's own basins; \code{seg_conserv_tn} is the TN removed by the
+conservation-land correction (see \code{\link{conserv_correction}} in the
+NPS/MS4 path below), summed the same way. Both support downstream
+segment-total reporting (e.g. \code{\link{show_aaloads}}) that needs a
+whole-segment hydrologic budget rather than an entity-specific one.
 
 \strong{DPS path}
 

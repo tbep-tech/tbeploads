@@ -36,7 +36,8 @@ globalVariables(c(".", "Facility.Name", "Month", "Outfall.ID", "Permit.Number", 
                   "year", "zero_flow", "elev", "x", "y", "category", "factor_rc", "factor_tn", "month",
                   "mult", "n_quarters", "quarter", "rc", "total_mult",
                   "aa_corrections", "conserv_correction", "day", "dps_allocations",
-                  "hydro_baseline", "ml_allocations", "nps_allocations", "ps_allocations")
+                  "hydro_baseline", "ml_allocations", "nps_allocations", "ps_allocations",
+                  "dps_source")
 )
 
 #' @importFrom utils capture.output read.csv read.table

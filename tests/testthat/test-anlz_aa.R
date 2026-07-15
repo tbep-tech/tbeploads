@@ -577,3 +577,143 @@ test_that("conserv_correction reduces NPS load for entities with conservation la
     expect_true(hill$eff_load_tons[1] > 0)
   }
 })
+
+# ---- annavg (year-specific loads) ---------------------------------------------
+
+test_that("annavg defaults to TRUE and matches an explicit annavg = TRUE call, with no year column", {
+  result_default  <- anlz_aa(2023L, dps_bradenton_sw(), make_ips_empty(), make_ml_empty(), nps_206_1(), tbbase)
+  result_explicit <- anlz_aa(2023L, dps_bradenton_sw(), make_ips_empty(), make_ml_empty(), nps_206_1(), tbbase,
+                              annavg = TRUE)
+
+  expect_false("year" %in% names(result_default))
+  expect_equal(result_default, result_explicit)
+})
+
+test_that("annavg = FALSE adds a year column with one row per year in yrrng", {
+  nps_two <- rbind(nps_206_1(tn = 50.0, yr = 2022L), nps_206_1(tn = 100.0, yr = 2023L))
+  result <- anlz_aa(c(2022, 2023), make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_two, tbbase,
+                     annavg = FALSE)
+
+  expect_true("year" %in% names(result))
+
+  cw <- result[result$entity == "CLEARWATER" & result$bay_seg == 1, ]
+  expect_equal(nrow(cw), 2L)
+  expect_setequal(cw$year, c(2022L, 2023L))
+  expect_true(cw$eff_load_tons[cw$year == 2023] > cw$eff_load_tons[cw$year == 2022])
+})
+
+test_that("annavg = FALSE zero-fills a year with no data for a facility that has data in another year", {
+  # dps_bradenton_sw() only supplies data for 2023 by default; 2022 must
+  # still appear, zero-filled, rather than being dropped.
+  result <- anlz_aa(c(2022, 2023), dps_bradenton_sw(tn = 20.0, yr = 2023L), make_ips_empty(),
+                     make_ml_empty(), make_nps_empty(), tbbase, annavg = FALSE)
+
+  brd <- result[
+    !is.na(result$facname) & result$facname == "City of Bradenton WRF" &
+      !is.na(result$source) & result$source == "DPS - end of pipe",
+  ]
+  expect_equal(nrow(brd), 2L)
+  expect_equal(brd$load_tons[brd$year == 2022], 0)
+  expect_equal(brd$load_tons[brd$year == 2023], 20.0, tolerance = 1e-9)
+  # allocation columns don't vary by year
+  expect_equal(length(unique(brd$alloc_tons)), 1L)
+})
+
+test_that("annavg = FALSE still surfaces an unmatched-allocation entity once per year, not once total", {
+  # Mosaic - Bartow (permit FL0001589) has a real ps_allocations entry but no
+  # ips_data here, so it has no load in any year; it must still appear once
+  # per year (not collapsed to a single NA row) with alloc_tons/ishared/
+  # group_id constant across years.
+  result <- anlz_aa(c(2022, 2024), make_dps_empty(), make_ips_empty(), make_ml_empty(), make_nps_empty(),
+                     tbbase, annavg = FALSE)
+
+  bartow <- result[!is.na(result$permit) & result$permit == "FL0001589", ]
+  expect_equal(nrow(bartow), 3L)
+  expect_setequal(bartow$year, 2022:2024)
+  expect_true(all(is.na(bartow$load_tons)))
+  expect_equal(length(unique(bartow$alloc_tons)), 1L)
+  expect_true(all(bartow$ishared))
+  expect_equal(unique(bartow$group_id), "ips_mosaic_hb")
+})
+
+test_that("annavg = FALSE per-year rows match the equivalent single-year annavg = TRUE call", {
+  dps_two <- rbind(
+    dps_bradenton_sw(tn = 10.0, yr = 2022L),
+    dps_bradenton_sw(tn = 90.0, yr = 2023L)
+  )
+
+  result_multi <- anlz_aa(c(2022, 2023), dps_two, make_ips_empty(), make_ml_empty(), make_nps_empty(),
+                           tbbase, annavg = FALSE)
+
+  for (yr in c(2022L, 2023L)) {
+    result_single <- anlz_aa(c(yr, yr), dps_two, make_ips_empty(), make_ml_empty(), make_nps_empty(),
+                              tbbase, annavg = TRUE)
+
+    brd_multi <- result_multi[
+      !is.na(result_multi$facname) & result_multi$facname == "City of Bradenton WRF" &
+        !is.na(result_multi$source) & result_multi$source == "DPS - end of pipe" &
+        result_multi$year == yr,
+    ]
+    brd_single <- result_single[
+      !is.na(result_single$facname) & result_single$facname == "City of Bradenton WRF" &
+        !is.na(result_single$source) & result_single$source == "DPS - end of pipe",
+    ]
+
+    expect_equal(nrow(brd_multi), 1L)
+    expect_equal(brd_multi$load_tons, brd_single$load_tons, tolerance = 1e-9)
+    expect_equal(brd_multi$eff_load_tons, brd_single$eff_load_tons, tolerance = 1e-9)
+  }
+})
+
+# ---- seg_h2o_total / seg_conserv_tn (annavg = FALSE only) --------------------
+
+test_that("seg_h2o_total and seg_conserv_tn are only present when annavg = FALSE", {
+  result_avg <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_206_1(), tbbase)
+  result_yr  <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_206_1(), tbbase,
+                        annavg = FALSE)
+
+  expect_false(any(c("seg_h2o_total", "seg_conserv_tn") %in% names(result_avg)))
+  expect_true(all(c("seg_h2o_total", "seg_conserv_tn") %in% names(result_yr)))
+})
+
+test_that("seg_h2o_total sums total_h2o across every basin in the segment", {
+  # Two basins in Old Tampa Bay (bay_seg = 1): 206-1 and a second synthetic
+  # basin sharing the segment. seg_h2o_total should be their combined
+  # hy_load (no IPS/DPS water and an ungaged basin means total_h2o = hy_load).
+  nps_two_basins <- rbind(
+    nps_206_1(tn = 50.0, yr = 2023L),
+    data.frame(Year = 2023L, source = "NPS", segment = "Old Tampa Bay",
+               basin = "206-2", tn_load = 20.0, hy_load = 30.0)
+  )
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), nps_two_basins, tbbase,
+                    annavg = FALSE)
+
+  h2o_206_1 <- hydro_baseline$mean_h2o_9294[
+    hydro_baseline$bay_seg == 1 & hydro_baseline$basin == "206-1"
+  ]
+  otb <- result[result$bay_seg == 1 & result$year == 2023L, ]
+  expect_equal(unique(otb$seg_h2o_total), h2o_206_1 + 30.0, tolerance = 1e-9)
+})
+
+test_that("seg_conserv_tn is nonzero for a segment with conservation land and repeats across all rows", {
+  nps_hb <- data.frame(
+    Year = 2023L, source = "NPS", segment = "Hillsborough Bay",
+    basin = "02304500", tn_load = 1000.0, hy_load = 500.0
+  )
+  result <- anlz_aa(2023L, dps_bradenton_sw(tn = 5.0, yr = 2023L), make_ips_empty(), make_ml_empty(),
+                    nps_hb, tbbase, annavg = FALSE)
+
+  hb <- result[result$bay_seg == 2 & result$year == 2023L, ]
+  expect_equal(length(unique(hb$seg_conserv_tn)), 1L)
+  expect_true(unique(hb$seg_conserv_tn) > 0)
+})
+
+test_that("seg_h2o_total and seg_conserv_tn are NA when no NPS input covers a segment/year", {
+  result <- anlz_aa(2023L, dps_bradenton_sw(tn = 5.0, yr = 2023L), make_ips_empty(), make_ml_empty(),
+                    make_nps_empty(), tbbase, annavg = FALSE)
+
+  mtb <- result[result$bay_seg == 3 & result$year == 2023L, ]
+  expect_true(nrow(mtb) > 0)
+  expect_true(all(is.na(mtb$seg_h2o_total)))
+  expect_true(all(is.na(mtb$seg_conserv_tn)))
+})

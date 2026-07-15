@@ -29,6 +29,10 @@ reference:
   desc: |
     Functions for analyzing data.
   contents: starts_with('anlz')
+- title: Show results
+  desc: |
+    Functions to show results.
+  contents: starts_with('show')
 - title: Internal datasets
   desc: |
     Supporting datasets used by the other functions.
