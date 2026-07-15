@@ -123,6 +123,7 @@ The function returns one row per entity (NPS/MS4) or entity/facility (IPS, DPS, 
 | `eff_load_tons` | Mean hydrologically-normalized TN load (tons/yr); equals `load_tons` for DPS and ML, and for IPS facilities not flagged `hydro_affected` in `ps_allocations` |
 | `load_tons` | Mean annual TN load without normalization (tons/yr); always the facility's own individual load, even for `ishared` rows |
 | `ishared` | `TRUE` when the facility is jointly assessed against a collective allocation shared with other facilities; `FALSE` for NPS/MS4 and DPS rows |
+| `group_id` | Character identifier for the shared group a row belongs to when `ishared` is `TRUE` (`NA` otherwise) |
 
 Entities present in the computed loads but absent from the allocation tables are retained in the output with `NA` allocation fields so that unmatched entries are visible for troubleshooting, with one exception: unmatched NPS/MS4 entities with a mean annual load under 0.01 tons/yr are dropped, since these are negligible land-use polygon artifacts (e.g. land in `tbbase` not attributed to any jurisdiction, or a jurisdiction's boundary crossing into an adjacent basin/segment where it has no allocation) rather than real troubleshooting signal. Set `verbose = TRUE` to print a message reporting what was dropped and why.
 
@@ -141,7 +142,7 @@ A conservation land correction is applied before summing across CLUCSIDs, using 
 
 Only after this correction are two groups of entities aggregated regardless of their underlying MS4 jurisdiction: agricultural land use (category `"Agriculture"`) is attributed to entity `"All"`, and land under a Municipal Separate storm sewer Generic Permit (entities `"MSGP COT"` and `"MSGP PINELLAS"` in `tbbase`, plus `"PORT MANATEE"`, whose footprint spans both Middle Tampa Bay and Lower Tampa Bay) is attributed to entity `"Non-MS4/Ag NPS"`, consistent with the loading tables generated for each Reasonable Assurance period. Lower Tampa Bay has no other MSGP entities, so Port Manatee is its sole contributor. Conservation land correction must precede both relabeling steps since `conserv_correction` is keyed by the true entity and would never match either aggregate label.
 
-After disaggregation, entity loads and 1992-1994 baseline water volumes from `hydro_baseline` are summed across basins to the bay segment level. Corrections from `aa_corrections` (representing atmospheric deposition and approved project TN adjustments from the 2007 RA analysis) are subtracted before hydrologic normalization:
+After disaggregation, entity loads and 1992-1994 baseline water volumes from `hydro_baseline` are summed across basins to the bay segment level. Corrections from `aa_corrections` (representing atmospheric deposition and approved project TN adjustments) are subtracted before hydrologic normalization:
 
 $$\text{eff\_tn} = (\text{tn\_entity} - \text{corr\_tons}) \times \frac{\text{mean\_h2o\_9294}}{\text{total\_h2o}}$$
 
@@ -159,7 +160,7 @@ $$\text{eff\_tn} = \text{tn\_load} \times \frac{\text{mean\_h2o\_9294}}{\text{ba
 
 where `basin_total_h2o` is the same gaged/ungaged-gated basin water quantity described in the NPS path above.
 
-Permits flagged `ishared = TRUE` in `ps_allocations` carry their group's collective allocation in `alloc_tons` rather than an individual one, while `load_tons`/`eff_load_tons` remain each permit's own load. `ishared` and `hydro_affected` are independent flags — a permit can be jointly assessed without being hydrologically normalized, or vice versa.
+Permits flagged `ishared = TRUE` in `ps_allocations` carry their group's collective allocation in `alloc_tons` rather than an individual one, while `load_tons`/`eff_load_tons` remain each permit's own load. `ishared` and `hydro_affected` are independent flags — a permit can be jointly assessed without being hydrologically normalized, or vice versa. `group_id` identifies which shared group a permit belongs to (`"ips_mosaic_hb"` or `"ips_kinder_morgan"`; `NA` when `ishared` is `FALSE`).
 
 ### DPS
 
@@ -167,7 +168,7 @@ Domestic point source loads require no hydrologic normalization. Monthly loads f
 
 ### ML
 
-Material loss loads require no hydrologic normalization. Monthly loads are summed to annual totals per facility and averaged over `yrrng`, then joined to `ml_allocations` on entity + facname + bay segment — one output row per facility, always. Facilities with `ishared = TRUE` in `ml_allocations` carry their group's collective allocation in `alloc_tons` rather than an individual one, while `load_tons`/`eff_load_tons` remain each facility's own load.
+Material loss loads require no hydrologic normalization. Monthly loads are summed to annual totals per facility and averaged over `yrrng`, then joined to `ml_allocations` on entity + facname + bay segment — one output row per facility, always. Facilities with `ishared = TRUE` in `ml_allocations` carry their group's collective allocation in `alloc_tons` rather than an individual one, while `load_tons`/`eff_load_tons` remain each facility's own load. `group_id` identifies which shared group a facility belongs to (`"ml_mosaic_hb"`; `NA` when `ishared` is `FALSE`).
 
 ## Supporting datasets
 

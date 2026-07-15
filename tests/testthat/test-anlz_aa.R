@@ -73,7 +73,8 @@ test_that("anlz_aa returns a data frame with expected columns", {
   expect_s3_class(result, "data.frame")
   expected_cols <- c(
     "bay_seg", "segment", "entity", "entity_full", "facname",
-    "permit", "source", "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared"
+    "permit", "source", "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared",
+    "group_id"
   )
   expect_true(all(expected_cols %in% names(result)))
 })
@@ -121,6 +122,8 @@ test_that("ishared is FALSE for NPS/MS4 and DPS rows", {
   expect_true(nrow(dps_rows) > 0)
   expect_true(all(!nps_rows$ishared))
   expect_true(all(!dps_rows$ishared))
+  expect_true(all(is.na(nps_rows$group_id)))
+  expect_true(all(is.na(dps_rows$group_id)))
 })
 
 test_that("a shared-group IPS facility carries the collective allocation, not an individual one", {
@@ -133,6 +136,20 @@ test_that("a shared-group IPS facility carries the collective allocation, not an
   expect_equal(nrow(bartow), 1L)
   expect_true(bartow$ishared)
   expect_equal(bartow$alloc_tons, 124.1, tolerance = 1e-9)
+  expect_equal(bartow$group_id, "ips_mosaic_hb")
+})
+
+test_that("distinct IPS shared groups carry distinct group_id values", {
+  # Mosaic Hillsborough Bay (124.1 ton/yr) and Kinder Morgan (25.0 ton/yr) are
+  # both shared IPS groups; group_id must disambiguate them independently of
+  # entity/alloc_tons.
+  result <- anlz_aa(2023L, make_dps_empty(), make_ips_empty(), make_ml_empty(), make_nps_empty(), tbbase)
+
+  mosaic_grp <- result$group_id[!is.na(result$permit) & result$permit == "FL0001589"]
+  km_grp     <- result$group_id[!is.na(result$permit) & result$permit == "FL0321486"]
+  expect_equal(mosaic_grp, "ips_mosaic_hb")
+  expect_equal(km_grp, "ips_kinder_morgan")
+  expect_false(mosaic_grp == km_grp)
 })
 
 test_that("a non-shared ML facility carries its own individual allocation with ishared FALSE", {
@@ -146,6 +163,7 @@ test_that("a non-shared ML facility carries its own individual allocation with i
   expect_true(nrow(km_pm) >= 1)
   expect_false(km_pm$ishared[1])
   expect_equal(km_pm$alloc_tons[1], 0.29894, tolerance = 1e-9)
+  expect_true(is.na(km_pm$group_id[1]))
 })
 
 # ---- load_tons column -------------------------------------------------------
@@ -454,6 +472,7 @@ test_that("shared ML Mosaic facilities each appear with the collective allocatio
   expect_setequal(shared_rows$facname, c("Riverview", "Tampa Marine", "Big Bend"))
   expect_true(all(shared_rows$ishared))
   expect_equal(shared_rows$alloc_tons, rep(9.9, 3), tolerance = 1e-9)
+  expect_equal(shared_rows$group_id, rep("ml_mosaic_hb", 3))
 })
 
 test_that("ML rows carry source equal to ML", {
@@ -495,6 +514,7 @@ test_that("ML shared Mosaic facility keeps its own individual load, not the grou
   expect_equal(riverview$eff_load_tons, 1.0, tolerance = 1e-9)
   expect_true(riverview$ishared)
   expect_equal(riverview$alloc_tons, 9.9, tolerance = 1e-9)
+  expect_equal(riverview$group_id, "ml_mosaic_hb")
 })
 
 test_that("ML year range filtering averages only over yrrng years", {

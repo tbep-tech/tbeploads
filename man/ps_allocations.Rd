@@ -31,6 +31,10 @@ load \code{\link{anlz_aa}} hydrologically normalizes
 \item \code{ishared}: Logical; \code{TRUE} when the permit is jointly
 assessed against a collective allocation shared with other permits
 (see \code{alloc_tons})
+\item \code{group_id}: Character identifier for the shared group a permit
+belongs to (\code{NA} when \code{ishared} is \code{FALSE}). Provided so
+shared-group membership can be recovered directly rather than inferred
+from matching \code{entity} + \code{alloc_tons}
 }
 
 The 19 Mosaic facilities in Hillsborough Bay (Bartow, Bonnie, Ft. Lonesome,
@@ -38,10 +42,11 @@ Green Bay, Hookers Prairie, Mulberry Phosphogypsum Stack, Mulberry Plant,
 New Wales Chemical Plant, Nichols Mine, Plant City, Riverview, Riverview
 Stack Closure, South Pierce, Tampa Ammonia Terminal, Tampa Marine
 Terminal, Hopewell, Kingsford, Port Sutton, Black Point) share a single
-124.1 ton/year allocation (\code{ishared = TRUE}). Kinder Morgan
-Tampaplex, Port Sutton, and Hartford Terminal likewise share a single 25.0
-ton/year allocation. All other permits are non-shared (\code{ishared =
-FALSE}).
+124.1 ton/year allocation (\code{ishared = TRUE}, \code{group_id =
+"ips_mosaic_hb"}). Kinder Morgan Tampaplex, Port Sutton, and Hartford
+Terminal likewise share a single 25.0 ton/year allocation (\code{group_id =
+"ips_kinder_morgan"}). All other permits are non-shared (\code{ishared =
+FALSE}, \code{group_id = NA}).
 }
 \examples{
 ps_allocations

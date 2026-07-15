@@ -20,15 +20,20 @@
 #'   \item \code{ishared}: Logical; \code{TRUE} when the facility is jointly
 #'     assessed against a collective allocation shared with other facilities
 #'     (see \code{alloc_tons})
+#'   \item \code{group_id}: Character identifier for the shared group a
+#'     facility belongs to (\code{NA} when \code{ishared} is \code{FALSE}).
+#'     Provided so shared-group membership can be recovered directly rather
+#'     than inferred from matching \code{entity} + \code{alloc_tons}
 #' }
 #'
 #' The three Mosaic material loss facilities (Big Bend, Riverview, Tampa
 #' Marine) share a single 9.9 ton/year allocation in Hillsborough Bay
-#' (\code{ishared = TRUE} on all three rows). Kinder Morgan Port Sutton and
-#' Tampaplex Material Losses are each assessed individually against their own
-#' distinct allocation (\code{ishared = FALSE}), despite the misleadingly
-#' similar names to the shared IPS Kinder Morgan group; Kinder Morgan Port
-#' Manatee is likewise a separate, non-shared facility.
+#' (\code{ishared = TRUE} on all three rows, \code{group_id = "ml_mosaic_hb"}).
+#' Kinder Morgan Port Sutton and Tampaplex Material Losses are each assessed
+#' individually against their own distinct allocation (\code{ishared =
+#' FALSE}), despite the misleadingly similar names to the shared IPS Kinder
+#' Morgan group; Kinder Morgan Port Manatee is likewise a separate, non-shared
+#' facility.
 #'
 #' @examples
 #' ml_allocations

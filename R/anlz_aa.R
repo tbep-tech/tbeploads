@@ -53,6 +53,9 @@
 #'     facilities (see \code{alloc_tons}), rather than its own individual
 #'     allocation. \code{FALSE} for NPS/MS4 and DPS rows, which have no
 #'     shared-group concept currently}
+#'   \item{group_id}{Character identifier for the shared group a row belongs
+#'     to when \code{ishared} is \code{TRUE} (\code{NA} otherwise), from
+#'     \code{\link{ps_allocations}}/\code{\link{ml_allocations}}.}
 #' }
 #'
 #' @details
@@ -115,7 +118,9 @@
 #' individual one, while \code{load_tons}/\code{eff_load_tons} remain each
 #' permit's own load — see \code{ishared} in Returns. \code{ishared} and
 #' \code{hydro_affected} are independent: a permit can be jointly assessed
-#' without being hydrologically normalized, or vice versa.
+#' without being hydrologically normalized, or vice versa. \code{group_id}
+#' identifies which shared group a permit belongs to (\code{NA} when
+#' \code{ishared} is \code{FALSE}).
 #'
 #' \strong{ML path}
 #'
@@ -126,7 +131,9 @@
 #' Facilities with \code{ishared = TRUE} carry
 #' their group's collective allocation in \code{alloc_tons} rather than an
 #' individual one, while \code{load_tons}/\code{eff_load_tons} remain each
-#' facility's own load — see \code{ishared} in Returns.
+#' facility's own load — see \code{ishared} in Returns. \code{group_id}
+#' identifies which shared group a facility belongs to (\code{NA} when
+#' \code{ishared} is \code{FALSE}).
 #' 
 #' \strong{NPS/MS4 path}
 #'
@@ -496,12 +503,13 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
       source  = .data$type,
       facname = NA_character_,
       permit  = NA_character_,
-      ishared = FALSE
+      ishared = FALSE,
+      group_id = NA_character_
     ) |>
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared", "group_id"
     )
 
   # Drop negligible unmatched NPS/MS4 entities: land not attributed to any
@@ -650,7 +658,7 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared", "group_id"
     )
 
   # ---- DPS path ------------------------------------------------------------
@@ -705,12 +713,13 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
       permit    = NA_character_,
       alloc_pct = NA_real_,
       load_tons = .data$eff_load_tons,
-      ishared   = FALSE
+      ishared   = FALSE,
+      group_id  = NA_character_
     ) |>
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared", "group_id"
     )
 
   # ---- ML path ------------------------------------------------------------
@@ -757,7 +766,7 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
     dplyr::select(
       "bay_seg", "segment", "entity", "entity_full",
       "facname", "permit", "source",
-      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared"
+      "alloc_pct", "alloc_tons", "eff_load_tons", "load_tons", "ishared", "group_id"
     )
 
   # ---- Combine -------------------------------------------------------------

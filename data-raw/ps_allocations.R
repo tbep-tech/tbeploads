@@ -67,6 +67,7 @@ ps_allocations <- read_csv(
       "FL0038652"  # Mosaic - Black Point (fka Yara)
     ),
     alloc_tons = if_else(ishared, 124.1, alloc_tons),
+    group_id = if_else(ishared, "ips_mosaic_hb", NA_character_),
     # RP's draft TN-loading tables mark these permits (mostly Mosaic mining
     # facilities plus a handful of others) with a "Hydrologically Affected"
     # row label in the Point Sources section; all other IPS facilities (and
@@ -117,7 +118,7 @@ ps_allocations <- read_csv(
       "Point Source - Nichols Prep Plant"
     )
   ) |>
-  select(entity, facname, permit, alloc_pct, alloc_tons, hydro_affected, ishared)
+  select(entity, facname, permit, alloc_pct, alloc_tons, hydro_affected, ishared, group_id)
 
 # These IPS facilities are absent from the original 2016 source CSV entirely
 # but carry a real allocation in RP's draft assessment tables (confirmed
@@ -135,21 +136,21 @@ ps_allocations <- read_csv(
 # Hillsborough Bay Mosaic ishared group (see above) but, unlike its 18
 # siblings, was never in the original 2016 CSV at all.
 missing_ps <- tribble(
-  ~entity,                ~facname,                     ~permit,     ~alloc_tons, ~ishared,
-  "Duke Energy",          "Duke Energy-Bartow Plant",   "FL0000132", 3.00,        FALSE,
-  "Kerry",                "Kerry I and F",              "FL0037389", 1.80,        FALSE,
-  "Lowry Park Zoo",       "Lowry Park Zoo",             "FL0188651", 1.00,        FALSE,
-  "TECO",                 "TECO - Big Bend",            "FL0000817", 56.50,       FALSE,
-  "Piney Point Facility", "HRK Piney Point",             "FL0000124", 0.9354,      FALSE,
-  "CSX",                  "CSX Winston Yard",           "FL0032581", 3.00,        FALSE,
-  "Mosaic",               "Mosaic - Port Sutton",        "FL0000264", 124.1,       TRUE,
-  "Kinder Morgan",        "Kinder Morgan Tampaplex",     "FL0321486", 25.00,       TRUE,
-  "Kinder Morgan",        "Kinder Morgan Port Sutton",   "FL0122904", 25.00,       TRUE,
-  "Kinder Morgan",        "Kinder Morgan Hartford Terminal", NA_character_, 25.00, TRUE,
-  "Tampa Bay Water",      "Point Source - Tampa Bay Water", NA_character_, 1.5,    FALSE
+  ~entity,                ~facname,                     ~permit,     ~alloc_tons, ~ishared, ~group_id,
+  "Duke Energy",          "Duke Energy-Bartow Plant",   "FL0000132", 3.00,        FALSE,    NA_character_,
+  "Kerry",                "Kerry I and F",              "FL0037389", 1.80,        FALSE,    NA_character_,
+  "Lowry Park Zoo",       "Lowry Park Zoo",             "FL0188651", 1.00,        FALSE,    NA_character_,
+  "TECO",                 "TECO - Big Bend",            "FL0000817", 56.50,       FALSE,    NA_character_,
+  "Piney Point Facility", "HRK Piney Point",             "FL0000124", 0.9354,      FALSE,    NA_character_,
+  "CSX",                  "CSX Winston Yard",           "FL0032581", 3.00,        FALSE,    NA_character_,
+  "Mosaic",               "Mosaic - Port Sutton",        "FL0000264", 124.1,       TRUE,     "ips_mosaic_hb",
+  "Kinder Morgan",        "Kinder Morgan Tampaplex",     "FL0321486", 25.00,       TRUE,     "ips_kinder_morgan",
+  "Kinder Morgan",        "Kinder Morgan Port Sutton",   "FL0122904", 25.00,       TRUE,     "ips_kinder_morgan",
+  "Kinder Morgan",        "Kinder Morgan Hartford Terminal", NA_character_, 25.00, TRUE,     "ips_kinder_morgan",
+  "Tampa Bay Water",      "Point Source - Tampa Bay Water", NA_character_, 1.5,    FALSE,    NA_character_
 ) |>
   mutate(alloc_pct = NA_real_, hydro_affected = FALSE) |>
-  select(entity, facname, permit, alloc_pct, alloc_tons, hydro_affected, ishared)
+  select(entity, facname, permit, alloc_pct, alloc_tons, hydro_affected, ishared, group_id)
 
 ps_allocations <- ps_allocations |>
   bind_rows(missing_ps)

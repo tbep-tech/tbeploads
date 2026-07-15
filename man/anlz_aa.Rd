@@ -68,6 +68,9 @@ assessed against a collective allocation shared with other
 facilities (see \code{alloc_tons}), rather than its own individual
 allocation. \code{FALSE} for NPS/MS4 and DPS rows, which have no
 shared-group concept currently}
+\item{group_id}{Character identifier for the shared group a row belongs
+to when \code{ishared} is \code{TRUE} (\code{NA} otherwise), from
+\code{\link{ps_allocations}}/\code{\link{ml_allocations}}.}
 }
 }
 \description{
@@ -133,7 +136,9 @@ their group's collective allocation in \code{alloc_tons} rather than an
 individual one, while \code{load_tons}/\code{eff_load_tons} remain each
 permit's own load — see \code{ishared} in Returns. \code{ishared} and
 \code{hydro_affected} are independent: a permit can be jointly assessed
-without being hydrologically normalized, or vice versa.
+without being hydrologically normalized, or vice versa. \code{group_id}
+identifies which shared group a permit belongs to (\code{NA} when
+\code{ishared} is \code{FALSE}).
 
 \strong{ML path}
 
@@ -144,7 +149,9 @@ entity + facname + bay segment — one output row per facility, always.
 Facilities with \code{ishared = TRUE} carry
 their group's collective allocation in \code{alloc_tons} rather than an
 individual one, while \code{load_tons}/\code{eff_load_tons} remain each
-facility's own load — see \code{ishared} in Returns.
+facility's own load — see \code{ishared} in Returns. \code{group_id}
+identifies which shared group a facility belongs to (\code{NA} when
+\code{ishared} is \code{FALSE}).
 
 \strong{NPS/MS4 path}
 

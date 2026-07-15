@@ -50,8 +50,9 @@ ml_allocations <- entity_facility_alloc |>
   dplyr::left_join(crosswalk_ns, by = c("entity_alloc", "facility_alloc")) |>
   dplyr::left_join(ml_shared_totals, by = c("entity", "bay_seg")) |>
   dplyr::mutate(
-    alloc_tons = dplyr::if_else(.data$ishared, .data$alloc_tons_shared, .data$alloc_tons)
+    alloc_tons = dplyr::if_else(.data$ishared, .data$alloc_tons_shared, .data$alloc_tons),
+    group_id   = dplyr::if_else(.data$ishared, "ml_mosaic_hb", NA_character_)
   ) |>
-  dplyr::select("entity", "facname", "bay_seg", "alloc_tons", "ishared")
+  dplyr::select("entity", "facname", "bay_seg", "alloc_tons", "ishared", "group_id")
 
 usethis::use_data(ml_allocations, overwrite = TRUE)
