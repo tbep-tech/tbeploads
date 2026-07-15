@@ -124,6 +124,12 @@ segment:
   rather than its own individual allocation. `FALSE` for NPS/MS4 and DPS
   rows, which have no shared-group concept currently
 
+- group_id:
+
+  Character identifier for the shared group a row belongs to when
+  `ishared` is `TRUE` (`NA` otherwise), from
+  [`ps_allocations`](https://tbep-tech.github.io/tbeploads/reference/ps_allocations.md)/[`ml_allocations`](https://tbep-tech.github.io/tbeploads/reference/ml_allocations.md).
+
 ## Details
 
 Entities present in the computed loads but absent from the allocation
@@ -190,7 +196,8 @@ carry their group's collective allocation in `alloc_tons` rather than an
 individual one, while `load_tons`/`eff_load_tons` remain each permit's
 own load — see `ishared` in Returns. `ishared` and `hydro_affected` are
 independent: a permit can be jointly assessed without being
-hydrologically normalized, or vice versa.
+hydrologically normalized, or vice versa. `group_id` identifies which
+shared group a permit belongs to (`NA` when `ishared` is `FALSE`).
 
 **ML path**
 
@@ -202,7 +209,8 @@ table on entity + facname + bay segment — one output row per facility,
 always. Facilities with `ishared = TRUE` carry their group's collective
 allocation in `alloc_tons` rather than an individual one, while
 `load_tons`/`eff_load_tons` remain each facility's own load — see
-`ishared` in Returns.
+`ishared` in Returns. `group_id` identifies which shared group a
+facility belongs to (`NA` when `ishared` is `FALSE`).
 
 **NPS/MS4 path**
 

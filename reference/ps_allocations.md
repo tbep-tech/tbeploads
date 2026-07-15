@@ -38,32 +38,38 @@ framework.
 - `ishared`: Logical; `TRUE` when the permit is jointly assessed against
   a collective allocation shared with other permits (see `alloc_tons`)
 
+- `group_id`: Character identifier for the shared group a permit belongs
+  to (`NA` when `ishared` is `FALSE`). Provided so shared-group
+  membership can be recovered directly rather than inferred from
+  matching `entity` + `alloc_tons`
+
 The 19 Mosaic facilities in Hillsborough Bay (Bartow, Bonnie, Ft.
 Lonesome, Green Bay, Hookers Prairie, Mulberry Phosphogypsum Stack,
 Mulberry Plant, New Wales Chemical Plant, Nichols Mine, Plant City,
 Riverview, Riverview Stack Closure, South Pierce, Tampa Ammonia
 Terminal, Tampa Marine Terminal, Hopewell, Kingsford, Port Sutton, Black
-Point) share a single 124.1 ton/year allocation (`ishared = TRUE`).
-Kinder Morgan Tampaplex, Port Sutton, and Hartford Terminal likewise
-share a single 25.0 ton/year allocation. All other permits are
-non-shared (`ishared = FALSE`).
+Point) share a single 124.1 ton/year allocation (`ishared = TRUE`,
+`group_id = "ips_mosaic_hb"`). Kinder Morgan Tampaplex, Port Sutton, and
+Hartford Terminal likewise share a single 25.0 ton/year allocation
+(`group_id = "ips_kinder_morgan"`). All other permits are non-shared
+(`ishared = FALSE`, `group_id = NA`).
 
 ## Examples
 
 ``` r
 ps_allocations
-#> # A tibble: 39 × 7
-#>    entity facname             permit alloc_pct alloc_tons hydro_affected ishared
-#>    <chr>  <chr>               <chr>      <dbl>      <dbl> <lgl>          <lgl>  
-#>  1 CSX    CSX - Rockport New… FL016…    0.0072         6  FALSE          FALSE  
-#>  2 Mosaic Point Source - Bon… FL000…    0.0145       124. TRUE           TRUE   
-#>  3 Mosaic Point Source - Pla… FL000…    0.0009       124. TRUE           TRUE   
-#>  4 Mosaic Point Source - Tam… FL018…    0.0002       124. TRUE           TRUE   
-#>  5 Mosaic Point Source - Tam… FL016…    0.0006       124. TRUE           TRUE   
-#>  6 Mosaic Point Source - Bar… FL000…    0.001        124. TRUE           TRUE   
-#>  7 Mosaic Point Source - Ft.… FL003…    0.0025       124. TRUE           TRUE   
-#>  8 Mosaic Point Source - Gre… FL000…    0.0064       124. TRUE           TRUE   
-#>  9 Mosaic Point Source - Hoo… FL003…    0.0052       124. TRUE           TRUE   
-#> 10 Mosaic Point Source - Hop… FL003…    0.0025       124. TRUE           TRUE   
+#> # A tibble: 39 × 8
+#>    entity facname    permit alloc_pct alloc_tons hydro_affected ishared group_id
+#>    <chr>  <chr>      <chr>      <dbl>      <dbl> <lgl>          <lgl>   <chr>   
+#>  1 CSX    CSX - Roc… FL016…    0.0072         6  FALSE          FALSE   NA      
+#>  2 Mosaic Point Sou… FL000…    0.0145       124. TRUE           TRUE    ips_mos…
+#>  3 Mosaic Point Sou… FL000…    0.0009       124. TRUE           TRUE    ips_mos…
+#>  4 Mosaic Point Sou… FL018…    0.0002       124. TRUE           TRUE    ips_mos…
+#>  5 Mosaic Point Sou… FL016…    0.0006       124. TRUE           TRUE    ips_mos…
+#>  6 Mosaic Point Sou… FL000…    0.001        124. TRUE           TRUE    ips_mos…
+#>  7 Mosaic Point Sou… FL003…    0.0025       124. TRUE           TRUE    ips_mos…
+#>  8 Mosaic Point Sou… FL000…    0.0064       124. TRUE           TRUE    ips_mos…
+#>  9 Mosaic Point Sou… FL003…    0.0052       124. TRUE           TRUE    ips_mos…
+#> 10 Mosaic Point Sou… FL003…    0.0025       124. TRUE           TRUE    ips_mos…
 #> # ℹ 29 more rows
 ```

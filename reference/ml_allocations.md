@@ -37,27 +37,33 @@ One row per facility, always.
   against a collective allocation shared with other facilities (see
   `alloc_tons`)
 
+- `group_id`: Character identifier for the shared group a facility
+  belongs to (`NA` when `ishared` is `FALSE`). Provided so shared-group
+  membership can be recovered directly rather than inferred from
+  matching `entity` + `alloc_tons`
+
 The three Mosaic material loss facilities (Big Bend, Riverview, Tampa
 Marine) share a single 9.9 ton/year allocation in Hillsborough Bay
-(`ishared = TRUE` on all three rows). Kinder Morgan Port Sutton and
-Tampaplex Material Losses are each assessed individually against their
-own distinct allocation (`ishared = FALSE`), despite the misleadingly
-similar names to the shared IPS Kinder Morgan group; Kinder Morgan Port
-Manatee is likewise a separate, non-shared facility.
+(`ishared = TRUE` on all three rows, `group_id = "ml_mosaic_hb"`).
+Kinder Morgan Port Sutton and Tampaplex Material Losses are each
+assessed individually against their own distinct allocation
+(`ishared = FALSE`), despite the misleadingly similar names to the
+shared IPS Kinder Morgan group; Kinder Morgan Port Manatee is likewise a
+separate, non-shared facility.
 
 ## Examples
 
 ``` r
 ml_allocations
-#> # A tibble: 8 × 5
-#>   entity        facname                    bay_seg alloc_tons ishared
-#>   <chr>         <chr>                        <int>      <dbl> <lgl>  
-#> 1 CSX           Rockport                         2      5.63  FALSE  
-#> 2 CSX           Newport                          2      5.63  FALSE  
-#> 3 Kinder Morgan Kinder Morgan Port Sutton        2      1.8   FALSE  
-#> 4 Kinder Morgan Kinder Morgan Tampaplex          2      3.38  FALSE  
-#> 5 Kinder Morgan Kinder Morgan Port Manatee       4      0.299 FALSE  
-#> 6 Mosaic        Riverview                        2      9.9   TRUE   
-#> 7 Mosaic        Tampa Marine                     2      9.9   TRUE   
-#> 8 Mosaic        Big Bend                         2      9.9   TRUE   
+#> # A tibble: 8 × 6
+#>   entity        facname                    bay_seg alloc_tons ishared group_id  
+#>   <chr>         <chr>                        <int>      <dbl> <lgl>   <chr>     
+#> 1 CSX           Rockport                         2      5.63  FALSE   NA        
+#> 2 CSX           Newport                          2      5.63  FALSE   NA        
+#> 3 Kinder Morgan Kinder Morgan Port Sutton        2      1.8   FALSE   NA        
+#> 4 Kinder Morgan Kinder Morgan Tampaplex          2      3.38  FALSE   NA        
+#> 5 Kinder Morgan Kinder Morgan Port Manatee       4      0.299 FALSE   NA        
+#> 6 Mosaic        Riverview                        2      9.9   TRUE    ml_mosaic…
+#> 7 Mosaic        Tampa Marine                     2      9.9   TRUE    ml_mosaic…
+#> 8 Mosaic        Big Bend                         2      9.9   TRUE    ml_mosaic…
 ```

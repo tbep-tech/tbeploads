@@ -250,6 +250,12 @@ facility’s own individual load, even for <code>ishared</code> rows</td>
 collective allocation shared with other facilities; <code>FALSE</code>
 for NPS/MS4 and DPS rows</td>
 </tr>
+<tr class="odd">
+<td><code>group_id</code></td>
+<td>Character identifier for the shared group a row belongs to when
+<code>ishared</code> is <code>TRUE</code> (<code>NA</code>
+otherwise)</td>
+</tr>
 </tbody>
 </table>
 <p>Entities present in the computed loads but absent from the allocation
@@ -322,9 +328,8 @@ never match either aggregate label.</p>
 <p>After disaggregation, entity loads and 1992-1994 baseline water
 volumes from <code>hydro_baseline</code> are summed across basins to the
 bay segment level. Corrections from <code>aa_corrections</code>
-(representing atmospheric deposition and approved project TN adjustments
-from the 2007 RA analysis) are subtracted before hydrologic
-normalization:</p>
+(representing atmospheric deposition and approved project TN
+adjustments) are subtracted before hydrologic normalization:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">eff_tn</mtext><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">tn_entity</mtext><mo>−</mo><mtext mathvariant="normal">corr_tons</mtext><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mfrac><mtext mathvariant="normal">mean_h2o_9294</mtext><mtext mathvariant="normal">total_h2o</mtext></mfrac></mrow><annotation encoding="application/x-tex">\text{eff\_tn} = (\text{tn\_entity} - \text{corr\_tons}) \times \frac{\text{mean\_h2o\_9294}}{\text{total\_h2o}}</annotation></semantics></math></p>
 <p><code>total_h2o</code> is the annual total basin water load for that
 basin, gated by whether the basin is gaged (per
@@ -365,7 +370,10 @@ basin water quantity described in the NPS path above.</p>
 <code>load_tons</code>/<code>eff_load_tons</code> remain each permit’s
 own load. <code>ishared</code> and <code>hydro_affected</code> are
 independent flags — a permit can be jointly assessed without being
-hydrologically normalized, or vice versa.</p>
+hydrologically normalized, or vice versa. <code>group_id</code>
+identifies which shared group a permit belongs to
+(<code>"ips_mosaic_hb"</code> or <code>"ips_kinder_morgan"</code>;
+<code>NA</code> when <code>ishared</code> is <code>FALSE</code>).</p>
 </div>
 <div class="section level3">
 <h3 id="dps">DPS<a class="anchor" aria-label="anchor" href="#dps"></a>
@@ -389,7 +397,9 @@ Facilities with <code>ishared = TRUE</code> in
 <code>ml_allocations</code> carry their group’s collective allocation in
 <code>alloc_tons</code> rather than an individual one, while
 <code>load_tons</code>/<code>eff_load_tons</code> remain each facility’s
-own load.</p>
+own load. <code>group_id</code> identifies which shared group a facility
+belongs to (<code>"ml_mosaic_hb"</code>; <code>NA</code> when
+<code>ishared</code> is <code>FALSE</code>).</p>
 </div>
 </div>
 <div class="section level2">

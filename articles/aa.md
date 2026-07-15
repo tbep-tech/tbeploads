@@ -160,6 +160,7 @@ The function returns one row per entity (NPS/MS4) or entity/facility
 | `eff_load_tons` | Mean hydrologically-normalized TN load (tons/yr); equals `load_tons` for DPS and ML, and for IPS facilities not flagged `hydro_affected` in `ps_allocations` |
 | `load_tons` | Mean annual TN load without normalization (tons/yr); always the facility’s own individual load, even for `ishared` rows |
 | `ishared` | `TRUE` when the facility is jointly assessed against a collective allocation shared with other facilities; `FALSE` for NPS/MS4 and DPS rows |
+| `group_id` | Character identifier for the shared group a row belongs to when `ishared` is `TRUE` (`NA` otherwise) |
 
 Entities present in the computed loads but absent from the allocation
 tables are retained in the output with `NA` allocation fields so that
@@ -227,8 +228,8 @@ either aggregate label.
 After disaggregation, entity loads and 1992-1994 baseline water volumes
 from `hydro_baseline` are summed across basins to the bay segment level.
 Corrections from `aa_corrections` (representing atmospheric deposition
-and approved project TN adjustments from the 2007 RA analysis) are
-subtracted before hydrologic normalization:
+and approved project TN adjustments) are subtracted before hydrologic
+normalization:
 
 ``` math
 \text{eff\_tn} = (\text{tn\_entity} - \text{corr\_tons}) \times \frac{\text{mean\_h2o\_9294}}{\text{total\_h2o}}
@@ -276,6 +277,9 @@ collective allocation in `alloc_tons` rather than an individual one,
 while `load_tons`/`eff_load_tons` remain each permit’s own load.
 `ishared` and `hydro_affected` are independent flags — a permit can be
 jointly assessed without being hydrologically normalized, or vice versa.
+`group_id` identifies which shared group a permit belongs to
+(`"ips_mosaic_hb"` or `"ips_kinder_morgan"`; `NA` when `ishared` is
+`FALSE`).
 
 ### DPS
 
@@ -295,7 +299,9 @@ joined to `ml_allocations` on entity + facname + bay segment — one
 output row per facility, always. Facilities with `ishared = TRUE` in
 `ml_allocations` carry their group’s collective allocation in
 `alloc_tons` rather than an individual one, while
-`load_tons`/`eff_load_tons` remain each facility’s own load.
+`load_tons`/`eff_load_tons` remain each facility’s own load. `group_id`
+identifies which shared group a facility belongs to (`"ml_mosaic_hb"`;
+`NA` when `ishared` is `FALSE`).
 
 ## Supporting datasets
 

@@ -155,6 +155,11 @@ facilities (see <code>alloc_tons</code>), rather than its own individual
 allocation. <code>FALSE</code> for NPS/MS4 and DPS rows, which have no
 shared-group concept currently</p></dd>
 
+<dt>group_id</dt>
+<dd><p>Character identifier for the shared group a row belongs
+to when <code>ishared</code> is <code>TRUE</code> (<code>NA</code> otherwise), from
+<code><a href="ps_allocations.html">ps_allocations</a></code>/<code><a href="ml_allocations.html">ml_allocations</a></code>.</p></dd>
+
 
 </dl></div>
     <div class="section level2">
@@ -210,7 +215,9 @@ their group's collective allocation in <code>alloc_tons</code> rather than an
 individual one, while <code>load_tons</code>/<code>eff_load_tons</code> remain each
 permit's own load — see <code>ishared</code> in Returns. <code>ishared</code> and
 <code>hydro_affected</code> are independent: a permit can be jointly assessed
-without being hydrologically normalized, or vice versa.</p>
+without being hydrologically normalized, or vice versa. <code>group_id</code>
+identifies which shared group a permit belongs to (<code>NA</code> when
+<code>ishared</code> is <code>FALSE</code>).</p>
 <p><strong>ML path</strong></p>
 <p>Material loss TN loads require no hydrologic normalization. Monthly loads
 from <code>ml_data</code> are summed to annual totals per facility, averaged
@@ -219,7 +226,9 @@ entity + facname + bay segment — one output row per facility, always.
 Facilities with <code>ishared = TRUE</code> carry
 their group's collective allocation in <code>alloc_tons</code> rather than an
 individual one, while <code>load_tons</code>/<code>eff_load_tons</code> remain each
-facility's own load — see <code>ishared</code> in Returns.</p>
+facility's own load — see <code>ishared</code> in Returns. <code>group_id</code>
+identifies which shared group a facility belongs to (<code>NA</code> when
+<code>ishared</code> is <code>FALSE</code>).</p>
 <p><strong>NPS/MS4 path</strong></p>
 <p>Gaged-basin TN loads in <code>nps_data</code> are gauge-measured totals and so
 include any upstream IPS + DPS discharge in that basin. Before

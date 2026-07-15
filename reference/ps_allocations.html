@@ -74,33 +74,38 @@ load <code><a href="anlz_aa.html">anlz_aa</a></code> hydrologically normalizes</
 <li><p><code>ishared</code>: Logical; <code>TRUE</code> when the permit is jointly
 assessed against a collective allocation shared with other permits
 (see <code>alloc_tons</code>)</p></li>
+<li><p><code>group_id</code>: Character identifier for the shared group a permit
+belongs to (<code>NA</code> when <code>ishared</code> is <code>FALSE</code>). Provided so
+shared-group membership can be recovered directly rather than inferred
+from matching <code>entity</code> + <code>alloc_tons</code></p></li>
 </ul><p>The 19 Mosaic facilities in Hillsborough Bay (Bartow, Bonnie, Ft. Lonesome,
 Green Bay, Hookers Prairie, Mulberry Phosphogypsum Stack, Mulberry Plant,
 New Wales Chemical Plant, Nichols Mine, Plant City, Riverview, Riverview
 Stack Closure, South Pierce, Tampa Ammonia Terminal, Tampa Marine
 Terminal, Hopewell, Kingsford, Port Sutton, Black Point) share a single
-124.1 ton/year allocation (<code>ishared = TRUE</code>). Kinder Morgan
-Tampaplex, Port Sutton, and Hartford Terminal likewise share a single 25.0
-ton/year allocation. All other permits are non-shared (<code>ishared =
-FALSE</code>).</p>
+124.1 ton/year allocation (<code>ishared = TRUE</code>, <code>group_id =
+"ips_mosaic_hb"</code>). Kinder Morgan Tampaplex, Port Sutton, and Hartford
+Terminal likewise share a single 25.0 ton/year allocation (<code>group_id =
+"ips_kinder_morgan"</code>). All other permits are non-shared (<code>ishared =
+FALSE</code>, <code>group_id = NA</code>).</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">ps_allocations</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 39 × 7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    entity facname             permit alloc_pct alloc_tons hydro_affected ishared</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> CSX    CSX - Rockport New… FL016…    0.007<span style="text-decoration: underline;">2</span>         6  FALSE          FALSE  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> Mosaic Point Source - Bon… FL000…    0.014<span style="text-decoration: underline;">5</span>       124. TRUE           TRUE   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> Mosaic Point Source - Pla… FL000…    0.000<span style="text-decoration: underline;">9</span>       124. TRUE           TRUE   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> Mosaic Point Source - Tam… FL018…    0.000<span style="text-decoration: underline;">2</span>       124. TRUE           TRUE   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Mosaic Point Source - Tam… FL016…    0.000<span style="text-decoration: underline;">6</span>       124. TRUE           TRUE   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Mosaic Point Source - Bar… FL000…    0.001        124. TRUE           TRUE   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> Mosaic Point Source - Ft.… FL003…    0.002<span style="text-decoration: underline;">5</span>       124. TRUE           TRUE   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Mosaic Point Source - Gre… FL000…    0.006<span style="text-decoration: underline;">4</span>       124. TRUE           TRUE   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Mosaic Point Source - Hoo… FL003…    0.005<span style="text-decoration: underline;">2</span>       124. TRUE           TRUE   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Mosaic Point Source - Hop… FL003…    0.002<span style="text-decoration: underline;">5</span>       124. TRUE           TRUE   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 39 × 8</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    entity facname    permit alloc_pct alloc_tons hydro_affected ishared group_id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> CSX    CSX - Roc… FL016…    0.007<span style="text-decoration: underline;">2</span>         6  FALSE          FALSE   <span style="color: #BB0000;">NA</span>      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> Mosaic Point Sou… FL000…    0.014<span style="text-decoration: underline;">5</span>       124. TRUE           TRUE    ips_mos…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> Mosaic Point Sou… FL000…    0.000<span style="text-decoration: underline;">9</span>       124. TRUE           TRUE    ips_mos…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> Mosaic Point Sou… FL018…    0.000<span style="text-decoration: underline;">2</span>       124. TRUE           TRUE    ips_mos…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Mosaic Point Sou… FL016…    0.000<span style="text-decoration: underline;">6</span>       124. TRUE           TRUE    ips_mos…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Mosaic Point Sou… FL000…    0.001        124. TRUE           TRUE    ips_mos…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> Mosaic Point Sou… FL003…    0.002<span style="text-decoration: underline;">5</span>       124. TRUE           TRUE    ips_mos…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Mosaic Point Sou… FL000…    0.006<span style="text-decoration: underline;">4</span>       124. TRUE           TRUE    ips_mos…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Mosaic Point Sou… FL003…    0.005<span style="text-decoration: underline;">2</span>       124. TRUE           TRUE    ips_mos…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Mosaic Point Sou… FL003…    0.002<span style="text-decoration: underline;">5</span>       124. TRUE           TRUE    ips_mos…</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 29 more rows</span></span>
 </code></pre></div>
     </div>
