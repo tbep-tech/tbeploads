@@ -69,8 +69,7 @@
 
 <dl><dt id="arg-aa-data">aa_data<a class="anchor" aria-label="anchor" href="#arg-aa-data"></a></dt>
 <dd><p>data frame returned by <code><a href="anlz_aa.html">anlz_aa</a></code> called with
-<code>annavg = FALSE</code>; must contain <code>year</code>, <code>seg_h2o_total</code>,
-and <code>seg_conserv_tn</code> columns.</p></dd>
+<code>annavg = FALSE</code></p></dd>
 
 
 <dt id="arg-bay-seg">bay_seg<a class="anchor" aria-label="anchor" href="#arg-bay-seg"></a></dt>
@@ -116,16 +115,18 @@ Default <code>1</code>.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <code><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable</a></code> object with one row per
-entity/facility in <code>bay_seg</code>, grouped into bolded sections, and one
+entity/facility in <code>bay_seg</code>, grouped into sections by source, and one
 column per year.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Rows are grouped into sections using <code>aa_data</code>'s own <code>source</code>
-column rather than replicating the TBNMC partner's combined "Point
-Sources" grouping: <code>"MS4"</code> (<code>source</code> of <code>"MS4"</code> or
-<code>"Nonpoint Source/MS4"</code>), <code>"IPS"</code>, <code>"DPS - end of pipe"</code>,
-<code>"DPS - reuse"</code>, <code>"ML"</code>, and <code>"Nonpoint Source"</code> (the
+    <p>Rows are grouped into sections using <code>aa_data</code>'s <code>source</code>
+column: <code>"MS4"</code> (<code>source</code> of <code>"MS4"</code> or
+<code>"Nonpoint Source/MS4"</code>), <code>"Industrial Point Source"</code>
+(<code>source == "IPS"</code>), <code>"Domestic Point Source - end of pipe"</code>
+and <code>"Domestic Point Source - reuse"</code> (<code>source == "DPS - end of
+pipe"</code>/<code>"DPS - reuse"</code>), <code>"Material Losses"</code> (<code>source ==
+"ML"</code>), and <code>"Nonpoint Source"</code> (the
 <code>"All"</code> (FDACS) and <code>"Non-MS4/Ag NPS"</code> aggregate rows from
 <code>aa_data</code>, plus two rows built from <code>gw_data</code>/<code>spr_data</code>/
 <code>ad_data</code> - see below; other unmatched <code>source = NA</code> rows in
@@ -134,23 +135,17 @@ Sources" grouping: <code>"MS4"</code> (<code>source</code> of <code>"MS4"</code>
 all, and are excluded here rather than shown as a spurious partial row).
 Each facility/entity keeps its own row, even for <code>ishared</code>
 shared-allocation groups (see <code><a href="anlz_aa.html">anlz_aa</a></code>). Row labels combine
-the owning entity with the facility name (<code>"Mosaic - Riverview"</code>),
-except when the facility name already identifies its owner
-(<code>"Mosaic - Bartow"</code>, <code>"City of Lakeland"</code>), to avoid
-duplicating it; an uninformative <code>"Point Source - "</code> prefix on some
-<code>facname</code> values (<code>"Point Source - Hopewell"</code>) is stripped
-first so it doesn't end up duplicated in the combined label either.</p>
+the owning entity with the facility name (e.g., <code>"Mosaic - Riverview"</code>).</p>
 <p><strong>Atmospheric Deposition and Other (Groundwater, Springs,
-Conservation)</strong>: <code>gw_data</code>, <code>spr_data</code>, and <code>ad_data</code> key on
-a <code>segment</code> name column rather than <code>bay_seg</code>; they are mapped
+Conservation)</strong>: <code>gw_data</code>, <code>spr_data</code>, and <code>ad_data</code> are mapped
 to <code>bay_seg</code> the same way <code><a href="anlz_aa.html">anlz_aa</a></code> does internally
 (Terra Ceia Bay and Manatee River summed into segment 55; Boca Ciega Bay
 variants dropped, consistent with the allocation framework's existing
 exclusion) and filtered to the requested <code>bay_seg</code>. <code>ad_data</code>'s
 <code>tn_load</code> becomes the <code>"Atmospheric Deposition"</code> row.
 <code>gw_data</code>'s and <code>spr_data</code>'s <code>tn_load</code> (<code>spr_data</code>
-only has rows for Hillsborough Bay - other segments get <code>0</code> from it)
-plus <code>aa_data</code>'s <code>seg_conserv_tn</code> (TN removed by the
+only has rows for Hillsborough Bay - other segments that have no contribution
+receive <code>0</code>) plus <code>aa_data</code>'s <code>seg_conserv_tn</code> (TN removed by the
 conservation-land correction already computed inside <code><a href="anlz_aa.html">anlz_aa()</a></code>,
 exposed as a segment total rather than sourced separately) become the
 <code>"Other (Groundwater, Springs, Conservation)"</code> row. Both are
@@ -160,10 +155,7 @@ rows.</p>
 year (or any year at all) is <code>NA</code> in <code>aa_data</code> by design (see
 <code><a href="anlz_aa.html">anlz_aa</a></code>); here it displays as <code>0</code> rather than blank.</p>
 <p>Values shown are always <code>load_tons</code> (raw, unnormalized loads), never
-<code>eff_load_tons</code> - per direct communication with the TBNMC partner,
-their draft annual loading tables report unnormalized loads even for
-facilities that are hydrologically normalized in the 3-year assessment
-table.</p>
+<code>eff_load_tons</code>.</p>
 <p>A bolded <code>"Total Load"</code> row sums every displayed row for each year
 (including the AD and Other rows). A bolded <code>"Normalized Load"</code> row
 below it applies one hydrologic-normalization ratio to the whole segment's
@@ -176,34 +168,9 @@ $$</p>
 <p>where the denominator is <code>aa_data</code>'s <code>seg_h2o_total</code> (NPS+IPS+DPS
 combined) plus <code>gw_data</code>/<code>spr_data</code>/<code>ad_data</code>'s own
 <code>hy_load</code>, and <code>baseline_h2o</code> is a hardcoded 1992-1994 baseline
-hydrologic load (million m3/yr) per bay segment, supplied directly in this
-function (not derived from <code><a href="hydro_baseline.html">hydro_baseline</a></code>, which only covers
-NPS+IPS+DPS water):</p>
-<table class="table table"><tr><td><strong>bay\_seg</strong></td><td><strong>baseline\_h2o</strong></td></tr><tr><td>1 (Old Tampa Bay)</td><td>449.44</td></tr><tr><td>2 (Hillsborough Bay)</td><td>895.62</td></tr><tr><td>3 (Middle Tampa Bay)</td><td>645.25</td></tr><tr><td>4 (Lower Tampa Bay)</td><td>361.19</td></tr><tr><td>55 (Remaining Lower Tampa Bay)</td><td>422.709</td></tr></table><p>These were extracted directly from the "Normalized Load" cell formula
-(<code>=C6*&lt;baseline&gt;/&lt;total_h2o&gt;</code>, e.g. <code>=C6*895.62/1060.477</code> for
-Hillsborough Bay 2022) in the TBNMC partner's draft annual loading
-workbooks (<code>data-raw/misc/draftload/*.xlsx</code> in <code>tbeploadsproc</code>),
-by unzipping each <code>.xlsx</code> and reading the formula (not just the
-computed value) out of the underlying sheet XML - not the "TMDL" figure in
-each sheet's title (e.g. "HILLSBOROUGH BAY: TMDL 1451"), which is a
-different quantity (the TN mass threshold used for pass/fail comparison,
-unrelated to this hydrologic ratio). This whole-segment-ratio approach
-(rather than summing each entity's own <code>eff_load_tons</code>) was validated
-against real 2022-2024 Hillsborough Bay data before these values were
-found: it reproduced a nearly constant implied baseline across all three
-years, unlike per-entity-based alternatives that varied by 3-4x year to
-year - and with the real value now in hand (895.62), the same formula's
-<code>"Other (Groundwater, Springs, Conservation)"</code> breakdown in that
-workbook (<code>=20.726327+133.700005+65.7377066</code> for 2022) confirms the
-<code>seg_conserv_tn</code> figure exposed by <code><a href="anlz_aa.html">anlz_aa</a></code> independently
-(65.4 tons computed here vs. 65.74 tons in the workbook for that year).</p>
-<p>An additional <code>"Average"</code> column, appended after the year columns,
-gives each row's own mean across the displayed years (a row-wise average,
-not a column summary); it is not computed for <code>"Normalized Load"</code>
-differently than any other row.</p>
-<p>This is a first-pass approximation of the TBNMC partner's draft annual
-loading workbooks - exact reproduction of RP's reported numbers is not
-guaranteed, only a close approximation.</p>
+hydrologic load (million m3/yr) per bay segment:</p>
+<table class="table table"><tr><td><strong>bay\_seg</strong></td><td><strong>baseline\_h2o</strong></td></tr><tr><td>1 Old Tampa Bay</td><td>449.44</td></tr><tr><td>2 Hillsborough Bay</td><td>895.62</td></tr><tr><td>3 Middle Tampa Bay</td><td>645.25</td></tr><tr><td>4 Lower Tampa Bay</td><td>361.19</td></tr><tr><td>55 Remaining Lower Tampa Bay</td><td>422.709</td></tr></table><p>An additional <code>"Average"</code> column, appended after the year columns,
+gives each row's own mean across the displayed years.</p>
     </div>
 
     <div class="section level2">
