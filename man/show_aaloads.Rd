@@ -18,8 +18,7 @@ show_aaloads(
 }
 \arguments{
 \item{aa_data}{data frame returned by \code{\link{anlz_aa}} called with
-\code{annavg = FALSE}; must contain \code{year}, \code{seg_h2o_total},
-and \code{seg_conserv_tn} columns.}
+\code{annavg = FALSE}}
 
 \item{bay_seg}{integer bay segment identifier, one of \code{1L} (Old Tampa
 Bay), \code{2L} (Hillsborough Bay), \code{3L} (Middle Tampa Bay),
@@ -47,18 +46,20 @@ Default \code{1}.}
 }
 \value{
 A \code{\link[flextable]{flextable}} object with one row per
-entity/facility in \code{bay_seg}, grouped into bolded sections, and one
+entity/facility in \code{bay_seg}, grouped into sections by source, and one
 column per year.
 }
 \description{
 Bay segment table of TN loads by year
 }
 \details{
-Rows are grouped into sections using \code{aa_data}'s own \code{source}
-column rather than replicating the TBNMC partner's combined "Point
-Sources" grouping: \code{"MS4"} (\code{source} of \code{"MS4"} or
-\code{"Nonpoint Source/MS4"}), \code{"IPS"}, \code{"DPS - end of pipe"},
-\code{"DPS - reuse"}, \code{"ML"}, and \code{"Nonpoint Source"} (the
+Rows are grouped into sections using \code{aa_data}'s \code{source}
+column: \code{"MS4"} (\code{source} of \code{"MS4"} or
+\code{"Nonpoint Source/MS4"}), \code{"Industrial Point Source"}
+(\code{source == "IPS"}), \code{"Domestic Point Source - end of pipe"}
+and \code{"Domestic Point Source - reuse"} (\code{source == "DPS - end of
+pipe"}/\code{"DPS - reuse"}), \code{"Material Losses"} (\code{source ==
+"ML"}), and \code{"Nonpoint Source"} (the
 \code{"All"} (FDACS) and \code{"Non-MS4/Ag NPS"} aggregate rows from
 \code{aa_data}, plus two rows built from \code{gw_data}/\code{spr_data}/
 \code{ad_data} - see below; other unmatched \code{source = NA} rows in
@@ -67,24 +68,18 @@ Sources" grouping: \code{"MS4"} (\code{source} of \code{"MS4"} or
 all, and are excluded here rather than shown as a spurious partial row).
 Each facility/entity keeps its own row, even for \code{ishared}
 shared-allocation groups (see \code{\link{anlz_aa}}). Row labels combine
-the owning entity with the facility name (\code{"Mosaic - Riverview"}),
-except when the facility name already identifies its owner
-(\code{"Mosaic - Bartow"}, \code{"City of Lakeland"}), to avoid
-duplicating it; an uninformative \code{"Point Source - "} prefix on some
-\code{facname} values (\code{"Point Source - Hopewell"}) is stripped
-first so it doesn't end up duplicated in the combined label either.
+the owning entity with the facility name (e.g., \code{"Mosaic - Riverview"}).
 
 \strong{Atmospheric Deposition and Other (Groundwater, Springs,
-Conservation)}: \code{gw_data}, \code{spr_data}, and \code{ad_data} key on
-a \code{segment} name column rather than \code{bay_seg}; they are mapped
+Conservation)}: \code{gw_data}, \code{spr_data}, and \code{ad_data} are mapped
 to \code{bay_seg} the same way \code{\link{anlz_aa}} does internally
 (Terra Ceia Bay and Manatee River summed into segment 55; Boca Ciega Bay
 variants dropped, consistent with the allocation framework's existing
 exclusion) and filtered to the requested \code{bay_seg}. \code{ad_data}'s
 \code{tn_load} becomes the \code{"Atmospheric Deposition"} row.
 \code{gw_data}'s and \code{spr_data}'s \code{tn_load} (\code{spr_data}
-only has rows for Hillsborough Bay - other segments get \code{0} from it)
-plus \code{aa_data}'s \code{seg_conserv_tn} (TN removed by the
+only has rows for Hillsborough Bay - other segments that have no contribution
+receive \code{0}) plus \code{aa_data}'s \code{seg_conserv_tn} (TN removed by the
 conservation-land correction already computed inside \code{anlz_aa()},
 exposed as a segment total rather than sourced separately) become the
 \code{"Other (Groundwater, Springs, Conservation)"} row. Both are
@@ -96,10 +91,7 @@ year (or any year at all) is \code{NA} in \code{aa_data} by design (see
 \code{\link{anlz_aa}}); here it displays as \code{0} rather than blank.
 
 Values shown are always \code{load_tons} (raw, unnormalized loads), never
-\code{eff_load_tons} - per direct communication with the TBNMC partner,
-their draft annual loading tables report unnormalized loads even for
-facilities that are hydrologically normalized in the 3-year assessment
-table.
+\code{eff_load_tons}.
 
 A bolded \code{"Total Load"} row sums every displayed row for each year
 (including the AD and Other rows). A bolded \code{"Normalized Load"} row
@@ -115,46 +107,19 @@ Total Load:
 where the denominator is \code{aa_data}'s \code{seg_h2o_total} (NPS+IPS+DPS
 combined) plus \code{gw_data}/\code{spr_data}/\code{ad_data}'s own
 \code{hy_load}, and \code{baseline_h2o} is a hardcoded 1992-1994 baseline
-hydrologic load (million m3/yr) per bay segment, supplied directly in this
-function (not derived from \code{\link{hydro_baseline}}, which only covers
-NPS+IPS+DPS water):
+hydrologic load (million m3/yr) per bay segment:
 
 \tabular{lr}{
 \strong{bay\_seg} \tab \strong{baseline\_h2o} \cr
-1 (Old Tampa Bay) \tab 449.44 \cr
-2 (Hillsborough Bay) \tab 895.62 \cr
-3 (Middle Tampa Bay) \tab 645.25 \cr
-4 (Lower Tampa Bay) \tab 361.19 \cr
-55 (Remaining Lower Tampa Bay) \tab 422.709
+1 Old Tampa Bay \tab 449.44 \cr
+2 Hillsborough Bay \tab 895.62 \cr
+3 Middle Tampa Bay \tab 645.25 \cr
+4 Lower Tampa Bay \tab 361.19 \cr
+55 Remaining Lower Tampa Bay \tab 422.709
 }
 
-These were extracted directly from the "Normalized Load" cell formula
-(\code{=C6*<baseline>/<total_h2o>}, e.g. \code{=C6*895.62/1060.477} for
-Hillsborough Bay 2022) in the TBNMC partner's draft annual loading
-workbooks (\code{data-raw/misc/draftload/*.xlsx} in \code{tbeploadsproc}),
-by unzipping each \code{.xlsx} and reading the formula (not just the
-computed value) out of the underlying sheet XML - not the "TMDL" figure in
-each sheet's title (e.g. "HILLSBOROUGH BAY: TMDL 1451"), which is a
-different quantity (the TN mass threshold used for pass/fail comparison,
-unrelated to this hydrologic ratio). This whole-segment-ratio approach
-(rather than summing each entity's own \code{eff_load_tons}) was validated
-against real 2022-2024 Hillsborough Bay data before these values were
-found: it reproduced a nearly constant implied baseline across all three
-years, unlike per-entity-based alternatives that varied by 3-4x year to
-year - and with the real value now in hand (895.62), the same formula's
-\code{"Other (Groundwater, Springs, Conservation)"} breakdown in that
-workbook (\code{=20.726327+133.700005+65.7377066} for 2022) confirms the
-\code{seg_conserv_tn} figure exposed by \code{\link{anlz_aa}} independently
-(65.4 tons computed here vs. 65.74 tons in the workbook for that year).
-
 An additional \code{"Average"} column, appended after the year columns,
-gives each row's own mean across the displayed years (a row-wise average,
-not a column summary); it is not computed for \code{"Normalized Load"}
-differently than any other row.
-
-This is a first-pass approximation of the TBNMC partner's draft annual
-loading workbooks - exact reproduction of RP's reported numbers is not
-guaranteed, only a close approximation.
+gives each row's own mean across the displayed years.
 }
 \examples{
 \dontrun{
