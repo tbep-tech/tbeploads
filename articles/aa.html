@@ -403,6 +403,29 @@ belongs to (<code>"ml_mosaic_hb"</code>; <code>NA</code> when
 </div>
 </div>
 <div class="section level2">
+<h2 id="reporting-tables">Reporting tables<a class="anchor" aria-label="anchor" href="#reporting-tables"></a>
+</h2>
+<p>Two functions build formatted <code>flextable</code> reports directly
+from <code><a href="../reference/anlz_aa.html">anlz_aa()</a></code> output. First, <code><a href="../reference/show_aaassess.html">show_aaassess()</a></code>
+reports allocation percentages, allocated tons, and effective loads by
+entity and facility:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_aa.html">anlz_aa</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, <span class="va">dps</span>, <span class="va">ips</span>, <span class="va">ml</span>, <span class="va">nps</span>, <span class="va">tbbase</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/show_aaassess.html">show_aaassess</a></span><span class="op">(</span><span class="va">result</span>, bay_seg <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<p>Second, <code><a href="../reference/show_aaloads.html">show_aaloads()</a></code> reports annual TN loads by
+source, including atmospheric deposition and
+groundwater/springs/conservation contributions, plus a
+hydrologically-normalized total. It requires <code>annavg = FALSE</code>
+output from <code><a href="../reference/anlz_aa.html">anlz_aa()</a></code>, along with <code><a href="../reference/anlz_gw.html">anlz_gw()</a></code>,
+<code><a href="../reference/anlz_spr.html">anlz_spr()</a></code>, and <code><a href="../reference/anlz_ad.html">anlz_ad()</a></code> results:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result_yr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_aa.html">anlz_aa</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, <span class="va">dps</span>, <span class="va">ips</span>, <span class="va">ml</span>, <span class="va">nps</span>, <span class="va">tbbase</span>, annavg <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">gw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_gw.html">anlz_gw</a></span><span class="op">(</span><span class="va">contdry</span>, <span class="va">contwet</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, summtime <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span></span>
+<span><span class="va">spr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_spr.html">anlz_spr</a></span><span class="op">(</span><span class="va">tbwxlpth</span>, <span class="va">wqpth</span>, yrrng <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, summ <span class="op">=</span> <span class="st">"segment"</span>, summtime <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span></span>
+<span><span class="va">ad</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anlz_ad.html">anlz_ad</a></span><span class="op">(</span><span class="va">rain</span>, <span class="va">vernafl</span>, summ <span class="op">=</span> <span class="st">"segment"</span>, summtime <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/show_aaloads.html">show_aaloads</a></span><span class="op">(</span><span class="va">result_yr</span>, bay_seg <span class="op">=</span> <span class="fl">2</span>, <span class="va">gw</span>, <span class="va">spr</span>, <span class="va">ad</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="supporting-datasets">Supporting datasets<a class="anchor" aria-label="anchor" href="#supporting-datasets"></a>
 </h2>
 <p>The following package datasets support the allocation assessment and

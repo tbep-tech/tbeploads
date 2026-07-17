@@ -303,6 +303,44 @@ output row per facility, always. Facilities with `ishared = TRUE` in
 identifies which shared group a facility belongs to (`"ml_mosaic_hb"`;
 `NA` when `ishared` is `FALSE`).
 
+## Reporting tables
+
+Two functions build formatted `flextable` reports directly from
+[`anlz_aa()`](https://tbep-tech.github.io/tbeploads/reference/anlz_aa.md)
+output. First,
+[`show_aaassess()`](https://tbep-tech.github.io/tbeploads/reference/show_aaassess.md)
+reports allocation percentages, allocated tons, and effective loads by
+entity and facility:
+
+``` r
+
+result <- anlz_aa(c(2022, 2024), dps, ips, ml, nps, tbbase)
+show_aaassess(result, bay_seg = 2)
+```
+
+Second,
+[`show_aaloads()`](https://tbep-tech.github.io/tbeploads/reference/show_aaloads.md)
+reports annual TN loads by source, including atmospheric deposition and
+groundwater/springs/conservation contributions, plus a
+hydrologically-normalized total. It requires `annavg = FALSE` output
+from
+[`anlz_aa()`](https://tbep-tech.github.io/tbeploads/reference/anlz_aa.md),
+along with
+[`anlz_gw()`](https://tbep-tech.github.io/tbeploads/reference/anlz_gw.md),
+[`anlz_spr()`](https://tbep-tech.github.io/tbeploads/reference/anlz_spr.md),
+and
+[`anlz_ad()`](https://tbep-tech.github.io/tbeploads/reference/anlz_ad.md)
+results:
+
+``` r
+
+result_yr <- anlz_aa(c(2022, 2024), dps, ips, ml, nps, tbbase, annavg = FALSE)
+gw <- anlz_gw(contdry, contwet, yrrng = c(2022, 2024), summtime = "year")
+spr <- anlz_spr(tbwxlpth, wqpth, yrrng = c(2022, 2024), summ = "segment", summtime = "year")
+ad <- anlz_ad(rain, vernafl, summ = "segment", summtime = "year")
+show_aaloads(result_yr, bay_seg = 2, gw, spr, ad)
+```
+
 ## Supporting datasets
 
 The following package datasets support the allocation assessment and are
