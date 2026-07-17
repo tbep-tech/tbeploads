@@ -69,6 +69,8 @@ Functions for analyzing data.
 
 Functions to show results.
 
+- [`show_aaassess()`](https://tbep-tech.github.io/tbeploads/reference/show_aaassess.md)
+  : Bay segment table of allocation assessment by entity and facility
 - [`show_aaloads()`](https://tbep-tech.github.io/tbeploads/reference/show_aaloads.md)
   : Bay segment table of TN loads by year
 
