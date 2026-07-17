@@ -67,6 +67,13 @@ ps_allocations <- read_csv(
       "FL0038652"  # Mosaic - Black Point (fka Yara)
     ),
     alloc_tons = if_else(ishared, 124.1, alloc_tons),
+    # The 18 pre-existing rows' individual alloc_pct values (like alloc_tons
+    # above) predate the group's consolidation and no longer mean anything on
+    # their own; RP's draft assessment table stores one collective
+    # percentage for the whole group, identically repeated on every member
+    # row (0.1203, confirmed directly from that table's merged cell) -
+    # mirrored here the same way alloc_tons already is.
+    alloc_pct = if_else(ishared, 0.1203, alloc_pct),
     group_id = if_else(ishared, "ips_mosaic_hb", NA_character_),
     # RP's draft TN-loading tables mark these permits (mostly Mosaic mining
     # facilities plus a handful of others) with a "Hydrologically Affected"
@@ -134,7 +141,10 @@ ps_allocations <- read_csv(
 #
 # Mosaic - Port Sutton (Ammonia Terminal) is the 19th member of the
 # Hillsborough Bay Mosaic ishared group (see above) but, unlike its 18
-# siblings, was never in the original 2016 CSV at all.
+# siblings, was never in the original 2016 CSV at all. It still gets the
+# group's collective alloc_pct (0.1203) below, unlike the other facilities
+# here, since RP's draft assessment table (the actual source of that value)
+# includes it as a full group member.
 missing_ps <- tribble(
   ~entity,                ~facname,                     ~permit,     ~alloc_tons, ~ishared, ~group_id,
   "Duke Energy",          "Duke Energy-Bartow Plant",   "FL0000132", 3.00,        FALSE,    NA_character_,
@@ -149,7 +159,10 @@ missing_ps <- tribble(
   "Kinder Morgan",        "Kinder Morgan Hartford Terminal", NA_character_, 25.00, TRUE,     "ips_kinder_morgan",
   "Tampa Bay Water",      "Point Source - Tampa Bay Water", NA_character_, 1.5,    FALSE,    NA_character_
 ) |>
-  mutate(alloc_pct = NA_real_, hydro_affected = FALSE) |>
+  mutate(
+    alloc_pct = if_else(facname == "Mosaic - Port Sutton", 0.1203, NA_real_),
+    hydro_affected = FALSE
+  ) |>
   select(entity, facname, permit, alloc_pct, alloc_tons, hydro_affected, ishared, group_id)
 
 ps_allocations <- ps_allocations |>
