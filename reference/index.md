@@ -226,6 +226,8 @@ Utility functions used by other functions or standalone.
   : Light edits to the outfall ID column for point source data
 - [`util_ps_getaoc()`](https://tbep-tech.github.io/tbeploads/reference/util_ps_getaoc.md)
   : Get AOC LLC discharge monitoring report data from FDEP OCULUS
+- [`util_ps_getkerry()`](https://tbep-tech.github.io/tbeploads/reference/util_ps_getkerry.md)
+  : Get Kerry I&F discharge monitoring report data from FDEP OCULUS
 - [`util_ps_getmacdill()`](https://tbep-tech.github.io/tbeploads/reference/util_ps_getmacdill.md)
   : Get MacDill AFB WWTP discharge monitoring report data from FDEP
   OCULUS
