@@ -1,6 +1,6 @@
 Package: tbeploads
 Title: Calculate Loading Data to Tampa Bay
-Version: 0.0.0.9000
+Version: 1.0.0
 Authors@R: c(
     person(given = "Marcus",
       family = "Beck",
