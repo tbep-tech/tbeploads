@@ -4,23 +4,31 @@
 \alias{util_spr_getwq}
 \title{Retrieve spring water quality data from APIs}
 \usage{
-util_spr_getwq(yrrng, verbose = TRUE)
+util_spr_getwq(yrrng, raw = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{yrrng}{integer vector of length 2, start and end year, e.g. \code{c(2022, 2024)}.}
 
+\item{raw}{logical, if \code{FALSE} (default) annual mean concentrations
+are returned (one row per spring per year). If \code{TRUE}, the raw,
+unaggregated observations are returned instead (one row per spring per
+sample date), with an additional \code{date} column in place of \code{yr}.}
+
 \item{verbose}{logical, if \code{TRUE} progress messages are printed.}
 }
 \value{
-A data frame with columns \code{spring}, \code{yr}, \code{tn_mgl},
-\code{tp_mgl}, and \code{tss_mgl} (one row per spring per year).
+A data frame with columns \code{spring}, \code{tn_mgl},
+\code{tp_mgl}, and \code{tss_mgl}, plus \code{yr} (one row per spring per
+year) when \code{raw = FALSE}, or \code{date} (one row per spring per
+sample date) when \code{raw = TRUE}.
 }
 \description{
 Retrieve spring water quality data from APIs
 }
 \details{
-Fetches annual mean TN, TP, and TSS concentrations (mg/L) for Lithia,
-Buckhorn, and Sulphur springs from two external sources.
+Fetches TN, TP, and TSS concentrations (mg/L) for Lithia, Buckhorn, and
+Sulphur springs from two external sources, returned either as annual means
+or as raw observations (see \code{raw}).
 
 \strong{Lithia and Buckhorn springs} are retrieved from the
 \href{https://dev.api.wateratlas.org}{Water Atlas API}
@@ -38,14 +46,21 @@ Protection Commission of Hillsborough County (EPC) monitoring spreadsheet.
 Station 174 corresponds to the Sulphur Spring sampling location and provides
 monthly TN, TP, and TSS observations.
 
-Annual means are computed across all observations within each calendar year.
-TSS values that are \code{NaN} (i.e., no valid observations in a year) are
-converted to \code{NA} so that \code{\link{anlz_spr}} can apply the fixed
-fallback concentrations.
+When \code{raw = FALSE}, means are computed across all observations within
+each calendar year, and TSS values that are \code{NaN} (i.e., no valid
+observations in a year) are converted to \code{NA} so that
+\code{\link{anlz_spr}} can apply the fixed fallback concentrations. When
+\code{raw = TRUE}, no aggregation is performed; each row reflects the
+actual sample date, and since TN, TP, and TSS are not always sampled on the
+same date, some rows may have \code{NA} for parameters not measured that
+day.
 }
 \examples{
 \dontrun{
 wqdat <- util_spr_getwq(c(2022, 2024))
+
+# raw, unaggregated observations instead of annual means
+wqdat <- util_spr_getwq(c(2022, 2024), raw = TRUE)
 }
 }
 \seealso{

@@ -204,6 +204,95 @@ test_that("util_spr_getwq stops on non-200 API response", {
 
 })
 
+test_that("util_spr_getwq returns annual means with a yr column by default", {
+
+  local_mocked_bindings(
+    GET         = function(...) list(),
+    status_code = function(x) 200L,
+    content     = function(x, as = NULL, encoding = NULL) default_ndjson(2022:2024),
+    .package    = "httr"
+  )
+  local_mocked_bindings(
+    read_importepc = function(tmpfl, download_latest = TRUE) make_mock_epc(),
+    .package       = "tbeptools"
+  )
+
+  result <- util_spr_getwq(c(2022, 2024), verbose = FALSE)
+
+  expect_true("yr" %in% names(result))
+  expect_false("date" %in% names(result))
+  expect_equal(nrow(result), 9L)   # 3 springs x 3 years
+
+})
+
+test_that("util_spr_getwq returns raw, unaggregated observations with a date column when raw = TRUE", {
+
+  # One API observation per year, always in March
+  ndjson_march_only <- default_ndjson(2022:2024)
+
+  local_mocked_bindings(
+    GET         = function(...) list(),
+    status_code = function(x) 200L,
+    content     = function(x, as = NULL, encoding = NULL) ndjson_march_only,
+    .package    = "httr"
+  )
+  local_mocked_bindings(
+    read_importepc = function(tmpfl, download_latest = TRUE) make_mock_epc(),
+    .package       = "tbeptools"
+  )
+
+  result <- util_spr_getwq(c(2022, 2024), raw = TRUE, verbose = FALSE)
+
+  expect_true("date" %in% names(result))
+  expect_false("yr" %in% names(result))
+
+  # Lithia/Buckhorn only have one March observation per year -> 2 springs x 3 dates
+  api_rows <- result[result$spring %in% c("Lithia", "Buckhorn"), ]
+  expect_equal(nrow(api_rows), 6L)
+  expect_true(all(lubridate::month(api_rows$date) == 3L))
+
+  # Sulphur (EPC) has one observation per calendar month across 2022-2024
+  sulphur_rows <- result[result$spring == "Sulphur", ]
+  expect_equal(nrow(sulphur_rows), 36L)
+
+  # Sorted by spring, date
+  expect_equal(order(sulphur_rows$date), seq_len(nrow(sulphur_rows)))
+
+})
+
+test_that("util_spr_getwq raw output has NA for a parameter not measured on a given date", {
+
+  # TN measured on one date, TP measured on a different date -> two separate rows
+  ndjson_offset_dates <- make_ndjson(
+    list(parameter = "TN_mgl", activityStartDate = "2023-03-10T00:00:00", resultValue = 0.5),
+    list(parameter = "TP_mgl", activityStartDate = "2023-03-20T00:00:00", resultValue = 0.05)
+  )
+
+  local_mocked_bindings(
+    GET         = function(...) list(),
+    status_code = function(x) 200L,
+    content     = function(x, as = NULL, encoding = NULL) ndjson_offset_dates,
+    .package    = "httr"
+  )
+  local_mocked_bindings(
+    read_importepc = function(tmpfl, download_latest = TRUE) make_mock_epc(),
+    .package       = "tbeptools"
+  )
+
+  result <- util_spr_getwq(c(2022, 2024), raw = TRUE, verbose = FALSE)
+
+  lithia_rows <- result[result$spring == "Lithia", ]
+  expect_equal(nrow(lithia_rows), 2L)
+
+  tn_row <- lithia_rows[lithia_rows$date == as.Date("2023-03-10"), ]
+  tp_row <- lithia_rows[lithia_rows$date == as.Date("2023-03-20"), ]
+  expect_equal(tn_row$tn_mgl, 0.5)
+  expect_true(is.na(tn_row$tp_mgl))
+  expect_equal(tp_row$tp_mgl, 0.05)
+  expect_true(is.na(tp_row$tn_mgl))
+
+})
+
 test_that("util_spr_getwq prints progress messages when verbose = TRUE", {
 
   local_mocked_bindings(

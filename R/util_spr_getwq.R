@@ -1,11 +1,16 @@
 #' Retrieve spring water quality data from APIs
 #'
 #' @param yrrng integer vector of length 2, start and end year, e.g. \code{c(2022, 2024)}.
+#' @param raw logical, if \code{FALSE} (default) annual mean concentrations
+#'   are returned (one row per spring per year). If \code{TRUE}, the raw,
+#'   unaggregated observations are returned instead (one row per spring per
+#'   sample date), with an additional \code{date} column in place of \code{yr}.
 #' @param verbose logical, if \code{TRUE} progress messages are printed.
 #'
 #' @details
-#' Fetches annual mean TN, TP, and TSS concentrations (mg/L) for Lithia,
-#' Buckhorn, and Sulphur springs from two external sources.
+#' Fetches TN, TP, and TSS concentrations (mg/L) for Lithia, Buckhorn, and
+#' Sulphur springs from two external sources, returned either as annual means
+#' or as raw observations (see \code{raw}).
 #'
 #' \strong{Lithia and Buckhorn springs} are retrieved from the
 #' \href{https://dev.api.wateratlas.org}{Water Atlas API}
@@ -23,13 +28,19 @@
 #' Station 174 corresponds to the Sulphur Spring sampling location and provides
 #' monthly TN, TP, and TSS observations.
 #'
-#' Annual means are computed across all observations within each calendar year.
-#' TSS values that are \code{NaN} (i.e., no valid observations in a year) are
-#' converted to \code{NA} so that \code{\link{anlz_spr}} can apply the fixed
-#' fallback concentrations.
+#' When \code{raw = FALSE}, means are computed across all observations within
+#' each calendar year, and TSS values that are \code{NaN} (i.e., no valid
+#' observations in a year) are converted to \code{NA} so that
+#' \code{\link{anlz_spr}} can apply the fixed fallback concentrations. When
+#' \code{raw = TRUE}, no aggregation is performed; each row reflects the
+#' actual sample date, and since TN, TP, and TSS are not always sampled on the
+#' same date, some rows may have \code{NA} for parameters not measured that
+#' day.
 #'
-#' @return A data frame with columns \code{spring}, \code{yr}, \code{tn_mgl},
-#'   \code{tp_mgl}, and \code{tss_mgl} (one row per spring per year).
+#' @return A data frame with columns \code{spring}, \code{tn_mgl},
+#'   \code{tp_mgl}, and \code{tss_mgl}, plus \code{yr} (one row per spring per
+#'   year) when \code{raw = FALSE}, or \code{date} (one row per spring per
+#'   sample date) when \code{raw = TRUE}.
 #'
 #' @export
 #'
@@ -42,8 +53,11 @@
 #' @examples
 #' \dontrun{
 #' wqdat <- util_spr_getwq(c(2022, 2024))
+#'
+#' # raw, unaggregated observations instead of annual means
+#' wqdat <- util_spr_getwq(c(2022, 2024), raw = TRUE)
 #' }
-util_spr_getwq <- function(yrrng, verbose = TRUE) {
+util_spr_getwq <- function(yrrng, raw = FALSE, verbose = TRUE) {
 
   start_date <- paste0(yrrng[1], "-01-01")
   end_date   <- paste0(yrrng[2], "-12-31")
@@ -89,18 +103,26 @@ util_spr_getwq <- function(yrrng, verbose = TRUE) {
     dat <- dplyr::bind_rows(lapply(recs, function(r) {
       data.frame(
         spring    = spring_name,
-        yr        = lubridate::year(as.Date(substr(r$activityStartDate, 1, 10))),
+        date      = as.Date(substr(r$activityStartDate, 1, 10)),
         parameter = r$parameter,
         value     = r$resultValue,
         stringsAsFactors = FALSE
       )
     }))
 
-    dat |>
-      dplyr::group_by(spring, yr, parameter) |>
-      dplyr::summarise(value = mean(value, na.rm = TRUE), .groups = "drop") |>
-      tidyr::pivot_wider(names_from = parameter, values_from = value) |>
-      dplyr::rename_with(tolower, dplyr::any_of(c("TN_mgl", "TP_mgl", "TSS_mgl")))
+    if (raw) {
+      dat |>
+        tidyr::pivot_wider(names_from = parameter, values_from = value,
+                           values_fn = mean) |>
+        dplyr::rename_with(tolower, dplyr::any_of(c("TN_mgl", "TP_mgl", "TSS_mgl")))
+    } else {
+      dat |>
+        dplyr::mutate(yr = lubridate::year(date)) |>
+        dplyr::group_by(spring, yr, parameter) |>
+        dplyr::summarise(value = mean(value, na.rm = TRUE), .groups = "drop") |>
+        tidyr::pivot_wider(names_from = parameter, values_from = value) |>
+        dplyr::rename_with(tolower, dplyr::any_of(c("TN_mgl", "TP_mgl", "TSS_mgl")))
+    }
   })
 
   api_out <- dplyr::bind_rows(api_dat)
@@ -124,35 +146,46 @@ util_spr_getwq <- function(yrrng, verbose = TRUE) {
     tbeptools::read_importepc(tmpfl, download_latest = TRUE)
   )
 
-  sulphur_out <- epc_raw |>
+  sulphur_base <- epc_raw |>
     dplyr::filter(as.character(StationNumber) == "174") |>
     dplyr::mutate(
       spring  = "Sulphur",
-      yr      = lubridate::year(SampleTime),
+      date    = as.Date(SampleTime),
       tn_mgl  = suppressWarnings(as.numeric(Total_Nitrogen)),
       tp_mgl  = suppressWarnings(as.numeric(Total_Phosphorus)),
       tss_mgl = suppressWarnings(as.numeric(Total_Suspended_Solids))
     ) |>
-    dplyr::filter(yr >= yrrng[1], yr <= yrrng[2]) |>
-    dplyr::group_by(spring, yr) |>
-    dplyr::summarise(
-      tn_mgl  = mean(tn_mgl,  na.rm = TRUE),
-      tp_mgl  = mean(tp_mgl,  na.rm = TRUE),
-      tss_mgl = mean(tss_mgl, na.rm = TRUE),
-      .groups = "drop"
-    ) |>
-    # mean() of all-NA returns NaN; convert to NA so coalesce works downstream
-    dplyr::mutate(
-      tn_mgl  = ifelse(is.nan(tn_mgl),  NA_real_, tn_mgl),
-      tp_mgl  = ifelse(is.nan(tp_mgl),  NA_real_, tp_mgl),
-      tss_mgl = ifelse(is.nan(tss_mgl), NA_real_, tss_mgl)
-    )
+    dplyr::filter(date >= as.Date(start_date), date <= as.Date(end_date))
+
+  if (raw) {
+    sulphur_out <- sulphur_base |>
+      dplyr::select(spring, date, tn_mgl, tp_mgl, tss_mgl) |>
+      dplyr::arrange(date)
+  } else {
+    sulphur_out <- sulphur_base |>
+      dplyr::mutate(yr = lubridate::year(date)) |>
+      dplyr::group_by(spring, yr) |>
+      dplyr::summarise(
+        tn_mgl  = mean(tn_mgl,  na.rm = TRUE),
+        tp_mgl  = mean(tp_mgl,  na.rm = TRUE),
+        tss_mgl = mean(tss_mgl, na.rm = TRUE),
+        .groups = "drop"
+      ) |>
+      # mean() of all-NA returns NaN; convert to NA so coalesce works downstream
+      dplyr::mutate(
+        tn_mgl  = ifelse(is.nan(tn_mgl),  NA_real_, tn_mgl),
+        tp_mgl  = ifelse(is.nan(tp_mgl),  NA_real_, tp_mgl),
+        tss_mgl = ifelse(is.nan(tss_mgl), NA_real_, tss_mgl)
+      )
+  }
 
   # ---------------------------------------------------------------------------
   # 3. Combine
   # ---------------------------------------------------------------------------
+  sort_cols <- if (raw) c("spring", "date") else c("spring", "yr")
+
   out <- dplyr::bind_rows(api_out, sulphur_out) |>
-    dplyr::arrange(spring, yr)
+    dplyr::arrange(dplyr::across(dplyr::all_of(sort_cols)))
 
   return(out)
 
