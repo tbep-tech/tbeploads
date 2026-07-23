@@ -7,13 +7,13 @@
 #'   columns \code{DeviceID}, \code{MeasureDateTime}, \code{Value},
 #'   \code{MeasureType}, and \code{Units}.
 #' @param wqpth character string or \code{NULL} (default). File path to spring water
-#'   quality data (.csv). Must contain columns \code{spring}, \code{year},
-#'   \code{month}, \code{tn(mg/L)}, and \code{tp(mg/L)} with one row per sample.
-#'   Spring names must match \code{"Lithia"}, \code{"Buckhorn"}, and
-#'   \code{"Sulphur"}. When \code{NULL}, water quality data are retrieved
-#'   automatically from external APIs. Lithia and Buckhorn concentrations are
-#'   obtained from the Water Atlas API (SWFWMD stations 17805 and 18276) and
-#'   Sulphur Spring concentrations are obtained via
+#'   quality data (.csv), in one of two formats (see Details): FDEP IWR sample
+#'   data, or annual output from \code{\link{util_spr_getwq}}. Spring names
+#'   must match \code{"Lithia"}, \code{"Buckhorn"}, and \code{"Sulphur"}. When
+#'   \code{NULL}, water quality data are retrieved automatically from external
+#'   APIs via \code{\link{util_spr_getwq}}. Lithia and Buckhorn concentrations
+#'   are obtained from the Water Atlas API (SWFWMD stations 17805 and 18276)
+#'   and Sulphur Spring concentrations are obtained via
 #'   \href{https://tbep-tech.github.io/tbeptools/reference/read_importepc.html}{\code{read_importepc}} (EPC station 174).
 #' @param yrrng integer vector of length 2, start and end year for the analysis,
 #'   e.g. \code{c(2022, 2024)}.
@@ -50,11 +50,12 @@
 #' values (\code{\link[zoo]{na.approx}} with \code{rule = 2}). Leading or
 #' trailing gaps are filled with the nearest observed value.
 #'
-#' \strong{Water quality data (file path):}
-#' When \code{wqpth} is supplied, sample concentrations (mg/L) for TN and TP
-#' are read from the CSV. These data are from FDEP's Impaired Waters Rule
-#' dataset available at \url{https://publicfiles.dep.state.fl.us/dear/iwr/}.
-#' Annual mean concentrations are computed per spring and joined to monthly flow
+#' \strong{Water quality data (file path, FDEP IWR format):}
+#' When \code{wqpth} is supplied and the CSV contains a \code{sta} column, it
+#' is treated as raw FDEP Impaired Waters Rule (IWR) sample data (available at
+#' \url{https://publicfiles.dep.state.fl.us/dear/iwr/}), with sample
+#' concentrations (mg/L) for TN and TP read from the CSV. Annual mean
+#' concentrations are computed per spring and joined to monthly flow
 #' estimates. A spring-year is considered complete when its samples span all four
 #' calendar quarters (Jan-Mar, Apr-Jun, Jul-Sep, Oct-Dec). Spring-years that are
 #' entirely missing or whose samples do not cover all four quarters are filled by
@@ -64,9 +65,21 @@
 #' is already incomplete for a spring, there is no prior year to carry forward and
 #' an error is raised.
 #'
+#' \strong{Water quality data (file path, Water Atlas format):}
+#' When \code{wqpth} is supplied and the CSV does \emph{not} contain a
+#' \code{sta} column, it is treated as already-summarized annual output from
+#' \code{\link{util_spr_getwq}} (\code{raw = FALSE}, the default), with
+#' columns \code{spring}, \code{yr}, \code{tn_mgl}, \code{tp_mgl}, and
+#' \code{tss_mgl} used as-is (no additional summarization or quarter-completeness
+#' check is applied; see note below). Supplying the raw, per-observation output of
+#' \code{\link{util_spr_getwq}} (\code{raw = TRUE}, identified by a \code{date}
+#' column instead of \code{yr}) raises an error.
+#'
 #' \strong{Water quality data (API, \code{wqpth = NULL}):}
-#' When \code{wqpth} is \code{NULL}, water quality data are obtained using 
-#' \code{\link{util_spr_getwq}}. Lithia (SWFWMD station
+#' When \code{wqpth} is \code{NULL}, water quality data are obtained using
+#' \code{\link{util_spr_getwq}} (\code{raw = FALSE}), which is preferred over the
+#' FDEP IWR file in most cases because the Water Atlas API data are usually more
+#' current. Lithia (SWFWMD station
 #' 17805, Lithia Main Spring) and Buckhorn (SWFWMD station 18276, Buckhorn Main
 #' Spring) concentrations are retrieved from the
 #' \href{https://dev.api.wateratlas.org}{Water Atlas API}
@@ -75,6 +88,12 @@
 #' 174) is retrieved via \href{https://tbep-tech.github.io/tbeptools/reference/read_importepc.html}{\code{read_importepc}}, providing
 #' monthly observations from the Environmental Protection Commission of
 #' Hillsborough County.
+#'
+#' \strong{Note on quarter-completeness:} the four-quarter completeness check
+#' described above applies only to the FDEP IWR CSV format. Annual means from
+#' \code{\link{util_spr_getwq}} (whether obtained via \code{wqpth = NULL} or
+#' supplied as a Water Atlas-format CSV) are not checked for quarter coverage
+#' before averaging.
 #'
 #' \strong{TSS concentrations:}
 #' When \code{wqpth} is supplied, TSS concentrations are assigned from a fixed
@@ -267,38 +286,67 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
 
   # ---------------------------------------------------------------------------
   # 6. Water quality: annual means per spring
-  #    Source A (wqpth supplied): read from local CSV
-  #    Source B (wqpth = NULL):   fetch from Water Atlas API + EPC via
-  #                                util_spr_getwq()
+  #    Source A (wqpth supplied, 'sta' column present):     FDEP IWR sample
+  #                                                          data, summarized here
+  #    Source B (wqpth supplied, no 'sta' column):           already-annual
+  #                                                          util_spr_getwq() output
+  #    Source C (wqpth = NULL):                              fetch from Water Atlas
+  #                                                          API + EPC via
+  #                                                          util_spr_getwq()
   # ---------------------------------------------------------------------------
   if (!is.null(wqpth)) {
 
     wq_raw <- utils::read.csv(wqpth, check.names = FALSE, stringsAsFactors = FALSE)
 
-    wq_annual <- wq_raw |>
-      dplyr::rename(
-        yr     = year,
-        tn_mgl = `tn(mg/L)`,
-        tp_mgl = `tp(mg/L)`
-      ) |>
-      dplyr::mutate(
-        tn_mgl  = suppressWarnings(as.numeric(tn_mgl)),
-        tp_mgl  = suppressWarnings(as.numeric(tp_mgl)),
-        quarter = ceiling(month / 3L)
-      ) |>
-      dplyr::group_by(spring, yr) |>
-      dplyr::summarise(
-        tn_mgl     = mean(tn_mgl, na.rm = TRUE),
-        tp_mgl     = mean(tp_mgl, na.rm = TRUE),
-        n_quarters = dplyr::n_distinct(quarter),
-        .groups    = "drop"
-      ) |>
-      dplyr::mutate(
-        tn_mgl = dplyr::if_else(n_quarters < 4L, NA_real_, tn_mgl),
-        tp_mgl = dplyr::if_else(n_quarters < 4L, NA_real_, tp_mgl)
-      ) |>
-      dplyr::select(-n_quarters) |>
-      dplyr::mutate(tss_mgl = NA_real_)
+    if ("sta" %in% names(wq_raw)) {
+
+      # FDEP IWR sample data: one row per sample, summarize to annual means
+      wq_annual <- wq_raw |>
+        dplyr::rename(
+          yr     = year,
+          tn_mgl = `tn(mg/L)`,
+          tp_mgl = `tp(mg/L)`
+        ) |>
+        dplyr::mutate(
+          tn_mgl  = suppressWarnings(as.numeric(tn_mgl)),
+          tp_mgl  = suppressWarnings(as.numeric(tp_mgl)),
+          quarter = ceiling(month / 3L)
+        ) |>
+        dplyr::group_by(spring, yr) |>
+        dplyr::summarise(
+          tn_mgl     = mean(tn_mgl, na.rm = TRUE),
+          tp_mgl     = mean(tp_mgl, na.rm = TRUE),
+          n_quarters = dplyr::n_distinct(quarter),
+          .groups    = "drop"
+        ) |>
+        dplyr::mutate(
+          tn_mgl = dplyr::if_else(n_quarters < 4L, NA_real_, tn_mgl),
+          tp_mgl = dplyr::if_else(n_quarters < 4L, NA_real_, tp_mgl)
+        ) |>
+        dplyr::select(-n_quarters) |>
+        dplyr::mutate(tss_mgl = NA_real_)
+
+    } else {
+
+      # Already-annual util_spr_getwq() output; the raw (per-observation) output
+      # has a 'date' column instead of 'yr' and is not accepted here.
+      if ("date" %in% names(wq_raw))
+        stop(
+          "'", wqpth, "' looks like the raw (unaggregated) output of ",
+          "util_spr_getwq() (raw = TRUE). anlz_spr() requires the annual ",
+          "output instead (raw = FALSE, the default), which has a 'yr' ",
+          "column rather than 'date'.",
+          call. = FALSE
+        )
+
+      wq_annual <- wq_raw |>
+        dplyr::mutate(
+          tn_mgl  = suppressWarnings(as.numeric(tn_mgl)),
+          tp_mgl  = suppressWarnings(as.numeric(tp_mgl)),
+          tss_mgl = suppressWarnings(as.numeric(tss_mgl))
+        )
+
+    }
 
   } else {
 

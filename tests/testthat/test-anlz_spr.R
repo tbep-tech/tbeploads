@@ -279,6 +279,87 @@ test_that("anlz_spr wqpth=NULL and wqpth file produce similar TN/TP loads", {
 })
 
 # ---------------------------------------------------------------------------
+# wqpth = Water Atlas-format CSV (util_spr_getwq annual output, no 'sta' column)
+# ---------------------------------------------------------------------------
+
+test_that("anlz_spr accepts a Water Atlas-format CSV (no 'sta' column) and matches wqpth = NULL", {
+
+  wa_csv <- tempfile(fileext = ".csv")
+  on.exit(unlink(wa_csv), add = TRUE)
+  write.csv(make_mock_wq(c(2022, 2024)), wa_csv, row.names = FALSE)
+
+  local_mocked_bindings(
+    util_spr_getwq = make_mock_wq,
+    .package = "tbeploads"
+  )
+
+  api_result <- anlz_spr(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
+                         summ = 'spring', summtime = 'month',
+                         sulphurflow = mock_sulphurflow, verbose = FALSE)
+
+  csv_result <- anlz_spr(tbwxlpth, wqpth = wa_csv, yrrng = c(2022, 2024),
+                         summ = 'spring', summtime = 'month',
+                         sulphurflow = mock_sulphurflow, verbose = FALSE)
+
+  expect_identical(names(api_result), names(csv_result))
+  expect_equal(csv_result$tn_load,  api_result$tn_load)
+  expect_equal(csv_result$tp_load,  api_result$tp_load)
+  expect_equal(csv_result$tss_load, api_result$tss_load)
+
+})
+
+test_that("anlz_spr uses observed TSS from a Water Atlas-format CSV instead of the fixed fallback", {
+
+  csv_no_tss   <- tempfile(fileext = ".csv")
+  csv_with_tss <- tempfile(fileext = ".csv")
+  on.exit(unlink(c(csv_no_tss, csv_with_tss)), add = TRUE)
+  write.csv(make_mock_wq(c(2022, 2024)),          csv_no_tss,   row.names = FALSE)
+  write.csv(make_mock_wq_with_tss(c(2022, 2024)), csv_with_tss, row.names = FALSE)
+
+  result_no_tss <- anlz_spr(tbwxlpth, wqpth = csv_no_tss, yrrng = c(2022, 2024),
+                            summ = 'spring', summtime = 'month',
+                            sulphurflow = mock_sulphurflow, verbose = FALSE)
+
+  result_with_tss <- anlz_spr(tbwxlpth, wqpth = csv_with_tss, yrrng = c(2022, 2024),
+                              summ = 'spring', summtime = 'month',
+                              sulphurflow = mock_sulphurflow, verbose = FALSE)
+
+  # Lithia/Buckhorn have no observed TSS in either CSV -> same fixed fallback,
+  # so their tss_load is unchanged between the two runs.
+  is_non_sulphur <- result_no_tss$spring != "Sulphur"
+  expect_equal(result_with_tss$tss_load[is_non_sulphur], result_no_tss$tss_load[is_non_sulphur])
+
+  # Sulphur has an observed TSS (3.0 mg/L) only in csv_with_tss, which differs
+  # from the fixed fallback (4.4 mg/L) used in csv_no_tss.
+  is_sulphur <- result_no_tss$spring == "Sulphur"
+  expect_false(isTRUE(all.equal(result_with_tss$tss_load[is_sulphur], result_no_tss$tss_load[is_sulphur])))
+
+})
+
+test_that("anlz_spr errors when a Water Atlas CSV is the raw (per-observation) format", {
+
+  wa_raw_csv <- tempfile(fileext = ".csv")
+  on.exit(unlink(wa_raw_csv), add = TRUE)
+
+  wq_raw_fmt <- data.frame(
+    spring  = "Sulphur",
+    date    = as.Date("2024-03-15"),
+    tn_mgl  = 0.15,
+    tp_mgl  = 0.10,
+    tss_mgl = NA_real_,
+    stringsAsFactors = FALSE
+  )
+  write.csv(wq_raw_fmt, wa_raw_csv, row.names = FALSE)
+
+  expect_error(
+    anlz_spr(tbwxlpth, wqpth = wa_raw_csv, yrrng = c(2024, 2024),
+             sulphurflow = mock_sulphurflow, verbose = FALSE),
+    "raw \\(unaggregated\\) output"
+  )
+
+})
+
+# ---------------------------------------------------------------------------
 # Error: no complete prior year to carry forward from
 # ---------------------------------------------------------------------------
 
@@ -289,6 +370,7 @@ test_that("anlz_spr errors when no prior complete year exists for carry-forward"
 
   # Only Jan-Apr 2024 for Sulphur (incomplete); no Lithia or Buckhorn data at all
   wq_incomplete <- data.frame(
+    sta        = "21FLHILL174",
     year       = 2024L,
     month      = 1:4,
     spring     = "Sulphur",
