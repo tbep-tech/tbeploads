@@ -12,7 +12,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/tbep-tech/tbeploads/blob/v1.0.0/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/tbep-tech/tbeploads/blob/main/DESCRIPTION)
 
 Beck M, Sherwood E, Pribble R (2026). *tbeploads: Calculate Loading Data
 to Tampa Bay*. R package version 1.0.0,

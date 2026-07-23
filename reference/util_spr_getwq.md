@@ -5,7 +5,7 @@ Retrieve spring water quality data from APIs
 ## Usage
 
 ``` r
-util_spr_getwq(yrrng, verbose = TRUE)
+util_spr_getwq(yrrng, raw = FALSE, verbose = TRUE)
 ```
 
 ## Arguments
@@ -14,19 +14,28 @@ util_spr_getwq(yrrng, verbose = TRUE)
 
   integer vector of length 2, start and end year, e.g. `c(2022, 2024)`.
 
+- raw:
+
+  logical, if `FALSE` (default) annual mean concentrations are returned
+  (one row per spring per year). If `TRUE`, the raw, unaggregated
+  observations are returned instead (one row per spring per sample
+  date), with an additional `date` column in place of `yr`.
+
 - verbose:
 
   logical, if `TRUE` progress messages are printed.
 
 ## Value
 
-A data frame with columns `spring`, `yr`, `tn_mgl`, `tp_mgl`, and
-`tss_mgl` (one row per spring per year).
+A data frame with columns `spring`, `tn_mgl`, `tp_mgl`, and `tss_mgl`,
+plus `yr` (one row per spring per year) when `raw = FALSE`, or `date`
+(one row per spring per sample date) when `raw = TRUE`.
 
 ## Details
 
-Fetches annual mean TN, TP, and TSS concentrations (mg/L) for Lithia,
-Buckhorn, and Sulphur springs from two external sources.
+Fetches TN, TP, and TSS concentrations (mg/L) for Lithia, Buckhorn, and
+Sulphur springs from two external sources, returned either as annual
+means or as raw observations (see `raw`).
 
 **Lithia and Buckhorn springs** are retrieved from the [Water Atlas
 API](https://dev.api.wateratlas.org) (`GET /api/samplingdata/stream`),
@@ -46,11 +55,14 @@ County (EPC) monitoring spreadsheet. Station 174 corresponds to the
 Sulphur Spring sampling location and provides monthly TN, TP, and TSS
 observations.
 
-Annual means are computed across all observations within each calendar
-year. TSS values that are `NaN` (i.e., no valid observations in a year)
-are converted to `NA` so that
+When `raw = FALSE`, means are computed across all observations within
+each calendar year, and TSS values that are `NaN` (i.e., no valid
+observations in a year) are converted to `NA` so that
 [`anlz_spr`](https://tbep-tech.github.io/tbeploads/reference/anlz_spr.md)
-can apply the fixed fallback concentrations.
+can apply the fixed fallback concentrations. When `raw = TRUE`, no
+aggregation is performed; each row reflects the actual sample date, and
+since TN, TP, and TSS are not always sampled on the same date, some rows
+may have `NA` for parameters not measured that day.
 
 ## See also
 
@@ -61,5 +73,8 @@ can apply the fixed fallback concentrations.
 ``` r
 if (FALSE) { # \dontrun{
 wqdat <- util_spr_getwq(c(2022, 2024))
+
+# raw, unaggregated observations instead of annual means
+wqdat <- util_spr_getwq(c(2022, 2024), raw = TRUE)
 } # }
 ```

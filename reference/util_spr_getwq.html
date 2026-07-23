@@ -40,7 +40,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Retrieve spring water quality data from APIs</h1>
-      <small class="dont-index">Source: <a href="https://github.com/tbep-tech/tbeploads/blob/v1.0.0/R/util_spr_getwq.R" class="external-link"><code>R/util_spr_getwq.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/tbep-tech/tbeploads/blob/main/R/util_spr_getwq.R" class="external-link"><code>R/util_spr_getwq.R</code></a></small>
       <div class="d-none name"><code>util_spr_getwq.Rd</code></div>
     </div>
 
@@ -50,7 +50,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_spr_getwq</span><span class="op">(</span><span class="va">yrrng</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">util_spr_getwq</span><span class="op">(</span><span class="va">yrrng</span>, raw <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -61,19 +61,29 @@
 <dd><p>integer vector of length 2, start and end year, e.g. <code>c(2022, 2024)</code>.</p></dd>
 
 
+<dt id="arg-raw">raw<a class="anchor" aria-label="anchor" href="#arg-raw"></a></dt>
+<dd><p>logical, if <code>FALSE</code> (default) annual mean concentrations
+are returned (one row per spring per year). If <code>TRUE</code>, the raw,
+unaggregated observations are returned instead (one row per spring per
+sample date), with an additional <code>date</code> column in place of <code>yr</code>.</p></dd>
+
+
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>logical, if <code>TRUE</code> progress messages are printed.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame with columns <code>spring</code>, <code>yr</code>, <code>tn_mgl</code>,
-<code>tp_mgl</code>, and <code>tss_mgl</code> (one row per spring per year).</p>
+    <p>A data frame with columns <code>spring</code>, <code>tn_mgl</code>,
+<code>tp_mgl</code>, and <code>tss_mgl</code>, plus <code>yr</code> (one row per spring per
+year) when <code>raw = FALSE</code>, or <code>date</code> (one row per spring per
+sample date) when <code>raw = TRUE</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Fetches annual mean TN, TP, and TSS concentrations (mg/L) for Lithia,
-Buckhorn, and Sulphur springs from two external sources.</p>
+    <p>Fetches TN, TP, and TSS concentrations (mg/L) for Lithia, Buckhorn, and
+Sulphur springs from two external sources, returned either as annual means
+or as raw observations (see <code>raw</code>).</p>
 <p><strong>Lithia and Buckhorn springs</strong> are retrieved from the
 <a href="https://dev.api.wateratlas.org" class="external-link">Water Atlas API</a>
 (<code>GET /api/samplingdata/stream</code>), using Southwest Florida Water
@@ -88,10 +98,14 @@ substitutes fixed historical values.</p>
 Protection Commission of Hillsborough County (EPC) monitoring spreadsheet.
 Station 174 corresponds to the Sulphur Spring sampling location and provides
 monthly TN, TP, and TSS observations.</p>
-<p>Annual means are computed across all observations within each calendar year.
-TSS values that are <code>NaN</code> (i.e., no valid observations in a year) are
-converted to <code>NA</code> so that <code><a href="anlz_spr.html">anlz_spr</a></code> can apply the fixed
-fallback concentrations.</p>
+<p>When <code>raw = FALSE</code>, means are computed across all observations within
+each calendar year, and TSS values that are <code>NaN</code> (i.e., no valid
+observations in a year) are converted to <code>NA</code> so that
+<code><a href="anlz_spr.html">anlz_spr</a></code> can apply the fixed fallback concentrations. When
+<code>raw = TRUE</code>, no aggregation is performed; each row reflects the
+actual sample date, and since TN, TP, and TSS are not always sampled on the
+same date, some rows may have <code>NA</code> for parameters not measured that
+day.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -102,6 +116,9 @@ fallback concentrations.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="va">wqdat</span> <span class="op">&lt;-</span> <span class="fu">util_spr_getwq</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># raw, unaggregated observations instead of annual means</span></span></span>
+<span class="r-in"><span><span class="va">wqdat</span> <span class="op">&lt;-</span> <span class="fu">util_spr_getwq</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2024</span><span class="op">)</span>, raw <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
