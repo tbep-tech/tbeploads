@@ -203,7 +203,7 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
   # 1. Read TBW discharge from Excel workbook (one sheet per device ID)
   # ---------------------------------------------------------------------------
   tbw_raw <- lapply(as.character(tbw_devices$deviceid), function(dev) {
-    readxl::read_excel(tbwxlpth, sheet = dev) |>
+    suppressWarnings(readxl::read_excel(tbwxlpth, sheet = dev)) |>
       dplyr::rename_with(tolower) |>
       dplyr::rename(date = measuredatetime) |>
       dplyr::mutate(
@@ -243,10 +243,10 @@ anlz_spr <- function(tbwxlpth, wqpth = NULL, yrrng = c(2022, 2024),
     dplyr::group_by(date) |>
     dplyr::summarise(flow_cfs = sum(flow_cfs, na.rm = TRUE), .groups = "drop") |>
     dplyr::mutate(spring = "Lithia", site = "02301600")
-
+  
   buckhorn_daily <- tbw_daily |>
     dplyr::filter(spring == "Buckhorn") |>
-    tidyr::pivot_wider(id_cols = date, names_from = subspring, values_from = flow_cfs) |>
+    tidyr::pivot_wider(id_cols = date, names_from = subspring, values_from = flow_cfs, values_fn = mean) |>
     dplyr::mutate(flow_cfs = lower - upper) |>
     dplyr::select(date, flow_cfs) |>
     dplyr::mutate(spring = "Buckhorn", site = "02301695")
