@@ -30,13 +30,16 @@ anlz_spr(
 - wqpth:
 
   character string or `NULL` (default). File path to spring water
-  quality data (.csv). Must contain columns `spring`, `year`, `month`,
-  `tn(mg/L)`, and `tp(mg/L)` with one row per sample. Spring names must
-  match `"Lithia"`, `"Buckhorn"`, and `"Sulphur"`. When `NULL`, water
-  quality data are retrieved automatically from external APIs. Lithia
-  and Buckhorn concentrations are obtained from the Water Atlas API
-  (SWFWMD stations 17805 and 18276) and Sulphur Spring concentrations
-  are obtained via
+  quality data (.csv), in one of two formats (see Details): FDEP IWR
+  sample data, or annual output from
+  [`util_spr_getwq`](https://tbep-tech.github.io/tbeploads/reference/util_spr_getwq.md).
+  Spring names must match `"Lithia"`, `"Buckhorn"`, and `"Sulphur"`.
+  When `NULL`, water quality data are retrieved automatically from
+  external APIs via
+  [`util_spr_getwq`](https://tbep-tech.github.io/tbeploads/reference/util_spr_getwq.md).
+  Lithia and Buckhorn concentrations are obtained from the Water Atlas
+  API (SWFWMD stations 17805 and 18276) and Sulphur Spring
+  concentrations are obtained via
   [`read_importepc`](https://tbep-tech.github.io/tbeptools/reference/read_importepc.html)
   (EPC station 174).
 
@@ -118,10 +121,11 @@ interpolation between observed values
 `rule = 2`). Leading or trailing gaps are filled with the nearest
 observed value.
 
-**Water quality data (file path):** When `wqpth` is supplied, sample
-concentrations (mg/L) for TN and TP are read from the CSV. These data
-are from FDEP's Impaired Waters Rule dataset available at
-<https://publicfiles.dep.state.fl.us/dear/iwr/>. Annual mean
+**Water quality data (file path, FDEP IWR format):** When `wqpth` is
+supplied and the CSV contains a `sta` column, it is treated as raw FDEP
+Impaired Waters Rule (IWR) sample data (available at
+<https://publicfiles.dep.state.fl.us/dear/iwr/>), with sample
+concentrations (mg/L) for TN and TP read from the CSV. Annual mean
 concentrations are computed per spring and joined to monthly flow
 estimates. A spring-year is considered complete when its samples span
 all four calendar quarters (Jan-Mar, Apr-Jun, Jul-Sep, Oct-Dec).
@@ -133,18 +137,39 @@ reference year available. If the earliest year in the file is already
 incomplete for a spring, there is no prior year to carry forward and an
 error is raised.
 
+**Water quality data (file path, Water Atlas format):** When `wqpth` is
+supplied and the CSV does *not* contain a `sta` column, it is treated as
+already-summarized annual output from
+[`util_spr_getwq`](https://tbep-tech.github.io/tbeploads/reference/util_spr_getwq.md)
+(`raw = FALSE`, the default), with columns `spring`, `yr`, `tn_mgl`,
+`tp_mgl`, and `tss_mgl` used as-is (no additional summarization or
+quarter-completeness check is applied; see note below). Supplying the
+raw, per-observation output of
+[`util_spr_getwq`](https://tbep-tech.github.io/tbeploads/reference/util_spr_getwq.md)
+(`raw = TRUE`, identified by a `date` column instead of `yr`) raises an
+error.
+
 **Water quality data (API, `wqpth = NULL`):** When `wqpth` is `NULL`,
 water quality data are obtained using
-[`util_spr_getwq`](https://tbep-tech.github.io/tbeploads/reference/util_spr_getwq.md).
-Lithia (SWFWMD station 17805, Lithia Main Spring) and Buckhorn (SWFWMD
-station 18276, Buckhorn Main Spring) concentrations are retrieved from
-the [Water Atlas API](https://dev.api.wateratlas.org) (`WIN_21FLSWFD`
-data source). These are probably the same quarterly SWFWMD observations
+[`util_spr_getwq`](https://tbep-tech.github.io/tbeploads/reference/util_spr_getwq.md)
+(`raw = FALSE`), which is preferred over the FDEP IWR file in most cases
+because the Water Atlas API data are usually more current. Lithia
+(SWFWMD station 17805, Lithia Main Spring) and Buckhorn (SWFWMD station
+18276, Buckhorn Main Spring) concentrations are retrieved from the
+[Water Atlas API](https://dev.api.wateratlas.org) (`WIN_21FLSWFD` data
+source). These are probably the same quarterly SWFWMD observations
 included in the FDEP IWR file. Sulphur Spring (EPC station 174) is
 retrieved via
 [`read_importepc`](https://tbep-tech.github.io/tbeptools/reference/read_importepc.html),
 providing monthly observations from the Environmental Protection
 Commission of Hillsborough County.
+
+**Note on quarter-completeness:** the four-quarter completeness check
+described above applies only to the FDEP IWR CSV format. Annual means
+from
+[`util_spr_getwq`](https://tbep-tech.github.io/tbeploads/reference/util_spr_getwq.md)
+(whether obtained via `wqpth = NULL` or supplied as a Water Atlas-format
+CSV) are not checked for quarter coverage before averaging.
 
 **TSS concentrations:** When `wqpth` is supplied, TSS concentrations are
 assigned from a fixed lookup table derived from the historical SAS-based
