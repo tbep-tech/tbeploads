@@ -305,3 +305,364 @@ test_that("util_ps_getkerry retains PDFs when pdf_dir is supplied", {
 
   expect_gt(length(list.files(tmp_dir, pattern = "\\.pdf$")), 0L)
 })
+
+test_that("util_ps_getkerry stops with an error when no documents match the requested year", {
+  skip_if(!nzchar(kerry_xlsx), "kerry2025search.xlsx fixture not installed")
+
+  expect_error(
+    util_ps_getkerry(yr = 1999, search_xlsx = kerry_xlsx, quiet = TRUE),
+    "No monthly Part A documents found for year"
+  )
+})
+
+test_that("util_ps_getkerry prints a cached message and skips download for an existing valid PDF", {
+  skip_if(!nzchar(kerry_xlsx), "kerry2025search.xlsx fixture not installed")
+
+  tmp_dir <- tempfile()
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+  writeBin(raw(6000L), file.path(tmp_dir, "JAN.pdf"))
+
+  download_called_for <- character(0)
+  stub(util_ps_getkerry, ".kerry_oculus_login", function() NULL)
+  stub(util_ps_getkerry, ".kerry_download_pdf", function(guid, dest_path, session_handle) {
+    download_called_for <<- c(download_called_for, basename(dest_path))
+    TRUE
+  })
+  stub(util_ps_getkerry, ".kerry_parse_pdf", parse_pdf_from_filename)
+
+  expect_output(
+    util_ps_getkerry(yr = 2025, search_xlsx = kerry_xlsx, pdf_dir = tmp_dir, quiet = FALSE),
+    "(cached)", fixed = TRUE
+  )
+  expect_false("JAN.pdf" %in% download_called_for)
+})
+
+test_that("util_ps_getkerry prints a FAILED message when quiet = FALSE and download fails", {
+  skip_if(!nzchar(kerry_xlsx), "kerry2025search.xlsx fixture not installed")
+
+  call_n <- 0L
+  stub(util_ps_getkerry, ".kerry_oculus_login", function() NULL)
+  stub(util_ps_getkerry, ".kerry_download_pdf", function(guid, dest_path, session_handle) {
+    call_n <<- call_n + 1L
+    call_n > 1L
+  })
+  stub(util_ps_getkerry, ".kerry_parse_pdf", parse_pdf_from_filename)
+
+  suppressWarnings(
+    expect_output(
+      util_ps_getkerry(yr = 2025, search_xlsx = kerry_xlsx, quiet = FALSE),
+      "FAILED"
+    )
+  )
+})
+
+test_that("util_ps_getkerry prints a note listing missing months when quiet = FALSE", {
+  skip_if(!nzchar(kerry_xlsx), "kerry2025search.xlsx fixture not installed")
+
+  call_n <- 0L
+  stub(util_ps_getkerry, ".kerry_oculus_login", function() NULL)
+  stub(util_ps_getkerry, ".kerry_download_pdf",
+       function(guid, dest_path, session_handle) TRUE)
+  stub(util_ps_getkerry, ".kerry_parse_pdf", function(path) {
+    call_n <<- call_n + 1L
+    if (call_n == 1L) stop("simulated parse error")
+    parse_pdf_from_filename(path)
+  })
+
+  expect_warning(
+    expect_output(
+      result <- util_ps_getkerry(yr = 2025, search_xlsx = kerry_xlsx, quiet = FALSE),
+      "no Part A document found for month"
+    ),
+    "simulated parse error"
+  )
+  expect_equal(nrow(result), 11L)
+})
+
+test_that("util_ps_getkerry prints a message when writing the out_file", {
+  skip_if(!nzchar(kerry_xlsx), "kerry2025search.xlsx fixture not installed")
+
+  out <- tempfile(fileext = ".xlsx")
+  on.exit(unlink(out), add = TRUE)
+
+  stub(util_ps_getkerry, ".kerry_oculus_login",  function() NULL)
+  stub(util_ps_getkerry, ".kerry_download_pdf",
+       function(guid, dest_path, session_handle) TRUE)
+  stub(util_ps_getkerry, ".kerry_parse_pdf", parse_pdf_from_filename)
+
+  expect_output(
+    util_ps_getkerry(yr = 2025, search_xlsx = kerry_xlsx, out_file = out, quiet = FALSE),
+    "Writing results to"
+  )
+})
+
+test_that("util_ps_getkerry prints a message when retaining PDFs in pdf_dir", {
+  skip_if(!nzchar(kerry_xlsx), "kerry2025search.xlsx fixture not installed")
+
+  tmp_dir <- tempfile()
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+
+  stub(util_ps_getkerry, ".kerry_oculus_login", function() NULL)
+  stub(util_ps_getkerry, ".kerry_download_pdf",
+       function(guid, dest_path, session_handle) {
+         writeBin(raw(1L), dest_path)
+         TRUE
+       })
+  stub(util_ps_getkerry, ".kerry_parse_pdf", parse_pdf_from_filename)
+
+  expect_output(
+    util_ps_getkerry(yr = 2025, search_xlsx = kerry_xlsx, pdf_dir = tmp_dir, quiet = FALSE),
+    "PDFs retained in"
+  )
+})
+
+# ===========================================================================
+# .kerry_extract_guids -- error handling and fallback row assignment
+# ===========================================================================
+
+make_relocated_guid_xlsx <- function(src_xlsx) {
+  tmpdir <- tempfile()
+  dir.create(tmpdir)
+  utils::unzip(src_xlsx, exdir = tmpdir)
+
+  sheet_path <- file.path(tmpdir, "xl", "worksheets", "sheet1.xml")
+  txt <- paste(readLines(sheet_path, warn = FALSE), collapse = "")
+  txt <- gsub('r="A', 'r="Z', txt, fixed = TRUE)
+  writeLines(txt, sheet_path)
+
+  out <- tempfile(fileext = ".xlsx")
+  old_wd <- setwd(tmpdir)
+  on.exit(setwd(old_wd), add = TRUE)
+  all_files <- list.files(".", recursive = TRUE, all.files = TRUE, no.. = TRUE)
+  utils::zip(out, files = all_files, flags = "-q")
+  out
+}
+
+make_no_worksheet_xlsx <- function(src_xlsx) {
+  tmpdir <- tempfile()
+  dir.create(tmpdir)
+  utils::unzip(src_xlsx, exdir = tmpdir)
+  file.remove(file.path(tmpdir, "xl", "worksheets", "sheet1.xml"))
+
+  out <- tempfile(fileext = ".xlsx")
+  old_wd <- setwd(tmpdir)
+  on.exit(setwd(old_wd), add = TRUE)
+  all_files <- list.files(".", recursive = TRUE, all.files = TRUE, no.. = TRUE)
+  utils::zip(out, files = all_files, flags = "-q")
+  out
+}
+
+test_that(".kerry_extract_guids stops when the worksheet XML cannot be located", {
+  skip_if(!nzchar(kerry_xlsx), "kerry2025search.xlsx fixture not installed")
+
+  bad_xlsx <- make_no_worksheet_xlsx(kerry_xlsx)
+  on.exit(unlink(bad_xlsx), add = TRUE)
+
+  expect_error(
+    tbeploads:::.kerry_extract_guids(bad_xlsx, 2025),
+    "Cannot locate worksheet XML"
+  )
+})
+
+test_that(".kerry_extract_guids falls back to positional row assignment when column A pattern is absent", {
+  skip_if(!nzchar(kerry_xlsx), "kerry2025search.xlsx fixture not installed")
+
+  fallback_xlsx <- make_relocated_guid_xlsx(kerry_xlsx)
+  on.exit(unlink(fallback_xlsx), add = TRUE)
+
+  result <- tbeploads:::.kerry_extract_guids(fallback_xlsx, 2025)
+
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 12L)
+  expect_equal(sort(result$month_num), 1:12)
+})
+
+# ===========================================================================
+# .kerry_parse_pdf -- error branch
+# ===========================================================================
+
+test_that(".kerry_parse_pdf stops when no monitoring period line is present", {
+  tmp <- tempfile(fileext = ".pdf")
+  on.exit(unlink(tmp), add = TRUE)
+  writeBin(raw(1L), tmp)
+
+  local_mocked_bindings(
+    pdf_text = function(pdf, ...) "no period info here",
+    .package = "pdftools"
+  )
+
+  expect_error(
+    tbeploads:::.kerry_parse_pdf(tmp),
+    "Cannot find monitoring period"
+  )
+})
+
+# ===========================================================================
+# .kerry_extract_val / .kerry_parse_tok -- direct unit tests
+# ===========================================================================
+
+test_that(".kerry_extract_val returns NA when the PARM Code line is not found", {
+  result <- tbeploads:::.kerry_extract_val(
+    c("some", "unrelated", "lines"), "^PARM Code 99999 1", n_values = 1L
+  )
+  expect_true(all(is.na(result)))
+})
+
+test_that(".kerry_extract_val returns NA when the PARM Code line has too few preceding lines", {
+  # parm_idx < 3L guard
+  result <- tbeploads:::.kerry_extract_val(
+    c("PARM Code 50050 Q  Permit  Report", "Measurement"), "^PARM Code 50050 Q", n_values = 2L
+  )
+  expect_true(all(is.na(result)))
+})
+
+test_that(".kerry_extract_val returns NA when the value line does not match the anchor pattern", {
+  lines <- c(
+    "some header",
+    "Flow with no trailing frequency columns",
+    "Measurement",
+    "PARM Code 50050 Q    Permit    Report"
+  )
+  result <- tbeploads:::.kerry_extract_val(lines, "^PARM Code 50050 Q", n_values = 2L)
+  expect_true(all(is.na(result)))
+})
+
+test_that(".kerry_parse_tok returns NA for an empty or ANC token", {
+  expect_true(is.na(tbeploads:::.kerry_parse_tok(NA_character_)))
+  expect_true(is.na(tbeploads:::.kerry_parse_tok("ANC")))
+})
+
+test_that(".kerry_parse_tok returns NA for NOD when nod_zero = FALSE", {
+  expect_true(is.na(tbeploads:::.kerry_parse_tok("NOD", nod_zero = FALSE)))
+  expect_equal(tbeploads:::.kerry_parse_tok("NOD", nod_zero = TRUE), 0)
+})
+
+# ===========================================================================
+# .kerry_oculus_login
+# ===========================================================================
+
+test_that(".kerry_oculus_login performs a two-step login and returns a handle when no redirect occurs", {
+  login_fn <- tbeploads:::.kerry_oculus_login
+  urls_hit <- character(0)
+
+  stub(login_fn, "httr::GET", function(url, ...) {
+    urls_hit <<- c(urls_hit, url)
+    structure(list(fake_body = "<html>logged in, no redirect</html>"), class = "response")
+  })
+  stub(login_fn, "httr::content", function(r, type) charToRaw(r$fake_body))
+
+  h <- login_fn()
+
+  expect_s3_class(h, "handle")
+  expect_length(urls_hit, 2L)
+})
+
+test_that(".kerry_oculus_login follows a window.location redirect when present", {
+  login_fn <- tbeploads:::.kerry_oculus_login
+  urls_hit <- character(0)
+
+  stub(login_fn, "httr::GET", function(url, ...) {
+    urls_hit <<- c(urls_hit, url)
+    if (length(urls_hit) == 2L)
+      structure(list(fake_body = 'window.location = "/Oculus/servlet/redirected"'),
+                class = "response")
+    else
+      structure(list(fake_body = "ok"), class = "response")
+  })
+  stub(login_fn, "httr::content", function(r, type) charToRaw(r$fake_body))
+
+  h <- login_fn()
+
+  expect_s3_class(h, "handle")
+  expect_length(urls_hit, 3L)
+  expect_true(grepl("/Oculus/servlet/redirected$", urls_hit[3]))
+})
+
+# ===========================================================================
+# .kerry_download_pdf
+# ===========================================================================
+
+test_that(".kerry_download_pdf downloads and writes a valid PDF (primary filename pattern)", {
+  dl_fn <- tbeploads:::.kerry_download_pdf
+  dest  <- tempfile(fileext = ".pdf")
+  on.exit(unlink(dest), add = TRUE)
+
+  hitlist_body <- '<input name="_FILE_NAME_38.123.1" type="hidden" value="storedfile.pdf"/>'
+  call_n <- 0L
+  stub(dl_fn, "httr::GET", function(url, ...) {
+    call_n <<- call_n + 1L
+    if (call_n == 1L) structure(list(body = hitlist_body), class = "response")
+    else structure(list(body = "PDFDATA"), class = "response")
+  })
+  stub(dl_fn, "httr::content", function(r, type) {
+    if (identical(r$body, "PDFDATA"))
+      c(as.raw(c(0x25, 0x50, 0x44, 0x46)), charToRaw("...rest of pdf..."))
+    else
+      charToRaw(r$body)
+  })
+
+  ok <- dl_fn("38.123.1", dest, NULL)
+
+  expect_true(ok)
+  expect_true(file.exists(dest))
+})
+
+test_that(".kerry_download_pdf uses the fallback filename pattern when the primary pattern fails", {
+  dl_fn <- tbeploads:::.kerry_download_pdf
+  dest  <- tempfile(fileext = ".pdf")
+  on.exit(unlink(dest), add = TRUE)
+
+  hitlist_body <- '_FILE_NAME_38.123.1" value="storedfile.pdf"/>'
+  call_n <- 0L
+  stub(dl_fn, "httr::GET", function(url, ...) {
+    call_n <<- call_n + 1L
+    if (call_n == 1L) structure(list(body = hitlist_body), class = "response")
+    else structure(list(body = "PDFDATA"), class = "response")
+  })
+  stub(dl_fn, "httr::content", function(r, type) {
+    if (identical(r$body, "PDFDATA"))
+      c(as.raw(c(0x25, 0x50, 0x44, 0x46)), charToRaw("...rest of pdf..."))
+    else
+      charToRaw(r$body)
+  })
+
+  ok <- dl_fn("38.123.1", dest, NULL)
+
+  expect_true(ok)
+  expect_true(file.exists(dest))
+})
+
+test_that(".kerry_download_pdf returns FALSE when no filename can be extracted", {
+  dl_fn <- tbeploads:::.kerry_download_pdf
+  dest  <- tempfile(fileext = ".pdf")
+
+  stub(dl_fn, "httr::GET", function(url, ...)
+    structure(list(body = "<html>no matching hidden field here</html>"), class = "response"))
+  stub(dl_fn, "httr::content", function(r, type) charToRaw(r$body))
+
+  ok <- dl_fn("38.123.1", dest, NULL)
+
+  expect_false(ok)
+  expect_false(file.exists(dest))
+})
+
+test_that(".kerry_download_pdf returns FALSE when the downloaded content is not a valid PDF", {
+  dl_fn <- tbeploads:::.kerry_download_pdf
+  dest  <- tempfile(fileext = ".pdf")
+
+  hitlist_body <- '<input name="_FILE_NAME_38.123.1" type="hidden" value="storedfile.pdf"/>'
+  call_n <- 0L
+  stub(dl_fn, "httr::GET", function(url, ...) {
+    call_n <<- call_n + 1L
+    if (call_n == 1L) structure(list(body = hitlist_body), class = "response")
+    else structure(list(body = "not a pdf"), class = "response")
+  })
+  stub(dl_fn, "httr::content", function(r, type) charToRaw(r$body))
+
+  ok <- dl_fn("38.123.1", dest, NULL)
+
+  expect_false(ok)
+  expect_false(file.exists(dest))
+})

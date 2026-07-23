@@ -966,3 +966,661 @@ test_that("util_ps_getmacdill prints progress messages when quiet = FALSE", {
     "candidate monthly"
   )
 })
+
+test_that("util_ps_getmacdill stops with an error when no documents match the requested year", {
+  skip_if(!nzchar(macdill_xlsx), "macdill2025search.xlsx fixture not installed")
+
+  expect_error(
+    util_ps_getmacdill(yr = 1999, search_xlsx = macdill_xlsx, quiet = TRUE),
+    "No monthly documents found for year"
+  )
+})
+
+test_that("util_ps_getmacdill prints a cached message and skips download for an existing valid PDF", {
+  doc_list <- data.frame(guid = "38.111.1", row = 1L,
+                          subject = "DMR 2025 JUN MO PART A",
+                          stringsAsFactors = FALSE)
+
+  tmp_dir <- tempfile()
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+  writeBin(raw(6000L), file.path(tmp_dir, "38.111.1.pdf"))
+
+  download_called <- FALSE
+  stub(util_ps_getmacdill, ".macdill_extract_guids", function(...) doc_list)
+  stub(util_ps_getmacdill, ".macdill_oculus_login",  function() NULL)
+  stub(util_ps_getmacdill, ".macdill_download_pdf", function(guid, dest_path, session_handle) {
+    download_called <<- TRUE
+    TRUE
+  })
+  stub(util_ps_getmacdill, ".macdill_classify_pdf",
+       function(path) list(type = "partA", month = 6L, year = 2025L))
+  stub(util_ps_getmacdill, ".macdill_parse_part_a", parse_parta_from_guid)
+
+  expect_output(
+    util_ps_getmacdill(yr = 2025, search_xlsx = macdill_xlsx, pdf_dir = tmp_dir, quiet = FALSE)
+  )
+  expect_false(download_called)
+})
+
+test_that("util_ps_getmacdill prints a FAILED message when quiet = FALSE and download fails", {
+  doc_list <- data.frame(guid = c("guid_a","guid_b"), row = c(1L, 2L),
+                          subject = c("DMR 2025 JUN MO PART A","DMR 2025 JUL MO PART A"),
+                          stringsAsFactors = FALSE)
+
+  call_n <- 0L
+  stub(util_ps_getmacdill, ".macdill_extract_guids", function(...) doc_list)
+  stub(util_ps_getmacdill, ".macdill_oculus_login",  function() NULL)
+  stub(util_ps_getmacdill, ".macdill_download_pdf", function(guid, dest_path, session_handle) {
+    call_n <<- call_n + 1L
+    call_n > 1L   # first download fails, second succeeds
+  })
+  stub(util_ps_getmacdill, ".macdill_classify_pdf",
+       function(path) list(type = "partA", month = 7L, year = 2025L))
+  stub(util_ps_getmacdill, ".macdill_parse_part_a", parse_parta_from_guid)
+
+  expect_output(
+    util_ps_getmacdill(yr = 2025, search_xlsx = macdill_xlsx, quiet = FALSE),
+    "FAILED"
+  )
+})
+
+test_that("util_ps_getmacdill prints an unclassifiable message with the derived filename", {
+  doc_list <- data.frame(guid = "38.999.1", row = 1L,
+                          subject = "DMR 2022 JAN MO PART B (761028)",
+                          stringsAsFactors = FALSE)
+
+  tmp_dir <- tempfile()
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+
+  stub(util_ps_getmacdill, ".macdill_extract_guids", function(...) doc_list)
+  stub(util_ps_getmacdill, ".macdill_oculus_login",  function() NULL)
+  stub(util_ps_getmacdill, ".macdill_download_pdf",
+       function(guid, dest_path, session_handle) { writeBin(raw(1L), dest_path); TRUE })
+  stub(util_ps_getmacdill, ".macdill_classify_pdf", function(path) NULL)
+
+  expect_output(
+    util_ps_getmacdill(yr = 2025, search_xlsx = macdill_xlsx, pdf_dir = tmp_dir, quiet = FALSE),
+    "unclassifiable"
+  )
+})
+
+test_that("util_ps_getmacdill prints a skip message for a PDF classified to a different year", {
+  doc_list <- data.frame(guid = "guid_a", row = 1L,
+                          subject = "DMR 2025 JUL MO PART A",
+                          stringsAsFactors = FALSE)
+
+  stub(util_ps_getmacdill, ".macdill_extract_guids", function(...) doc_list)
+  stub(util_ps_getmacdill, ".macdill_oculus_login",  function() NULL)
+  stub(util_ps_getmacdill, ".macdill_download_pdf",
+       function(guid, dest_path, session_handle) TRUE)
+  stub(util_ps_getmacdill, ".macdill_classify_pdf",
+       function(path) list(type = "partA", month = 7L, year = 2024L))
+
+  expect_output(
+    util_ps_getmacdill(yr = 2025, search_xlsx = macdill_xlsx, quiet = FALSE),
+    "skipping"
+  )
+})
+
+test_that("util_ps_getmacdill prints 'No usable PDFs found' and returns an empty data frame when every document is unclassifiable", {
+  doc_list <- data.frame(guid = c("38.1.1","38.2.1"), row = c(1L, 2L),
+                          subject = c("DMR 2022 JAN MO PART A (1)", "DMR 2022 FEB MO PART A (2)"),
+                          stringsAsFactors = FALSE)
+
+  stub(util_ps_getmacdill, ".macdill_extract_guids", function(...) doc_list)
+  stub(util_ps_getmacdill, ".macdill_oculus_login",  function() NULL)
+  stub(util_ps_getmacdill, ".macdill_download_pdf",
+       function(guid, dest_path, session_handle) { writeBin(raw(1L), dest_path); TRUE })
+  stub(util_ps_getmacdill, ".macdill_classify_pdf", function(path) NULL)
+
+  result <- expect_output(
+    util_ps_getmacdill(yr = 2025, search_xlsx = macdill_xlsx, quiet = FALSE),
+    "No usable PDFs found"
+  )
+})
+
+test_that("util_ps_getmacdill keeps Part A values for an outfall missing from Part B", {
+  skip_if(!nzchar(macdill_xlsx), "macdill2025search.xlsx fixture not installed")
+
+  doc_list <- data.frame(guid = c("guid_a","guid_b"), row = c(1L, 2L),
+                          subject = c("DMR 2025 JUN MO PART A","DMR 2025 JUN MO PART B"),
+                          stringsAsFactors = FALSE)
+
+  classify_mock <- function(path) {
+    if (grepl("guid_a", path)) list(type="partA", month=6L, year=2025L)
+    else                        list(type="partB", month=6L, year=2025L)
+  }
+  # Part B is missing an R-002 row entirely
+  partb_missing_r2 <- function(path) {
+    data.frame(outfall  = c("R-001","R-003"),
+               flow_mgd = c(0.25, 0.55),
+               bod_mgl  = c(1.8,  2.5),
+               tss_mgl  = c(1.2,  1.2),
+               tn_mgl   = NA_real_,
+               stringsAsFactors = FALSE)
+  }
+
+  stub(util_ps_getmacdill, ".macdill_extract_guids", function(...) doc_list)
+  stub(util_ps_getmacdill, ".macdill_oculus_login",  function() NULL)
+  stub(util_ps_getmacdill, ".macdill_download_pdf",
+       function(guid, dest_path, session_handle) TRUE)
+  stub(util_ps_getmacdill, ".macdill_classify_pdf",  classify_mock)
+  stub(util_ps_getmacdill, ".macdill_parse_part_a",  parse_parta_from_guid)
+  stub(util_ps_getmacdill, ".macdill_parse_part_b",  partb_missing_r2)
+
+  result <- util_ps_getmacdill(yr = 2025, search_xlsx = macdill_xlsx, quiet = TRUE)
+
+  r2 <- result[result$outfall == "R-002", ]
+  parta <- parse_parta_from_guid(NULL)
+  parta_r2 <- parta[parta$outfall == "R-002", ]
+  # R-002 has no Part B row, so its Part A values must be untouched
+  expect_equal(r2$flow_mgd, parta_r2$flow_mgd)
+  expect_equal(r2$bod_mgl,  parta_r2$bod_mgl)
+  expect_equal(r2$tss_mgl,  parta_r2$tss_mgl)
+})
+
+test_that("util_ps_getmacdill skips a month entirely when both Part A and Part B fail to parse", {
+  skip_if(!nzchar(macdill_xlsx), "macdill2025search.xlsx fixture not installed")
+
+  # Two months: June has only a Part A doc whose parse fails (no Part B at all,
+  # so both parta_data and partb_data are NULL); July parses normally.
+  doc_list <- data.frame(
+    guid    = c("guid_jun", "guid_jul"), row = c(1L, 2L),
+    subject = c("DMR 2025 JUN MO PART A", "DMR 2025 JUL MO PART A"),
+    stringsAsFactors = FALSE
+  )
+
+  classify_mock <- function(path) {
+    if (grepl("guid_jun", path)) list(type = "partA", month = 6L, year = 2025L)
+    else                          list(type = "partA", month = 7L, year = 2025L)
+  }
+
+  stub(util_ps_getmacdill, ".macdill_extract_guids", function(...) doc_list)
+  stub(util_ps_getmacdill, ".macdill_oculus_login",  function() NULL)
+  stub(util_ps_getmacdill, ".macdill_download_pdf",
+       function(guid, dest_path, session_handle) TRUE)
+  stub(util_ps_getmacdill, ".macdill_classify_pdf",  classify_mock)
+  stub(util_ps_getmacdill, ".macdill_parse_part_a", function(path) {
+    # PDFs are renamed to "macdill_<yr>_<mo>_partA.pdf" before parsing, so key
+    # off the month embedded in the renamed path rather than the original guid.
+    if (grepl("_06_", path, fixed = TRUE)) stop("simulated parse error")
+    parse_parta_from_guid(path)
+  })
+
+  result <- suppressWarnings(
+    util_ps_getmacdill(yr = 2025, search_xlsx = macdill_xlsx, quiet = TRUE)
+  )
+
+  expect_equal(sort(unique(result$mo)), 7L)
+  expect_equal(nrow(result), 3L)
+})
+
+test_that("util_ps_getmacdill prints a note listing missing months when quiet = FALSE", {
+  skip_if(!nzchar(macdill_xlsx), "macdill2025search.xlsx fixture not installed")
+
+  doc_list <- data.frame(guid = "guid_a", row = 1L,
+                          subject = "DMR 2025 JUN MO PART A",
+                          stringsAsFactors = FALSE)
+
+  stub(util_ps_getmacdill, ".macdill_extract_guids", function(...) doc_list)
+  stub(util_ps_getmacdill, ".macdill_oculus_login",  function() NULL)
+  stub(util_ps_getmacdill, ".macdill_download_pdf",
+       function(guid, dest_path, session_handle) TRUE)
+  stub(util_ps_getmacdill, ".macdill_classify_pdf",
+       function(path) list(type = "partA", month = 6L, year = 2025L))
+  stub(util_ps_getmacdill, ".macdill_parse_part_a", parse_parta_from_guid)
+
+  expect_output(
+    util_ps_getmacdill(yr = 2025, search_xlsx = macdill_xlsx, quiet = FALSE),
+    "no usable document found for month"
+  )
+})
+
+test_that("util_ps_getmacdill prints a message when writing the out_file", {
+  skip_if(!nzchar(macdill_xlsx), "macdill2025search.xlsx fixture not installed")
+
+  out <- tempfile(fileext = ".xlsx")
+  on.exit(unlink(out), add = TRUE)
+  call_n <- 0L
+
+  stub(util_ps_getmacdill, ".macdill_oculus_login", function() NULL)
+  stub(util_ps_getmacdill, ".macdill_download_pdf",
+       function(guid, dest_path, session_handle) TRUE)
+  stub(util_ps_getmacdill, ".macdill_classify_pdf", function(path) {
+    call_n <<- call_n + 1L
+    list(type = "partA", month = call_n, year = 2025L)
+  })
+  stub(util_ps_getmacdill, ".macdill_parse_part_a", parse_parta_from_guid)
+
+  expect_output(
+    util_ps_getmacdill(yr = 2025, search_xlsx = macdill_xlsx, out_file = out, quiet = FALSE),
+    "Writing results to"
+  )
+})
+
+test_that("util_ps_getmacdill prints a retained-PDFs message and removes leftover raw GUID files", {
+  skip_if(!nzchar(macdill_xlsx), "macdill2025search.xlsx fixture not installed")
+
+  tmp_dir <- tempfile()
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+
+  # Three docs for the same month: an older, non-selected Part A revision
+  # (guid_old) that is never renamed and must be cleaned up as a leftover raw
+  # GUID file, plus the selected Part A (guid_new, higher row) and Part B.
+  doc_list <- data.frame(
+    guid    = c("38.100.1", "38.200.1", "38.300.1"),
+    row     = c(1L, 2L, 3L),
+    subject = c("DMR 2025 JUN MO PART A", "DMR 2025 JUN MO PART A", "DMR 2025 JUN MO PART B"),
+    stringsAsFactors = FALSE
+  )
+
+  classify_mock <- function(path) {
+    if (grepl("38\\.300\\.1", path)) list(type = "partB", month = 6L, year = 2025L)
+    else                              list(type = "partA", month = 6L, year = 2025L)
+  }
+
+  stub(util_ps_getmacdill, ".macdill_extract_guids", function(...) doc_list)
+  stub(util_ps_getmacdill, ".macdill_oculus_login",  function() NULL)
+  stub(util_ps_getmacdill, ".macdill_download_pdf",
+       function(guid, dest_path, session_handle) { writeBin(raw(1L), dest_path); TRUE })
+  stub(util_ps_getmacdill, ".macdill_classify_pdf",  classify_mock)
+  stub(util_ps_getmacdill, ".macdill_parse_part_a",  parse_parta_from_guid)
+  stub(util_ps_getmacdill, ".macdill_parse_part_b",  parse_partb_from_guid)
+
+  expect_output(
+    util_ps_getmacdill(yr = 2025, search_xlsx = macdill_xlsx, pdf_dir = tmp_dir, quiet = FALSE),
+    "PDFs retained in"
+  )
+
+  retained <- list.files(tmp_dir, pattern = "\\.pdf$")
+  # The lower-row Part A revision (38.100.1) was never selected as best_a, so
+  # it should remain un-renamed and then be removed as a leftover raw GUID file.
+  expect_false(any(grepl("^38\\.100\\.1\\.pdf$", retained)))
+  expect_true(all(grepl("^macdill_", retained)))
+})
+
+# ===========================================================================
+# .macdill_extract_guids -- error handling and fallback row assignment
+# ===========================================================================
+
+make_relocated_guid_xlsx <- function(src_xlsx) {
+  tmpdir <- tempfile()
+  dir.create(tmpdir)
+  utils::unzip(src_xlsx, exdir = tmpdir)
+
+  sheet_path <- file.path(tmpdir, "xl", "worksheets", "sheet1.xml")
+  txt <- paste(readLines(sheet_path, warn = FALSE), collapse = "")
+  txt <- gsub('r="A', 'r="Z', txt, fixed = TRUE)
+  writeLines(txt, sheet_path)
+
+  out <- tempfile(fileext = ".xlsx")
+  old_wd <- setwd(tmpdir)
+  on.exit(setwd(old_wd), add = TRUE)
+  all_files <- list.files(".", recursive = TRUE, all.files = TRUE, no.. = TRUE)
+  utils::zip(out, files = all_files, flags = "-q")
+  out
+}
+
+make_no_worksheet_xlsx <- function(src_xlsx) {
+  tmpdir <- tempfile()
+  dir.create(tmpdir)
+  utils::unzip(src_xlsx, exdir = tmpdir)
+  file.remove(file.path(tmpdir, "xl", "worksheets", "sheet1.xml"))
+
+  out <- tempfile(fileext = ".xlsx")
+  old_wd <- setwd(tmpdir)
+  on.exit(setwd(old_wd), add = TRUE)
+  all_files <- list.files(".", recursive = TRUE, all.files = TRUE, no.. = TRUE)
+  utils::zip(out, files = all_files, flags = "-q")
+  out
+}
+
+test_that(".macdill_extract_guids stops when the worksheet XML cannot be located", {
+  skip_if(!nzchar(macdill_xlsx), "macdill2025search.xlsx fixture not installed")
+
+  bad_xlsx <- make_no_worksheet_xlsx(macdill_xlsx)
+  on.exit(unlink(bad_xlsx), add = TRUE)
+
+  expect_error(
+    tbeploads:::.macdill_extract_guids(bad_xlsx, 2025),
+    "Cannot locate worksheet XML"
+  )
+})
+
+test_that(".macdill_extract_guids falls back to positional row assignment when column A pattern is absent", {
+  skip_if(!nzchar(macdill_xlsx), "macdill2025search.xlsx fixture not installed")
+
+  fallback_xlsx <- make_relocated_guid_xlsx(macdill_xlsx)
+  on.exit(unlink(fallback_xlsx), add = TRUE)
+
+  result <- tbeploads:::.macdill_extract_guids(fallback_xlsx, 2025)
+
+  expect_s3_class(result, "data.frame")
+  expect_true(nrow(result) > 0L)
+})
+
+# ===========================================================================
+# .macdill_classify_pdf -- additional branches
+# ===========================================================================
+
+test_that(".macdill_classify_pdf returns NULL when the monitoring period pattern is absent", {
+  tmp <- tempfile(fileext = ".pdf")
+  on.exit(unlink(tmp), add = TRUE)
+  writeBin(raw(1L), tmp)
+
+  local_mocked_bindings(
+    pdf_text = function(pdf, ...) "DISCHARGE MONITORING REPORT with no period info at all",
+    .package = "pdftools"
+  )
+
+  expect_null(tbeploads:::.macdill_classify_pdf(tmp))
+})
+
+test_that(".macdill_classify_pdf returns NULL when the monitoring period date is invalid", {
+  tmp <- tempfile(fileext = ".pdf")
+  on.exit(unlink(tmp), add = TRUE)
+  writeBin(raw(1L), tmp)
+
+  local_mocked_bindings(
+    pdf_text = function(pdf, ...) paste(
+      "DEPARTMENT OF ENVIRONMENTAL PROTECTION DISCHARGE MONITORING REPORT - PART A",
+      "COUNTY: HILLSBOROUGH    MONITORING PERIOD: From: 02/30/2025 To: 02/28/2025",
+      sep = "\n"
+    ),
+    .package = "pdftools"
+  )
+
+  expect_null(tbeploads:::.macdill_classify_pdf(tmp))
+})
+
+# ===========================================================================
+# .macdill_parse_part_a -- no monitoring groups found
+# ===========================================================================
+
+test_that(".macdill_parse_part_a returns an all-NA 3-row frame when no monitoring groups are found", {
+  tmp <- tempfile(fileext = ".pdf")
+  on.exit(unlink(tmp), add = TRUE)
+  writeBin(raw(1L), tmp)
+
+  local_mocked_bindings(
+    pdf_text = function(pdf, ...) "no monitoring groups mentioned anywhere here",
+    .package = "pdftools"
+  )
+
+  result <- tbeploads:::.macdill_parse_part_a(tmp)
+
+  expect_equal(sort(result$outfall), c("R-001","R-002","R-003"))
+  expect_true(all(is.na(result$flow_mgd)))
+  expect_true(all(is.na(result$bod_mgl)))
+  expect_true(all(is.na(result$tss_mgl)))
+  expect_true(all(is.na(result$tn_mgl)))
+})
+
+# ===========================================================================
+# .macdill_extract_val -- direct unit tests
+# ===========================================================================
+
+test_that(".macdill_extract_val returns NA when no Requirement line matches the timing pattern", {
+  lines <- c("Flow  1.0  2.0  extra", "totally unrelated line")
+  result <- tbeploads:::.macdill_extract_val(lines, "^Flow\\s", "Mo Avg", 1L)
+  expect_true(is.na(result))
+})
+
+test_that(".macdill_extract_val skips a candidate line that itself matches Permit/Requirement/Mon.", {
+  lines <- c(
+    "Mon. Site: BOD, Carbonaceous 5 day, 20C  something",
+    "Mon. Site: EFA-01    Requirement    (Mo Avg)"
+  )
+  result <- tbeploads:::.macdill_extract_val(lines, "BOD.*Carbon", "Mo Avg", 1L)
+  expect_true(is.na(result))
+})
+
+test_that(".macdill_extract_val continues past a Sample line whose next line has no value tokens", {
+  lines <- c(
+    "BOD, Carbonaceous 5 day,          Sample",
+    "Mon. Site: EFA-01    Requirement    (Mo Avg)"
+  )
+  result <- tbeploads:::.macdill_extract_val(lines, "BOD.*Carbon", "Mo Avg", 1L)
+  expect_true(is.na(result))
+})
+
+# ===========================================================================
+# .macdill_parse_tok -- direct unit tests
+# ===========================================================================
+
+test_that(".macdill_parse_tok returns NA (not NOD) for an empty or ANC token", {
+  r1 <- tbeploads:::.macdill_parse_tok(NA_character_)
+  r2 <- tbeploads:::.macdill_parse_tok("ANC")
+  expect_true(is.na(r1$val)); expect_false(r1$nod)
+  expect_true(is.na(r2$val)); expect_false(r2$nod)
+})
+
+test_that(".macdill_parse_tok flags NOD without halving", {
+  r <- tbeploads:::.macdill_parse_tok("NOD")
+  expect_true(is.na(r$val))
+  expect_true(r$nod)
+})
+
+test_that(".macdill_parse_tok halves below-detection '<X' tokens", {
+  r <- tbeploads:::.macdill_parse_tok("<4")
+  expect_equal(r$val, 4)
+  expect_false(r$nod)
+})
+
+# ===========================================================================
+# .macdill_parse_part_b -- additional branches
+# ===========================================================================
+
+test_that(".macdill_parse_part_b returns NA for a column whose header token was not found", {
+  tmp <- tempfile(fileext = ".pdf")
+  on.exit(unlink(tmp), add = TRUE)
+  writeBin(raw(1L), tmp)
+
+  make_word <- function(text, x, y)
+    data.frame(text = as.character(text), x = as.integer(x), y = as.integer(y),
+               space = FALSE, width = 10L, height = 9L, stringsAsFactors = FALSE)
+
+  # Site header omits the second "EFA-02" token, so tss_r2_x resolves to NA
+  hdr1 <- rbind(
+    make_word("DAILY SAMPLE RESULTS - PART B", 200L, 50L),
+    make_word("Site",   82L, 172L), make_word("CAL-01", 153L, 172L),
+    make_word("FLW-02", 194L, 172L), make_word("FLW-03", 235L, 172L),
+    make_word("EFA-01", 280L, 172L), make_word("EFA-02", 327L, 172L),
+    make_word("EFB-01", 376L, 172L), make_word("EFB-01", 425L, 172L)
+    # note: no second "EFA-02" token here
+  )
+  p1_rows <- rbind(
+    make_word(1L, 72L, 184L), make_word("0.3", 154L, 184L),
+    make_word(2L, 72L, 195L), make_word("0.3", 154L, 195L)
+  )
+  page1 <- rbind(hdr1, p1_rows)
+
+  local_mocked_bindings(
+    pdf_data = function(pdf, ...) list(page1),
+    .package = "pdftools"
+  )
+
+  result <- tbeploads:::.macdill_parse_part_b(tmp)
+
+  r2 <- result[result$outfall == "R-002", ]
+  expect_true(is.na(r2$tss_mgl))
+})
+
+test_that(".macdill_parse_part_b returns an all-NA 3-row frame when no Mon. Site rows are found", {
+  tmp <- tempfile(fileext = ".pdf")
+  on.exit(unlink(tmp), add = TRUE)
+  writeBin(raw(1L), tmp)
+
+  local_mocked_bindings(
+    pdf_data = function(pdf, ...) list(data.frame(
+      text = "nothing relevant here", x = 10L, y = 10L,
+      space = FALSE, width = 1L, height = 1L, stringsAsFactors = FALSE
+    )),
+    .package = "pdftools"
+  )
+
+  result <- tbeploads:::.macdill_parse_part_b(tmp)
+
+  expect_equal(sort(result$outfall), c("R-001","R-002","R-003"))
+  expect_true(all(is.na(result$flow_mgd)))
+  expect_true(all(is.na(result$tn_mgl)))
+})
+
+test_that(".macdill_parse_part_b debug = TRUE prints diagnostic output without altering results", {
+  tmp <- tempfile(fileext = ".pdf")
+  on.exit(unlink(tmp), add = TRUE)
+  writeBin(raw(1L), tmp)
+
+  daily <- list(
+    day     = c(1L, 7L),
+    r1_flow = c("0.3", "0.3"),
+    r2_flow = c("0.02","0.02"),
+    r3_flow = c("0.5", "0.5"),
+    bod_r1  = c("2.0", "2.0"),
+    bod_r23 = c("3.0", "3.0"),
+    tss_r13 = c("1.0", "1.0"),
+    tss_r2  = c("1.5", "1.5"),
+    tn_r3   = c(NA,   "1.8")
+  )
+
+  local_mocked_bindings(
+    pdf_data = function(pdf, ...) make_part_b_page(daily),
+    .package = "pdftools"
+  )
+
+  expect_output(
+    result <- tbeploads:::.macdill_parse_part_b(tmp, debug = TRUE)
+  )
+  expect_equal(nrow(result), 3L)
+})
+
+# ===========================================================================
+# .macdill_oculus_login
+# ===========================================================================
+
+test_that(".macdill_oculus_login performs a two-step login and returns a handle when no redirect occurs", {
+  login_fn <- tbeploads:::.macdill_oculus_login
+  urls_hit <- character(0)
+
+  stub(login_fn, "httr::GET", function(url, ...) {
+    urls_hit <<- c(urls_hit, url)
+    structure(list(fake_body = "<html>logged in, no redirect</html>"), class = "response")
+  })
+  stub(login_fn, "httr::content", function(r, type) charToRaw(r$fake_body))
+
+  h <- login_fn()
+
+  expect_s3_class(h, "handle")
+  expect_length(urls_hit, 2L)
+})
+
+test_that(".macdill_oculus_login follows a window.location redirect when present", {
+  login_fn <- tbeploads:::.macdill_oculus_login
+  urls_hit <- character(0)
+
+  stub(login_fn, "httr::GET", function(url, ...) {
+    urls_hit <<- c(urls_hit, url)
+    if (length(urls_hit) == 2L)
+      structure(list(fake_body = 'window.location = "/Oculus/servlet/redirected"'),
+                class = "response")
+    else
+      structure(list(fake_body = "ok"), class = "response")
+  })
+  stub(login_fn, "httr::content", function(r, type) charToRaw(r$fake_body))
+
+  h <- login_fn()
+
+  expect_s3_class(h, "handle")
+  expect_length(urls_hit, 3L)
+  expect_true(grepl("/Oculus/servlet/redirected$", urls_hit[3]))
+})
+
+# ===========================================================================
+# .macdill_download_pdf
+# ===========================================================================
+
+test_that(".macdill_download_pdf downloads and writes a valid PDF (primary filename pattern)", {
+  dl_fn <- tbeploads:::.macdill_download_pdf
+  dest  <- tempfile(fileext = ".pdf")
+  on.exit(unlink(dest), add = TRUE)
+
+  hitlist_body <- '<input name="_FILE_NAME_38.123.1" type="hidden" value="storedfile.pdf"/>'
+  call_n <- 0L
+  stub(dl_fn, "httr::GET", function(url, ...) {
+    call_n <<- call_n + 1L
+    if (call_n == 1L) structure(list(body = hitlist_body), class = "response")
+    else structure(list(body = "PDFDATA"), class = "response")
+  })
+  stub(dl_fn, "httr::content", function(r, type) {
+    if (identical(r$body, "PDFDATA"))
+      c(as.raw(c(0x25, 0x50, 0x44, 0x46)), charToRaw("...rest of pdf..."))
+    else
+      charToRaw(r$body)
+  })
+
+  ok <- dl_fn("38.123.1", dest, NULL)
+
+  expect_true(ok)
+  expect_true(file.exists(dest))
+})
+
+test_that(".macdill_download_pdf uses the fallback filename pattern when the primary pattern fails", {
+  dl_fn <- tbeploads:::.macdill_download_pdf
+  dest  <- tempfile(fileext = ".pdf")
+  on.exit(unlink(dest), add = TRUE)
+
+  hitlist_body <- '_FILE_NAME_38.123.1" value="storedfile.pdf"/>'
+  call_n <- 0L
+  stub(dl_fn, "httr::GET", function(url, ...) {
+    call_n <<- call_n + 1L
+    if (call_n == 1L) structure(list(body = hitlist_body), class = "response")
+    else structure(list(body = "PDFDATA"), class = "response")
+  })
+  stub(dl_fn, "httr::content", function(r, type) {
+    if (identical(r$body, "PDFDATA"))
+      c(as.raw(c(0x25, 0x50, 0x44, 0x46)), charToRaw("...rest of pdf..."))
+    else
+      charToRaw(r$body)
+  })
+
+  ok <- dl_fn("38.123.1", dest, NULL)
+
+  expect_true(ok)
+  expect_true(file.exists(dest))
+})
+
+test_that(".macdill_download_pdf returns FALSE when no filename can be extracted", {
+  dl_fn <- tbeploads:::.macdill_download_pdf
+  dest  <- tempfile(fileext = ".pdf")
+
+  stub(dl_fn, "httr::GET", function(url, ...)
+    structure(list(body = "<html>no matching hidden field here</html>"), class = "response"))
+  stub(dl_fn, "httr::content", function(r, type) charToRaw(r$body))
+
+  ok <- dl_fn("38.123.1", dest, NULL)
+
+  expect_false(ok)
+  expect_false(file.exists(dest))
+})
+
+test_that(".macdill_download_pdf returns FALSE when the downloaded content is not a valid PDF", {
+  dl_fn <- tbeploads:::.macdill_download_pdf
+  dest  <- tempfile(fileext = ".pdf")
+
+  hitlist_body <- '<input name="_FILE_NAME_38.123.1" type="hidden" value="storedfile.pdf"/>'
+  call_n <- 0L
+  stub(dl_fn, "httr::GET", function(url, ...) {
+    call_n <<- call_n + 1L
+    if (call_n == 1L) structure(list(body = hitlist_body), class = "response")
+    else structure(list(body = "not a pdf"), class = "response")
+  })
+  stub(dl_fn, "httr::content", function(r, type) charToRaw(r$body))
+
+  ok <- dl_fn("38.123.1", dest, NULL)
+
+  expect_false(ok)
+  expect_false(file.exists(dest))
+})
