@@ -315,6 +315,7 @@ show_aaloads <- function(aa_data, bay_seg, gw_data, spr_data, ad_data, yrrng = N
     flextable::colformat_double(j = c(yr_cols, "Average"), digits = digits, na_str = "") |>
     flextable::align(j = c(yr_cols, "Average"), align = "center", part = "all") |>
     flextable::bold(i = c(divider_idx, total_idx, normalized_idx)) |>
+    flextable::bold(j = "Average", part = "body") |>
     flextable::border_inner() |>
     flextable::border_outer() |>
     flextable::set_caption(
