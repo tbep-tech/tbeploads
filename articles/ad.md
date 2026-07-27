@@ -62,6 +62,16 @@ The first equation corrects for the % of ions in ammonium and nitrate
 that are N, and the second is a regression relationship between TBADS TN
 and TP, applied to Verna.
 
+The raw Verna download also carries NADP completeness flags, `Criteria1`
+(percent of days with a valid sample) and `Criteria3` (percent of
+precipitation captured by valid samples).
+[`util_prepverna()`](https://tbep-tech.github.io/tbeploads/reference/util_prepverna.md)
+treats a month as missing (same as the raw `-9` value) if either flag
+falls below `mincrit` (default 75), before any gap-filling occurs, so
+that low-quality months are filled using recent same-month means rather
+than used as-is. This screen is skipped if `Criteria1`/`Criteria3` are
+absent from the input file.
+
 AD loads are estimated using the
 [`anlz_ad()`](https://tbep-tech.github.io/tbeploads/reference/anlz_ad.md)
 function, where total hydrologic load by bay segment is calculated from

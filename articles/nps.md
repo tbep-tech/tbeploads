@@ -424,8 +424,9 @@ depending on the inputs provided.
 - [`util_nps_segment()`](https://tbep-tech.github.io/tbeploads/reference/util_nps_segment.md):
   Assigns basins to bay segments.
 - [`util_prepverna()`](https://tbep-tech.github.io/tbeploads/reference/util_prepverna.md):
-  Prepares and fills missing data with five-year means for the Verna
-  Wellfield site data.
+  Prepares and fills missing or low-completeness (NADP
+  `Criteria1`/`Criteria3` below `mincrit`) data with five-year means for
+  the Verna Wellfield site data.
 
 Results can be summarized by basin, segment, baywide, monthly, or
 annually using the `summ` and `summtime` arguments. By default, loads

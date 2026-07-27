@@ -114,6 +114,16 @@ TP = 0.01262 * TN + 0.00110
 <p>The first equation corrects for the % of ions in ammonium and nitrate
 that are N, and the second is a regression relationship between TBADS TN
 and TP, applied to Verna.</p>
+<p>The raw Verna download also carries NADP completeness flags,
+<code>Criteria1</code> (percent of days with a valid sample) and
+<code>Criteria3</code> (percent of precipitation captured by valid
+samples). <code><a href="../reference/util_prepverna.html">util_prepverna()</a></code> treats a month as missing (same
+as the raw <code>-9</code> value) if either flag falls below
+<code>mincrit</code> (default 75), before any gap-filling occurs, so
+that low-quality months are filled using recent same-month means rather
+than used as-is. This screen is skipped if
+<code>Criteria1</code>/<code>Criteria3</code> are absent from the input
+file.</p>
 <p>AD loads are estimated using the <code><a href="../reference/anlz_ad.html">anlz_ad()</a></code> function,
 where total hydrologic load by bay segment is calculated from the rain
 data and total nitrogen and phosphorus load is calculated by multiplying

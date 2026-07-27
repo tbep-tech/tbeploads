@@ -447,8 +447,10 @@ regression modeling.</li>
 <code><a href="../reference/util_nps_segment.html">util_nps_segment()</a></code>: Assigns basins to bay
 segments.</li>
 <li>
-<code><a href="../reference/util_prepverna.html">util_prepverna()</a></code>: Prepares and fills missing data with
-five-year means for the Verna Wellfield site data.</li>
+<code><a href="../reference/util_prepverna.html">util_prepverna()</a></code>: Prepares and fills missing or
+low-completeness (NADP <code>Criteria1</code>/<code>Criteria3</code>
+below <code>mincrit</code>) data with five-year means for the Verna
+Wellfield site data.</li>
 </ul>
 <p>Results can be summarized by basin, segment, baywide, monthly, or
 annually using the <code>summ</code> and <code>summtime</code>
