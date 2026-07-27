@@ -4,7 +4,7 @@
 \alias{util_prepverna}
 \title{Prep Verna Wellfield data for use in AD and NPS calculations}
 \usage{
-util_prepverna(fl, typ, fillmis = T)
+util_prepverna(fl, typ, fillmis = T, mincrit = 75)
 }
 \arguments{
 \item{fl}{text string for the file path to the Verna Wellfield data}
@@ -12,6 +12,8 @@ util_prepverna(fl, typ, fillmis = T)
 \item{typ}{character string for the type of data to prepare, either 'AD' for atmospheric deposition or 'NPS' for nonpoint source.  Uses different TP calculation for each type.}
 
 \item{fillmis}{logical indicating whether to fill missing data with monthly means, see details}
+
+\item{mincrit}{numeric from 0 to 100, minimum value of the NADP \code{Criteria1} (percent valid sample days) and \code{Criteria3} (percent of precipitation captured by valid samples) completeness flags for a month to be treated as valid, see details. Ignored if either column is absent from \code{fl}.}
 }
 \value{
 A data frame with total nitrogen and phosphorus estimates as mg/l for each year and month of the input data
@@ -30,7 +32,9 @@ Raw data can be obtained from \url{https://nadp.slh.wisc.edu/sites/ntn-FL41/} as
 
 The first equation corrects for the \% of ions in ammonium and nitrate that is N, and the second is a regression relationship between TBADS TN and TP, applied to Verna for atmospheric deposition estimates.  A constant is used for non-point source estimates.
 
-Missing data (-9 values) can be filled using monthly means from the previous five years where data exist for that month.  If there are less than five previous years of data for that month, the missing value is not filled.
+NADP flags each month's completeness with \code{Criteria1} (percent of days with a valid sample) and \code{Criteria3} (percent of precipitation captured by valid samples), both 0-100. A month with either value below \code{mincrit} (default 75) is treated as missing, in addition to the raw \code{-9} value, before any gap-filling occurs.
+
+Missing data (-9 values, or values failing the \code{mincrit} completeness screen) can be filled using monthly means from the previous five years where data exist for that month. If there are less than five previous years of data for that month, the missing value is not filled.
 
 Years with incomplete seasonal data will be filled with NA values if \code{fillmis = FALSE} or filled with monthly means if \code{fillmis = TRUE}.
 }

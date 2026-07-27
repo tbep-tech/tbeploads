@@ -180,7 +180,7 @@ The following functions are used internally and are provided here for reference 
 * `util_nps_preprain()`: Prepares and formats rainfall data.
 * `util_nps_preplog()`: Prepares land use data for logistic regression modeling.
 * `util_nps_segment()`: Assigns basins to bay segments.
-* `util_prepverna()`: Prepares and fills missing data with five-year means for the Verna Wellfield site data.
+* `util_prepverna()`: Prepares and fills missing or low-completeness (NADP `Criteria1`/`Criteria3` below `mincrit`) data with five-year means for the Verna Wellfield site data.
 
 Results can be summarized by basin, segment, baywide, monthly, or annually using the `summ` and `summtime` arguments. By default, loads are returned monthly for each basin. Note that Boca Ciega Bay and Boca Ciega Bay South results are returned separately. Only Boca Ciega Bay South is used when estimating total bay loads.
 

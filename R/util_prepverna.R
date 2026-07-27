@@ -5,6 +5,7 @@
 #' @param fl text string for the file path to the Verna Wellfield data
 #' @param typ character string for the type of data to prepare, either 'AD' for atmospheric deposition or 'NPS' for nonpoint source.  Uses different TP calculation for each type.
 #' @param fillmis logical indicating whether to fill missing data with monthly means, see details
+#' @param mincrit numeric from 0 to 100, minimum value of the NADP \code{Criteria1} (percent valid sample days) and \code{Criteria3} (percent of precipitation captured by valid samples) completeness flags for a month to be treated as valid, see details. Ignored if either column is absent from \code{fl}.
 #'
 #' @return A data frame with total nitrogen and phosphorus estimates as mg/l for each year and month of the input data
 #'
@@ -16,34 +17,47 @@
 #' 0.01262 \cdot TN + 0.00110 & \text{if } typ = ``AD" \\
 #' 0.195 & \text{if } typ = ``NPS"
 #' \end{cases}}
-#' 
+#'
 #' The first equation corrects for the % of ions in ammonium and nitrate that is N, and the second is a regression relationship between TBADS TN and TP, applied to Verna for atmospheric deposition estimates.  A constant is used for non-point source estimates.
 #'
-#' Missing data (-9 values) can be filled using monthly means from the previous five years where data exist for that month.  If there are less than five previous years of data for that month, the missing value is not filled.
-#' 
+#' NADP flags each month's completeness with \code{Criteria1} (percent of days with a valid sample) and \code{Criteria3} (percent of precipitation captured by valid samples), both 0-100. A month with either value below \code{mincrit} (default 75) is treated as missing, in addition to the raw \code{-9} value, before any gap-filling occurs.
+#'
+#' Missing data (-9 values, or values failing the \code{mincrit} completeness screen) can be filled using monthly means from the previous five years where data exist for that month. If there are less than five previous years of data for that month, the missing value is not filled.
+#'
 #' Years with incomplete seasonal data will be filled with NA values if `fillmis = FALSE` or filled with monthly means if `fillmis = TRUE`.
-#' 
+#'
 #' @export
 #'
 #' @examples
 #' fl <- system.file('extdata/verna-raw.csv', package = 'tbeploads')
 #' util_prepverna(fl, typ = 'AD')
-util_prepverna <- function(fl, typ, fillmis = T){
+util_prepverna <- function(fl, typ, fillmis = T, mincrit = 75){
 
   typ <- match.arg(typ, choices = c('AD', 'NPS'))
 
-  # import raw, subset relevant, fill -9 as NA
-  dat <- read.csv(fl, header = T, stringsAsFactors = F) |>
+  raw <- read.csv(fl, header = T, stringsAsFactors = F)
+
+  # Criteria1/Criteria3 are NADP completeness flags present in the official
+  # monthly export; default to always-passing values so the
+  # completeness screen below is a no-op when either column is unavailable.
+  if(!'Criteria1' %in% names(raw)) raw$Criteria1 <- 100
+  if(!'Criteria3' %in% names(raw)) raw$Criteria3 <- 100
+
+  # import raw, subset relevant, fill -9 and sub-mincrit completeness as NA
+  dat <- raw |>
     dplyr::select(
       Year = yr,
       Month = seas,
       nh4 = NH4,
-      no3 = NO3
+      no3 = NO3,
+      Criteria1,
+      Criteria3
     ) |>
     dplyr::mutate(
-      nh4 = ifelse(nh4 == -9, NA, nh4),
-      no3 = ifelse(no3 == -9, NA, no3)
-    ) |> 
+      nh4 = ifelse(nh4 == -9 | Criteria1 < mincrit | Criteria3 < mincrit, NA, nh4),
+      no3 = ifelse(no3 == -9 | Criteria1 < mincrit | Criteria3 < mincrit, NA, no3)
+    ) |>
+    dplyr::select(-Criteria1, -Criteria3) |>
     dplyr::arrange(Year, Month)
 
   # make complete year, month sequence
