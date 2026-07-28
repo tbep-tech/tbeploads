@@ -27,7 +27,8 @@ industrial point source (IPS), material losses (ML), nonpoint source
 (NPS), atmospheric deposition (AD), and groundwater sources and springs
 (GW). The functions are built around these sources with unique inputs
 for each. See the articles below for detailed documentation on each
-loading type.
+loading type, including how they are combined for a complete loading and
+allocation assessment.
 
 | Loading type | Article |
 |----|----|
@@ -38,3 +39,4 @@ loading type.
 | Non-point source | [NPS](https://tbep-tech.github.io/tbeploads/articles/nps.md) |
 | Springs | [SPR](https://tbep-tech.github.io/tbeploads/articles/spr.md) |
 | Groundwater | [GW](https://tbep-tech.github.io/tbeploads/articles/gw.md) |
+| Complete loading and allocation assessment | [AA](https://tbep-tech.github.io/tbeploads/articles/aa.md) |
