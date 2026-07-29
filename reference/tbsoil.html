@@ -60,8 +60,7 @@
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Used for estimating ungaged non-point source (NPS) loads. The data includes the following columns.</p>
-<ul><li><p><code>FLUCCSCODE</code>: Numeric value for the Florida Land Use, Cover and Forms Classification System (FLUCCS) code</p></li>
-<li><p><code>FLUCCSDESC</code>: Character describing the FLUCCS description</p></li>
+<ul><li><p><code>hydgrp</code>: Character for the hydrologic group (A, B, C, D, etc.) of the soil</p></li>
 <li><p><code>geometry</code>: The geometry column</p></li>
 </ul><p>Projection is NAD83(2011) / Florida West (ftUS), CRS 6443.</p>
     </div>
@@ -69,9 +68,12 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="co"># use SWFWMD API</span></span></span>
-<span class="r-in"><span><span class="va">tbsoil</span> <span class="op">&lt;-</span> <span class="fu"><a href="util_nps_getswfwmd.html">util_nps_getswfwmd</a></span><span class="op">(</span><span class="st">'soil'</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">usdasoil</span> <span class="op">&lt;-</span> <span class="fu">st_read</span><span class="op">(</span><span class="st">'T:/05_GIS/TBEP/TBLOADS/USDA_SSURGO_CLIP_FIPS0902.shp'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tbsoil</span> <span class="op">&lt;-</span> <span class="va">usdasoil</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">select</span><span class="op">(</span>hydgrp <span class="op">=</span> <span class="va">SDV_Hydr_1</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">hydgrp</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">summarise</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">st_transform</span><span class="op">(</span>crs <span class="op">=</span> <span class="fl">6443</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">tbsoil</span>, file <span class="op">=</span> <span class="st">'data/tbsoil.RData'</span>, compress <span class="op">=</span> <span class="st">'xz'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>

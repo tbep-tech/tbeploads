@@ -18,10 +18,8 @@ A [`sf`](https://r-spatial.github.io/sf/reference/sf.html) object
 Used for estimating ungaged non-point source (NPS) loads. The data
 includes the following columns.
 
-- `FLUCCSCODE`: Numeric value for the Florida Land Use, Cover and Forms
-  Classification System (FLUCCS) code
-
-- `FLUCCSDESC`: Character describing the FLUCCS description
+- `hydgrp`: Character for the hydrologic group (A, B, C, D, etc.) of the
+  soil
 
 - `geometry`: The geometry column
 
@@ -31,9 +29,12 @@ Projection is NAD83(2011) / Florida West (ftUS), CRS 6443.
 
 ``` r
 if (FALSE) { # \dontrun{
-# use SWFWMD API
-tbsoil <- util_nps_getswfwmd('soil')
-
+usdasoil <- st_read('T:/05_GIS/TBEP/TBLOADS/USDA_SSURGO_CLIP_FIPS0902.shp')
+tbsoil <- usdasoil |>
+  select(hydgrp = SDV_Hydr_1) |>
+  group_by(hydgrp) |>
+  summarise() |>
+  st_transform(crs = 6443)
 save(tbsoil, file = 'data/tbsoil.RData', compress = 'xz')
 } # }
 ```
