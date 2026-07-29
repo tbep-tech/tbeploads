@@ -191,9 +191,14 @@ sub-basin data
 (<code><a href="../reference/tbsubshed.html">tbsubshed</a></code>). The
 function <code><a href="../reference/util_nps_tbbase.html">util_nps_tbbase()</a></code> combines these datasets into a
 single spatial object that is used for ungaged load estimation using
-<code><a href="../reference/util_nps_union.html">util_nps_union()</a></code>. The function requires GDAL to be
-installed and accessible in the system PATH, or the path to GDAL
-binaries can be provided using the <code>gdal_path</code> argument.</p>
+<code><a href="../reference/util_nps_union.html">util_nps_union()</a></code>. It also flags land under an active NPDES
+discharge permit using
+<code><a href="../reference/tbmines.html">tbmines</a></code> (currently,
+phosphate mine boundaries), reclassifying it to CLUCSID 22 so it isn’t
+double-counted between the land-use-based NPS estimate and its actual
+point-source discharge data. The function requires GDAL to be installed
+and accessible in the system PATH, or the path to GDAL binaries can be
+provided using the <code>gdal_path</code> argument.</p>
 <p>Land use and soil data can be updated using the
 <code><a href="../reference/util_nps_getswfwmd.html">util_nps_getswfwmd()</a></code> function. These data are also stored
 internally with the package for easy retrieval, as are the remaining
@@ -205,11 +210,9 @@ datasets.</p>
 <code><a href="../reference/tbbase.html">tbbase</a></code>, can be
 created (takes an hour or two).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbsubshed</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbjuris</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tblu2023</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tblu2023</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tbsoil</span><span class="op">)</span></span>
-<span><span class="va">tbbase</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_nps_tbbase.html">util_nps_tbbase</a></span><span class="op">(</span><span class="va">tbsubshed</span>, <span class="va">tbjuris</span>, <span class="va">tblu2023</span>, <span class="va">tbsoil</span>, gdal_path <span class="op">=</span> <span class="st">"C:/OSGeo4W/bin"</span>, chunk_size <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">tbbase</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/util_nps_tbbase.html">util_nps_tbbase</a></span><span class="op">(</span><span class="va">tblu2023</span>, <span class="va">tbsoil</span>, gdal_path <span class="op">=</span> <span class="st">"C:/OSGeo4W/bin"</span>, chunk_size <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
 <p>The <code><a href="../reference/tbbase.html">tbbase</a></code> data
 object is also included with the package for convenience.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -308,10 +311,14 @@ categories)</li>
 <p>Where EMCs (Event Mean Concentrations) represent the average
 pollutant concentrations in stormwater runoff for different land use
 types. EMCs vary by land use category (CLUCSID) based on empirical
-studies of stormwater quality. Special handling is applied for water
-bodies and certain wetland types (CLUCSIDs 18, 20), which are assigned
-zero stormwater loads since these areas do not generate surface runoff
-in the same manner as terrestrial land uses.</p>
+studies of stormwater quality. Some categories carry an EMC of zero in
+the <code><a href="../reference/emc.html">emc</a></code> lookup table
+(open water and saltwater/tidal categories, since these do not generate
+terrestrial stormwater runoff), which results in a zero stormwater load
+for those areas. CLUCSID 22 (land under an active NPDES discharge
+permit, see <code><a href="../reference/util_nps_tbbase.html">util_nps_tbbase()</a></code>) is zero for the same reason,
+to avoid double-counting with point-source discharge data already
+accounted for elsewhere.</p>
 <p>All together, the above can be implemented as follows. Flow inputs
 (as cubic feet per second) to <code><a href="../reference/anlz_nps_ungaged.html">anlz_nps_ungaged()</a></code> can be
 provided numerous ways:</p>

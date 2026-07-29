@@ -54,7 +54,12 @@ A summarized data frame containing the union of all inputs showing major
 bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction
 (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED,
 hydrologic group (hydgrp), and area in hectares. These represent all
-relevant spatial combinations in the Tampa Bay watershed.
+relevant spatial combinations in the Tampa Bay watershed. Land falling
+under an active NPDES discharge permit (see
+[`tbmines`](https://tbep-tech.github.io/tbeploads/reference/tbmines.md))
+is reclassified to `CLUCSID = 22`, overriding any FLUCCS-based category,
+so it can be excluded from NPS load estimation in
+[`util_aa_npsfactors`](https://tbep-tech.github.io/tbeploads/reference/util_aa_npsfactors.md).
 
 ## Details
 

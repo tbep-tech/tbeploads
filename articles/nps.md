@@ -144,9 +144,13 @@ The function
 combines these datasets into a single spatial object that is used for
 ungaged load estimation using
 [`util_nps_union()`](https://tbep-tech.github.io/tbeploads/reference/util_nps_union.md).
-The function requires GDAL to be installed and accessible in the system
-PATH, or the path to GDAL binaries can be provided using the `gdal_path`
-argument.
+It also flags land under an active NPDES discharge permit using
+[`tbmines`](https://tbep-tech.github.io/tbeploads/reference/tbmines.md)
+(currently, phosphate mine boundaries), reclassifying it to CLUCSID 22
+so it isn’t double-counted between the land-use-based NPS estimate and
+its actual point-source discharge data. The function requires GDAL to be
+installed and accessible in the system PATH, or the path to GDAL
+binaries can be provided using the `gdal_path` argument.
 
 Land use and soil data can be updated using the
 [`util_nps_getswfwmd()`](https://tbep-tech.github.io/tbeploads/reference/util_nps_getswfwmd.md)
@@ -165,11 +169,9 @@ can be created (takes an hour or two).
 
 ``` r
 
-data(tbsubshed)
-data(tbjuris)
 data(tblu2023)
 data(tbsoil)
-tbbase <- util_nps_tbbase(tbsubshed, tbjuris, tblu2023, tbsoil, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
+tbbase <- util_nps_tbbase(tblu2023, tbsoil, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
 ```
 
 The
@@ -275,10 +277,15 @@ The fundamental equation for pollutant load estimation is:
 Where EMCs (Event Mean Concentrations) represent the average pollutant
 concentrations in stormwater runoff for different land use types. EMCs
 vary by land use category (CLUCSID) based on empirical studies of
-stormwater quality. Special handling is applied for water bodies and
-certain wetland types (CLUCSIDs 18, 20), which are assigned zero
-stormwater loads since these areas do not generate surface runoff in the
-same manner as terrestrial land uses.
+stormwater quality. Some categories carry an EMC of zero in the
+[`emc`](https://tbep-tech.github.io/tbeploads/reference/emc.md) lookup
+table (open water and saltwater/tidal categories, since these do not
+generate terrestrial stormwater runoff), which results in a zero
+stormwater load for those areas. CLUCSID 22 (land under an active NPDES
+discharge permit, see
+[`util_nps_tbbase()`](https://tbep-tech.github.io/tbeploads/reference/util_nps_tbbase.md))
+is zero for the same reason, to avoid double-counting with point-source
+discharge data already accounted for elsewhere.
 
 All together, the above can be implemented as follows. Flow inputs (as
 cubic feet per second) to
