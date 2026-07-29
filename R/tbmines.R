@@ -1,0 +1,33 @@
+#' Simple feature polygons of NPDES-permitted phosphate mine boundaries in the Tampa Bay watershed
+#'
+#' @format A \code{\link[sf]{sf}} object
+#'
+#' @details Used by \code{\link{util_nps_tbbase}} to flag land under an active NPDES discharge
+#' permit so it can be excluded from non-point source (NPS) load estimation (see
+#' \code{\link{util_aa_npsfactors}}, which excludes \code{CLUCSID = 22}). Without this
+#' exclusion, a permitted facility's land area would be counted twice: once through the
+#' land-use-based NPS model and again through its actual point-source (IPS/DPS) discharge
+#' data. The data include the following columns.
+#'
+#' \itemize{
+#'  \item \code{Location}: Character for the mine name
+#'  \item \code{Owner}: Character for the operating company
+#'  \item \code{geometry}: The geometry column
+#'}
+#'
+#' Projection is NAD83(2011) / Florida West (ftUS), CRS 6443.
+#'
+#' Covers 14 Central Florida phosphate mine sites (13 operated by Mosaic, 1 by CF Industries).
+#'
+#' @examples
+#' \dontrun{
+#' prj <- 6443
+#'
+#' tbmines <- sf::st_read("./data-raw/gis/TB_mines_NPDES.shp") |>
+#'   sf::st_make_valid() |>
+#'   sf::st_transform(prj)
+#'
+#' save(tbmines, file = 'data/tbmines.RData', compress = 'xz')
+#' }
+#' tbmines
+"tbmines"

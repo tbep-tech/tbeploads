@@ -60,7 +60,7 @@ In all use cases for the function, a data frame is returned with columns for bas
 
 Ungaged (unmonitored basins) estimates are obtained using `anlz_nps_ungaged()`. The approach combines spatial land use data, rainfall patterns, hydrologic modeling, and empirical relationships to estimate monthly nutrient and sediment loads. The function requires combined spatial data for bay segment, basin, entity jurisdiction, land use data, and soils (obtained with `util_nps_tbbase()`), rainfall data (obtained with `util_getrain()`), and flow data (obtained with `util_nps_getflow()`).
 
-The first step is updating the combined spatial data if any of the input datasets have changed.  The required inputs are land use (<code><a href="../reference/tblu2023.html">tblu2023</a></code>), soil data (<code><a href="../reference/tbsoil.html">tbsoil</a></code>), jurisdiction (<code><a href="../reference/tbjuris.html">tbjuris</a></code>), and sub-basin data (<code><a href="../reference/tbsubshed.html">tbsubshed</a></code>).  The function `util_nps_tbbase()` combines these datasets into a single spatial object that is used for ungaged load estimation using `util_nps_union()`.  The function requires GDAL to be installed and accessible in the system PATH, or the path to GDAL binaries can be provided using the `gdal_path` argument.
+The first step is updating the combined spatial data if any of the input datasets have changed.  The required inputs are land use (<code><a href="../reference/tblu2023.html">tblu2023</a></code>), soil data (<code><a href="../reference/tbsoil.html">tbsoil</a></code>), jurisdiction (<code><a href="../reference/tbjuris.html">tbjuris</a></code>), and sub-basin data (<code><a href="../reference/tbsubshed.html">tbsubshed</a></code>).  The function `util_nps_tbbase()` combines these datasets into a single spatial object that is used for ungaged load estimation using `util_nps_union()`.  It also flags land under an active NPDES discharge permit using <code><a href="../reference/tbmines.html">tbmines</a></code> (currently, phosphate mine boundaries), reclassifying it to CLUCSID 22 so it isn't double-counted between the land-use-based NPS estimate and its actual point-source discharge data. The function requires GDAL to be installed and accessible in the system PATH, or the path to GDAL binaries can be provided using the `gdal_path` argument.
 
 Land use and soil data can be updated using the `util_nps_getswfwmd()` function.  These data are also stored internally with the package for easy retrieval, as are the remaining datasets.
 
@@ -72,11 +72,9 @@ tbsoil <- util_nps_getswfwmd('soil')
 Then, the combined layer, <code><a href="../reference/tbbase.html">tbbase</a></code>, can be created (takes an hour or two).
 
 ```{r eval = F}
-data(tbsubshed)
-data(tbjuris)
 data(tblu2023)
 data(tbsoil)
-tbbase <- util_nps_tbbase(tbsubshed, tbjuris, tblu2023, tbsoil, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
+tbbase <- util_nps_tbbase(tblu2023, tbsoil, gdal_path = "C:/OSGeo4W/bin", chunk_size = 1000)
 ```
 
 The <code><a href="../reference/tbbase.html">tbbase</a></code> data object is also included with the package for convenience.
@@ -123,7 +121,7 @@ The fundamental equation for pollutant load estimation is:
 
 **Load = Flow × EMC × Unit Conversions**
 
-Where EMCs (Event Mean Concentrations) represent the average pollutant concentrations in stormwater runoff for different land use types. EMCs vary by land use category (CLUCSID) based on empirical studies of stormwater quality. Special handling is applied for water bodies and certain wetland types (CLUCSIDs 18, 20), which are assigned zero stormwater loads since these areas do not generate surface runoff in the same manner as terrestrial land uses.
+Where EMCs (Event Mean Concentrations) represent the average pollutant concentrations in stormwater runoff for different land use types. EMCs vary by land use category (CLUCSID) based on empirical studies of stormwater quality. Some categories carry an EMC of zero in the <code><a href="../reference/emc.html">emc</a></code> lookup table (open water and saltwater/tidal categories, since these do not generate terrestrial stormwater runoff), which results in a zero stormwater load for those areas. CLUCSID 22 (land under an active NPDES discharge permit, see `util_nps_tbbase()`) is zero for the same reason, to avoid double-counting with point-source discharge data already accounted for elsewhere.
 
 All together, the above can be implemented as follows. Flow inputs (as cubic feet per second) to `anlz_nps_ungaged()` can be provided numerous ways:
 

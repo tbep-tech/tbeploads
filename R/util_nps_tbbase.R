@@ -7,7 +7,7 @@
 #' @param cast Logical. If TRUE, will cast multipolygon geometries to polygons before processing. Default is FALSE, which keeps multipolygons as is (usually faster).
 #' @param verbose Logical. If TRUE, will print progress messages. Default is TRUE.
 #'
-#' @returns A summarized data frame containing the union of all inputs showing major bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED, hydrologic group (hydgrp), and area in hectares. These represent all relevant spatial combinations in the Tampa Bay watershed.
+#' @returns A summarized data frame containing the union of all inputs showing major bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED, hydrologic group (hydgrp), and area in hectares. These represent all relevant spatial combinations in the Tampa Bay watershed. Land falling under an active NPDES discharge permit (see \code{\link{tbmines}}) is reclassified to \code{CLUCSID = 22}, overriding any FLUCCS-based category, so it can be excluded from NPS load estimation in \code{\link{util_aa_npsfactors}}.
 #'
 #' @details
 #' Relies heavily on \code{\link{util_nps_union}} to perform the union operations efficiently using GDAL/OGR.  All input must have the CRS of NAD83(2011) / Florida West (ftUS), EPSG:6443.
@@ -68,6 +68,25 @@ util_nps_tbbase <- function(tblu, tbsoil, gdal_path = NULL,
     dplyr::summarise()
 
   if(verbose)
+    cat('Flagging NPDES-permitted (mine) land...\n')
+
+  # tbmines covers only a small fraction of the watershed, so util_nps_union()
+  # (an inner intersection) would drop everything outside the mine boundaries
+  # if used here - a direct intersection/difference preserves full coverage
+  # while flagging which land falls under a permit boundary.
+  mines_union <- sf::st_union(sf::st_geometry(tbmines))
+
+  tbbase4 <- dplyr::ungroup(tbbase4)
+  tbbase4_mine <- suppressWarnings(sf::st_intersection(tbbase4, mines_union)) |>
+    dplyr::mutate(npdes = TRUE)
+  tbbase4_nomine <- suppressWarnings(sf::st_difference(tbbase4, mines_union)) |>
+    dplyr::mutate(npdes = FALSE)
+
+  tbbase4 <- dplyr::bind_rows(tbbase4_mine, tbbase4_nomine) |>
+    dplyr::group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE, hydgrp, npdes) |>
+    dplyr::summarise(.groups = 'drop')
+
+  if(verbose)
     cat('Summarizing...\n')
 
   # Join with CLUCSID lookup table
@@ -80,7 +99,7 @@ util_nps_tbbase <- function(tblu, tbsoil, gdal_path = NULL,
       hydgrp = tidyr::replace_na(hydgrp, "D")
     ) |>
     sf::st_transform(prj) |>
-    dplyr::group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE, CLUCSID, IMPROVED, hydgrp) |>
+    dplyr::group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE, CLUCSID, IMPROVED, hydgrp, npdes) |>
     dplyr::summarise(.groups = 'drop')
 
   out$area_ha <- as.numeric(sf::st_area(out) * 0.000009290304) # Convert from ft^2 to ha
@@ -91,8 +110,13 @@ util_nps_tbbase <- function(tblu, tbsoil, gdal_path = NULL,
       CLUCSID = dplyr::case_when(
         FLUCCSCODE == 2100 ~ 10,
         TRUE ~ CLUCSID),
+      # land under an active NPDES discharge permit always overrides the
+      # FLUCCS-based category - applied last so a mined parcel's permit
+      # status wins regardless of its underlying land use (see @returns)
+      CLUCSID = dplyr::if_else(npdes, 22L, CLUCSID),
       drnfeat = ifelse(is.na(drnfeat), "CON", drnfeat)
-    )
+    ) |>
+    dplyr::select(-npdes)
 
   dif <- capture.output(Sys.time() - str)
   if(verbose)

@@ -97,12 +97,65 @@ test_that("util_nps_tbbase processes successfully with valid inputs", {
       "Combining results with TBNMC jurisdictions...",
       "Combining results with land use...",
       "Combining results with soils...",
+      "Flagging NPDES-permitted \\(mine\\) land...",
       "Summarizing...",
       sep = "\\n"
     )
   )
 
   rm(clucsid, envir = .GlobalEnv)
+})
+
+test_that("util_nps_tbbase reclassifies NPDES-permitted (mine) land to CLUCSID 22", {
+  tblu   <- poly6443(FLUCCSCODE = 1100)
+  tbsoil <- poly6443(hydgrp = "A")
+
+  tbbase1_mock <- poly6443(bay_seg = "TS1", basin = "Basin1", drnfeat = "Feature1")
+
+  tbbase2_mock <- poly6443(bay_seg = "TS1", basin = "Basin1", drnfeat = "Feature1",
+                           entity = "City1")
+
+  tbbase3_mock <- poly6443(bay_seg = "TS1", basin = "Basin1", drnfeat = "Feature1",
+                           entity = "City1", FLUCCSCODE = 1100)
+
+  # covers (0,0)-(1,1); a mine polygon covering the lower-left quarter,
+  # (0,0)-(0.5,0.5), overlaps a quarter of this parcel
+  tbbase4_mock <- poly6443(bay_seg = "TS1", basin = "Basin1", drnfeat = "Feature1",
+                           entity = "City1", FLUCCSCODE = 1100,
+                           hydgrp = "A")
+
+  mine_mock <- st_sf(
+    Location = "Test Mine", Owner = "Test Co",
+    geometry = st_sfc(
+      st_polygon(list(matrix(c(0,0, 0.5,0, 0.5,0.5, 0,0.5, 0,0), ncol = 2, byrow = TRUE))),
+      crs = 6443
+    )
+  )
+
+  assign("clucsid",
+         data.frame(FLUCCSCODE = 1100, CLUCSID = 1, IMPROVED = 0,
+                    DESCRIPTION = "Low Density Residential"),
+         envir = .GlobalEnv)
+  assign("tbmines", mine_mock, envir = .GlobalEnv)
+
+  union_call_count <- 0
+  stub(util_nps_tbbase, "util_nps_union", function(...) {
+    union_call_count <<- union_call_count + 1
+    if (union_call_count == 1) return(tbbase1_mock)
+    if (union_call_count == 2) return(tbbase2_mock)
+    if (union_call_count == 3) return(tbbase3_mock)
+    if (union_call_count == 4) return(tbbase4_mock)
+  })
+
+  result <- util_nps_tbbase(tblu, tbsoil, verbose = FALSE)
+
+  # one row for the mine-overlapping quarter (CLUCSID 22), one for the rest
+  # (CLUCSID 1, unaffected FLUCCS-based category)
+  expect_setequal(result$CLUCSID, c(22, 1))
+  expect_equal(sum(result$area_ha), as.numeric(st_area(tbbase4_mock)) * 0.000009290304,
+               tolerance = 1e-6)
+
+  rm(clucsid, tbmines, envir = .GlobalEnv)
 })
 
 test_that("util_nps_tbbase handles missing drnfeat values", {
