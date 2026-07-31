@@ -26,7 +26,7 @@ drainage feature, CLUCSID, hydrologic group, and improved status.
 ``` r
 data(tbbase)
 util_nps_landsoil(tbbase)
-#> # A tibble: 2,420 × 7
+#> # A tibble: 2,871 × 7
 #>    bay_seg basin    drnfeat clucsid hydgrp improved     area
 #>      <dbl> <chr>    <chr>     <dbl> <chr>     <int>    <dbl>
 #>  1       1 02304500 CON           1 A             1 0.0116  
@@ -39,5 +39,5 @@ util_nps_landsoil(tbbase)
 #>  8       1 02304500 CON           9 A             0 0.00403 
 #>  9       1 02304500 CON           5 A             1 0.000606
 #> 10       1 02304500 CON          16 A             0 0.00257 
-#> # ℹ 2,410 more rows
+#> # ℹ 2,861 more rows
 ```
