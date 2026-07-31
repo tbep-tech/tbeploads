@@ -7,7 +7,7 @@
 #' @param cast Logical. If TRUE, will cast multipolygon geometries to polygons before processing. Default is FALSE, which keeps multipolygons as is (usually faster).
 #' @param verbose Logical. If TRUE, will print progress messages. Default is TRUE.
 #'
-#' @returns A summarized data frame containing the union of all inputs showing major bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED, hydrologic group (hydgrp), and area in hectares. These represent all relevant spatial combinations in the Tampa Bay watershed. Land falling under an active NPDES discharge permit (see \code{\link{tbmines}}) is reclassified to \code{CLUCSID = 22}, overriding any FLUCCS-based category, so it can be excluded from NPS load estimation in \code{\link{util_aa_npsfactors}}.
+#' @returns A summarized data frame containing the union of all inputs showing major bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED, hydrologic group (hydgrp), and area in hectares. These represent all relevant spatial combinations in the Tampa Bay watershed. Land falling under an active NPDES discharge permit (see \code{\link{tbmines}}) is reclassified to \code{CLUCSID = 22}, overriding any FLUCCS-based category, so it can be excluded from NPS load estimation in \code{\link{util_aa_npsfactors}}. Areas with no soil classification in \code{\link{tbsoil}} (\code{hydgrp} is \code{NA}, typically open water) are assigned \code{hydgrp = "D"} and retained rather than dropped.
 #'
 #' @details
 #' Relies heavily on \code{\link{util_nps_union}} to perform the union operations efficiently using GDAL/OGR.  All input must have the CRS of NAD83(2011) / Florida West (ftUS), EPSG:6443.
@@ -38,6 +38,15 @@ util_nps_tbbase <- function(tblu, tbsoil, gdal_path = NULL,
            sf::st_crs(tbsoil)$epsg == prj)) {
     stop("All inputs must have CRS of NAD83(2011) / Florida West (ftUS), EPSG:6443.")
   }
+
+  # util_nps_union()'s SQL requires each input's first non-geometry attribute
+  # to be non-missing, or that row is dropped from the join entirely. hydgrp
+  # is tbsoil's only attribute and is legitimately NA for water bodies (no
+  # SSURGO hydrologic group), so without this, those areas are silently
+  # excluded from tbbase instead of retained with a default group - the
+  # replace_na() below never gets a chance to run for them otherwise.
+  tbsoil <- tbsoil |>
+    dplyr::mutate(hydgrp = tidyr::replace_na(hydgrp, "D"))
 
   if(verbose)
     cat('Combining drainage basins with sub-watersheds...\n')

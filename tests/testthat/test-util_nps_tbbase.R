@@ -161,6 +161,7 @@ test_that("util_nps_tbbase reclassifies NPDES-permitted (mine) land to CLUCSID 2
 test_that("util_nps_tbbase handles missing drnfeat values", {
   tblu   <- create_mock_sf(crs = 6443)
   tbsoil <- create_mock_sf(crs = 6443)
+  tbsoil$hydgrp <- "A"
 
   tbbase4_mock <- poly6443(bay_seg = "TS1", basin = "Basin1", drnfeat = NA_character_,
                            entity = "City1",

@@ -17,11 +17,13 @@ Simple feature polygons of soil data in the Tampa Bay Estuary Program boundary
 Used for estimating ungaged non-point source (NPS) loads. The data includes the following columns.
 
 \itemize{
-\item \code{hydgrp}: Character for the hydrologic group (A, B, C, D, etc.) of the soil
+\item \code{hydgrp}: Character for the hydrologic group (A, B, C, D, etc.) of the soil, \code{NA} for areas with no SSURGO classification (e.g., open water)
 \item \code{geometry}: The geometry column
 }
 
 Projection is NAD83(2011) / Florida West (ftUS), CRS 6443.
+
+\code{NA} \code{hydgrp} values are treated as group D by \code{\link{util_nps_tbbase}} rather than excluded, matching RP's own convention (see the \code{"NOSOIL"} handling in their SAS workflow) of retaining such areas instead of dropping them from the combined base layer.
 }
 \examples{
 \dontrun{
