@@ -196,9 +196,12 @@ discharge permit using
 <code><a href="../reference/tbmines.html">tbmines</a></code> (currently,
 phosphate mine boundaries), reclassifying it to CLUCSID 22 so it isn’t
 double-counted between the land-use-based NPS estimate and its actual
-point-source discharge data. The function requires GDAL to be installed
-and accessible in the system PATH, or the path to GDAL binaries can be
-provided using the <code>gdal_path</code> argument.</p>
+point-source discharge data. Areas with no soil classification in
+<code><a href="../reference/tbsoil.html">tbsoil</a></code> (typically
+open water) are assigned hydrologic group D and retained rather than
+dropped from the combined layer. The function requires GDAL to be
+installed and accessible in the system PATH, or the path to GDAL
+binaries can be provided using the <code>gdal_path</code> argument.</p>
 <p>Land use and soil data can be updated using the
 <code><a href="../reference/util_nps_getswfwmd.html">util_nps_getswfwmd()</a></code> function. These data are also stored
 internally with the package for easy retrieval, as are the remaining

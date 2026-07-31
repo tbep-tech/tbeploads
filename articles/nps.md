@@ -148,8 +148,12 @@ It also flags land under an active NPDES discharge permit using
 [`tbmines`](https://tbep-tech.github.io/tbeploads/reference/tbmines.md)
 (currently, phosphate mine boundaries), reclassifying it to CLUCSID 22
 so it isn’t double-counted between the land-use-based NPS estimate and
-its actual point-source discharge data. The function requires GDAL to be
-installed and accessible in the system PATH, or the path to GDAL
+its actual point-source discharge data. Areas with no soil
+classification in
+[`tbsoil`](https://tbep-tech.github.io/tbeploads/reference/tbsoil.md)
+(typically open water) are assigned hydrologic group D and retained
+rather than dropped from the combined layer. The function requires GDAL
+to be installed and accessible in the system PATH, or the path to GDAL
 binaries can be provided using the `gdal_path` argument.
 
 Land use and soil data can be updated using the

@@ -60,9 +60,10 @@
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Used for estimating ungaged non-point source (NPS) loads. The data includes the following columns.</p>
-<ul><li><p><code>hydgrp</code>: Character for the hydrologic group (A, B, C, D, etc.) of the soil</p></li>
+<ul><li><p><code>hydgrp</code>: Character for the hydrologic group (A, B, C, D, etc.) of the soil, <code>NA</code> for areas with no SSURGO classification (e.g., open water)</p></li>
 <li><p><code>geometry</code>: The geometry column</p></li>
 </ul><p>Projection is NAD83(2011) / Florida West (ftUS), CRS 6443.</p>
+<p><code>NA</code> <code>hydgrp</code> values are treated as group D by <code><a href="util_nps_tbbase.html">util_nps_tbbase</a></code> rather than excluded, matching RP's own convention (see the <code>"NOSOIL"</code> handling in their SAS workflow) of retaining such areas instead of dropping them from the combined base layer.</p>
     </div>
 
     <div class="section level2">

@@ -60,6 +60,10 @@ under an active NPDES discharge permit (see
 is reclassified to `CLUCSID = 22`, overriding any FLUCCS-based category,
 so it can be excluded from NPS load estimation in
 [`util_aa_npsfactors`](https://tbep-tech.github.io/tbeploads/reference/util_aa_npsfactors.md).
+Areas with no soil classification in
+[`tbsoil`](https://tbep-tech.github.io/tbeploads/reference/tbsoil.md)
+(`hydgrp` is `NA`, typically open water) are assigned `hydgrp = "D"` and
+retained rather than dropped.
 
 ## Details
 

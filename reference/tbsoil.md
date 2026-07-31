@@ -19,11 +19,17 @@ Used for estimating ungaged non-point source (NPS) loads. The data
 includes the following columns.
 
 - `hydgrp`: Character for the hydrologic group (A, B, C, D, etc.) of the
-  soil
+  soil, `NA` for areas with no SSURGO classification (e.g., open water)
 
 - `geometry`: The geometry column
 
 Projection is NAD83(2011) / Florida West (ftUS), CRS 6443.
+
+`NA` `hydgrp` values are treated as group D by
+[`util_nps_tbbase`](https://tbep-tech.github.io/tbeploads/reference/util_nps_tbbase.md)
+rather than excluded, matching RP's own convention (see the `"NOSOIL"`
+handling in their SAS workflow) of retaining such areas instead of
+dropping them from the combined base layer.
 
 ## Examples
 
