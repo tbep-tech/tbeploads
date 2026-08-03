@@ -7,7 +7,7 @@
 #' @param cast Logical. If TRUE, will cast multipolygon geometries to polygons before processing. Default is FALSE, which keeps multipolygons as is (usually faster).
 #' @param verbose Logical. If TRUE, will print progress messages. Default is TRUE.
 #'
-#' @returns A summarized data frame containing the union of all inputs showing major bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED, hydrologic group (hydgrp), and area in hectares. These represent all relevant spatial combinations in the Tampa Bay watershed. Land falling under an active NPDES discharge permit (see \code{\link{tbmines}}) is reclassified to \code{CLUCSID = 22}, overriding any FLUCCS-based category, so it can be excluded from NPS load estimation in \code{\link{util_aa_npsfactors}}. Areas with no soil classification in \code{\link{tbsoil}} (\code{hydgrp} is \code{NA}, typically open water) are assigned \code{hydgrp = "D"} and retained rather than dropped.
+#' @returns A summarized data frame containing the union of all inputs showing major bay segment, sub-basin (basin), drainage feature (drnfeat), jurisdiction (entity), land use/land cover (FLUCCSCODE), CLUCSID, IMPROVED, hydrologic group (hydgrp), and area in hectares. These represent all relevant spatial combinations in the Tampa Bay watershed. Land falling under an active NPDES discharge permit (see \code{\link{tbmines}}) is reclassified to \code{CLUCSID = 22}, overriding any FLUCCS-based category, so it can be excluded from NPS load estimation in \code{\link{util_aa_npsfactors}}. Areas with no soil classification in \code{\link{tbsoil}} (\code{hydgrp} is \code{NA}, typically open water) are assigned \code{hydgrp = "D"} and retained rather than dropped. Basin/jurisdiction area not covered by \code{tblu} (also typically open bay/estuarine water) is likewise retained, assigned FLUCCS code 5400 (\code{CLUCSID = 17}, Saltwater) rather than dropped.
 #'
 #' @details
 #' Relies heavily on \code{\link{util_nps_union}} to perform the union operations efficiently using GDAL/OGR.  All input must have the CRS of NAD83(2011) / Florida West (ftUS), EPSG:6443.
@@ -68,6 +68,34 @@ util_nps_tbbase <- function(tblu, tbsoil, gdal_path = NULL,
   tbbase3 <- util_nps_union(tbbase2, tblu, gdal_path = gdal_path, cast = cast) |>
     dplyr::group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE) |>
     dplyr::summarise()
+
+  if(verbose)
+    cat('Filling land use gaps...\n')
+
+  # tblu does not fully cover the watershed - real basin/jurisdiction area can
+  # include open bay/estuarine water not covered by a terrestrial land use
+  # survey (e.g., basin 206-3C is ~77% open water), so util_nps_union()'s
+  # inner intersection silently drops that area rather than retaining it.
+  # Recover it and assign a default "Saltwater" FLUCCSCODE (5400, CLUCSID 17
+  # per the clucsid lookup), rather than letting it artificially inflate
+  # other land's share of the basin during NPS disaggregation (see
+  # util_aa_npsfactors()).
+  lu_union <- sf::st_union(sf::st_geometry(tblu))
+
+  tbbase2 <- dplyr::ungroup(tbbase2)
+  tbbase2_gap <- suppressWarnings(sf::st_difference(tbbase2, lu_union))
+  # st_difference() leaves a row with empty geometry (rather than dropping it)
+  # when a feature is fully covered by lu_union, i.e. no gap - drop those
+  # instead of carrying forward zero-area placeholder rows.
+  tbbase2_gap <- tbbase2_gap[!sf::st_is_empty(tbbase2_gap), ]
+  tbbase2_gap <- tbbase2_gap |>
+    dplyr::mutate(FLUCCSCODE = 5400) |>
+    dplyr::group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE) |>
+    dplyr::summarise(.groups = 'drop')
+
+  tbbase3 <- dplyr::bind_rows(dplyr::ungroup(tbbase3), tbbase2_gap) |>
+    dplyr::group_by(bay_seg, basin, drnfeat, entity, FLUCCSCODE) |>
+    dplyr::summarise(.groups = 'drop')
 
   if(verbose)
     cat('Combining results with soils...\n')

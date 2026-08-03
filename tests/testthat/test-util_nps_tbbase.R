@@ -96,6 +96,7 @@ test_that("util_nps_tbbase processes successfully with valid inputs", {
       "Combining drainage basins with sub-watersheds...",
       "Combining results with TBNMC jurisdictions...",
       "Combining results with land use...",
+      "Filling land use gaps...",
       "Combining results with soils...",
       "Flagging NPDES-permitted \\(mine\\) land...",
       "Summarizing...",
@@ -156,6 +157,56 @@ test_that("util_nps_tbbase reclassifies NPDES-permitted (mine) land to CLUCSID 2
                tolerance = 1e-6)
 
   rm(clucsid, tbmines, envir = .GlobalEnv)
+})
+
+test_that("util_nps_tbbase fills land use gaps with FLUCCSCODE 5400 instead of dropping them", {
+  # tbbase2 (basin/jurisdiction) covers the full (0,0)-(1,1) unit square, but
+  # tblu only covers the left half, (0,0)-(0.5,1) - the uncovered right half
+  # should be recovered and assigned FLUCCSCODE 5400 (Saltwater) rather than
+  # silently dropped by util_nps_union()'s inner intersection
+  left_half <- st_polygon(list(matrix(c(0,0, 0.5,0, 0.5,1, 0,1, 0,0), ncol = 2, byrow = TRUE)))
+
+  tblu <- st_sf(FLUCCSCODE = 1100, geometry = st_sfc(left_half, crs = 6443))
+  tbsoil <- poly6443(hydgrp = "A")
+
+  tbbase1_mock <- poly6443(bay_seg = "TS1", basin = "Basin1", drnfeat = "Feature1")
+  tbbase2_mock <- poly6443(bay_seg = "TS1", basin = "Basin1", drnfeat = "Feature1",
+                           entity = "City1")
+
+  # what a real inner-join union of tbbase2 (full square) x tblu (left half)
+  # would produce: just the overlapping left half, classified FLUCCSCODE 1100
+  tbbase3_mock <- st_sf(
+    bay_seg = "TS1", basin = "Basin1", drnfeat = "Feature1", entity = "City1",
+    FLUCCSCODE = 1100,
+    geometry = st_sfc(left_half, crs = 6443)
+  )
+
+  assign("clucsid",
+         data.frame(FLUCCSCODE = c(1100, 5400), CLUCSID = c(1, 17), IMPROVED = c(0, 0),
+                    DESCRIPTION = c("Low Density Residential", "Saltwater")),
+         envir = .GlobalEnv)
+
+  union_call_count <- 0
+  stub(util_nps_tbbase, "util_nps_union", function(sf1, ...) {
+    union_call_count <<- union_call_count + 1
+    if (union_call_count == 1) return(tbbase1_mock)
+    if (union_call_count == 2) return(tbbase2_mock)
+    if (union_call_count == 3) return(tbbase3_mock)
+    # soil step: echo whatever land use produced (by now includes the
+    # gap-filled right half) with a constant hydgrp, simulating a single
+    # uniform soil type across the whole parcel
+    if (union_call_count == 4) return(dplyr::mutate(sf1, hydgrp = "A"))
+  })
+
+  result <- util_nps_tbbase(tblu, tbsoil, verbose = FALSE)
+
+  # left half (FLUCCSCODE 1100 -> CLUCSID 1) and gap-filled right half
+  # (FLUCCSCODE 5400 -> CLUCSID 17) should both be present
+  expect_setequal(result$CLUCSID, c(1, 17))
+  expect_equal(sum(result$area_ha), as.numeric(st_area(tbbase2_mock)) * 0.000009290304,
+               tolerance = 1e-6)
+
+  rm(clucsid, envir = .GlobalEnv)
 })
 
 test_that("util_nps_tbbase handles missing drnfeat values", {
