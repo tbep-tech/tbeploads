@@ -63,7 +63,10 @@ so it can be excluded from NPS load estimation in
 Areas with no soil classification in
 [`tbsoil`](https://tbep-tech.github.io/tbeploads/reference/tbsoil.md)
 (`hydgrp` is `NA`, typically open water) are assigned `hydgrp = "D"` and
-retained rather than dropped.
+retained rather than dropped. Basin/jurisdiction area not covered by
+`tblu` (also typically open bay/estuarine water) is likewise retained,
+assigned FLUCCS code 5400 (`CLUCSID = 17`, Saltwater) rather than
+dropped.
 
 ## Details
 
