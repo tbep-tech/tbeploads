@@ -23,7 +23,7 @@ See "data-raw/tbbase.R" for creation.
 
 ``` r
 tbbase
-#> # A tibble: 24,873 × 9
+#> # A tibble: 24,975 × 9
 #>    bay_seg basin    drnfeat entity    FLUCCSCODE CLUCSID IMPROVED hydgrp area_ha
 #>      <dbl> <chr>    <chr>   <chr>          <dbl>   <dbl>    <int> <chr>    <dbl>
 #>  1       1 02304500 LAKE    HILLSBOR…       1100       1        1 A      2.53e-3
@@ -36,5 +36,5 @@ tbbase
 #>  8       1 02304500 LAKE    HILLSBOR…       1900       8        0 A      5.45e-3
 #>  9       1 02304500 LAKE    HILLSBOR…       1900       8        0 A/D    5.74e-3
 #> 10       1 02304500 LAKE    HILLSBOR…       2600       8        0 A      2.28e-3
-#> # ℹ 24,863 more rows
+#> # ℹ 24,965 more rows
 ```

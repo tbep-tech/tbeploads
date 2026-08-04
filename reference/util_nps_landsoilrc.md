@@ -32,7 +32,7 @@ year and month.
 data(tbbase)
 
 util_nps_landsoilrc(tbbase, yrexp = c(2021:2023))
-#> # A tibble: 92,052 × 13
+#> # A tibble: 93,096 × 13
 #>    bay_seg basin drnfeat clucsid hydgrp   area dry_rc wet_rc    mo    rc     rca
 #>      <dbl> <chr> <chr>     <dbl> <chr>   <dbl>  <dbl>  <dbl> <int> <dbl>   <dbl>
 #>  1       1 0230… CON           1 A      0.0116   0.15   0.25     1  0.15 0.00174
@@ -45,6 +45,6 @@ util_nps_landsoilrc(tbbase, yrexp = c(2021:2023))
 #>  8       1 0230… CON           1 A      0.0116   0.15   0.25     3  0.15 0.00174
 #>  9       1 0230… CON           1 A      0.0116   0.15   0.25     3  0.15 0.00174
 #> 10       1 0230… CON           1 A      0.0116   0.15   0.25     4  0.15 0.00174
-#> # ℹ 92,042 more rows
+#> # ℹ 93,086 more rows
 #> # ℹ 2 more variables: tot_rca <dbl>, yr <int>
 ```
