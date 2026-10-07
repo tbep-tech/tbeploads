@@ -129,6 +129,30 @@ test_that("Normalized Load applies the segment-wide ratio using the real baselin
   expect_equal(normalized[["2023"]], total[["2023"]] * (895.62 / total_h2o_2023), tolerance = 1e-9)
 })
 
+test_that("Material Losses shared group members are summed into one row", {
+  aa_data <- make_aa_data()
+  ml <- do.call(rbind, lapply(c("Riverview", "Tampa Marine", "Big Bend"), function(f) {
+    x <- aa_data[aa_data$entity == "Mosaic", ]
+    x$facname <- f
+    x$permit <- NA_character_
+    x$source <- "ML"
+    x$ishared <- TRUE
+    x$group_id <- "ml_mosaic_hb"
+    x$load_tons <- c(1, 2)
+    x
+  }))
+
+  ft <- show_aaloads(rbind(aa_data, ml), bay_seg = 2L, make_gw_data(), make_spr_data(), make_ad_data())
+  d <- ft$body$dataset
+
+  expect_false(any(d$entity_label %in% c("Mosaic - Riverview", "Mosaic - Tampa Marine", "Mosaic - Big Bend")))
+  merged <- d[d$entity_label == "Mosaic - Big Bend, Riverview, Tampa Marine", ]
+  expect_equal(nrow(merged), 1L)
+  expect_equal(as.numeric(merged[, c("2022", "2023")]), c(3, 6))
+  # the IPS Mosaic row is untouched
+  expect_equal(sum(d$entity_label == "Mosaic - Bartow"), 1L)
+})
+
 test_that("digits controls year-column display precision", {
   ft1 <- show_aaloads(make_aa_data(), bay_seg = 2L, make_gw_data(), make_spr_data(), make_ad_data())
   ft3 <- show_aaloads(make_aa_data(), bay_seg = 2L, make_gw_data(), make_spr_data(), make_ad_data(),

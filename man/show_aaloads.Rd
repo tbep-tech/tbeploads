@@ -67,8 +67,12 @@ pipe"}/\code{"DPS - reuse"}), \code{"Material Losses"} (\code{source ==
 \code{\link{anlz_aa}} at its 0.01 tons/yr threshold in most years but not
 all, and are excluded here rather than shown as a spurious partial row).
 Each facility/entity keeps its own row, even for \code{ishared}
-shared-allocation groups (see \code{\link{anlz_aa}}). Row labels combine
-the owning entity with the facility name (e.g., \code{"Mosaic - Riverview"}).
+shared-allocation groups (see \code{\link{anlz_aa}}), except Material
+Losses shared groups. Their members' loads are an even split of one
+combined load, so they are summed into a single row labeled with every
+member (e.g., \code{"Mosaic - Big Bend, Riverview, Tampa Marine"}),
+consistent with \code{\link{show_aaassess}}. Other row labels combine the
+owning entity with the facility name (e.g., \code{"Mosaic - Bartow"}).
 
 \strong{Atmospheric Deposition and Other (Groundwater, Springs,
 Conservation)}: \code{gw_data}, \code{spr_data}, and \code{ad_data} are mapped

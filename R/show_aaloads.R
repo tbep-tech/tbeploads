@@ -38,8 +38,12 @@
 #' \code{\link{anlz_aa}} at its 0.01 tons/yr threshold in most years but not
 #' all, and are excluded here rather than shown as a spurious partial row).
 #' Each facility/entity keeps its own row, even for \code{ishared}
-#' shared-allocation groups (see \code{\link{anlz_aa}}). Row labels combine
-#' the owning entity with the facility name (e.g., \code{"Mosaic - Riverview"}).
+#' shared-allocation groups (see \code{\link{anlz_aa}}), except Material
+#' Losses shared groups. Their members' loads are an even split of one
+#' combined load, so they are summed into a single row labeled with every
+#' member (e.g., \code{"Mosaic - Big Bend, Riverview, Tampa Marine"}),
+#' consistent with \code{\link{show_aaassess}}. Other row labels combine the
+#' owning entity with the facility name (e.g., \code{"Mosaic - Bartow"}).
 #'
 #' \strong{Atmospheric Deposition and Other (Groundwater, Springs,
 #' Conservation)}: \code{gw_data}, \code{spr_data}, and \code{ad_data} are mapped
@@ -241,6 +245,28 @@ show_aaloads <- function(aa_data, bay_seg, gw_data, spr_data, ad_data, yrrng = N
     # in others) would otherwise show up as a spurious partial row.
     dplyr::filter(!(.data$section == "Nonpoint Source" &
                       !.data$entity %in% c("All", "Non-MS4/Ag NPS")))
+
+  # Material Losses shared groups (e.g. Mosaic Big Bend/Riverview/Tampa
+  # Marine) carry an even split of one combined load across their members, so
+  # collapse each group to one row summing its members' loads, labeled with
+  # the owner and every member facility.
+  ml_grp <- dat$section == "Material Losses" & !is.na(dat$group_id)
+  if (any(ml_grp)) {
+    ml_merged <- dat[ml_grp, ] |>
+      dplyr::mutate(owner = dplyr::coalesce(.data$entity_full, .data$entity)) |>
+      dplyr::group_by(.data$group_id) |>
+      dplyr::mutate(
+        entity_label = paste0(.data$owner[1], " - ",
+                              paste(sort(unique(.data$facname)), collapse = ", "))
+      ) |>
+      dplyr::group_by(.data$section, .data$entity_label, .data$year) |>
+      dplyr::summarise(
+        load_tons = if (all(is.na(.data$load_tons))) NA_real_ else sum(.data$load_tons, na.rm = TRUE),
+        .groups = "drop"
+      ) |>
+      dplyr::mutate(facname = NA_character_, permit = NA_character_)
+    dat <- dplyr::bind_rows(dat[!ml_grp, ], ml_merged)
+  }
 
   wide <- dat |>
     tidyr::pivot_wider(
