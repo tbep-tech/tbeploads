@@ -122,7 +122,10 @@
 #' \code{source} distinguishes direct surface water discharge
 #' (\code{"DPS - end of pipe"}) from reclaimed water reuse
 #' (\code{"DPS - reuse"}). Bay segment 5 (Boca Ciega Bay) is excluded
-#' and bayseg 6/7 are remapped to 55.
+#' and bayseg 6/7 are remapped to 55. Coastal subbasin 580 straddles Boca
+#' Ciega Bay and Boca Ciega Bay South, so only 41.1\% of its DPS load and
+#' water (St. Petersburg reuse) is assigned to segment 55. The remaining 
+#' 58.9\% belongs to segment 5 and is excluded.
 #'
 #' \strong{IPS path}
 #'
@@ -296,6 +299,11 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
     )
   }
 
+  # Coastal subbasin 580 straddles Boca Ciega Bay (5) and Boca Ciega Bay
+  # South (55). The SAS DPS-by-segment step assigns 41.1% of its DPS load and
+  # water to 55 and 58.9% to 5, which is excluded from allocation.
+  bcbs_frac <- function(coastco) dplyr::if_else(coastco %in% "580", 0.411, 1)
+
   # ---- Shared: facility-to-basin lookups for total H2O normalization ------
   # SAS ratio1_2224 (the normalization denominator) sums NPS + DPS + IPS water
   # for each basin and year. Reproduce that here.
@@ -362,6 +370,7 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
     dplyr::filter(.data$Year %in% yrrng) |>
     dplyr::group_by(.data$Year, .data$entity, .data$coastco) |>
     dplyr::summarise(hy_load_dps = sum(.data$hy_load, na.rm = TRUE), .groups = "drop") |>
+    dplyr::mutate(hy_load_dps = .data$hy_load_dps * bcbs_frac(.data$coastco)) |>
     dplyr::left_join(dps_fac_h2o, by = c("entity", "coastco")) |>
     dplyr::filter(!is.na(.data$basin)) |>
     dplyr::group_by(.data$bay_seg, .data$basin, .data$Year) |>
@@ -382,6 +391,7 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
     dplyr::filter(.data$Year %in% yrrng) |>
     dplyr::group_by(.data$Year, .data$entity, .data$coastco) |>
     dplyr::summarise(tn_load_dps = sum(.data$tn_load, na.rm = TRUE), .groups = "drop") |>
+    dplyr::mutate(tn_load_dps = .data$tn_load_dps * bcbs_frac(.data$coastco)) |>
     dplyr::left_join(dps_fac_h2o, by = c("entity", "coastco")) |>
     dplyr::filter(!is.na(.data$basin)) |>
     dplyr::group_by(.data$bay_seg, .data$basin, .data$Year) |>
@@ -798,6 +808,7 @@ anlz_aa <- function(yrrng, dps_data, ips_data, ml_data, nps_data, tbbase, verbos
     ) |>
     dplyr::group_by(.data$Year, .data$entity, .data$coastco, .data$dps_source) |>
     dplyr::summarise(tn_dps = sum(.data$tn_load, na.rm = TRUE), .groups = "drop") |>
+    dplyr::mutate(tn_dps = .data$tn_dps * bcbs_frac(.data$coastco)) |>
     dplyr::left_join(dps_fac, by = c("entity", "coastco", "dps_source")) |>
     dplyr::filter(!is.na(.data$facname)) |>
     dplyr::group_by(.data$Year, .data$bay_seg, .data$entity, .data$facname, .data$dps_source) |>

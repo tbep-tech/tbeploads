@@ -423,6 +423,20 @@ test_that("St Pete Facilities DPS loads appear in anlz_aa output for bay_segs 1,
   expect_true(all(sp$eff_load_tons > 0))
 })
 
+test_that("St Pete Facilities RALTB load includes only the BCB South share (41.1%) of coastco 580", {
+  result <- anlz_aa(2023L, dps_stpete_reuse(tn_per_coastco = 1.0), make_ips_empty(), make_ml_empty(),
+                    make_nps_empty(), tbbase)
+
+  sp <- result[!is.na(result$entity) & result$entity == "St. Petersburg" &
+                 !is.na(result$source) & result$source == "DPS - reuse", ]
+
+  # coastco 580 is the only St Pete coastco in bay_seg 55
+  expect_equal(sp$eff_load_tons[sp$bay_seg == 55L], 0.411)
+  # the other segments are unaffected (508 in OTB, six coastcos in MTB)
+  expect_equal(sp$eff_load_tons[sp$bay_seg == 1L], 1.0)
+  expect_equal(sp$eff_load_tons[sp$bay_seg == 3L], 6.0)
+})
+
 # Helper: Pasco Reuse DPS data with the two coastcos anlz_dps_facility assigns
 dps_pasco_reuse <- function(tn_per_coastco = 1.0, yr = 2023L) {
   do.call(rbind, lapply(c('189', '193'), function(cc) {

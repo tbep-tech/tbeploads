@@ -149,7 +149,10 @@ table. The join key is \code{entity + facname + bay\_seg + source}, where
 \code{source} distinguishes direct surface water discharge
 (\code{"DPS - end of pipe"}) from reclaimed water reuse
 (\code{"DPS - reuse"}). Bay segment 5 (Boca Ciega Bay) is excluded
-and bayseg 6/7 are remapped to 55.
+and bayseg 6/7 are remapped to 55. Coastal subbasin 580 straddles Boca
+Ciega Bay and Boca Ciega Bay South, so only 41.1\\% of its DPS load and
+water (St. Petersburg reuse) is assigned to segment 55. The remaining
+58.9\\% belongs to segment 5 and is excluded.
 
 \strong{IPS path}
 
