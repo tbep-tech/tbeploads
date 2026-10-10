@@ -94,9 +94,14 @@ at its 0.01 tons/yr threshold in most years but not all, and are
 excluded here rather than shown as a spurious partial row). Each
 facility/entity keeps its own row, even for `ishared` shared-allocation
 groups (see
-[`anlz_aa`](https://tbep-tech.github.io/tbeploads/reference/anlz_aa.md)).
-Row labels combine the owning entity with the facility name (e.g.,
-`"Mosaic - Riverview"`).
+[`anlz_aa`](https://tbep-tech.github.io/tbeploads/reference/anlz_aa.md)),
+except Material Losses shared groups. Their members' loads are an even
+split of one combined load, so they are summed into a single row labeled
+with every member (e.g.,
+`"Mosaic - Big Bend, Riverview, Tampa Marine"`), consistent with
+[`show_aaassess`](https://tbep-tech.github.io/tbeploads/reference/show_aaassess.md).
+Other row labels combine the owning entity with the facility name (e.g.,
+`"Mosaic - Bartow"`).
 
 **Atmospheric Deposition and Other (Groundwater, Springs,
 Conservation)**: `gw_data`, `spr_data`, and `ad_data` are mapped to

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tbeploads</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -134,8 +134,12 @@ pipe"</code>/<code>"DPS - reuse"</code>), <code>"Material Losses"</code> (<code>
 <code><a href="anlz_aa.html">anlz_aa</a></code> at its 0.01 tons/yr threshold in most years but not
 all, and are excluded here rather than shown as a spurious partial row).
 Each facility/entity keeps its own row, even for <code>ishared</code>
-shared-allocation groups (see <code><a href="anlz_aa.html">anlz_aa</a></code>). Row labels combine
-the owning entity with the facility name (e.g., <code>"Mosaic - Riverview"</code>).</p>
+shared-allocation groups (see <code><a href="anlz_aa.html">anlz_aa</a></code>), except Material
+Losses shared groups. Their members' loads are an even split of one
+combined load, so they are summed into a single row labeled with every
+member (e.g., <code>"Mosaic - Big Bend, Riverview, Tampa Marine"</code>),
+consistent with <code><a href="show_aaassess.html">show_aaassess</a></code>. Other row labels combine the
+owning entity with the facility name (e.g., <code>"Mosaic - Bartow"</code>).</p>
 <p><strong>Atmospheric Deposition and Other (Groundwater, Springs,
 Conservation)</strong>: <code>gw_data</code>, <code>spr_data</code>, and <code>ad_data</code> are mapped
 to <code>bay_seg</code> the same way <code><a href="anlz_aa.html">anlz_aa</a></code> does internally
