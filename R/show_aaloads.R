@@ -49,9 +49,10 @@
 #' \strong{Atmospheric Deposition and Other (Groundwater, Springs,
 #' Conservation)}: \code{gw_data}, \code{spr_data}, and \code{ad_data} are mapped
 #' to \code{bay_seg} the same way \code{\link{anlz_aa}} does internally
-#' (Terra Ceia Bay and Manatee River summed into segment 55; Boca Ciega Bay
-#' variants dropped, consistent with the allocation framework's existing
-#' exclusion) and filtered to the requested \code{bay_seg}. \code{ad_data}'s
+#' (Terra Ceia Bay, Manatee River, and Boca Ciega Bay South summed into
+#' segment 55; Boca Ciega Bay dropped, consistent with the allocation
+#' framework's existing exclusion) and filtered to the requested
+#' \code{bay_seg}. \code{ad_data}'s
 #' \code{tn_load} becomes the \code{"Atmospheric Deposition"} row.
 #' \code{gw_data}'s and \code{spr_data}'s \code{tn_load} (\code{spr_data}
 #' only has rows for Hillsborough Bay - other segments that have no contribution
@@ -158,11 +159,13 @@ show_aaloads <- function(aa_data, bay_seg, gw_data, spr_data, ad_data, yrrng = N
   }
 
   # gw_data/spr_data/ad_data key on segment name, not bay_seg - map/aggregate
-  # the same way anlz_aa() does internally (Terra Ceia Bay + Manatee River ->
-  # 55; Boca Ciega Bay variants excluded from the allocation framework).
+  # the same way anlz_aa() does internally (Terra Ceia Bay + Manatee River +
+  # Boca Ciega Bay South -> 55; Boca Ciega Bay excluded from the allocation
+  # framework).
   seg_map <- c(
     "Old Tampa Bay" = 1L, "Hillsborough Bay" = 2L, "Middle Tampa Bay" = 3L,
-    "Lower Tampa Bay" = 4L, "Terra Ceia Bay" = 55L, "Manatee River" = 55L
+    "Lower Tampa Bay" = 4L, "Terra Ceia Bay" = 55L, "Manatee River" = 55L,
+    "Boca Ciega Bay South" = 55L
   )
   agg_by_seg <- function(x, seg) {
     x |>

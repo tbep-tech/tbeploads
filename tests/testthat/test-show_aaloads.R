@@ -165,6 +165,23 @@ test_that("Material Losses shared group keeps member rows but shows and merges t
   expect_equal(total[["2022"]], 33 + 3 + 72.2 + 156.9, tolerance = 1e-9)
 })
 
+test_that("RALTB Atmospheric Deposition sums Terra Ceia Bay, Manatee River, and Boca Ciega Bay South only", {
+  aa_data <- make_aa_data()
+  aa_data$bay_seg <- 55L
+  aa_data$segment <- "Remaining Lower Tampa Bay"
+
+  ad <- data.frame(
+    Year = 2022L, source = "AD",
+    segment = c("Terra Ceia Bay", "Manatee River", "Boca Ciega Bay South", "Boca Ciega Bay"),
+    tn_load = c(1, 2, 4, 8), hy_load = c(10, 20, 40, 80)
+  )
+  empty <- data.frame(Year = integer(), source = character(), segment = character(),
+                      tn_load = numeric(), hy_load = numeric())
+
+  d <- show_aaloads(aa_data, bay_seg = 55L, empty, empty, ad)$body$dataset
+  expect_equal(d[d$entity_label == "Atmospheric Deposition", "2022"], 7)
+})
+
 test_that("digits controls year-column display precision", {
   ft1 <- show_aaloads(make_aa_data(), bay_seg = 2L, make_gw_data(), make_spr_data(), make_ad_data())
   ft3 <- show_aaloads(make_aa_data(), bay_seg = 2L, make_gw_data(), make_spr_data(), make_ad_data(),
