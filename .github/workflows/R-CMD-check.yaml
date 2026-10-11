@@ -44,6 +44,7 @@ jobs:
       - name: Install system dependencies (macOS)
         if: runner.os == 'macOS'
         run: |
+          brew install --cask xquartz
           brew install gdal proj
           echo "PROJ_LIB=$(brew --prefix)/share/proj" >> $GITHUB_ENV
 
