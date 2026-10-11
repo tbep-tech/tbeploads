@@ -129,7 +129,7 @@ test_that("Normalized Load applies the segment-wide ratio using the real baselin
   expect_equal(normalized[["2023"]], total[["2023"]] * (895.62 / total_h2o_2023), tolerance = 1e-9)
 })
 
-test_that("Material Losses shared group members are summed into one row", {
+test_that("Material Losses shared group keeps member rows but shows and merges the combined load", {
   aa_data <- make_aa_data()
   ml <- do.call(rbind, lapply(c("Riverview", "Tampa Marine", "Big Bend"), function(f) {
     x <- aa_data[aa_data$entity == "Mosaic", ]
@@ -145,12 +145,24 @@ test_that("Material Losses shared group members are summed into one row", {
   ft <- show_aaloads(rbind(aa_data, ml), bay_seg = 2L, make_gw_data(), make_spr_data(), make_ad_data())
   d <- ft$body$dataset
 
-  expect_false(any(d$entity_label %in% c("Mosaic - Riverview", "Mosaic - Tampa Marine", "Mosaic - Big Bend")))
-  merged <- d[d$entity_label == "Mosaic - Big Bend, Riverview, Tampa Marine", ]
-  expect_equal(nrow(merged), 1L)
-  expect_equal(as.numeric(merged[, c("2022", "2023")]), c(3, 6))
-  # the IPS Mosaic row is untouched
-  expect_equal(sum(d$entity_label == "Mosaic - Bartow"), 1L)
+  members <- c("Mosaic - Big Bend", "Mosaic - Riverview", "Mosaic - Tampa Marine")
+  idx <- which(d$entity_label %in% members)
+  expect_equal(d$entity_label[idx], members)
+  expect_equal(diff(idx), c(1L, 1L))
+  # every member row carries the group's combined load
+  expect_equal(d[["2022"]][idx], rep(3, 3))
+  expect_equal(d[["2023"]][idx], rep(6, 3))
+  expect_equal(d$Average[idx], rep(4.5, 3))
+
+  # year and Average cells are merged across the member rows
+  spans <- ft$body$spans$columns
+  for (j in match(c("2022", "2023", "Average"), names(d)))
+    expect_equal(spans[idx, j], c(3L, 0L, 0L))
+  expect_equal(spans[idx, match("entity_label", names(d))], c(1L, 1L, 1L))
+
+  # Total Load counts the group once: aa_data rows (10+3+20) + ML group (3) + AD + Other
+  total <- d[d$entity_label == "Total Load", ]
+  expect_equal(total[["2022"]], 33 + 3 + 72.2 + 156.9, tolerance = 1e-9)
 })
 
 test_that("digits controls year-column display precision", {

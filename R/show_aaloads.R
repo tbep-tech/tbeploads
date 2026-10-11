@@ -38,12 +38,13 @@
 #' \code{\link{anlz_aa}} at its 0.01 tons/yr threshold in most years but not
 #' all, and are excluded here rather than shown as a spurious partial row).
 #' Each facility/entity keeps its own row, even for \code{ishared}
-#' shared-allocation groups (see \code{\link{anlz_aa}}), except Material
-#' Losses shared groups. Their members' loads are an even split of one
-#' combined load, so they are summed into a single row labeled with every
-#' member (e.g., \code{"Mosaic - Big Bend, Riverview, Tampa Marine"}),
-#' consistent with \code{\link{show_aaassess}}. Other row labels combine the
-#' owning entity with the facility name (e.g., \code{"Mosaic - Bartow"}).
+#' shared-allocation groups (see \code{\link{anlz_aa}}). Row labels combine
+#' the owning entity with the facility name (e.g., \code{"Mosaic - Riverview"}).
+#' Material Losses shared groups (e.g., Mosaic Big Bend, Riverview, and Tampa
+#' Marine) carry an even split of one combined load across their members, so
+#' their year and Average cells are merged across the member rows and show
+#' the group's combined load, consistent with \code{\link{show_aaassess}}.
+#' The group is counted once in Total Load.
 #'
 #' \strong{Atmospheric Deposition and Other (Groundwater, Springs,
 #' Conservation)}: \code{gw_data}, \code{spr_data}, and \code{ad_data} are mapped
@@ -247,30 +248,17 @@ show_aaloads <- function(aa_data, bay_seg, gw_data, spr_data, ad_data, yrrng = N
                       !.data$entity %in% c("All", "Non-MS4/Ag NPS")))
 
   # Material Losses shared groups (e.g. Mosaic Big Bend/Riverview/Tampa
-  # Marine) carry an even split of one combined load across their members, so
-  # collapse each group to one row summing its members' loads, labeled with
-  # the owner and every member facility.
-  ml_grp <- dat$section == "Material Losses" & !is.na(dat$group_id)
-  if (any(ml_grp)) {
-    ml_merged <- dat[ml_grp, ] |>
-      dplyr::mutate(owner = dplyr::coalesce(.data$entity_full, .data$entity)) |>
-      dplyr::group_by(.data$group_id) |>
-      dplyr::mutate(
-        entity_label = paste0(.data$owner[1], " - ",
-                              paste(sort(unique(.data$facname)), collapse = ", "))
-      ) |>
-      dplyr::group_by(.data$section, .data$entity_label, .data$year) |>
-      dplyr::summarise(
-        load_tons = if (all(is.na(.data$load_tons))) NA_real_ else sum(.data$load_tons, na.rm = TRUE),
-        .groups = "drop"
-      ) |>
-      dplyr::mutate(facname = NA_character_, permit = NA_character_)
-    dat <- dplyr::bind_rows(dat[!ml_grp, ], ml_merged)
-  }
+  # Marine) carry an even split of one combined load across their members.
+  # Members keep their own rows, but their year/Average cells are merged and
+  # show the group's combined load (see merge_grp handling below).
+  dat <- dat |>
+    dplyr::mutate(
+      merge_grp = dplyr::if_else(.data$section == "Material Losses", .data$group_id, NA_character_)
+    )
 
   wide <- dat |>
     tidyr::pivot_wider(
-      id_cols = c("section", "entity_label", "facname", "permit"),
+      id_cols = c("section", "entity_label", "facname", "permit", "merge_grp"),
       names_from = "year",
       values_from = "load_tons"
     ) |>
@@ -289,11 +277,26 @@ show_aaloads <- function(aa_data, bay_seg, gw_data, spr_data, ad_data, yrrng = N
 
   row_idx <- 0L
   divider_idx <- integer(0)
+  merge_rows <- list()
   blocks <- list()
   for (sec in present_sections) {
     sec_rows <- wide[wide$section == sec, ] |>
-      dplyr::arrange(.data$entity_label) |>
-      dplyr::select("entity_label", dplyr::all_of(yr_cols))
+      # keeps a merge group's member rows contiguous, sorted where its first
+      # member would fall alphabetically
+      dplyr::mutate(unit = dplyr::coalesce(.data$merge_grp, paste0("row_", dplyr::row_number()))) |>
+      dplyr::mutate(sort_key = min(.data$entity_label), .by = "unit") |>
+      dplyr::arrange(.data$sort_key, .data$entity_label) |>
+      # every member row displays the group's combined load (merged below);
+      # Total Load is computed from `wide`, so the group is still counted once
+      dplyr::mutate(dplyr::across(dplyr::all_of(yr_cols), sum), .by = "unit")
+
+    grp_rle <- rle(dplyr::coalesce(sec_rows$merge_grp, ""))
+    grp_end <- cumsum(grp_rle$lengths)
+    for (k in which(grp_rle$values != "" & grp_rle$lengths > 1))
+      merge_rows[[length(merge_rows) + 1]] <-
+        row_idx + 1L + (grp_end[k] - grp_rle$lengths[k] + 1L):grp_end[k]
+
+    sec_rows <- dplyr::select(sec_rows, "entity_label", dplyr::all_of(yr_cols))
 
     if (sec == "Nonpoint Source") {
       extra <- tibble::tibble(
@@ -353,6 +356,12 @@ show_aaloads <- function(aa_data, bay_seg, gw_data, spr_data, ad_data, yrrng = N
 
   for (idx in divider_idx)
     ft <- flextable::merge_at(ft, i = idx, j = seq_len(ncol(tab)))
+
+  # merge each year/Average cell (one column at a time) across a Material
+  # Losses shared group's member rows
+  for (rows in merge_rows)
+    for (j in match(c(yr_cols, "Average"), names(tab)))
+      ft <- flextable::merge_at(ft, i = rows, j = j)
 
   ft
 
