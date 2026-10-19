@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tbeploads</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,10 +44,40 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="tbeploads-development-version">tbeploads (development version)<a class="anchor" aria-label="anchor" href="#tbeploads-development-version"></a></h2>
-<ul><li>Placeholder</li>
+<h2 class="pkg-version" data-toc-text="1.0.1" id="tbeploads-101">tbeploads 1.0.1<a class="anchor" aria-label="anchor" href="#tbeploads-101"></a></h2>
+<ul><li>Added the <code>tbmines</code> dataset of NPDES-permitted mine boundaries. <code><a href="../reference/util_nps_tbbase.html">util_nps_tbbase()</a></code> now uses it to reclassify land under an active NPDES permit to <code>CLUCSID = 22</code> so it can be excluded from NPS load estimates.</li>
+<li>
+<code>tbsoil</code> was rebuilt from the USDA SSURGO layer and now has a single <code>hydgrp</code> column for the hydrologic soil group.</li>
+<li>
+<code><a href="../reference/util_nps_tbbase.html">util_nps_tbbase()</a></code> now assigns hydrologic group D to areas with no soil classification (typically open water). These areas were previously dropped from the base layer.</li>
+<li>
+<code><a href="../reference/util_nps_tbbase.html">util_nps_tbbase()</a></code> now fills basin and jurisdiction area not covered by the land use layer (typically open bay or estuarine water) as Saltwater (FLUCCS 5400, <code>CLUCSID = 17</code>). This area was previously dropped, which inflated the share of other land uses within a basin.</li>
+<li>
+<code>tbbase</code> was rebuilt with the changes above.</li>
+<li>
+<code><a href="../reference/anlz_aa.html">anlz_aa()</a></code> now splits domestic point source load and water for Coastal subbasin 580, which straddles Boca Ciega Bay and Boca Ciega Bay South. Only 41.1% is assigned to segment 55, matching the original SAS workflow. The remaining 58.9% belongs to Boca Ciega Bay and is excluded.</li>
+<li>
+<code><a href="../reference/show_aaloads.html">show_aaloads()</a></code> now includes Boca Ciega Bay South in segment 55 when summing atmospheric deposition, groundwater, and springs loads.</li>
+<li>
+<code><a href="../reference/show_aaloads.html">show_aaloads()</a></code> now merges the year and Average cells across the member rows of Material Losses shared groups (e.g., Mosaic Big Bend, Riverview, and Tampa Marine). The merged cells show the combined group load, consistent with <code><a href="../reference/show_aaassess.html">show_aaassess()</a></code>. The group is counted once in Total Load.</li>
+<li>The Average column in <code><a href="../reference/show_aaloads.html">show_aaloads()</a></code> is now bold.</li>
+<li>
+<code><a href="../reference/util_prepverna.html">util_prepverna()</a></code> has a new <code>mincrit</code> argument (default 75). Months with an NADP <code>Criteria1</code> or <code>Criteria3</code> completeness value below <code>mincrit</code> are treated as missing before gap filling, in addition to the raw <code>-9</code> values.</li>
+<li>
+<code><a href="../reference/util_spr_getwq.html">util_spr_getwq()</a></code> has a new <code>raw</code> argument. Setting <code>raw = TRUE</code> returns the unaggregated observations instead of annual means.</li>
+<li>
+<code><a href="../reference/anlz_spr.html">anlz_spr()</a></code> now accepts a CSV of annual output from <code><a href="../reference/util_spr_getwq.html">util_spr_getwq()</a></code> for the <code>wqpth</code> argument, in addition to FDEP IWR sample data. The format is detected from the columns in the file.</li>
+<li>
+<code><a href="../reference/anlz_spr.html">anlz_spr()</a></code> now averages duplicate Buckhorn flow records when pivoting and suppresses <code>readxl</code> warnings on import.</li>
+<li>Added a link to the allocation assessment vignette on the package website.</li>
+<li>The macOS R CMD check on GitHub Actions now installs XQuartz.</li>
 </ul></div>
-  </main></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.0" id="tbeploads-100">tbeploads 1.0.0<a class="anchor" aria-label="anchor" href="#tbeploads-100"></a></h2>
+<ul><li>First release, full load estimate workflow</li>
+</ul></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
